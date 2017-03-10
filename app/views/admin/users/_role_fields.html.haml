@@ -3,9 +3,9 @@
   .input
     = f.collection_select :role_id, @roles, :id, :name, {include_blank: ""}, {class: 'large'}
 .clearfix#hospital_fields
-  = f.label :hospital_id, "Hospital"
+  = f.label :hospital_id, "Clinic"
   .input
-    = f.select :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state, @user.hospital_id), {include_blank: ""}
+    = f.select :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state_with_site_name, @user.hospital_id), {include_blank: ""}
 
 
 :javascript

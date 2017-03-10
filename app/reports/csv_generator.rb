@@ -36,7 +36,7 @@ class CsvGenerator
     CSV.generate(:col_sep => ",") do |csv|
       csv.add_row BASIC_HEADERS + question_codes
       records.each do |response|
-        basic_row_data = [response.survey.name, response.year_of_registration, response.hospital.abbrev, response.baby_code]
+        basic_row_data = [response.survey.name, response.year_of_registration, response.hospital.name, response.baby_code]
         csv.add_row basic_row_data + answers(response)
       end
     end

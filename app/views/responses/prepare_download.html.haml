@@ -16,7 +16,7 @@
         = select_tag :survey_id, options_from_collection_for_select(surveys, :id, :name, @survey_id), {class: "large", prompt: "Please select"}
         = required
     .clearfix
-      = label_tag :hospital_id, "Hospital"
+      = label_tag :hospital_id, "Clinic"
       .input
         = select_tag :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state, @hospital_id), {prompt: "ALL", class: 'large'}
         = required
