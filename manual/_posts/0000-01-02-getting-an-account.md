@@ -6,10 +6,10 @@ group: manual
 ---
 {% include JB/setup %}
 
-Before you can submit data to the ANZNN system, you need to create an account and be approved. This ensures only authorised users can submit data.
+Before you can submit data to the ANZARD system, you need to create an account and be approved. This ensures only authorised users can submit data.
 
 ## How to request an account
-Go to the ANZNN home page, and click the 'Request An Account' link in the top right corner.
+Go to the ANZARD home page, and click the 'Request An Account' link in the top right corner.
 ![Home page](/user_manual/assets/images/accounts/home.png)
 *Fig 1. Home page*
 
@@ -23,12 +23,12 @@ Once you have filled in the details, click the 'Submit Request' button. You won'
 *Fig 2. Request account page*
 
 ## What will happen afterwards
-After you request an account, your request will be reviewed by ANZNN administrators. Once approved, you will receive an email notification. Once you receive this notification you will be able to log in. 
+After you request an account, your request will be reviewed by ANZARD administrators. Once approved, you will receive an email notification. Once you receive this notification you will be able to log in. 
 
 ## How to log in
-Go to the ANZNN home page and enter your email address and the password you chose when requesting an account.
+Go to the ANZARD home page and enter your email address and the password you chose when requesting an account.
 
 ## What to do if you can't log in
-If you're having trouble logging in, you can use the 'Forgot your password?' link on the home page to create a new password. A password reset link will be sent to the email address you registered with. If you are still having difficulties, please contact ANZNN.
+If you're having trouble logging in, you can use the 'Forgot your password?' link on the home page to create a new password. A password reset link will be sent to the email address you registered with. If you are still having difficulties, please contact ANZARD.
 
   

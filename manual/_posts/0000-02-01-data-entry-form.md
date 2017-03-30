@@ -9,7 +9,7 @@ From the 'Data Entry Forms' tab on the home page, click on the 'New Data Entry F
 ![Start a new data entry form](/user_manual/assets/images/data_entry/start.png)
 *Fig 1. Starting a new data entry form*
 
-You will be asked to select the registration type, the year of registration and to enter the baby code. Once you have entered these click 'Save' to start the record. If you're unsure how to answer these questions please contact the ANZNN.
+You will be asked to select the treatment data, the year of treatment and to enter the cycle ID. Once you have entered these click 'Save' to start the record. If you're unsure how to answer these questions please contact the ANZARD.
 
 ![New data entry form](/user_manual/assets/images/data_entry/new.png)
 *Fig 2. Entering key information about the new data entry form*
@@ -50,7 +50,7 @@ The summary page shows you your progress on each of the sections, and you can cl
 *Fig 5. Summary page*
 
 ### Errors and Warnings
-Each time you save a page of answers, they will be validated against the ANZNN data requirements. Anything that has a problem is highlighted in red or orange.
+Each time you save a page of answers, they will be validated against the ANZARD data requirements. Anything that has a problem is highlighted in red or orange.
 
 * *Red* means the answer has an error and must be corrected. A message will tell you what the problem is. Any red errors must be corrected before your data can be submitted.
 * *Orange* means the answer has a warning (e.g your answer is outside the usual range for the question). You should check these carefully to ensure you haven't made a mistake. Data entry forms can be submitted with warnings, but only by a user with "Supervisor" privileges. 

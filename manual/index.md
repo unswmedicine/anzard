@@ -1,6 +1,6 @@
 ---
 layout: page
-title: ANZNN User Manual
+title: ANZARD User Manual
 ---
 {% include JB/setup %}
 
@@ -13,4 +13,3 @@ title: ANZNN User Manual
     {% include JB/pages_list %}
   </ul>
 {% endfor %}
-
