@@ -25,6 +25,7 @@ class BatchFile < ApplicationRecord
   has_many :supplementary_files
 
   has_attached_file :file, :styles => {}, :path => :make_file_path
+  do_not_validate_attachment_file_type :file
 
   before_validation :set_status
   before_destroy :delete_data_file_and_reports

@@ -17,12 +17,13 @@ class CsvGenerator
   end
 
   def csv_filename
-    name_parts = [survey.name.parameterize("_")]
+    name_parts = [survey.name.parameterize(separator: "_")]
 
     unless hospital_id.blank?
       hospital = Hospital.where(unit: hospital_id).first
       name_parts << hospital.name.parameterize("_")
     end
+    
     unless year_of_registration.blank?
       name_parts << year_of_registration
     end

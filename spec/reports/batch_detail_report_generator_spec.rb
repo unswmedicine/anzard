@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe BatchDetailReportGenerator do
 
@@ -6,7 +6,7 @@ describe BatchDetailReportGenerator do
     problems = []
     problems << ['B1', 'C1', 'Err', '2', 'Hello']
     problems << ['B1', 'C2', 'Warn', 'asdf', 'Msg']
-    organiser = mock
+    organiser = double
     organiser.should_receive(:detailed_problems).and_return(problems)
     
     BatchDetailReportGenerator.generate_report(organiser, Rails.root.join("tmp/details.csv"))

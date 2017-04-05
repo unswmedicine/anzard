@@ -56,9 +56,9 @@ Anznn::Application.routes.draw do
           put :deactivate
           put :activate
           get :edit_role
-          put :update_role
+          patch :update_role
           get :edit_approval
-          put :approve
+          patch :approve
 
         end
       end

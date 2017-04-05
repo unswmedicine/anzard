@@ -4,7 +4,7 @@ class StatsReport
 
   def initialize(survey)
     self.survey = survey
-    self.counts = Response.count(conditions: {survey_id: survey.id}, group: [:year_of_registration, :submitted_status, :hospital_id])
+    self.counts = Response.where(survey_id: survey.id).group(:year_of_registration, :submitted_status, :hospital_id).count
     self.years = Response.for_survey(survey).select("distinct year_of_registration").collect(&:year_of_registration).sort
   end
 

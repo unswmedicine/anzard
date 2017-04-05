@@ -51,4 +51,11 @@ class BatchFilesController < ApplicationController
     raise "No detail report for batch file" unless @batch_file.has_detail_report?
     send_file @batch_file.detail_report_path, :type => 'text/csv', :disposition => 'attachment', :filename => "detail-report.csv"
   end
+
+  private
+
+  def create_params
+    params.require(:batch_file).permit(:survey_id, :year_of_registration, :file, :supplementary_files)
+  end
+
 end

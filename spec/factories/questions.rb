@@ -7,7 +7,7 @@ FactoryGirl.define do
     association :section
     question_type "Text"
     code "What"
-    after_create do |survey|
+    after(:create) do |survey|
       StaticModelPreloader.load
     end
   end

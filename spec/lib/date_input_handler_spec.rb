@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe DateInputHandler do
 
@@ -76,21 +76,21 @@ describe DateInputHandler do
 
   describe "Refuses to handle other types of input" do
     it "should throw an error on other types" do
-      lambda { DateInputHandler.new(123) }.should raise_error
+      lambda { DateInputHandler.new(123) }.should raise_error("DateInputHandler can only handle String, Hash and Date input")
     end
   end
 
   describe "Refuses to answer to_raw if valid" do
     it "should throw an error" do
       dih = DateInputHandler.new("2012-12-22")
-      lambda { dih.to_raw }.should raise_error
+      lambda { dih.to_raw }.should raise_error("Date is valid, cannot call to_raw, you should check valid? first")
     end
   end
 
   describe "Refuses to answer to_date if invalid" do
     it "should throw an error" do
       dih = DateInputHandler.new("asdf")
-      lambda { dih.to_date }.should raise_error
+      lambda { dih.to_date }.should raise_error("Date is not valid, cannot call to_date, you should check valid? first")
     end
   end
 

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 include CsvSurveyOperations
 
 describe BatchFile do
@@ -8,8 +8,8 @@ describe BatchFile do
     cross_question_validations_file = Rails.root.join 'test_data/survey', 'cross_question_validations.csv'
     create_survey("some_name", question_file, options_file, cross_question_validations_file)
   end
-  let(:user) { Factory(:user) }
-  let(:hospital) { Factory(:hospital) }
+  let(:user) { create(:user) }
+  let(:hospital) { create(:hospital) }
 
   describe "Associations" do
     it { should belong_to(:user) }
@@ -27,11 +27,11 @@ describe BatchFile do
   describe "Scopes" do
     describe "Failed" do
       it "should only include failed batches" do
-        d1 = Factory(:batch_file, status: BatchFile::STATUS_FAILED)
-        Factory(:batch_file, status: BatchFile::STATUS_SUCCESS)
-        Factory(:batch_file, status: BatchFile::STATUS_REVIEW)
-        Factory(:batch_file, status: BatchFile::STATUS_IN_PROGRESS)
-        d5 = Factory(:batch_file, status: BatchFile::STATUS_FAILED)
+        d1 = create(:batch_file, status: BatchFile::STATUS_FAILED)
+        create(:batch_file, status: BatchFile::STATUS_SUCCESS)
+        create(:batch_file, status: BatchFile::STATUS_REVIEW)
+        create(:batch_file, status: BatchFile::STATUS_IN_PROGRESS)
+        d5 = create(:batch_file, status: BatchFile::STATUS_FAILED)
         BatchFile.failed.collect(&:id).sort.should eq([d1.id, d5.id])
       end
     end
@@ -39,12 +39,12 @@ describe BatchFile do
     describe "Older than" do
       it "should only return files older than the specified date" do
         time = Time.new(2011, 4, 14, 0, 30)
-        d1 = Factory(:batch_file, updated_at: Time.new(2011, 4, 14, 1, 2))
-        d2 = Factory(:batch_file, updated_at: Time.new(2011, 4, 13, 23, 59))
-        d3 = Factory(:batch_file, updated_at: Time.new(2011, 4, 14, 0, 30))
-        d4 = Factory(:batch_file, updated_at: Time.new(2011, 1, 1, 14, 24))
-        d5 = Factory(:batch_file, updated_at: Time.new(2011, 4, 15, 0, 0))
-        d6 = Factory(:batch_file, updated_at: Time.new(2011, 5, 15, 0, 0))
+        d1 = create(:batch_file, updated_at: Time.new(2011, 4, 14, 1, 2))
+        d2 = create(:batch_file, updated_at: Time.new(2011, 4, 13, 23, 59))
+        d3 = create(:batch_file, updated_at: Time.new(2011, 4, 14, 0, 30))
+        d4 = create(:batch_file, updated_at: Time.new(2011, 1, 1, 14, 24))
+        d5 = create(:batch_file, updated_at: Time.new(2011, 4, 15, 0, 0))
+        d6 = create(:batch_file, updated_at: Time.new(2011, 5, 15, 0, 0))
         BatchFile.older_than(time).collect(&:id).should eq([d2.id, d4.id])
       end
     end
@@ -52,11 +52,11 @@ describe BatchFile do
 
   describe "New object should have status set to 'In Progress'" do
     it "Should set the status on a new object" do
-      Factory(:batch_file).status.should eq("In Progress")
+      create(:batch_file).status.should eq("In Progress")
     end
 
     it "Shouldn't update status if already set" do
-      Factory(:batch_file, status: "Mine").status.should eq("Mine")
+      create(:batch_file, status: "Mine").status.should eq("Mine")
     end
   end
 
@@ -81,13 +81,21 @@ describe BatchFile do
       [BatchFile::STATUS_FAILED, BatchFile::STATUS_SUCCESS, BatchFile::STATUS_IN_PROGRESS].each do |status|
         batch_file.stub(:status) { status }
 
-        expect { batch_file.process }.should raise_error
-        expect { batch_file.process(:force) }.should raise_error
+        if status == BatchFile::STATUS_IN_PROGRESS
+          # Batch process explicitly raises error unless status is in progress. When in progress, this will raise
+          #  type error due to no file being attached to the batch file object
+          expect { batch_file.process }.to raise_error('no implicit conversion of nil into String')
+          expect { batch_file.process(:force) }.to raise_error('no implicit conversion of nil into String')
+        else
+          expect { batch_file.process }.to raise_error("Batch has already been processed, cannot reprocess")
+          expect { batch_file.process(:force) }.to raise_error("Batch has already been processed, cannot reprocess")
+        end
+
       end
     end
     it "should needs_review" do
       batch_file.stub(:status) { BatchFile::STATUS_REVIEW }
-      expect { batch_file.process }.should raise_error
+      expect { batch_file.process }.to raise_error("Batch has already been processed, cannot reprocess")
     end
   end
 
@@ -178,12 +186,12 @@ describe BatchFile do
         answer_hash["Choice"].choice_answer.should == "0"
         answer_hash["Decimal"].decimal_answer.should == 56.77
         answer_hash["Integer"].integer_answer.should == 10
-        Answer.all.each { |a| a.has_fatal_warning?.should be_false }
-        Answer.all.each { |a| a.has_warning?.should be_false }
+        Answer.all.each { |a| a.has_fatal_warning?.should be false }
+        Answer.all.each { |a| a.has_warning?.should be false }
         batch_file.record_count.should == 3
                                    # summary report should exist but not detail report
         batch_file.summary_report_path.should_not be_nil
-        File.exist?(batch_file.summary_report_path).should be_true
+        File.exist?(batch_file.summary_report_path).should be true
         batch_file.detail_report_path.should be_nil
       end
 
@@ -216,12 +224,12 @@ describe BatchFile do
         answer_hash["Choice"].choice_answer.should == "0"
         answer_hash["Decimal"].decimal_answer.should == 56.77
         answer_hash["Integer"].integer_answer.should == 10
-        Answer.all.each { |a| a.has_fatal_warning?.should be_false }
-        Answer.all.each { |a| a.has_warning?.should be_false }
+        Answer.all.each { |a| a.has_fatal_warning?.should be false }
+        Answer.all.each { |a| a.has_warning?.should be false }
         batch_file.record_count.should == 3
                                    # summary report should exist but not detail report
         batch_file.summary_report_path.should_not be_nil
-        File.exist?(batch_file.summary_report_path).should be_true
+        File.exist?(batch_file.summary_report_path).should be true
         batch_file.detail_report_path.should be_nil
       end
     end
@@ -353,7 +361,7 @@ describe BatchFile do
       end
 
       it "should reject records where the baby code is already in the system" do
-        Factory(:response, survey: survey, baby_code: "B2")
+        create(:response, survey: survey, baby_code: "B2")
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -362,7 +370,7 @@ describe BatchFile do
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
         batch_file.detail_report_path.should_not be_nil
-        File.exist?(batch_file.summary_report_path).should be_true
+        File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
@@ -372,7 +380,7 @@ describe BatchFile do
       end
 
       it "should reject records where the baby code is already in the system even with whitespace padding" do
-        Factory(:response, survey: survey, baby_code: "B2")
+        create(:response, survey: survey, baby_code: "B2")
         batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -381,7 +389,7 @@ describe BatchFile do
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
         batch_file.detail_report_path.should_not be_nil
-        File.exist?(batch_file.summary_report_path).should be_true
+        File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
@@ -391,7 +399,7 @@ describe BatchFile do
       end
 
       it "can detect both duplicate baby code and other errors on the same record" do
-        Factory(:response, survey: survey, baby_code: "B2")
+        create(:response, survey: survey, baby_code: "B2")
         batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -400,7 +408,7 @@ describe BatchFile do
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
         batch_file.detail_report_path.should_not be_nil
-        File.exist?(batch_file.summary_report_path).should be_true
+        File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
@@ -507,7 +515,7 @@ describe BatchFile do
         batch_file.problem_record_count.should == 1
         batch_file.summary_report_path.should_not be_nil
         batch_file.detail_report_path.should_not be_nil
-        File.exist?(batch_file.summary_report_path).should be_true
+        File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
@@ -541,7 +549,7 @@ describe BatchFile do
         rows[5].should eq(['B2', 'Time', 'Error', 'ab:59', 'Answer is invalid (must be a valid time)'])
         rows[6].should eq(['B3', 'Date1', 'Warning', '2010-05-29', 'D1 must be >= D2'])
 
-        File.exist?(batch_file.summary_report_path).should be_true
+        File.exist?(batch_file.summary_report_path).should be true
       end
     end
 
@@ -641,14 +649,14 @@ describe BatchFile do
       summary_path.should_not be_nil
       detail_path.should_not be_nil
 
-      File.exist?(path).should be_true
-      File.exist?(summary_path).should be_true
-      File.exist?(detail_path).should be_true
+      File.exist?(path).should be true
+      File.exist?(summary_path).should be true
+      File.exist?(detail_path).should be true
 
       batch_file.destroy
-      File.exist?(path).should be_false
-      File.exist?(summary_path).should be_false
-      File.exist?(detail_path).should be_false
+      File.exist?(path).should be false
+      File.exist?(summary_path).should be false
+      File.exist?(detail_path).should be false
     end
   end
 

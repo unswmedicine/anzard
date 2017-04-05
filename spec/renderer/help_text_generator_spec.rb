@@ -1,10 +1,10 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe HelpTextGenerator do
   describe "Generating format hint for display" do
     it "should return nil for Date, Time and Choice type questions" do
       [Question::TYPE_DATE, Question::TYPE_TIME, Question::TYPE_CHOICE].each do |type|
-        q = Factory(:question, question_type: type)
+        q = create(:question, question_type: type)
         HelpTextGenerator.new(q).help_text.should be_nil
       end
     end
@@ -78,6 +78,6 @@ describe HelpTextGenerator do
 end
 
 def help_text(question_attrs)
-  q = Factory(:question, question_attrs)
+  q = create(:question, question_attrs)
   HelpTextGenerator.new(q).help_text
 end

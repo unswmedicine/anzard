@@ -1,8 +1,8 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe BatchFileCleaner do
   it "deletes old failed batch files" do
-    batch_file = Factory :batch_file, status: BatchFile::STATUS_FAILED, updated_at: 35.days.ago
+    batch_file = create :batch_file, status: BatchFile::STATUS_FAILED, updated_at: 35.days.ago
 
     lambda do
       subject.delete_old_files
@@ -10,7 +10,7 @@ describe BatchFileCleaner do
   end
 
   it "does not delete old 'non failed' files" do
-    batch_file = Factory :batch_file, status: BatchFile::STATUS_SUCCESS, updated_at: 35.days.ago
+    batch_file = create :batch_file, status: BatchFile::STATUS_SUCCESS, updated_at: 35.days.ago
 
     lambda do
       subject.delete_old_files
@@ -18,7 +18,7 @@ describe BatchFileCleaner do
   end
 
   it "does not delete recent failed files" do
-    batch_file = Factory :batch_file, status: BatchFile::STATUS_FAILED, updated_at: 25.days.ago
+    batch_file = create :batch_file, status: BatchFile::STATUS_FAILED, updated_at: 25.days.ago
 
     lambda do
       subject.delete_old_files

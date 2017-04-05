@@ -1,9 +1,9 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe NumberRangeValidator do
 
   describe "Validating a range with an unknown value" do
-    let(:question) { Factory(:question, number_min: 5, number_max: 15, number_unknown: 99) }
+    let(:question) { create(:question, number_min: 5, number_max: 15, number_unknown: 99) }
 
     it "should return true if in range" do
       NumberRangeValidator.validate(question, 5).should eq([true, nil])
@@ -26,7 +26,7 @@ describe NumberRangeValidator do
   end
 
   describe "Validating a range without an unknown value" do
-    let(:question) { Factory(:question, number_min: 5, number_max: 15, number_unknown: nil) }
+    let(:question) { create(:question, number_min: 5, number_max: 15, number_unknown: nil) }
 
     it "should return true if in range" do
       NumberRangeValidator.validate(question, 5).should eq([true, nil])
@@ -45,7 +45,7 @@ describe NumberRangeValidator do
   end
 
   describe "Validating min only with an unknown value" do
-    let(:question) { Factory(:question, number_min: 5, number_max: nil, number_unknown: 1) }
+    let(:question) { create(:question, number_min: 5, number_max: nil, number_unknown: 1) }
 
     it "should return true if in range" do
       NumberRangeValidator.validate(question, 5).should eq([true, nil])
@@ -66,7 +66,7 @@ describe NumberRangeValidator do
   end
 
   describe "Validating min only without an unknown value" do
-    let(:question) { Factory(:question, number_min: 5, number_max: nil, number_unknown: nil) }
+    let(:question) { create(:question, number_min: 5, number_max: nil, number_unknown: nil) }
 
     it "should return true if in range" do
       NumberRangeValidator.validate(question, 5).should eq([true, nil])
@@ -83,7 +83,7 @@ describe NumberRangeValidator do
   end
 
   describe "Validating max only with an unknown value" do
-    let(:question) { Factory(:question, number_min: nil, number_max: 15, number_unknown: 1) }
+    let(:question) { create(:question, number_min: nil, number_max: 15, number_unknown: 1) }
 
     it "should return true if in range" do
       NumberRangeValidator.validate(question, 5).should eq([true, nil])
@@ -104,7 +104,7 @@ describe NumberRangeValidator do
   end
 
   describe "Validating max only without an unknown value" do
-    let(:question) { Factory(:question, number_min: nil, number_max: 15, number_unknown: nil) }
+    let(:question) { create(:question, number_min: nil, number_max: 15, number_unknown: nil) }
 
     it "should return true if in range" do
       NumberRangeValidator.validate(question, 5).should eq([true, nil])
@@ -122,14 +122,14 @@ describe NumberRangeValidator do
 
   describe "Validating on a question with no range" do
     it "should always return true" do
-      question = Factory(:question, number_min: nil, number_max: nil)
+      question = create(:question, number_min: nil, number_max: nil)
       NumberRangeValidator.validate(question, 2344).should eq([true, nil])
     end
   end
 
   describe "Validating a nil answer" do
     it "should always return true" do
-      question = Factory(:question, number_min: 1, number_max: 5)
+      question = create(:question, number_min: 1, number_max: 5)
       #nil does not produce an error
       NumberRangeValidator.validate(question, nil).should eq([true, nil])
     end

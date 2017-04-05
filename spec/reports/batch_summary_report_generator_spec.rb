@@ -1,12 +1,12 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe BatchSummaryReportGenerator do
 
   it "should create a pdf in the specified path" do
-    batch_file = Factory(:batch_file)
-    organiser = mock
+    batch_file = create(:batch_file)
+    organiser = double
     organiser.should_receive(:aggregated_by_question_and_message).and_return([["row1", "row1"], ["row2", "row2"]])
     BatchSummaryReportGenerator.generate_report(batch_file, organiser, Rails.root.join("tmp/summary.pdf"))
-    File.exist?("tmp/summary.pdf").should be_true
+    File.exist?("tmp/summary.pdf").should be true
   end
 end

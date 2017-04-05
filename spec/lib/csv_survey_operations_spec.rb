@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 include CsvSurveyOperations
 
@@ -78,12 +78,12 @@ describe CsvSurveyOperations do
     end
 
     before :each do
-      @survey = Factory :survey
-      @section = Factory :section, survey: @survey
+      @survey = create :survey
+      @section = create :section, survey: @survey
       @error_message = 'q2 was date, q1 was not expected constant (-1)'
-      @q1 = Factory :question, section: @section, question_type: 'Integer', code: "q1"
-      @q2 = Factory :question, section: @section, question_type: 'Integer', code: "q2"
-      @q3 = Factory :question, section: @section, question_type: 'Integer', code: "q3"
+      @q1 = create :question, section: @section, question_type: 'Integer', code: "q1"
+      @q2 = create :question, section: @section, question_type: 'Integer', code: "q2"
+      @q3 = create :question, section: @section, question_type: 'Integer', code: "q3"
 
       @multi_related_hash = {"related_question_list" => "q2, q3",
                              "rule" => "multi_hours_date_to_date",
@@ -101,13 +101,13 @@ describe CsvSurveyOperations do
 
     end
     it 'should accept if it can map question lists to questions' do
-      run_make_cqv_test(@survey, @multi_related_hash).should be_true
+      run_make_cqv_test(@survey, @multi_related_hash).should be true
     end
 
     it 'should reject if it can\'t map question lists to questions' do
       new_hash = @multi_related_hash
       new_hash['related_question_list'] = "q2, q3, q4"
-      run_make_cqv_test(@survey, new_hash).should be_false
+      run_make_cqv_test(@survey, new_hash).should be false
     end
 
 
@@ -125,12 +125,12 @@ describe CsvSurveyOperations do
     end
 
     before :each do
-      @survey = Factory :survey
-      @section = Factory :section, survey: @survey
+      @survey = create :survey
+      @section = create :section, survey: @survey
       @error_message = 'q2 was date, q1 was not expected constant (-1)'
-      @q1 = Factory :question, section: @section, question_type: 'Integer', code: "q1"
-      @q2 = Factory :question, section: @section, question_type: 'Integer', code: "q2"
-      @q3 = Factory :question, section: @section, question_type: 'Integer', code: "q3"
+      @q1 = create :question, section: @section, question_type: 'Integer', code: "q1"
+      @q2 = create :question, section: @section, question_type: 'Integer', code: "q2"
+      @q3 = create :question, section: @section, question_type: 'Integer', code: "q3"
 
       @hashes = []
 

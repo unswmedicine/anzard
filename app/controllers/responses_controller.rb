@@ -232,4 +232,8 @@ class ResponsesController < ApplicationController
     response.answers.each { |a| a.response = response }
   end
 
+  def create_params
+    params.require(:response).permit(:year_of_registration, :survey_id, :baby_code)
+  end
+
 end

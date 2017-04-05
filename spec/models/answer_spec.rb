@@ -1,36 +1,37 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Answer do
-  let(:response) { Factory(:response) }
-  let(:text_question) { Factory(:question, question_type: Question::TYPE_TEXT) }
-  let(:integer_question) { Factory(:question, question_type: Question::TYPE_INTEGER) }
-  let(:decimal_question) { Factory(:question, question_type: Question::TYPE_DECIMAL) }
-  let(:date_question) { Factory(:question, question_type: Question::TYPE_DATE) }
-  let(:time_question) { Factory(:question, question_type: Question::TYPE_TIME) }
+  let(:response) { create(:response) }
+  let(:text_question) { create(:question, question_type: Question::TYPE_TEXT) }
+  let(:integer_question) { create(:question, question_type: Question::TYPE_INTEGER) }
+  let(:decimal_question) { create(:question, question_type: Question::TYPE_DECIMAL) }
+  let(:date_question) { create(:question, question_type: Question::TYPE_DATE) }
+  let(:time_question) { create(:question, question_type: Question::TYPE_TIME) }
   let(:choice_question) do
-    cq = Factory(:question, question_type: Question::TYPE_CHOICE)
-    Factory(:question_option, question: cq, option_value: '0', label: 'Dog')
-    Factory(:question_option, question: cq, option_value: '1', label: 'Cat')
-    Factory(:question_option, question: cq, option_value: '99', label: 'Apple')
+    cq = create(:question, question_type: Question::TYPE_CHOICE)
+    create(:question_option, question: cq, option_value: '0', label: 'Dog')
+    create(:question_option, question: cq, option_value: '1', label: 'Cat')
+    create(:question_option, question: cq, option_value: '99', label: 'Apple')
     cq
   end
 
   describe "Associations" do
     it { should belong_to :response }
   end
+
   describe "Validations" do
     it { should validate_presence_of :question_id }
     it { should validate_presence_of :response }
   end
 
   describe "Validating for warnings" do
-    let(:text_answer) { Factory(:answer, question: text_question, answer_value: "blah") }
-    let(:integer_answer) { Factory(:answer, question: integer_question, answer_value: 34) }
-    let(:decimal_answer) { Factory(:answer, question: decimal_question, answer_value: 1.13) }
+    let(:text_answer) { create(:answer, question: text_question, answer_value: "blah") }
+    let(:integer_answer) { create(:answer, question: integer_question, answer_value: 34) }
+    let(:decimal_answer) { create(:answer, question: decimal_question, answer_value: 1.13) }
 
     describe "Should call the string length validator if question type is text" do
       it "should record the warning if validation fails" do
-        StringLengthValidator.should_receive(:validate).twice.with(text_question, "blah").and_return([false, "My string warning"])
+        expect(StringLengthValidator).to receive(:validate).twice.with(text_question, "blah").and_return([false, "My string warning"])
         text_answer.has_warning?.should eq true
         text_answer.warnings.should eq ["My string warning"]
         text_answer.fatal_warnings.should eq []
@@ -58,7 +59,7 @@ describe Answer do
     describe "Cross-question validation" do
       it "should record the warning if validation fails" do
         CrossQuestionValidation.should_receive(:check).twice.and_return(['error1', 'error2'])
-        answer = Factory(:answer)
+        answer = create(:answer)
 
         answer.should have_warning
         answer.warnings.should eq ["error1", "error2"]
@@ -68,11 +69,11 @@ describe Answer do
 
     describe "Validating that choice answers are one of the allowed values" do
       it "should pass when value is allowed" do
-        answer = Factory(:answer, question: choice_question, answer_value: "99")
+        answer = create(:answer, question: choice_question, answer_value: "99")
         answer.should_not have_warning
       end
       it "should fail when value is not allowed" do
-        answer = Factory(:answer, question: choice_question, answer_value: "98")
+        answer = create(:answer, question: choice_question, answer_value: "98")
         answer.fatal_warnings.should eq(['Answer must be one of ["0", "1", "99"]'])
         answer.should have_warning
       end
@@ -82,29 +83,29 @@ describe Answer do
   describe "comparable_answer should always return answers that can be compared using standard operators (<, >, ==, != etc)" do
     describe "answer_with_offset" do
       it "should return a comparable answer with an added offset" do
-        q_choice = Factory(:answer, question: choice_question, answer_value: "98")
-        q_dec = Factory(:answer, question: decimal_question, answer_value: "98")
-        q_s = Factory(:answer, question: text_question, answer_value: "98")
-        q_s2 = Factory(:answer, question: text_question, answer_value: "98")
-        q_i = Factory(:answer, question: integer_question, answer_value: "98")
-        q_date = Factory(:answer, question: date_question, answer_value: Date.today)
-        q_time = Factory(:answer, question: time_question, answer_value: Time.now)
+        q_choice = create(:answer, question: choice_question, answer_value: "98")
+        q_dec = create(:answer, question: decimal_question, answer_value: "98")
+        q_s = create(:answer, question: text_question, answer_value: "98")
+        q_s2 = create(:answer, question: text_question, answer_value: "98")
+        q_i = create(:answer, question: integer_question, answer_value: "98")
+        q_date = create(:answer, question: date_question, answer_value: Date.today)
+        q_time = create(:answer, question: time_question, answer_value: Time.now)
 
         #some select cases. the key thing is that they don't explode (but the logic should also never break)
-        (q_choice.answer_with_offset(-1) < q_i.answer_with_offset(0)).should be_true
-        (q_choice.answer_with_offset(-1) > q_i.answer_with_offset(0)).should be_false
-        (q_choice.answer_with_offset(-1) < q_dec.answer_with_offset(0)).should be_true
-        (q_choice.answer_with_offset(-1) > q_dec.answer_with_offset(0)).should be_false
+        (q_choice.answer_with_offset(-1) < q_i.answer_with_offset(0)).should be true
+        (q_choice.answer_with_offset(-1) > q_i.answer_with_offset(0)).should be false
+        (q_choice.answer_with_offset(-1) < q_dec.answer_with_offset(0)).should be true
+        (q_choice.answer_with_offset(-1) > q_dec.answer_with_offset(0)).should be false
 
         #offsets ignored for strings
-        (q_s.answer_with_offset(45345) == q_s2.answer_with_offset(-2342323)).should be_true
-        (q_s.answer_with_offset(45345) != q_s2.answer_with_offset(-2342323)).should be_false
+        (q_s.answer_with_offset(45345) == q_s2.answer_with_offset(-2342323)).should be true
+        (q_s.answer_with_offset(45345) != q_s2.answer_with_offset(-2342323)).should be false
 
-        (q_date.answer_with_offset(1) > q_date.answer_with_offset(0)).should be_true
-        (q_date.answer_with_offset(1) < q_date.answer_with_offset(0)).should be_false
+        (q_date.answer_with_offset(1) > q_date.answer_with_offset(0)).should be true
+        (q_date.answer_with_offset(1) < q_date.answer_with_offset(0)).should be false
 
-        (q_time.answer_with_offset(1) > q_time.answer_with_offset(0)).should be_true
-        (q_time.answer_with_offset(1) < q_time.answer_with_offset(0)).should be_false
+        (q_time.answer_with_offset(1) > q_time.answer_with_offset(0)).should be true
+        (q_time.answer_with_offset(1) < q_time.answer_with_offset(0)).should be false
       end
 
     end
@@ -131,28 +132,28 @@ describe Answer do
       it "saves invalid input as 'raw input' and has a warning" do
         a = Answer.new(question: decimal_question)
         a.answer_value = '1.23f'
-        a.decimal_answer.should be_false
+        a.decimal_answer.should be nil
         a.raw_answer.should eq '1.23f'
-        a.has_warning?.should be_true
+        a.has_warning?.should be true
 
       end
       # The answer record should be culled if it becomes empty, but if it gets left behind it should be blank.
       it "nils out on empty string" do
-        a = Factory(:answer, question: decimal_question, decimal_answer: 1.23)
+        a = create(:answer, question: decimal_question, decimal_answer: 1.23)
         a.decimal_answer.should eq 1.23
 
         a.answer_value = ''
-        a.decimal_answer.should be_false
-        a.raw_answer.should be_false
+        a.decimal_answer.should be nil
+        a.raw_answer.should be nil
       end
       it "does not nil out on invalid input, and has a warning" do
-        a = Factory(:answer, question: decimal_question, decimal_answer: 1.23)
+        a = create(:answer, question: decimal_question, decimal_answer: 1.23)
         a.decimal_answer.should eq 1.23
 
         a.answer_value = 'garbage'
-        a.decimal_answer.should be_false
+        a.decimal_answer.should be nil
         a.raw_answer.should eq 'garbage'
-        a.has_warning?.should be_true
+        a.has_warning?.should be true
 
       end
     end
@@ -167,26 +168,26 @@ describe Answer do
         a = Answer.new(question: integer_question)
         a.answer_value = '1234d'
         a.raw_answer.should eq '1234d'
-        a.has_warning?.should be_true
+        a.has_warning?.should be true
 
       end
       it "nils out on empty string" do
-        a = Factory(:answer, question: integer_question, integer_answer: 123)
+        a = create(:answer, question: integer_question, integer_answer: 123)
         a.integer_answer.should eq 123
 
         a.answer_value = ''
-        a.integer_answer.should be_false
-        a.raw_answer.should be_false
+        a.integer_answer.should be nil
+        a.raw_answer.should be nil
       end
       # The answer record should be culled if it becomes empty, but if it gets left behind it should be blank.
       it "does not nil out on invalid input and shows a warning" do
-        a = Factory(:answer, question: integer_question, integer_answer: 123)
+        a = create(:answer, question: integer_question, integer_answer: 123)
         a.integer_answer.should eq 123
 
         a.answer_value = 'garbage'
-        a.integer_answer.should be_false
+        a.integer_answer.should be nil
         a.raw_answer.should eq 'garbage'
-        a.has_warning?.should be_true
+        a.has_warning?.should be true
 
       end
     end
@@ -194,21 +195,21 @@ describe Answer do
     describe "For date questions, should delegate to DateInputHandler to process the input" do
       it "should set the date answer if the input is valid" do
         date = Date.today
-        mock_ih = mock('mock input handler')
+        mock_ih = double('mock input handler')
         DateInputHandler.should_receive(:new).and_return(mock_ih)
         mock_ih.should_receive(:valid?).and_return(true)
         mock_ih.should_receive(:to_date).and_return(date)
-        a = Factory(:answer, question: date_question, answer_value: "abc")
+        a = create(:answer, question: date_question, answer_value: "abc")
         a.date_answer.should be(date)
         a.raw_answer.should be_nil
       end
 
       it "should set the raw answer if the input is invalid" do
-        mock_ih = mock('mock input handler')
+        mock_ih = double('mock input handler')
         DateInputHandler.should_receive(:new).and_return(mock_ih)
         mock_ih.should_receive(:valid?).and_return(false)
         mock_ih.should_receive(:to_raw).and_return("blah")
-        a = Factory(:answer, question: date_question, answer_value: "abc")
+        a = create(:answer, question: date_question, answer_value: "abc")
         a.date_answer.should be_nil
         a.raw_answer.should eq("blah")
       end
@@ -216,22 +217,22 @@ describe Answer do
 
     describe "For time questions, should delegate to TimeInputHandler to process the input" do
       it "should set the time answer if the input is valid" do
-        time = Time.now
-        mock_ih = mock('mock input handler')
+        time = Time.now.utc
+        mock_ih = double('mock input handler')
         TimeInputHandler.should_receive(:new).and_return(mock_ih)
         mock_ih.should_receive(:valid?).and_return(true)
         mock_ih.should_receive(:to_time).and_return(time)
-        a = Factory(:answer, question: time_question, answer_value: "abc")
+        a = build(:answer, question: time_question, answer_value: "abc")
         a.time_answer.should be(time)
         a.raw_answer.should be_nil
       end
 
       it "should set the raw answer if the input is invalid" do
-        mock_ih = mock('mock input handler')
+        mock_ih = double('mock input handler')
         TimeInputHandler.should_receive(:new).and_return(mock_ih)
         mock_ih.should_receive(:valid?).and_return(false)
         mock_ih.should_receive(:to_raw).and_return("blah")
-        a = Factory(:answer, question: time_question, answer_value: "abc")
+        a = create(:answer, question: time_question, answer_value: "abc")
         a.time_answer.should be_nil
         a.raw_answer.should eq("blah")
       end
@@ -281,7 +282,7 @@ describe Answer do
       a = Answer.create!(response: response, question: date_question, answer_value: "blah")
       a.reload
       a.answer_value.should eq("blah")
-      a.has_warning?.should be_true
+      a.has_warning?.should be true
       a.fatal_warnings.should eq(["Answer is invalid (must be a valid date)"])
     end
 
@@ -291,7 +292,7 @@ describe Answer do
       a = Answer.create!(response: response, question: date_question, answer_value: date_a_s_hash)
       a.reload
       a.answer_value.should eq(date_hash)
-      a.has_warning?.should be_true
+      a.has_warning?.should be true
       a.fatal_warnings.should eq(["Answer is invalid (Provided date does not exist)"])
     end
 
@@ -301,7 +302,7 @@ describe Answer do
       a = Answer.create!(response: response, question: date_question, answer_value: date_a_s_hash)
       a.reload
       a.answer_value.should eq(date_hash)
-      a.has_warning?.should be_true
+      a.has_warning?.should be true
       a.fatal_warnings.should eq(["Answer is incomplete (one or more fields left blank)"])
     end
 
@@ -309,7 +310,7 @@ describe Answer do
       a = Answer.create!(response: response, question: time_question, answer_value: "ab:11")
       a.reload
       a.answer_value.should eq("ab:11")
-      a.has_warning?.should be_true
+      a.has_warning?.should be true
       a.fatal_warnings.should eq(["Answer is invalid (must be a valid time)"])
     end
 
@@ -319,7 +320,7 @@ describe Answer do
       a = Answer.create!(response: response, question: time_question, answer_value: time_a_s_hash)
       a.reload
       a.answer_value.should eq(time_hash)
-      a.has_warning?.should be_true
+      a.has_warning?.should be true
       a.fatal_warnings.should eq(["Answer is incomplete (a field was left blank)"])
     end
 
@@ -337,7 +338,7 @@ describe Answer do
       a = Answer.new(response: response, question: integer_question, answer_value: input)
       a.save!; b = Answer.find(a.id); a = b
       a.answer_value.should eq(input)
-      a.has_warning?.should be_true
+      a.has_warning?.should be true
     end
 
     it "invalid decimal" do
@@ -345,7 +346,7 @@ describe Answer do
       a = Answer.new(response: response, question: decimal_question, answer_value: input)
       a.save!; b = Answer.find(a.id); a = b
       a.answer_value.should eq(input)
-      a.has_warning?.should be_true
+      a.has_warning?.should be true
     end
 
   end
@@ -353,15 +354,15 @@ describe Answer do
   describe "Formatting an answer for display" do
 
     it "should handle each of the data types correctly" do
-      Factory(:answer, question: text_question, answer_value: "blah").format_for_display.should eq("blah")
-      Factory(:answer, question: integer_question, answer_value: "14").format_for_display.should eq("14")
-      Factory(:answer, question: decimal_question, answer_value: "14").format_for_display.should eq("14.0")
-      Factory(:answer, question: decimal_question, answer_value: "22.5").format_for_display.should eq("22.5")
-      Factory(:answer, question: decimal_question, answer_value: "22.59").format_for_display.should eq("22.59")
-      Factory(:answer, question: date_question, answer_value: PartialDateTimeHash.new({day: 31, month: 12, year: 2011})).format_for_display.should eq("31/12/2011")
-      Factory(:answer, question: time_question, answer_value: PartialDateTimeHash.new({hour: 18, min: 6})).format_for_display.should eq("18:06")
+      create(:answer, question: text_question, answer_value: "blah").format_for_display.should eq("blah")
+      create(:answer, question: integer_question, answer_value: "14").format_for_display.should eq("14")
+      create(:answer, question: decimal_question, answer_value: "14").format_for_display.should eq("14.0")
+      create(:answer, question: decimal_question, answer_value: "22.5").format_for_display.should eq("22.5")
+      create(:answer, question: decimal_question, answer_value: "22.59").format_for_display.should eq("22.59")
+      create(:answer, question: date_question, answer_value: PartialDateTimeHash.new({day: 31, month: 12, year: 2011})).format_for_display.should eq("31/12/2011")
+      create(:answer, question: time_question, answer_value: PartialDateTimeHash.new({hour: 18, min: 6})).format_for_display.should eq("18:06")
 
-      Factory(:answer, question: choice_question, answer_value: "99").format_for_display.should eq("(99) Apple")
+      create(:answer, question: choice_question, answer_value: "99").format_for_display.should eq("(99) Apple")
     end
 
     it "should handle answers that are not filled out yet" do
@@ -389,14 +390,14 @@ describe Answer do
   describe "Formatting an answer for batch file detail report" do
 
     it "should handle each of the data types correctly" do
-      Factory(:answer, question: text_question, answer_value: "blah").format_for_csv.should eq("blah")
-      Factory(:answer, question: integer_question, answer_value: "14").format_for_csv.should eq("14")
-      Factory(:answer, question: decimal_question, answer_value: "14").format_for_csv.should eq("14.0")
-      Factory(:answer, question: decimal_question, answer_value: "22.5").format_for_csv.should eq("22.5")
-      Factory(:answer, question: decimal_question, answer_value: "22.59").format_for_csv.should eq("22.59")
-      Factory(:answer, question: date_question, answer_value: "31/12/2011").format_for_csv.should eq("2011-12-31")
-      Factory(:answer, question: time_question, answer_value: "18:06").format_for_csv.should eq("18:06")
-      Factory(:answer, question: choice_question, answer_value: "99").format_for_csv.should eq("99")
+      create(:answer, question: text_question, answer_value: "blah").format_for_csv.should eq("blah")
+      create(:answer, question: integer_question, answer_value: "14").format_for_csv.should eq("14")
+      create(:answer, question: decimal_question, answer_value: "14").format_for_csv.should eq("14.0")
+      create(:answer, question: decimal_question, answer_value: "22.5").format_for_csv.should eq("22.5")
+      create(:answer, question: decimal_question, answer_value: "22.59").format_for_csv.should eq("22.59")
+      create(:answer, question: date_question, answer_value: "31/12/2011").format_for_csv.should eq("2011-12-31")
+      create(:answer, question: time_question, answer_value: "18:06").format_for_csv.should eq("18:06")
+      create(:answer, question: choice_question, answer_value: "99").format_for_csv.should eq("99")
     end
 
     it "should return the raw answer for answers that are invalid" do

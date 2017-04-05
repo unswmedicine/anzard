@@ -1,9 +1,9 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe StringLengthValidator do
 
   describe "Validating a range" do
-    let(:question) { Factory(:question, string_min: 5, string_max: 15) }
+    let(:question) { create(:question, string_min: 5, string_max: 15) }
 
     it "should return true if in range" do
       StringLengthValidator.validate(question, "12345").should eq([true, nil])
@@ -19,7 +19,7 @@ describe StringLengthValidator do
   end
 
   describe "Validating a range with same min/max" do
-    let(:question) { Factory(:question, string_min: 5, string_max: 5) }
+    let(:question) { create(:question, string_min: 5, string_max: 5) }
 
     it "should return true if in range" do
       StringLengthValidator.validate(question, "12345").should eq([true, nil])
@@ -32,7 +32,7 @@ describe StringLengthValidator do
   end
 
   describe "Validating min only" do
-    let(:question) { Factory(:question, string_min: 5, string_max: nil) }
+    let(:question) { create(:question, string_min: 5, string_max: nil) }
 
     it "should return true if in range" do
       StringLengthValidator.validate(question, "12345").should eq([true, nil])
@@ -47,7 +47,7 @@ describe StringLengthValidator do
   end
 
   describe "Validating max only" do
-    let(:question) { Factory(:question, string_min: nil, string_max: 15) }
+    let(:question) { create(:question, string_min: nil, string_max: 15) }
 
     it "should return true if in range" do
       StringLengthValidator.validate(question, "1").should eq([true, nil])
@@ -62,14 +62,14 @@ describe StringLengthValidator do
 
   describe "Validating on a question with no range" do
     it "should always return true" do
-      question = Factory(:question, string_min: nil, string_max: nil)
+      question = create(:question, string_min: nil, string_max: nil)
       StringLengthValidator.validate(question, "abc").should eq([true, nil])
     end
   end
 
   describe "Validating a nil or blank answer" do
     it "should always return true" do
-      question = Factory(:question, string_min: 1, string_max: 5)
+      question = create(:question, string_min: 1, string_max: 5)
       #blank / nil are not considered errors
       StringLengthValidator.validate(question, nil).should eq([true, nil])
       StringLengthValidator.validate(question, "").should eq([true, nil])

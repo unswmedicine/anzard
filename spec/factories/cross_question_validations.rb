@@ -13,7 +13,7 @@ FactoryGirl.define do
     conditional_constant nil
     conditional_set_operator nil
     conditional_set nil
-    after_create do |survey|
+    after(:create) do |survey|
       StaticModelPreloader.load
     end
 

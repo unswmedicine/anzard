@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe Response do
   describe "Associations" do
@@ -15,33 +15,33 @@ describe Response do
     it { should validate_presence_of :year_of_registration }
     it { should ensure_length_of(:baby_code).is_at_most(30) }
     it "should reject non-alphanumeric except -_ strings for babycodes" do
-      Factory.build(:response, baby_code: '!').should_not be_valid
-      Factory.build(:response, baby_code: '-').should be_valid
-      Factory.build(:response, baby_code: '_').should be_valid
+      build(:response, baby_code: '!').should_not be_valid
+      build(:response, baby_code: '-').should be_valid
+      build(:response, baby_code: '_').should be_valid
     end
 
     it "should validate that submitted_status is one of the allowed types" do
       [Response::STATUS_SUBMITTED, Response::STATUS_UNSUBMITTED].each do |value|
         should allow_value(value).for(:submitted_status)
       end
-      Factory.build(:response, submitted_status: nil).should_not be_valid
-      Factory.build(:response, submitted_status: "Blah").should_not be_valid
+      build(:response, submitted_status: nil).should_not be_valid
+      build(:response, submitted_status: "Blah").should_not be_valid
     end
 
     it "should validate that baby code is unique within survey" do
-      first = Factory(:response, baby_code: "abcd")
-      second = Factory.build(:response, survey: first.survey, baby_code: first.baby_code)
+      first = create(:response, baby_code: "abcd")
+      second = build(:response, survey: first.survey, baby_code: first.baby_code)
       second.should_not be_valid
       second.errors.full_messages.should eq(["Baby code abcd has already been used."])
-      diff_survey = Factory.build(:response, survey: Factory(:survey), baby_code: first.baby_code)
+      diff_survey = build(:response, survey: create(:survey), baby_code: first.baby_code)
       diff_survey.should be_valid
     end
 
     it "should strip leading/trailing spaces from baby codes before validating" do
-      first = Factory(:response, baby_code: " abcd ")
+      first = create(:response, baby_code: " abcd ")
       first.baby_code.should eq("abcd")
 
-      second = Factory.build(:response, survey: first.survey, baby_code: " abcd")
+      second = build(:response, survey: first.survey, baby_code: " abcd")
       second.should_not be_valid
       second.errors.full_messages.should eq(["Baby code abcd has already been used."])
     end
@@ -49,19 +49,19 @@ describe Response do
 
   describe "Scopes" do
     it "for survey scope should return responses for the given survey" do
-      survey_a = Factory(:survey)
-      survey_b = Factory(:survey)
-      r1 = Factory(:response, survey: survey_a)
-      r2 = Factory(:response, survey: survey_b)
-      r3 = Factory(:response, survey: survey_a)
+      survey_a = create(:survey)
+      survey_b = create(:survey)
+      r1 = create(:response, survey: survey_a)
+      r2 = create(:response, survey: survey_b)
+      r3 = create(:response, survey: survey_a)
       matches = Response.for_survey(survey_a).collect(&:id).sort
       matches.should eq([r1.id, r3.id])
     end
 
     it "unsubmitted scope should return responses that are unsubmitted" do
-      r1 = Factory(:response, submitted_status: Response::STATUS_UNSUBMITTED)
-      r2 = Factory(:response, submitted_status: Response::STATUS_SUBMITTED)
-      r3 = Factory(:response, submitted_status: Response::STATUS_UNSUBMITTED)
+      r1 = create(:response, submitted_status: Response::STATUS_UNSUBMITTED)
+      r2 = create(:response, submitted_status: Response::STATUS_SUBMITTED)
+      r3 = create(:response, submitted_status: Response::STATUS_UNSUBMITTED)
       matches = Response.unsubmitted.collect(&:id).sort
       matches.should eq([r1.id, r3.id])
     end
@@ -69,18 +69,18 @@ describe Response do
 
   describe "Getting submitted responses by survey, hospital and year of reg" do
     before(:each) do
-      @survey_a = Factory(:survey)
-      @survey_b = Factory(:survey)
-      @hospital_a = Factory(:hospital)
-      @hospital_b = Factory(:hospital)
-      @r1 = Factory(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "1").id
-      @r2 = Factory(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "2").id
-      @r3 = Factory(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "3").id
-      @r4 = Factory(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "4").id
-      @r5 = Factory(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "5").id
-      @r6 = Factory(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, baby_code: "6").id
-      @r7 = Factory(:response, survey: @survey_b, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "7").id
-      @r8 = Factory(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
+      @survey_a = create(:survey)
+      @survey_b = create(:survey)
+      @hospital_a = create(:hospital)
+      @hospital_b = create(:hospital)
+      @r1 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "1").id
+      @r2 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "2").id
+      @r3 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "3").id
+      @r4 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "4").id
+      @r5 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "5").id
+      @r6 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, baby_code: "6").id
+      @r7 = create(:response, survey: @survey_b, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "7").id
+      @r8 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
     end
 
     it "should return all submitted responses for survey when hospital and year of reg not provided" do
@@ -102,16 +102,16 @@ describe Response do
 
   describe "Getting the full set of possible years of registration" do
     it "returns unique values in ascending order" do
-      Factory(:response, year_of_registration: 2009)
-      Factory(:response, year_of_registration: 2007)
-      Factory(:response, year_of_registration: 2009)
-      Factory(:response, year_of_registration: 2011)
+      create(:response, year_of_registration: 2009)
+      create(:response, year_of_registration: 2007)
+      create(:response, year_of_registration: 2009)
+      create(:response, year_of_registration: 2011)
       Response.existing_years_of_registration.should eq([2007, 2009, 2011])
     end
   end
 
   describe "submit" do
-    let(:response) { Factory(:response) }
+    let(:response) { create(:response) }
     it "should set the status of the response when complete" do
       response.stub(:validation_status) { Response::COMPLETE }
       response.submitted_status.should eq Response::STATUS_UNSUBMITTED
@@ -137,12 +137,12 @@ describe Response do
     it "can't submit a response incomplete" do
       response.stub(:validation_status) { Response::INCOMPLETE }
 
-      expect { response.submit! }.should raise_error
+      expect { response.submit! }.to raise_error("Can't submit with status Incomplete")
     end
   end
 
   describe "submit_warning" do
-    let(:response) { Factory(:response) }
+    let(:response) { create(:response) }
     it "dies on complete" do
       response.stub(:validation_status) { Response::COMPLETE }
       response.submit_warning.should be_nil
@@ -159,61 +159,61 @@ describe Response do
 
   describe "status" do
     before(:each) do
-      @survey = Factory(:survey)
-      @section1 = Factory(:section, survey: @survey)
-      @section2 = Factory(:section, survey: @survey)
+      @survey = create(:survey)
+      @section1 = create(:section, survey: @survey)
+      @section2 = create(:section, survey: @survey)
 
-      @q1 = Factory(:question, section: @section1, mandatory: true, question_type: "Integer", number_min: 10)
-      @q2 = Factory(:question, section: @section1, mandatory: true)
-      @q3 = Factory(:question, section: @section1, mandatory: false)
+      @q1 = create(:question, section: @section1, mandatory: true, question_type: "Integer", number_min: 10)
+      @q2 = create(:question, section: @section1, mandatory: true)
+      @q3 = create(:question, section: @section1, mandatory: false)
 
-      @q4 = Factory(:question, section: @section2, mandatory: true)
-      @q5 = Factory(:question, section: @section2, mandatory: true)
-      @q6 = Factory(:question, section: @section2, mandatory: false)
-      @q7 = Factory(:question, section: @section2, mandatory: false, question_type: "Integer", number_max: 15)
+      @q4 = create(:question, section: @section2, mandatory: true)
+      @q5 = create(:question, section: @section2, mandatory: true)
+      @q6 = create(:question, section: @section2, mandatory: false)
+      @q7 = create(:question, section: @section2, mandatory: false, question_type: "Integer", number_max: 15)
 
-      @response = Factory(:response, survey: @survey)
+      @response = create(:response, survey: @survey)
     end
     describe "of a response" do
       it "incomplete when nothing done yet" do
         @response.validation_status.should eq "Incomplete"
       end
       it "incomplete section 1" do
-        Factory(:answer, response: @response, question: @q1, integer_answer: 3)
+        create(:answer, response: @response, question: @q1, integer_answer: 3)
         @response.save!
         @response.reload
 
         @response.validation_status.should eq "Incomplete"
       end
       it "incomplete section 2" do
-        Factory(:answer, response: @response, question: @q7, integer_answer: 16)
+        create(:answer, response: @response, question: @q7, integer_answer: 16)
         @response.save!
         @response.reload
 
         @response.validation_status.should eq "Incomplete"
       end
       it "Complete with warnings" do
-        Factory(:answer, question: @q1, response: @response, integer_answer: 9)
-        Factory(:answer, question: @q2, response: @response)
-        Factory(:answer, question: @q4, response: @response)
-        Factory(:answer, question: @q5, response: @response)
+        create(:answer, question: @q1, response: @response, integer_answer: 9)
+        create(:answer, question: @q2, response: @response)
+        create(:answer, question: @q4, response: @response)
+        create(:answer, question: @q5, response: @response)
         @response.reload
         @response.save!
         @response.validation_status.should eq "Complete with warnings"
       end
       it "Complete with no warnings" do
-        Factory(:answer, question: @q1, response: @response, integer_answer: 11)
-        Factory(:answer, question: @q2, response: @response)
-        Factory(:answer, question: @q4, response: @response)
-        Factory(:answer, question: @q5, response: @response)
+        create(:answer, question: @q1, response: @response, integer_answer: 11)
+        create(:answer, question: @q2, response: @response)
+        create(:answer, question: @q4, response: @response)
+        create(:answer, question: @q5, response: @response)
         @response.reload
         @response.save!
 
         @response.validation_status.should eq "Complete"
       end
       it "should recognise section 2 as incomplete and mark the response as incomplete even if section 1 is complete" do
-        Factory(:answer, question: @q1, response: @response, integer_answer: 11)
-        Factory(:answer, question: @q2, response: @response)
+        create(:answer, question: @q1, response: @response, integer_answer: 11)
+        create(:answer, question: @q2, response: @response)
         @response.reload
         @response.save!
 
@@ -223,102 +223,102 @@ describe Response do
     describe "of a section" do
 
       it "should be incomplete if no answers have been saved yet" do
-        @response.section_started?(@section1).should be_false
+        @response.section_started?(@section1).should be false
         @response.status_of_section(@section1).should eq("Incomplete")
-        @response.section_started?(@section2).should be_false
+        @response.section_started?(@section2).should be false
         @response.status_of_section(@section2).should eq("Incomplete")
       end
 
       it "should be incomplete if at least one question is answered but not all mandatory questions are answered" do
-        Factory(:answer, question: @q1, response: @response)
+        create(:answer, question: @q1, response: @response)
         @response.reload
 
-        @response.section_started?(@section1).should be_true
+        @response.section_started?(@section1).should be true
         @response.status_of_section(@section1).should eq("Incomplete")
-        @response.section_started?(@section2).should be_false
+        @response.section_started?(@section2).should be false
         @response.status_of_section(@section2).should eq("Incomplete")
       end
 
       it "should be complete once all mandatory questions are answered" do
-        Factory(:answer, question: @q1, response: @response)
-        Factory(:answer, question: @q2, response: @response)
+        create(:answer, question: @q1, response: @response)
+        create(:answer, question: @q2, response: @response)
         @response.reload
 
-        @response.section_started?(@section1).should be_true
+        @response.section_started?(@section1).should be true
         @response.status_of_section(@section1).should eq("Complete")
       end
 
       it "should be complete with warnings when all mandatory questions are answered but a warning is present" do
-        Factory(:answer, question: @q4, response: @response)
-        Factory(:answer, question: @q5, response: @response)
-        Factory(:answer, question: @q7, response: @response, answer_value: 16)
+        create(:answer, question: @q4, response: @response)
+        create(:answer, question: @q5, response: @response)
+        create(:answer, question: @q7, response: @response, answer_value: 16)
         @response.reload
 
-        @response.section_started?(@section2).should be_true
+        @response.section_started?(@section2).should be true
         @response.status_of_section(@section2).should eq 'Complete with warnings'
 
       end
 
       it "should be incomplete if there's any range warnings present and not all mandatory questions are answered" do
-        Factory(:answer, question: @q1, response: @response, answer_value: "5")
+        create(:answer, question: @q1, response: @response, answer_value: "5")
         @response.reload
 
-        @response.section_started?(@section1).should be_true
+        @response.section_started?(@section1).should be true
         @response.status_of_section(@section1).should eq("Incomplete")
       end
 
       it "should be incomplete if all mandatory questions are answered and garbage is stored" do
-        Factory(:answer, question: @q4, response: @response)
-        Factory(:answer, question: @q5, response: @response)
-        Factory(:answer, question: @q7, answer_value: 'abvcasdfsadf', response: @response)
+        create(:answer, question: @q4, response: @response)
+        create(:answer, question: @q5, response: @response)
+        create(:answer, question: @q7, answer_value: 'abvcasdfsadf', response: @response)
         @response.reload
 
-        @response.section_started?(@section2).should be_true
+        @response.section_started?(@section2).should be true
         @response.status_of_section(@section2).should eq 'Incomplete'
       end
 
       it "should be incomplete if all mandatory questions are answered and a cross-question validation fails" do
-        Factory(:answer, question: @q7, answer_value: 'abvcasdfsadf', response: @response)
+        create(:answer, question: @q7, answer_value: 'abvcasdfsadf', response: @response)
         @response.reload
 
-        @response.section_started?(@section2).should be_true
+        @response.section_started?(@section2).should be true
         @response.status_of_section(@section2).should eq 'Incomplete'
       end
 
       it "shows complete with warnings if a CQV fails and a range check fails" do
-        @section3 = Factory(:section, survey: @survey)
-        @q8 = Factory(:question, section: @section3, mandatory: false, question_type: "Date")
-        @q9 = Factory(:question, section: @section3, mandatory: false, question_type: "Integer", number_min: 0)
+        @section3 = create(:section, survey: @survey)
+        @q8 = create(:question, section: @section3, mandatory: false, question_type: "Date")
+        @q9 = create(:question, section: @section3, mandatory: false, question_type: "Integer", number_min: 0)
 
-        Factory(:cross_question_validation, rule: 'comparison', operator: '<', question: @q8, related_question: @q8)
-        Factory(:answer, question: @q8, answer_value: Date.today, response: @response)
-        Factory(:answer, question: @q9, answer_value: -1, response: @response)
+        create(:cross_question_validation, rule: 'comparison', operator: '<', question: @q8, related_question: @q8)
+        create(:answer, question: @q8, answer_value: Date.today, response: @response)
+        create(:answer, question: @q9, answer_value: -1, response: @response)
         @response.reload
 
-        @response.section_started?(@section3).should be_true
+        @response.section_started?(@section3).should be true
         @response.status_of_section(@section3).should eq 'Complete with warnings'
       end
 
       it "takes unanswered questions into account" do
-        survey = Factory(:survey)
-        response = Factory(:response, survey: survey)
-        section = Factory(:section, survey: survey)
+        survey = create(:survey)
+        response = create(:response, survey: survey)
+        section = create(:section, survey: survey)
 
-        question = Factory(:question, section: section, mandatory: false, question_type: Question::TYPE_TEXT)
-        trigger = Factory(:question, section: section, mandatory: false, question_type: Question::TYPE_INTEGER)
+        question = create(:question, section: section, mandatory: false, question_type: Question::TYPE_TEXT)
+        trigger = create(:question, section: section, mandatory: false, question_type: Question::TYPE_INTEGER)
 
-        Factory(:cross_question_validation,
+        create(:cross_question_validation,
                 rule: 'present_if_const',
                 conditional_operator: '==',
                 conditional_constant: '1',
                 question: question,
                 related_question: trigger)
 
-        Factory(:answer, question: trigger, answer_value: '1', response: response)
+        create(:answer, question: trigger, answer_value: '1', response: response)
         # no answer for particular question
         response.reload
 
-        response.section_started?(section).should be_true
+        response.section_started?(section).should be true
         response.status_of_section(section).should eq 'Complete with warnings'
       end
     end
@@ -326,51 +326,51 @@ describe Response do
 
   describe "Finding out if a response has warnings or fatal warnings" do
     before(:each) do
-      @survey = Factory(:survey)
-      @section = Factory(:section, survey: @survey)
-      @question1 = Factory(:question, mandatory: true, section: @section, code: "A", question_type: Question::TYPE_INTEGER, number_min: 5)
-      @question2 = Factory(:question, mandatory: false, section: @section, code: "B")
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @question1 = create(:question, mandatory: true, section: @section, code: "A", question_type: Question::TYPE_INTEGER, number_min: 5)
+      @question2 = create(:question, mandatory: false, section: @section, code: "B")
     end
 
     it "both warnings and fatal warnings are true if mandatory questions are missing" do
-      response = Factory(:response, survey: @survey)
-      response.fatal_warnings?.should be_true
-      response.warnings?.should be_true
+      response = create(:response, survey: @survey)
+      response.fatal_warnings?.should be true
+      response.warnings?.should be true
       response.build_answers_from_hash({"B" => "B answer"})
       response.save!
       response.reload
-      response.fatal_warnings?.should be_true
-      response.warnings?.should be_true
+      response.fatal_warnings?.should be true
+      response.warnings?.should be true
     end
 
     it "both warnings and fatal warnings are false if mandatory questions are all answered" do
-      response = Factory(:response, survey: @survey)
+      response = create(:response, survey: @survey)
       response.build_answers_from_hash({"A" => "10"})
       response.save!
       response.reload
-      response.fatal_warnings?.should be_false
-      response.warnings?.should be_false
+      response.fatal_warnings?.should be false
+      response.warnings?.should be false
     end
 
     it "has fatal warnings and has warnings are both true if at least one answer has a fatal warning" do
-      response = Factory(:response, survey: @survey)
+      response = create(:response, survey: @survey)
       response.build_answers_from_hash({"A" => "A answer", "B" => "B answer"}) #A answer is invalid
-      response.fatal_warnings?.should be_true
-      response.warnings?.should be_true
+      response.fatal_warnings?.should be true
+      response.warnings?.should be true
     end
 
     it "has fatal warnings is false but has warnings is true if at least one answer has a warning but none have fatal warnings" do
-      response = Factory(:response, survey: @survey)
+      response = create(:response, survey: @survey)
       response.build_answers_from_hash({"A" => "2", "B" => "B answer"}) #A is out of range
-      response.fatal_warnings?.should be_false
-      response.warnings?.should be_true
+      response.fatal_warnings?.should be false
+      response.warnings?.should be true
     end
 
     it "has fatal warnings and has warnings are both false if no answers have warnings or fatal warnings" do
-      response = Factory(:response, survey: @survey)
+      response = create(:response, survey: @survey)
       response.build_answers_from_hash({"A" => "7", "B" => "B answer"}) #A is out of range
-      response.fatal_warnings?.should be_false
-      response.warnings?.should be_false
+      response.fatal_warnings?.should be false
+      response.warnings?.should be false
     end
   end
 end

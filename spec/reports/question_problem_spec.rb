@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe QuestionProblem do
   it "can have more baby codes added to it" do

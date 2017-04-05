@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe TimeInputHandler do
 
@@ -62,21 +62,21 @@ describe TimeInputHandler do
 
   describe "Refuses to handle other types of input" do
     it "should throw an error on other types" do
-      lambda { TimeInputHandler.new(123) }.should raise_error
+      lambda { TimeInputHandler.new(123) }.should raise_error("TimeInputHandler can only handle String, Hash and Time input")
     end
   end
 
   describe "Refuses to answer to_raw if valid" do
     it "should throw an error" do
       dih = TimeInputHandler.new("11:45")
-      lambda { dih.to_raw }.should raise_error
+      lambda { dih.to_raw }.should raise_error("Time is valid, cannot call to_raw, you should check valid? first")
     end
   end
 
   describe "Refuses to answer to_time if invalid" do
     it "should throw an error" do
       dih = TimeInputHandler.new("asdf")
-      lambda { dih.to_time }.should raise_error
+      lambda { dih.to_time }.should raise_error("Time is not valid, cannot call to_time, you should check valid? first")
     end
   end
 

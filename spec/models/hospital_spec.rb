@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 
 describe Hospital do
@@ -15,12 +15,12 @@ describe Hospital do
 
   describe "Grouping Hospitals By State" do
     it "should put the states in alphabetic order then the hospitals under then in alphabetic order" do
-      rpa = Factory(:hospital, state: "NSW", name: "RPA").id
-      royal_childrens = Factory(:hospital, state: "Vic", name: "The Royal Childrens Hospital").id
-      campbelltown = Factory(:hospital, state: "NSW", name: "Campbelltown").id
-      liverpool = Factory(:hospital, state: "NSW", name: "Liverpool").id
-      mercy = Factory(:hospital, state: "Vic", name: "Mercy Hospital").id
-      royal_ad = Factory(:hospital, state: "SA", name: "Royal Adelaide").id
+      rpa = create(:hospital, state: "NSW", name: "RPA").id
+      royal_childrens = create(:hospital, state: "Vic", name: "The Royal Childrens Hospital").id
+      campbelltown = create(:hospital, state: "NSW", name: "Campbelltown").id
+      liverpool = create(:hospital, state: "NSW", name: "Liverpool").id
+      mercy = create(:hospital, state: "Vic", name: "Mercy Hospital").id
+      royal_ad = create(:hospital, state: "SA", name: "Royal Adelaide").id
 
       output = Hospital.hospitals_by_state
       output.size.should eq(3)

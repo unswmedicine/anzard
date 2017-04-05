@@ -12,7 +12,6 @@
 //= require bootstrap
 //= require help_text
 //= require section_navigation
-//= require ie6
 //= require show_hide_multi_questions
 //= require supplementary_questions_batch
 //= require deselect_option

@@ -55,7 +55,7 @@ class Response < ApplicationRecord
   end
 
   def self.count_per_survey_and_year_of_registration(survey_id, year)
-    Response.count(:conditions => ["year_of_registration = ? AND survey_id = ?", year, survey_id])
+    Response.where(year_of_registration: year, survey_id: survey_id).count
   end
 
   def self.delete_by_survey_and_year_of_registration(survey_id, year)
@@ -203,7 +203,7 @@ class Response < ApplicationRecord
   end
 
   def clear_dummy_answers
-    self.answers.delete_all{|elem| @dummy_answers.map(&:object_id).include? elem.object_id }
+    self.answers.delete(self.answers.select{|elem| @dummy_answers.map(&:object_id).include? elem.object_id})
     @dummy_answers.clear
   end
 

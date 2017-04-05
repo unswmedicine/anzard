@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe CrossQuestionValidation do
   describe "Associations" do
@@ -10,15 +10,15 @@ describe CrossQuestionValidation do
     it { should validate_presence_of :rule }
     it { should validate_presence_of :error_message }
     context "should check that comparison CQVs have safe operators" do
-      specify { Factory.build(:cross_question_validation, rule: 'comparison', operator: '').should_not be_valid }
-      specify { Factory.build(:cross_question_validation, rule: 'comparison', operator: '>').should be_valid }
-      specify { Factory.build(:cross_question_validation, rule: 'comparison', operator: 'dodgy_operator').should_not be_valid }
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '').should_not be_valid }
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>').should be_valid }
+      specify { build(:cross_question_validation, rule: 'comparison', operator: 'dodgy_operator').should_not be_valid }
     end
     it "should validate that the rule is one of the allowed rules" do
       CrossQuestionValidation.valid_rules.each do |value|
         should allow_value(value).for(:rule)
       end
-      Factory.build(:cross_question_validation, rule: 'Blahblah').should_not be_valid
+      build(:cross_question_validation, rule: 'Blahblah').should_not be_valid
     end
     it "should validate only one of related question, or related question list populated" do
       # 0 0 F
@@ -26,19 +26,19 @@ describe CrossQuestionValidation do
       # 1 0 T
       # 1 1 F
 
-      Factory.build(:cross_question_validation, related_question_id: nil, related_question_ids: nil).should_not be_valid
-      Factory.build(:cross_question_validation, related_question_id: nil, related_question_ids: [1]).should be_valid
-      Factory.build(:cross_question_validation, related_question_id: 1, related_question_ids: nil).should be_valid
-      Factory.build(:cross_question_validation, related_question_id: 1, related_question_ids: [1]).should_not be_valid
+      build(:cross_question_validation, related_question_id: nil, related_question_ids: nil).should_not be_valid
+      build(:cross_question_validation, related_question_id: nil, related_question_ids: [1]).should be_valid
+      build(:cross_question_validation, related_question_id: 1, related_question_ids: nil).should be_valid
+      build(:cross_question_validation, related_question_id: 1, related_question_ids: [1]).should_not be_valid
 
     end
     it "should validate that a CQV is only applied to question codes that they apply to" do
-      bad_q = Factory.create(:question, code: 'some_rubbish_question_code')
+      bad_q = create(:question, code: 'some_rubbish_question_code')
       SpecialRules::RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES.each do |rule_code, required_question_code|
-        good_q = Factory.create(:question, code: required_question_code)
+        good_q = create(:question, code: required_question_code)
 
-        Factory.build(:cross_question_validation, rule: rule_code, question: bad_q).should_not be_valid
-        Factory.build(:cross_question_validation, rule: rule_code, question: good_q).should be_valid
+        build(:cross_question_validation, rule: rule_code, question: bad_q).should_not be_valid
+        build(:cross_question_validation, rule: rule_code, question: good_q).should be_valid
       end
     end
   end
@@ -122,8 +122,8 @@ describe CrossQuestionValidation do
 
   describe "check" do
     before :each do
-      @survey = Factory :survey
-      @section = Factory :section, survey: @survey
+      @survey = create :survey
+      @section = create :section, survey: @survey
     end
 
     def do_cqv_check (first, val)
@@ -132,8 +132,8 @@ describe CrossQuestionValidation do
     end
 
     def standard_cqv_test(val_first, val_second, error)
-      first = Factory :answer, response: @response, question: @q1, answer_value: val_first
-      second = Factory :answer, response: @response, question: @q2, answer_value: val_second
+      first = create :answer, response: @response, question: @q1, answer_value: val_first
+      second = create :answer, response: @response, question: @q2, answer_value: val_second
 
       @response.reload
 
@@ -142,14 +142,14 @@ describe CrossQuestionValidation do
 
     describe "implications" do
       before :each do
-        @response = Factory :response, survey: @survey
+        @response = create :response, survey: @survey
       end
       describe 'date implies constant' do
         before :each do
           @error_message = 'q2 was date, q1 was not expected constant (-1)'
-          @q1 = Factory :question, section: @section, question_type: 'Integer'
-          @q2 = Factory :question, section: @section, question_type: 'Date'
-          Factory :cqv_present_implies_constant, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: -1
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Date'
+          create :cqv_present_implies_constant, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: -1
         end
         it("handles nils") { standard_cqv_test({}, {}, []) }
         it("doesn't reject the LHS when RHS not a date") { standard_cqv_test({}, "5", []) }
@@ -160,9 +160,9 @@ describe CrossQuestionValidation do
       describe 'constant implies constant' do
         before :each do
           @error_message = 'q2 was != 0, q1 was not > 0'
-          @q1 = Factory :question, section: @section, question_type: 'Integer'
-          @q2 = Factory :question, section: @section, question_type: 'Integer'
-          Factory :cqv_const_implies_const, question: @q1, related_question: @q2, error_message: @error_message
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          create :cqv_const_implies_const, question: @q1, related_question: @q2, error_message: @error_message
           #conditional_operator "!="
           #conditional_constant 0
           #operator ">"
@@ -177,9 +177,9 @@ describe CrossQuestionValidation do
       describe 'constant implies set' do
         before :each do
           @error_message = 'q2 was != 0, q1 was not in specified set [1,3,5,7]'
-          @q1 = Factory :question, section: @section, question_type: 'Integer'
-          @q2 = Factory :question, section: @section, question_type: 'Integer'
-          Factory :cqv_const_implies_set, question: @q1, related_question: @q2, error_message: @error_message
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          create :cqv_const_implies_set, question: @q1, related_question: @q2, error_message: @error_message
           #conditional_operator "!="
           #conditional_constant 0
           #set_operator "included"
@@ -194,9 +194,9 @@ describe CrossQuestionValidation do
       describe 'set implies set' do
         before :each do
           @error_message = 'q2  was in [2,4,6,8], q1 was not in specified set [1,3,5,7]'
-          @q1 = Factory :question, section: @section, question_type: 'Integer'
-          @q2 = Factory :question, section: @section, question_type: 'Integer'
-          Factory :cqv_set_implies_set, question: @q1, related_question: @q2, error_message: @error_message
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          create :cqv_set_implies_set, question: @q1, related_question: @q2, error_message: @error_message
           #conditional_set_operator "included"
           #conditional_set [2,4,6,8]
           #set_operator "included"
@@ -211,14 +211,14 @@ describe CrossQuestionValidation do
       describe 'present implies present' do
         before :each do
           @error_message = 'q2 must be answered if q1 is'
-          @q1 = Factory :question, section: @section, question_type: 'Date'
-          @q2 = Factory :question, section: @section, question_type: 'Time'
-          Factory :cqv_present_implies_present, question: @q1, related_question: @q2, error_message: @error_message
+          @q1 = create :question, section: @section, question_type: 'Date'
+          @q2 = create :question, section: @section, question_type: 'Time'
+          create :cqv_present_implies_present, question: @q1, related_question: @q2, error_message: @error_message
         end
         it("is not run if the question has a badly formed answer") { standard_cqv_test("2011-12-", "11:53", []) }
         it("passes if both are answered") { standard_cqv_test("2011-12-12", "11:53", []) }
         it "fails if the question is answered and the related question is not" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "2011-12-12"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "2011-12-12"
           do_cqv_check(a1, [@error_message])
         end
         it("fails if the question is answered and the related question has an invalid answer") { standard_cqv_test("2011-12-12", "11:", [@error_message]) }
@@ -227,19 +227,19 @@ describe CrossQuestionValidation do
       describe 'const implies present' do
         before :each do
           @error_message = 'q2 must be answered if q1 is'
-          @q1 = Factory :question, section: @section, question_type: 'Integer'
-          @q2 = Factory :question, section: @section, question_type: 'Date'
-          Factory :cqv_const_implies_present, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: -1
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Date'
+          create :cqv_const_implies_present, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: -1
         end
         it("is not run if the question has a badly formed answer") { standard_cqv_test("ab", "2011-12-12", []) }
         it("passes if both are answered and answer to question == constant") { standard_cqv_test("-1", "2011-12-12", []) }
         it("passes if both are answered and answer to question != constant") { standard_cqv_test("99", "2011-12-12", []) }
         it "fails if related question not answered and answer to question == constant" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "-1"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "-1"
           do_cqv_check(a1, [@error_message])
         end
         it "passes if related question not answered and answer to question != constant" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "00"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "00"
           do_cqv_check(a1, [])
         end
         it("fails if related question has an invalid answer and answer to question == constant") { standard_cqv_test("-1", "2011-12-", [@error_message]) }
@@ -248,28 +248,28 @@ describe CrossQuestionValidation do
       describe 'set implies present' do
         before :each do
           @error_message = 'q2 must be answered if q1 is in [2..7]'
-          @q1 = Factory :question, section: @section, question_type: 'Choice'
-          @q2 = Factory :question, section: @section, question_type: 'Date'
-          Factory :cqv_set_implies_present, question: @q1, related_question: @q2, error_message: @error_message, set_operator: 'range', set: [2, 7]
+          @q1 = create :question, section: @section, question_type: 'Choice'
+          @q2 = create :question, section: @section, question_type: 'Date'
+          create :cqv_set_implies_present, question: @q1, related_question: @q2, error_message: @error_message, set_operator: 'range', set: [2, 7]
         end
         it("is not run if the question has a badly formed answer") { standard_cqv_test("ab", "2011-12-12", []) }
         it("passes if both are answered and answer to question is at start of set") { standard_cqv_test("2", "2011-12-12", []) }
         it("passes if both are answered and answer to question is in middle of set") { standard_cqv_test("5", "2011-12-12", []) }
         it("passes if both are answered and answer to question is at end of set") { standard_cqv_test("7", "2011-12-12", []) }
         it "fails if related question not answered and answer to question is at start of set" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "2"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "2"
           do_cqv_check(a1, [@error_message])
         end
         it "fails if related question not answered and answer to question is in middle of set" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "5"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "5"
           do_cqv_check(a1, [@error_message])
         end
         it "fails if related question not answered and answer to question is at end of set" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "7"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "7"
           do_cqv_check(a1, [@error_message])
         end
         it "passes if related question not answered and answer to question is outside range" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "8"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "8"
           do_cqv_check(a1, [])
         end
         it("fails if related question has an invalid answer and answer to question in range") { standard_cqv_test("3", "2011-12-", [@error_message]) }
@@ -278,19 +278,19 @@ describe CrossQuestionValidation do
       describe 'const implies one of const' do
         before :each do
           @error_message = 'q2 or q3 must be -1 if q1 is 99'
-          @q1 = Factory :question, section: @section, question_type: 'Choice'
-          @q2 = Factory :question, section: @section, question_type: 'Integer'
-          @q3 = Factory :question, section: @section, question_type: 'Choice'
-          @cqv1 = Factory :cqv_const_implies_one_of_const, question: @q1, related_question: nil, related_question_ids: [@q2.id, @q3.id], error_message: @error_message, operator: '==', constant: 99, conditional_operator: '==', conditional_constant: -1
+          @q1 = create :question, section: @section, question_type: 'Choice'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          @q3 = create :question, section: @section, question_type: 'Choice'
+          @cqv1 = create :cqv_const_implies_one_of_const, question: @q1, related_question: nil, related_question_ids: [@q2.id, @q3.id], error_message: @error_message, operator: '==', constant: 99, conditional_operator: '==', conditional_constant: -1
         end
         it("handles nils") do
           v1 = 99
           v2 = nil
           v3 = nil
 
-          first = Factory :answer, response: @response, question: @q1, answer_value: v1
-          second = Factory :answer, response: @response, question: @q2, answer_value: v2
-          third = Factory :answer, response: @response, question: @q3, answer_value: v3
+          first = create :answer, response: @response, question: @q1, answer_value: v1
+          second = create :answer, response: @response, question: @q2, answer_value: v2
+          third = create :answer, response: @response, question: @q3, answer_value: v3
 
           err = @cqv1.check first
           err.should eq @error_message
@@ -300,19 +300,19 @@ describe CrossQuestionValidation do
 
     describe "Blank Unless " do
       before :each do
-        @response = Factory :response, survey: @survey
+        @response = create :response, survey: @survey
       end
 
       describe 'blank if constant (q must be blank if related q == constant)' do
         # e.g. If Died_ is 0, DiedDate must be blank (rule is on DiedDate)
         before :each do
           @error_message = 'if q2 == -1, q1 must be blank'
-          @q1 = Factory :question, section: @section, question_type: 'Integer'
-          @q2 = Factory :question, section: @section, question_type: 'Integer'
-          Factory :cqv_blank_if_const, question: @q1, related_question: @q2, error_message: @error_message, conditional_operator: '==', conditional_constant: -1
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          create :cqv_blank_if_const, question: @q1, related_question: @q2, error_message: @error_message, conditional_operator: '==', conditional_constant: -1
         end
         it "passes if q2 not answered but q1 is" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "7"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "7"
         end
         it("passes if q2 not answered and q1 not answered") {} # rule won't be run
         it("passes if q2 is not -1 and q1 is blank") {} # rule won't be run }
@@ -324,19 +324,19 @@ describe CrossQuestionValidation do
 
     describe "Present Unless " do
       before :each do
-        @response = Factory :response, survey: @survey
+        @response = create :response, survey: @survey
       end
 
       describe 'present if constant (q must be present if related q == constant)' do
         # e.g. If Died_ is 0, DiedDate must be blank (rule is on DiedDate)
         before :each do
           @error_message = 'if q2 == -1, q1 must be blank'
-          @q1 = Factory :question, section: @section, question_type: 'Integer'
-          @q2 = Factory :question, section: @section, question_type: 'Integer'
-          Factory :cqv_present_if_const, question: @q1, related_question: @q2, error_message: @error_message, conditional_operator: '==', conditional_constant: -1
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          create :cqv_present_if_const, question: @q1, related_question: @q2, error_message: @error_message, conditional_operator: '==', conditional_constant: -1
         end
         it "passes if q2 not answered but q1 is" do
-          a1 = Factory :answer, response: @response, question: @q1, answer_value: "7"
+          a1 = create :answer, response: @response, question: @q1, answer_value: "7"
           do_cqv_check(a1, [])
         end
         it("passes if q2 not answered and q1 answered") {} # rule won't be run
@@ -349,16 +349,16 @@ describe CrossQuestionValidation do
 
     describe "comparisons (using dates to represent a complex type that supports <,>,== etc)" do
       before :each do
-        @q1 = Factory :question, section: @section, question_type: 'Date'
-        @q2 = Factory :question, section: @section, question_type: 'Date'
-        @response = Factory :response, survey: @survey
+        @q1 = create :question, section: @section, question_type: 'Date'
+        @q2 = create :question, section: @section, question_type: 'Date'
+        @response = create :response, survey: @survey
         @response.reload
         @response.answers.count.should eq 0
       end
       describe "date_lte" do
         before :each do
           @error_message = 'not lte'
-          Factory :cross_question_validation, rule: 'comparison', operator: '<=', question: @q1, related_question: @q2, error_message: @error_message
+          create :cross_question_validation, rule: 'comparison', operator: '<=', question: @q1, related_question: @q2, error_message: @error_message
         end
         it("handles nils") { standard_cqv_test({}, {}, []) }
         it("rejects gt") { standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), [@error_message]) }
@@ -368,7 +368,7 @@ describe CrossQuestionValidation do
       describe "date_gte" do
         before :each do
           @error_message = 'not gte'
-          Factory :cross_question_validation, rule: 'comparison', operator: '>=', question: @q1, related_question: @q2, error_message: @error_message
+          create :cross_question_validation, rule: 'comparison', operator: '>=', question: @q1, related_question: @q2, error_message: @error_message
         end
         it("handles nils") { standard_cqv_test({}, {}, []) }
         it("accepts gt") { standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), []) }
@@ -378,7 +378,7 @@ describe CrossQuestionValidation do
       describe "date_gt" do
         before :each do
           @error_message = 'not gt'
-          Factory :cross_question_validation, rule: 'comparison', operator: '>', question: @q1, related_question: @q2, error_message: @error_message
+          create :cross_question_validation, rule: 'comparison', operator: '>', question: @q1, related_question: @q2, error_message: @error_message
         end
         it("handles nils") { standard_cqv_test({}, {}, []) }
         it("accepts gt") { standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), []) }
@@ -388,7 +388,7 @@ describe CrossQuestionValidation do
       describe "date_lt" do
         before :each do
           @error_message = 'not lt'
-          Factory :cross_question_validation, rule: 'comparison', operator: '<', question: @q1, related_question: @q2, error_message: @error_message
+          create :cross_question_validation, rule: 'comparison', operator: '<', question: @q1, related_question: @q2, error_message: @error_message
         end
         it("handles nils") { standard_cqv_test({}, {}, []) }
         it("rejects gt") { standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), [@error_message]) }
@@ -398,7 +398,7 @@ describe CrossQuestionValidation do
       describe "date_eq" do
         before :each do
           @error_message = 'not eq'
-          Factory :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message
         end
         it("handles nils") { standard_cqv_test({}, {}, []) }
         it("rejects gt") { standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), [@error_message]) }
@@ -408,7 +408,7 @@ describe CrossQuestionValidation do
       describe "date_ne" do
         before :each do
           @error_message = 'are eq'
-          Factory :cross_question_validation, rule: 'comparison', operator: '!=', question: @q1, related_question: @q2, error_message: @error_message
+          create :cross_question_validation, rule: 'comparison', operator: '!=', question: @q1, related_question: @q2, error_message: @error_message
         end
         it("handles nils") { standard_cqv_test({}, {}, []) }
         it("accepts gt") { standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), []) }
@@ -422,19 +422,19 @@ describe CrossQuestionValidation do
           @error_message = 'not eq'
         end
         it "accepts X eq Y (offset +1) when Y = X-1" do
-          Factory :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: 1
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: 1
           standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), [])
         end
         it "rejects X eq Y (offset +1) when Y = X" do
-          Factory :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: 1
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: 1
           standard_cqv_test(Date.new(2012, 2, 1), Date.new(2012, 2, 1), [@error_message])
         end
         it "accepts X eq Y (offset -1) when Y = X+1" do
-          Factory :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: -1
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: -1
           standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 4), [])
         end
         it "rejects X eq Y (offset -1) when Y = X" do
-          Factory :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: -1
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: -1
           standard_cqv_test(Date.new(2012, 2, 1), Date.new(2012, 2, 1), [@error_message])
         end
       end
@@ -443,8 +443,8 @@ describe CrossQuestionValidation do
 
   describe 'check if premature' do
     before(:each) do
-      @gest_q = Factory(:question, code: 'Gest', question_type: Question::TYPE_INTEGER)
-      @wght_q = Factory(:question, code: 'Wght', section: @gest_q.section, question_type: Question::TYPE_INTEGER)
+      @gest_q = create(:question, code: 'Gest', question_type: Question::TYPE_INTEGER)
+      @wght_q = create(:question, code: 'Wght', section: @gest_q.section, question_type: Question::TYPE_INTEGER)
     end
 
     it 'should return false if neither gest nor gest wgt answered' do
@@ -469,10 +469,10 @@ describe CrossQuestionValidation do
     end
 
     def check_gest_wght(gest, wght, expected_result)
-      response = Factory(:response, survey: @gest_q.section.survey)
-      Factory(:answer, question: @gest_q, answer_value: gest, response: response) unless gest.nil?
-      Factory(:answer, question: @wght_q, answer_value: wght, response: response) unless wght.nil?
-      any_answer = Factory(:answer, response: response)
+      response = create(:response, survey: @gest_q.section.survey)
+      create(:answer, question: @gest_q, answer_value: gest, response: response) unless gest.nil?
+      create(:answer, question: @wght_q, answer_value: wght, response: response) unless wght.nil?
+      any_answer = create(:answer, response: response)
       any_answer.reload
       CrossQuestionValidation.check_gest_wght(any_answer).should eq(expected_result)
     end
