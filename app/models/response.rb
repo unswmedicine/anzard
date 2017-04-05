@@ -46,9 +46,10 @@ class Response < ApplicationRecord
     self.survey_id = survey.id
   end
 
-  def self.for_survey_hospital_and_year_of_registration(survey, hospital_id, year_of_registration)
+  def self.for_survey_hospital_and_year_of_registration(survey, hospital_id, year_of_registration, site_id)
     results = submitted.for_survey(survey).order(:baby_code)
-    results = results.where(hospital_id: hospital_id) unless hospital_id.blank?
+    results = results.joins(:hospital).where(:hospitals => {:unit => hospital_id}) unless hospital_id.blank?
+    results = results.joins(:hospital).where(:hospitals => {:site => site_id}) unless site_id.blank?
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
     results.includes([:hospital])
   end

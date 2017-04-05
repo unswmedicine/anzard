@@ -45,6 +45,7 @@ class Ability
         can :read, Response
         can :stats, Response
         can :download, Response
+        can :get_sites, Response
         can :batch_delete, Response
         can :confirm_batch_delete, Response
         can :perform_batch_delete, Response
