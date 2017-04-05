@@ -188,7 +188,7 @@ class BatchFile < ApplicationRecord
       set_outcome(STATUS_SUCCESS, MESSAGE_SUCCESS)
     end
     save!
-    self.responses = responses #this is only ever kept in memory for the sake of reporting, its not an AR association
+    self.responses = responses #this is only ever kept in memory for the sake of reporting, its not an AR association.
     logger.info("After rest took #{Time.now - start}")
 
     true
