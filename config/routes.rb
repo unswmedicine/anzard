@@ -16,6 +16,7 @@ Anznn::Application.routes.draw do
       get :stats
       get :prepare_download
       get :download
+      get :get_sites
       get :batch_delete
       get :submitted_baby_codes
       put :confirm_batch_delete

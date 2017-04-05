@@ -161,10 +161,9 @@ def create_response(survey, profile, hospital, submit=false)
              when FEW
                "small"
            end
-  abbrev = hospital.abbrev.gsub(/[^a-z0-9\-_]/i, '_') # see Response::BABY_CODE_REGEX
   response = Response.create!(hospital: hospital,
                               submitted_status: status,
-                              baby_code: "#{prefix}-#{abbrev}-#{rand(10000000)}",
+                              baby_code: "#{prefix}-#{hospital.name}-#{rand(10000000)}",
                               survey: survey,
                               year_of_registration: year_of_reg,
                               user: User.all.sample)
@@ -214,7 +213,7 @@ def create_batch_file(survey, count_of_rows)
   responses = Response.where(survey_id: survey.id).all
   responses_to_use = responses.sample(count_of_rows)
 
-  csv = CsvGenerator.new(survey.id, nil, nil)
+  csv = CsvGenerator.new(survey.id, nil, nil,nil)
   csv.records = responses_to_use
 
   filepath = "#{Rails.root}/tmp/batch-#{survey.name.parameterize}-#{count_of_rows}.csv"

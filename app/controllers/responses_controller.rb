@@ -109,12 +109,13 @@ class ResponsesController < ApplicationController
     @survey_id = params[:survey_id]
     @hospital_id = params[:hospital_id]
     @year_of_registration = params[:year_of_registration]
+    @site_id = params[:site_id]
 
     if @survey_id.blank?
       @errors = ["Please select a registration type"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(@survey_id, @hospital_id, @year_of_registration)
+      generator = CsvGenerator.new(@survey_id, @hospital_id, @year_of_registration, @site_id)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
@@ -122,6 +123,10 @@ class ResponsesController < ApplicationController
         send_data generator.csv, :type => 'text/csv', :disposition => "attachment", :filename => generator.csv_filename
       end
     end
+  end
+
+  def get_sites
+    render json: Hospital.where(unit: params["unit_id"])
   end
 
   def batch_delete

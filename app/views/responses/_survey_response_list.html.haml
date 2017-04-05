@@ -5,9 +5,9 @@
   %table#responses.bordered-table
     %thead
       %tr
-        %th Baby Code
-        %th Registration Type
-        %th Year of Registration
+        %th Cycle_ID
+        %th Treatment Data
+        %th Year of Treatment
         %th Created By
         %th Status
         %th Date Started
@@ -28,5 +28,5 @@
           %p
             = link_to "Review Answers", review_answers_response_path(r), class: 'btn'
           - if can?(:destroy, r)
-            = link_to 'Delete', response_path(r), method: :delete, class: 'btn btn-ie6', id: r.baby_code, :data => { :confirm => "You are about to delete this form in progress for BabyCODE #{r.baby_code}. This action cannot be undone. Are you sure you want to delete this form?"}
+            = link_to 'Delete', response_path(r), method: :delete, class: 'btn btn-ie6', id: r.baby_code, :data => { :confirm => "You are about to delete this form in progress for Cycle_ID #{r.baby_code}. This action cannot be undone. Are you sure you want to delete this form?"}
           %p= render 'responses/submit_or_warning', response: r
