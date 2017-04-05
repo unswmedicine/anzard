@@ -17,6 +17,13 @@ def create_clinics
 
   clinics = read_hashes_from_csv(Rails.root.join("db/seed_files", "clinics.csv"))
   clinics.each do |hash|
-    Hospital.create!(hash)
+    #Hospital.create!(hash)
+
+    hospital = Hospital.new(name: hash['name'].strip,
+                            state:hash['state'].strip,
+                            unit: hash['unit'].strip,
+                            site: hash['site'].strip,
+                            site_name: hash['site_name'].strip)
+    hospital.save!
   end
 end
