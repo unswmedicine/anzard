@@ -15,4 +15,4 @@ class StaticModelPreloader
   end
 end
 
-StaticModelPreloader.load unless ENV['SKIP_PRELOAD_MODELS'] == 'skip'
+#StaticModelPreloader.load unless ENV['SKIP_PRELOAD_MODELS'] == 'skip'
