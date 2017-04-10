@@ -9,4 +9,4 @@ require File.dirname(__FILE__) + '/seed_helper.rb'
 
 create_roles_and_permissions
 create_config_items
-create_hospitals
+create_clinics

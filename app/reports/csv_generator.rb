@@ -1,27 +1,29 @@
 require 'csv'
 class CsvGenerator
 
-  BASIC_HEADERS = %w(RegistrationType YearOfRegistration Hospital BabyCODE)
-  attr_accessor :survey_id, :hospital_id, :year_of_registration, :records, :survey, :question_codes
+  BASIC_HEADERS = %w(TreatmentData YearOfTreatment Clinic SiteName UnitID SiteID CycleID)
+  attr_accessor :survey_id, :hospital_id, :year_of_registration, :records, :survey, :question_codes, :site_id
 
-  def initialize(survey_id, hospital_id, year_of_registration)
+  def initialize(survey_id, hospital_id, year_of_registration, site_id)
     self.survey_id = survey_id
     self.hospital_id = hospital_id
     self.year_of_registration = year_of_registration
+    self.site_id = site_id
 
     self.survey = SURVEYS[survey_id.to_i]
     self.question_codes = survey.ordered_questions.collect(&:code)
 
-    self.records = Response.for_survey_hospital_and_year_of_registration(survey, hospital_id, year_of_registration)
+    self.records = Response.for_survey_hospital_and_year_of_registration(survey, hospital_id, year_of_registration, site_id)
   end
 
   def csv_filename
     name_parts = [survey.name.parameterize(separator: "_")]
 
     unless hospital_id.blank?
-      hospital = Hospital.find(hospital_id)
-      name_parts << hospital.abbrev.parameterize(separator: "_")
+      hospital = Hospital.where(unit: hospital_id).first
+      name_parts << hospital.name.parameterize("_")
     end
+    
     unless year_of_registration.blank?
       name_parts << year_of_registration
     end
@@ -36,7 +38,7 @@ class CsvGenerator
     CSV.generate(:col_sep => ",") do |csv|
       csv.add_row BASIC_HEADERS + question_codes
       records.each do |response|
-        basic_row_data = [response.survey.name, response.year_of_registration, response.hospital.abbrev, response.baby_code]
+        basic_row_data = [response.survey.name, response.year_of_registration, response.hospital.name, response.hospital.site_name, response.hospital.unit, response.hospital.site, response.baby_code]
         csv.add_row basic_row_data + answers(response)
       end
     end

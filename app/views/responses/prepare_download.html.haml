@@ -11,17 +11,21 @@
           -@errors.each do |msg|
             %li= msg
     .clearfix
-      = label_tag :survey_id, "Registration type"
+      = label_tag :survey_id, "Treatment Data"
       .input
         = select_tag :survey_id, options_from_collection_for_select(surveys, :id, :name, @survey_id), {class: "large", prompt: "Please select"}
         = required
     .clearfix
-      = label_tag :hospital_id, "Hospital"
+      = label_tag :hospital_id, "Clinic"
       .input
-        = select_tag :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state, @hospital_id), {prompt: "ALL", class: 'large'}
+        = select_tag :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state_and_unique_by_unit, @hospital_id), {prompt: "ALL", class: 'large'}
         = required
     .clearfix
-      = label_tag :year_of_registration
+      = label_tag :site_id, "Site"
+      .input
+        = select_tag :site_id, nil, {prompt: "ALL", class: 'large'}
+    .clearfix
+      = label_tag :year_of_registration, "Year of Treatment"
       .input
         = select_tag :year_of_registration, options_for_select(existing_years_of_registration, @year_of_registration), {prompt: "ALL", class: "medium"}
         = required
