@@ -1,6 +1,6 @@
 Anznn::Application.configure do
 
-  config.action_mailer.default_url_options = { :host => 'gsw1-anznn-qa.intersect.org.au' }
+  config.action_mailer.default_url_options = { :host => 'anznn-qa.intersect.org.au' }
 
   # Settings specified here will take precedence over those in config/application.rb
 
