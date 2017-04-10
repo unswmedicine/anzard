@@ -31,7 +31,7 @@ production: &production
   host: localhost
   database: anznn
   username: anznn
-  password: anznn
+  password: placeholdertext
   pool: 5
   timeout: 5000
 
