@@ -71,6 +71,7 @@ end
   gem 'google-analytics-rails'
 #end
 
+gem 'activerecord-import', '~> 0.17.2'
 gem "iconv"
 gem "haml"
 gem "haml-rails"
