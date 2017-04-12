@@ -61,5 +61,6 @@ Anznn::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
-  config.eager_load = false
+  config.eager_load = true
+  config.eager_load_paths += %W(#{config.root}/lib)
 end
