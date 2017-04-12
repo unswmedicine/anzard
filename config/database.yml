@@ -29,8 +29,8 @@ test: &test
 production: &production
   adapter: mysql2
   host: localhost
-  database: anznn
-  username: anznn
+  database: anzard
+  username: anzard
   password: placeholdertext
   pool: 5
   timeout: 5000
