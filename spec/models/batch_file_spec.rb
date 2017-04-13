@@ -126,7 +126,7 @@ describe BatchFile do
       it "should reject file without a baby code column" do
         batch_file = process_batch_file('no_baby_code_column.csv', survey, user)
         batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not contain a BabyCODE column. Processing stopped on CSV row 0")
+        batch_file.message.should eq("The file you uploaded did not contain a CYCLE_ID column. Processing stopped on CSV row 0")
         batch_file.record_count.should be_nil
         batch_file.problem_record_count.should be_nil
         batch_file.summary_report_path.should be_nil
@@ -238,7 +238,7 @@ describe BatchFile do
       it "file that just has blank rows fails on baby code since baby codes are missing" do
         batch_file = process_batch_file('blank_rows.csv', survey, user)
         batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded is missing one or more baby codes. Each record must have a baby code. Processing stopped on CSV row 1")
+        batch_file.message.should eq("The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 1")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should be_nil
@@ -250,7 +250,7 @@ describe BatchFile do
       it "file with missing baby codes should be rejected completely and no reports generated" do
         batch_file = process_batch_file('missing_baby_code.csv', survey, user)
         batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded is missing one or more baby codes. Each record must have a baby code. Processing stopped on CSV row 2")
+        batch_file.message.should eq("The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 2")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should be_nil
@@ -262,7 +262,7 @@ describe BatchFile do
       it "file with duplicate baby codes within the file should be rejected completely and no reports generated" do
         batch_file = process_batch_file('duplicate_baby_code.csv', survey, user)
         batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded contained duplicate baby codes. Each baby code can only be used once. Processing stopped on CSV row 3")
+        batch_file.message.should eq("The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should be_nil
@@ -274,7 +274,7 @@ describe BatchFile do
       it "file with duplicate baby codes within the file (with whitespace padding) should be rejected completely and no reports generated" do
         batch_file = process_batch_file('duplicate_baby_code_whitespace.csv', survey, user)
         batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded contained duplicate baby codes. Each baby code can only be used once. Processing stopped on CSV row 3")
+        batch_file.message.should eq("The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should be_nil
@@ -375,8 +375,8 @@ describe BatchFile do
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
         rows.size.should eq(2)
-        rows[0].should eq(["BabyCODE", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'BabyCODE', 'Error', 'B2', 'Baby code B2 has already been used.'])
+        rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Baby code B2 has already been used.'])
       end
 
       it "should reject records where the baby code is already in the system even with whitespace padding" do
@@ -394,8 +394,8 @@ describe BatchFile do
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
         rows.size.should eq(2)
-        rows[0].should eq(["BabyCODE", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'BabyCODE', 'Error', 'B2', 'Baby code B2 has already been used.'])
+        rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Baby code B2 has already been used.'])
       end
 
       it "can detect both duplicate baby code and other errors on the same record" do
@@ -413,8 +413,8 @@ describe BatchFile do
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
         rows.size.should eq(3)
-        rows[0].should eq(["BabyCODE", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'BabyCODE', 'Error', 'B2', 'Baby code B2 has already been used.'])
+        rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Baby code B2 has already been used.'])
         rows[2].should eq(['B2', 'TextMandatory', 'Error', '', 'This question is mandatory'])
       end
     end
@@ -476,7 +476,7 @@ describe BatchFile do
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
         rows.size.should eq(2)
-        rows[0].should eq(['BabyCODE', 'Column Name', 'Type', 'Value', 'Message'])
+        rows[0].should eq(['CYCLE_ID', 'Column Name', 'Type', 'Value', 'Message'])
         rows[1].should eq(['B3', 'Date1', 'Warning', '2010-05-29', 'D1 must be >= D2'])
       end
 
@@ -520,7 +520,7 @@ describe BatchFile do
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
         rows.size.should eq(2)
-        rows[0].should eq(['BabyCODE', 'Column Name', 'Type', 'Value', 'Message'])
+        rows[0].should eq(['CYCLE_ID', 'Column Name', 'Type', 'Value', 'Message'])
         rows[1].should eq(['B3', 'Date1', 'Warning', '2010-05-29', 'D1+T1 must be > D2+T2'])
       end
 
@@ -541,7 +541,7 @@ describe BatchFile do
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
         rows.size.should eq(7)
-        rows[0].should eq(["BabyCODE", "Column Name", "Type", "Value", "Message"])
+        rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
         rows[1].should eq(['B1', 'Date1', 'Error', '2011-ab-25', 'Answer is invalid (must be a valid date)'])
         rows[2].should eq(['B1', 'Decimal', 'Error', 'a.77', 'Answer is the wrong format (expected a decimal number)'])
         rows[3].should eq(['B1', 'TextMandatory', 'Error', '', 'This question is mandatory'])

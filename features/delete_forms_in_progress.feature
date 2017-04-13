@@ -41,7 +41,7 @@ Feature: Delete Data Entry Forms in Progress
           | babycode123 | survey            | Fred Bloggs |
           | babycode456 | survey            | Fred Bloggs |
         And I follow "Delete"
-        Then I should see "You are about to delete this form in progress for BabyCODE babycode123. This action cannot be undone. Are you sure you want to delete this form?" 
+        Then I should see "You are about to delete this form in progress for CYCLE_ID babycode123. This action cannot be undone. Are you sure you want to delete this form?"
         And I wait for 2 seconds
         And I follow "Delete" within "#confirm_delete_123"
         Then I should see "responses" table with

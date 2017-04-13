@@ -18,12 +18,12 @@ Feature: Processing batch files
     | file                    | message                                                                                                                     |
     | not_csv.xls             | The file you uploaded was not a valid CSV file. Processing stopped on CSV row 0                                             |
     | invalid_csv.csv         | The file you uploaded was not a valid CSV file. Processing stopped on CSV row 2                                             |
-    | no_baby_code_column.csv | The file you uploaded did not contain a BabyCODE column. Processing stopped on CSV row 0                                    |
-    | missing_baby_code.csv   | The file you uploaded is missing one or more baby codes. Each record must have a baby code. Processing stopped on CSV row 2 |
-    | blank_rows.csv          | The file you uploaded is missing one or more baby codes. Each record must have a baby code. Processing stopped on CSV row 1 |
+    | no_baby_code_column.csv | The file you uploaded did not contain a CYCLE_ID column. Processing stopped on CSV row 0                                    |
+    | missing_baby_code.csv   | The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 2 |
+    | blank_rows.csv          | The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 1 |
     | empty.csv               | The file you uploaded did not contain any data.                                                                             |
     | headers_only.csv        | The file you uploaded did not contain any data.                                                                             |
-    | duplicate_baby_code.csv | The file you uploaded contained duplicate baby codes. Each baby code can only be used once. Processing stopped on CSV row 3 |
+    | duplicate_baby_code.csv | The file you uploaded contained duplicate cycle IDs. Each baby code can only be used once. Processing stopped on CSV row 3 |
     | duplicate_column.csv    | The file you uploaded contained duplicate columns. Each column heading must be unique.                                      |
 
   Scenario: Valid file with no errors or warnings
@@ -72,7 +72,7 @@ Feature: Processing batch files
     | cross_question_error.csv |
     | number_out_of_range.csv  |
 
-  Scenario: File that gets rejected because a baby code already exists in the system
+  Scenario: File that gets rejected because a cycle ID already exists in the system
     Given "data.provider@intersect.org.au" created a response to the "MySurvey" survey with babycode "B2"
     And I upload batch file "no_errors_or_warnings.csv" for survey "MySurvey"
     And the system processes the latest upload

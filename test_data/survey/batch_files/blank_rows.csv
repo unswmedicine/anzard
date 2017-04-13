@@ -1,4 +1,4 @@
-BabyCODE,TextMandatory,TextOptional,Date1,Date2,Time,Choice,Decimal,Integer
+CYCLE_ID,TextMandatory,TextOptional,Date1,Date2,Time,Choice,Decimal,Integer
 ,,,,,,,,,
 ,,,,,,,,,
 ,,,,,,,,,

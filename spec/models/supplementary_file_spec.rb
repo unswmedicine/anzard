@@ -25,7 +25,7 @@ describe SupplementaryFile do
     it "should reject file without a baby code column" do
       supplementary_file = create_supplementary_file('no_baby_code_column.csv', 'my multi')
       supplementary_file.pre_process.should be false
-      supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' did not contain a BabyCODE column.")
+      supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' did not contain a CYCLE_ID column.")
     end
 
     it "should reject files that are empty" do

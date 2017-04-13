@@ -2,20 +2,20 @@ require 'csv'
 
 class BatchFile < ApplicationRecord
 
-  BABY_CODE_COLUMN = "BabyCODE"
+  CYCLE_ID_COLUMN = "CYCLE_ID"
   STATUS_FAILED = "Failed"
   STATUS_SUCCESS = "Processed Successfully"
   STATUS_REVIEW = "Needs Review"
   STATUS_IN_PROGRESS = "In Progress"
 
   MESSAGE_WARNINGS = "The file you uploaded has one or more warnings. Please review the reports for details."
-  MESSAGE_NO_BABY_CODE = "The file you uploaded did not contain a BabyCODE column."
-  MESSAGE_MISSING_BABY_CODES = "The file you uploaded is missing one or more baby codes. Each record must have a baby code."
+  MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a CYCLE_ID column."
+  MESSAGE_MISSING_CYCLE_IDS = "The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID."
   MESSAGE_EMPTY = "The file you uploaded did not contain any data."
   MESSAGE_FAILED_VALIDATION = "The file you uploaded did not pass validation. Please review the reports for details."
   MESSAGE_SUCCESS = "Your file has been processed successfully."
   MESSAGE_BAD_FORMAT = "The file you uploaded was not a valid CSV file."
-  MESSAGE_DUPLICATE_BABY_CODES = "The file you uploaded contained duplicate baby codes. Each baby code can only be used once."
+  MESSAGE_DUPLICATE_CYCLE_IDS = "The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once."
   MESSAGE_UNEXPECTED_ERROR = "Processing failed due to an unexpected error."
   MESSAGE_CSV_STOP_LINE = " Processing stopped on CSV row "
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
@@ -132,7 +132,7 @@ class BatchFile < ApplicationRecord
         organiser.add_problems(question.code, r.baby_code, ["This question is mandatory"], [], "")
       end
       r.valid? #we have to call this to trigger errors getting populated
-      organiser.add_problems("BabyCODE", r.baby_code, r.errors.full_messages, [], r.baby_code) unless r.errors.empty?
+      organiser.add_problems("CYCLE_ID", r.baby_code, r.errors.full_messages, [], r.baby_code) unless r.errors.empty?
     end
     organiser
   end
@@ -162,7 +162,7 @@ class BatchFile < ApplicationRecord
     responses = []
     CSV.foreach(file.path, {headers: true}) do |row|
       @csv_row_count += 1
-      baby_code = row[BABY_CODE_COLUMN]
+      baby_code = row[CYCLE_ID_COLUMN]
       baby_code.strip! unless baby_code.nil?
       response = Response.new(survey: survey, baby_code: baby_code, user: user, hospital: hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
@@ -209,8 +209,8 @@ class BatchFile < ApplicationRecord
     @csv_row_count = 0
     baby_codes = []
     CSV.foreach(file.path, {headers: true}) do |row|
-      unless row.headers.include?(BABY_CODE_COLUMN)
-        set_outcome(STATUS_FAILED, MESSAGE_NO_BABY_CODE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+      unless row.headers.include?(CYCLE_ID_COLUMN)
+        set_outcome(STATUS_FAILED, MESSAGE_NO_CYCLE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
       end
       unless headers_unique?(row.headers)
@@ -218,14 +218,14 @@ class BatchFile < ApplicationRecord
         return false
       end
       @csv_row_count += 1
-      baby_code = row[BABY_CODE_COLUMN]
+      baby_code = row[CYCLE_ID_COLUMN]
       if baby_code.blank?
-        set_outcome(STATUS_FAILED, MESSAGE_MISSING_BABY_CODES + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        set_outcome(STATUS_FAILED, MESSAGE_MISSING_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
       else
         baby_code.strip!
         if baby_codes.include?(baby_code)
-          set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_BABY_CODES + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+          set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         else
           baby_codes << baby_code

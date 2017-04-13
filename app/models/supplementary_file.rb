@@ -20,13 +20,13 @@ class SupplementaryFile < ApplicationRecord
     begin
 
       CSV.foreach(file.path, {headers: true}) do |row|
-        unless row.headers.include?(BatchFile::BABY_CODE_COLUMN)
-          self.message = "The supplementary file you uploaded for '#{multi_name}' did not contain a BabyCODE column."
+        unless row.headers.include?(BatchFile::CYCLE_ID_COLUMN)
+          self.message = "The supplementary file you uploaded for '#{multi_name}' did not contain a CYCLE_ID column."
           return false
         end
-        baby_code = row[BatchFile::BABY_CODE_COLUMN]
+        baby_code = row[BatchFile::CYCLE_ID_COLUMN]
         if baby_code.blank?
-          self.message = "The supplementary file you uploaded for '#{multi_name}' is missing one or more baby codes. Each record must have a baby code."
+          self.message = "The supplementary file you uploaded for '#{multi_name}' is missing one or more cycle IDs. Each record must have a cycle ID."
           return false
         else
           self.supplementary_data[baby_code] ||= []
@@ -67,7 +67,7 @@ class SupplementaryFile < ApplicationRecord
         answer_hash = {}
         rows_for_baby.each_with_index do |row, index|
           answers = row.to_hash
-          answers.delete('BabyCODE')
+          answers.delete('CYCLE_ID')
           answers.each_pair do |key, value|
             answer_hash["#{key}#{index+1}"] = value unless value.blank?
           end

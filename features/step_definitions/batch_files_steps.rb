@@ -81,7 +81,7 @@ Given /^I have batch uploads$/ do |table|
     if detail
       file_path = File.join(APP_CONFIG['batch_reports_path'], "#{bf.id}-details.csv")
       CSV.open(file_path, "wb") do |csv|
-        csv.add_row ['BabyCode', 'Column Name', 'Type', 'Value', 'Message']
+        csv.add_row ['CYCLE_ID', 'Column Name', 'Type', 'Value', 'Message']
         csv.add_row ['1', 'MoAge', 'Error', '6', 'A bad value']
       end
       bf.detail_report_path = file_path
