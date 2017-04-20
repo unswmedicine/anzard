@@ -7,12 +7,12 @@
   %fieldset
     = render "shared/error_messages", target: @batch_file
     .clearfix
-      = f.label :survey_id
+      = f.label :survey_id, "Treatment data"
       .input
         = f.collection_select :survey_id, surveys, :id, :name, {:include_blank => "Please select"}, {:class => "large"}
         = required
     .clearfix
-      = f.label :year_of_registration
+      = f.label :year_of_registration, "Year of treatment"
       .input
         = f.select :year_of_registration, year_of_registration_range, {:include_blank => "Please select"}, {:class => "medium"}
         = required
