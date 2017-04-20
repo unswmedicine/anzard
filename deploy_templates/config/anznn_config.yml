@@ -2,8 +2,8 @@ defaults: &defaults
   password_reset_email_sender: no-reply@unsw.edu.au
   account_request_user_status_email_sender: no-reply@unsw.edu.au
   account_request_admin_notification_sender: no-reply@unsw.edu.au
-  batch_files_root: "/data/anznn-uploads"
-  batch_reports_path: "/data/anznn-uploads/reports"
+  batch_files_root: "/data/anzard-uploads"
+  batch_reports_path: "/data/anzard-uploads/reports"
   days_of_failed_batches_to_keep: 15
 
 development:
