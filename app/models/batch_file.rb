@@ -3,6 +3,8 @@ require 'csv'
 class BatchFile < ApplicationRecord
 
   CYCLE_ID_COLUMN = "CYCLE_ID"
+  UNIT_COLUMN = "UNIT"
+  SITE_COLUMN = "SITE"
   STATUS_FAILED = "Failed"
   STATUS_SUCCESS = "Processed Successfully"
   STATUS_REVIEW = "Needs Review"
@@ -10,6 +12,9 @@ class BatchFile < ApplicationRecord
 
   MESSAGE_WARNINGS = "The file you uploaded has one or more warnings. Please review the reports for details."
   MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a CYCLE_ID column."
+
+  MESSAGE_UNKNOWN_UNIT_OR_SITE_ID = "The file you uploaded contains a UNIT or SITE ID that is unknown to our database."
+
   MESSAGE_MISSING_CYCLE_IDS = "The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID."
   MESSAGE_EMPTY = "The file you uploaded did not contain any data."
   MESSAGE_FAILED_VALIDATION = "The file you uploaded did not pass validation. Please review the reports for details."
@@ -164,7 +169,8 @@ class BatchFile < ApplicationRecord
       @csv_row_count += 1
       baby_code = row[CYCLE_ID_COLUMN]
       baby_code.strip! unless baby_code.nil?
-      response = Response.new(survey: survey, baby_code: baby_code, user: user, hospital: hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      row_hospital = Hospital.where('unit = ? AND site = ?', row[UNIT_COLUMN], row[SITE_COLUMN]).first
+      response = Response.new(survey: survey, baby_code: baby_code, user: user, hospital: row_hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
       add_answers_from_supplementary_files(response, baby_code)
 
@@ -230,6 +236,12 @@ class BatchFile < ApplicationRecord
         else
           baby_codes << baby_code
         end
+      end
+
+      found_hospital = Hospital.where('unit = ? AND site = ?', row[UNIT_COLUMN], row[SITE_COLUMN]).first
+      if found_hospital.nil?
+        set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_OR_SITE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        return false
       end
     end
 
