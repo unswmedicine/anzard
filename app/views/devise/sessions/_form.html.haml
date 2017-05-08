@@ -1,13 +1,20 @@
 .container
-  %h2 Please enter your email and password to log in
-  .clearfix
-    = f.label :email, "Email:"
-    .input
-      = f.text_field :email, class: "xlarge"
-  .clearfix
-    = f.label :password, "Password:"
-    .input
-      = f.password_field :password, class: "xlarge"
+  .container-flex
+    .container-fixed-item
+      %h2 Please enter your email and password to log in
+      .clearfix
+        = f.label :email, "Email:"
+        .input
+          = f.text_field :email, class: "xlarge"
+      .clearfix
+        = f.label :password, "Password:"
+        .input
+          = f.password_field :password, class: "xlarge"
+    .container-flex-item
+      = image_tag 'banner_fertility_society_australia.png', class: 'logo'
+      -#= image_tag 'logo_fertility_society_australia.png', class: 'logo'
+    .container-flex-item
+      = image_tag 'logo_unsw.png', class: 'logo'
   .actions
     = f.submit "Log in", class: "btn primary"
     = link_to "Forgot your password?", new_user_password_path, class: "btn"
