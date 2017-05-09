@@ -22,6 +22,7 @@ class SpecialRules
     'special_height' => 'Hght',
     'special_length' => 'Length',
     'special_cochimplt' => 'CochImplt',
+    'special_rule22d' => 'N_V_EGTH',
   }
 
   def self.additional_cqv_validation(cqv)
@@ -58,7 +59,8 @@ class SpecialRules
                                  special_hmeo2
                                  special_hmeo2_new
                                  special_same_name_inf
-                                 special_pns)
+                                 special_pns
+                                 special_rule22d)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -416,6 +418,23 @@ class SpecialRules
 
     passing
   }
-    
+
+  CrossQuestionValidation.register_checker 'special_rule22d', lambda { |answer, ununused_related_answer, checker_params|
+    #rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
+    raise 'Can only be used on question N_V_EGTH' unless answer.question.code == 'N_V_EGTH'
+
+    n_v_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_EGTH')
+    n_s_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_EGTH')
+    n_eggs = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGS')
+    n_recvd = answer.response.comparable_answer_or_nil_for_question_with_code('N_RECVD')
+    n_donate = answer.response.comparable_answer_or_nil_for_question_with_code('N_DONATE')
+    n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+    n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
+    n_egfz_s = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
+    n_egfz_v = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
+
+    break true if (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+  }
+
   end
 end

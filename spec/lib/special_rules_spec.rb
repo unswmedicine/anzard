@@ -481,4 +481,72 @@ describe "Special Rules" do
       end
     end
   end
+
+  describe "RULE: rule22d" do
+    # rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
+    before(:each) do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @n_v_egth = create(:question, code: 'N_V_EGTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_s_egth = create(:question, code: 'N_S_EGTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_eggs = create(:question, code: 'N_EGGS', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_recvd = create(:question, code: 'N_RECVD', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_donate = create(:question, code: 'N_DONATE', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_ivf = create(:question, code: 'N_IVF', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_icsi = create(:question, code: 'N_ICSI', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_egfz_s = create(:question, code: 'N_EGFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_egfz_v = create(:question, code: 'N_EGFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
+      @cqv = create(:cross_question_validation, rule: 'special_rule22d', question: @n_v_egth, error_message: 'My error message', related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule22d', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule22d requires question code N_V_EGTH but got Blah']
+    end
+
+    it 'should pass when n_v_egth sum equal to n_donate sum' do
+      answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+      create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+      create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+      create(:answer, question: @n_recvd, answer_value: 0, response: @response)
+      create(:answer, question: @n_donate, answer_value: 0, response: @response)
+      create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+      create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+      create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+      create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should pass when n_v_egth sum greater than n_donate sum' do
+      answer = create(:answer, question: @n_v_egth, answer_value: 1, response: @response)
+      create(:answer, question: @n_s_egth, answer_value: 1, response: @response)
+      create(:answer, question: @n_eggs, answer_value: 1, response: @response)
+      create(:answer, question: @n_recvd, answer_value: 1, response: @response)
+      create(:answer, question: @n_donate, answer_value: 0, response: @response)
+      create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+      create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+      create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+      create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should fail when n_v_egth sum less than n_donate sum' do
+      answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+      create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+      create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+      create(:answer, question: @n_recvd, answer_value: 0, response: @response)
+      create(:answer, question: @n_donate, answer_value: 1, response: @response)
+      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
+      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
+      create(:answer, question: @n_egfz_s, answer_value: 1, response: @response)
+      create(:answer, question: @n_egfz_v, answer_value: 1, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to eq('My error message')
+    end
+  end
 end
