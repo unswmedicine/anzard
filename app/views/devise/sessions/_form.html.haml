@@ -11,10 +11,10 @@
         .input
           = f.password_field :password, class: "xlarge"
     .container-flex-item
-      = image_tag 'banner_fertility_society_australia.png', class: 'logo'
-      -#= image_tag 'logo_fertility_society_australia.png', class: 'logo'
+      = link_to (image_tag 'banner_fertility_society_australia.png', class: 'logo'), 'https://www.fertilitysociety.com.au/'
+      -#= link_to (image_tag 'logo_fertility_society_australia.png', class: 'logo'), 'https://www.fertilitysociety.com.au/'
     .container-flex-item
-      = image_tag 'logo_unsw.png', class: 'logo'
+      = link_to (image_tag 'logo_unsw.png', class: 'logo'), 'https://www.unsw.edu.au/'
   .actions
     = f.submit "Log in", class: "btn primary"
     = link_to "Forgot your password?", new_user_password_path, class: "btn"
