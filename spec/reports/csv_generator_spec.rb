@@ -54,7 +54,7 @@ describe CsvGenerator do
       q_text = create(:question, section: section1, question_order: 2, question_type: Question::TYPE_TEXT, code: 'TextQ')
       q_time = create(:question, section: section1, question_order: 4, question_type: Question::TYPE_TIME, code: 'TimeQ')
 
-      response1 = create(:response, hospital: create(:hospital, unit: 'IVF', site: 'HRL'), survey: survey, year_of_registration: 2009, baby_code: 'ABC-123')
+      response1 = create(:response, hospital: create(:hospital, name: 'RNS', unit: 'IVF', site: 'HRL', site_name: 'HRL'), survey: survey, year_of_registration: 2009, baby_code: 'ABC-123')
       create(:answer, response: response1, question: q_choice, answer_value: '1')
       create(:answer, response: response1, question: q_date, answer_value: '25/02/2001')
       create(:answer, response: response1, question: q_decimal, answer_value: '15.5673')
@@ -64,7 +64,7 @@ describe CsvGenerator do
       response1.reload
       response1.save!
 
-      response2 = create(:response, hospital: create(:hospital, unit: 'IVF', site: 'BBB'), survey: survey, year_of_registration: 2011, baby_code: 'DEF-567')
+      response2 = create(:response, hospital: create(:hospital, name: 'RNS', unit: 'IVF', site: 'BBB', site_name: 'BBB'), survey: survey, year_of_registration: 2011, baby_code: 'DEF-567')
       create(:answer, response: response2, question: q_integer, answer_value: '99')
       create(:answer, response: response2, question: q_text, answer_value: 'ABCdefg Ijkl')
       response2.reload
@@ -73,9 +73,9 @@ describe CsvGenerator do
       expect(Response).to receive(:for_survey_hospital_and_year_of_registration).with(survey, '', '', '').and_return([response1, response2])
       csv = CsvGenerator.new(survey.id, '', '', '').csv
       expected = []
-      expected << %w(RegistrationType YearOfRegistration Hospital CYCLE_ID ChoiceQ TextQ DateQ TimeQ IntegerQ DecimalQ)
-      expected << ['Survey One', '2009', 'HRL', 'ABC-123', '1', 'ABc', '2001-02-25', '14:56', '877', '15.5673']
-      expected << ['Survey One', '2011', 'BBB', 'DEF-567', '', 'ABCdefg Ijkl', '', '', '99', '']
+      expected << %w(TreatmentData YearOfTreatment Clinic SiteName UnitID SiteID CYCLE_ID ChoiceQ TextQ DateQ TimeQ IntegerQ DecimalQ)
+      expected << ['Survey One', '2009', 'RNS', 'HRL', 0, 0, 'ABC-123', '1', 'ABc', '2001-02-25', '14:56', '877', '15.5673']
+      expected << ['Survey One', '2011', 'RNS', 'BBB', 0, 0, 'DEF-567', '', 'ABCdefg Ijkl', '', '', '99', '']
       expect(CSV.parse(csv)).to eq(expected)
     end
   end

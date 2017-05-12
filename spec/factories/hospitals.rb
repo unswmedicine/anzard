@@ -9,5 +9,6 @@ FactoryGirl.define do
       end
       sequence(:unit) { |n| "Some Unit #{n}" }
       sequence(:site) { |n| "Some Site #{n}" }
+      sequence(:site_name) { |n| "Some Site Name #{n}" }
     end
 end
