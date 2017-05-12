@@ -10,7 +10,8 @@ describe Hospital do
   describe "Validations" do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:state) }
-    it { should validate_presence_of(:abbrev) }
+    it { should validate_presence_of(:unit) }
+    it { should validate_presence_of(:site) }
   end
 
   describe "Grouping Hospitals By State" do
