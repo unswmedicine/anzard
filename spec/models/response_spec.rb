@@ -13,12 +13,6 @@ describe Response do
     it { should validate_presence_of :user }
     it { should validate_presence_of :survey_id }
     it { should validate_presence_of :year_of_registration }
-    it { should ensure_length_of(:baby_code).is_at_most(30) }
-    it "should reject non-alphanumeric except -_ strings for babycodes" do
-      build(:response, baby_code: '!').should_not be_valid
-      build(:response, baby_code: '-').should be_valid
-      build(:response, baby_code: '_').should be_valid
-    end
 
     it "should validate that submitted_status is one of the allowed types" do
       [Response::STATUS_SUBMITTED, Response::STATUS_UNSUBMITTED].each do |value|
@@ -84,19 +78,19 @@ describe Response do
     end
 
     it "should return all submitted responses for survey when hospital and year of reg not provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
     end
 
     it "should filter by hospital when provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "").collect(&:id).should eq([@r1, @r2, @r3])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "", "").collect(&:id).should eq([@r1, @r2, @r3])
     end
 
     it "should filter by year of reg when provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "2001").collect(&:id).should eq([@r1, @r2, @r4])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "2001", "").collect(&:id).should eq([@r1, @r2, @r4])
     end
 
     it "should filter by hospital and year of reg when both provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "2001").collect(&:id).should eq([@r1, @r2])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "2001", "").collect(&:id).should eq([@r1, @r2])
     end
   end
 
