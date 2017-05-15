@@ -28,20 +28,20 @@ Feature: Review my answers
     And I have the following cross question validations
       | question   | related    | rule       | operator | error_message                         |
       | Integer Q2 | Integer Q3 | comparison | ==       | Integer Q2 should be eq to Integer Q3 |
-    And I create a response for "MySurvey" with baby code "ABCDEF" and year of registration "2005"
+    And I create a response for "MySurvey" with cycle id "ABCDEF" and year of registration "2005"
 
   Scenario: Navigate from home page to review answers page
     Given I am on the home page
     When I follow "Review Answers"
     Then I should be on the review answers page for ABCDEF
-    Then I should see "MySurvey - Baby Code ABCDEF - Year of Registration 2005"
+    Then I should see "MySurvey - Cycle Id ABCDEF - Year of Registration 2005"
 
   Scenario: Navigate from summary page to review answers and back again
     Given I am on the home page
     And I follow "View Summary"
     When I follow "Review Answers"
     Then I should be on the review answers page for ABCDEF
-    And I should see "MySurvey - Baby Code ABCDEF"
+    And I should see "MySurvey - Cycle Id ABCDEF"
     When I follow "Go To Summary Page"
     Then I should be on the response summary page for ABCDEF
 
@@ -144,5 +144,5 @@ Feature: Review my answers
     When I am on the home page
     And I follow "Review Answers"
     Then I should be on the review answers page for ABCDEF
-    And I should see "MySurvey - Baby Code ABCDEF - Year of Registration 2005"
+    And I should see "MySurvey - Cycle Id ABCDEF - Year of Registration 2005"
     But I should not see link "Edit Answers"

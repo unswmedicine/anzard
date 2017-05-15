@@ -18,7 +18,7 @@ class ResponsesController < ApplicationController
 
   def submit
     @response.submit!
-    redirect_to root_path, notice: "Data Entry Form for #{@response.baby_code} to #{@response.survey.name} was submitted successfully."
+    redirect_to root_path, notice: "Data Entry Form for #{@response.cycle_id} to #{@response.survey.name} was submitted successfully."
   end
 
   def create
@@ -160,15 +160,15 @@ class ResponsesController < ApplicationController
     end
   end
 
-  def submitted_baby_codes
-    set_tab :submitted_baby_codes, :home
+  def submitted_cycle_ids
+    set_tab :submitted_cycle_ids, :home
 
-    @baby_codes_by_year_by_form = organised_baby_codes(current_user)
+    @cycle_ids_by_year_by_form = organised_cycle_ids(current_user)
   end
 
   private
 
-  def organised_baby_codes(user)
+  def organised_cycle_ids(user)
     hospital = user.hospital
     responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, hospital_id: hospital)
     responses_by_survey = responses.group_by {|response| response.survey }

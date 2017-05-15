@@ -199,7 +199,7 @@ class Response < ApplicationRecord
   end
 
   def strip_whitespace
-    self.baby_code = self.baby_code.strip unless self.baby_code.nil?
+    self.cycle_id = self.cycle_id.strip unless self.cycle_id.nil?
   end
 
   def clear_dummy_answers
