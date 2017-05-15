@@ -9,7 +9,7 @@ describe Response do
   end
 
   describe "Validations" do
-    it { should validate_presence_of :baby_code }
+    it { should validate_presence_of :cycle_id }
     it { should validate_presence_of :user }
     it { should validate_presence_of :survey_id }
     it { should validate_presence_of :year_of_registration }
@@ -23,19 +23,19 @@ describe Response do
     end
 
     it "should validate that baby code is unique within survey" do
-      first = create(:response, baby_code: "abcd")
-      second = build(:response, survey: first.survey, baby_code: first.baby_code)
+      first = create(:response, cycle_id: "abcd")
+      second = build(:response, survey: first.survey, cycle_id: first.baby_code)
       second.should_not be_valid
       second.errors.full_messages.should eq(["Baby code abcd has already been used."])
-      diff_survey = build(:response, survey: create(:survey), baby_code: first.baby_code)
+      diff_survey = build(:response, survey: create(:survey), cycle_id: first.baby_code)
       diff_survey.should be_valid
     end
 
     it "should strip leading/trailing spaces from baby codes before validating" do
-      first = create(:response, baby_code: " abcd ")
+      first = create(:response, cycle_id: " abcd ")
       first.baby_code.should eq("abcd")
 
-      second = build(:response, survey: first.survey, baby_code: " abcd")
+      second = build(:response, survey: first.survey, cycle_id: " abcd")
       second.should_not be_valid
       second.errors.full_messages.should eq(["Baby code abcd has already been used."])
     end
@@ -67,13 +67,13 @@ describe Response do
       @survey_b = create(:survey)
       @hospital_a = create(:hospital)
       @hospital_b = create(:hospital)
-      @r1 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "1").id
-      @r2 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "2").id
-      @r3 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "3").id
-      @r4 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "4").id
-      @r5 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "5").id
-      @r6 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, baby_code: "6").id
-      @r7 = create(:response, survey: @survey_b, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "7").id
+      @r1 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "1").id
+      @r2 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "2").id
+      @r3 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "3").id
+      @r4 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "4").id
+      @r5 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "5").id
+      @r6 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "6").id
+      @r7 = create(:response, survey: @survey_b, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "7").id
       @r8 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
     end
 

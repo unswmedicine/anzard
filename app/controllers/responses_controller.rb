@@ -175,7 +175,7 @@ class ResponsesController < ApplicationController
     responses_by_survey_and_year = responses_by_survey.map do |survey, responses|
       responses_by_year = responses.group_by{|response| response.year_of_registration }
       ordered_stuff = responses_by_year.map do |year, responses|
-        [year, responses.map(&:baby_code).sort]
+        [year, responses.map(&:cycle_id).sort]
       end.sort_by {|year, _| -year}
 
       [survey.name, ordered_stuff]
@@ -233,7 +233,7 @@ class ResponsesController < ApplicationController
   end
 
   def create_params
-    params.require(:response).permit(:year_of_registration, :survey_id, :baby_code)
+    params.require(:response).permit(:year_of_registration, :survey_id, :cycle_id)
   end
 
 end

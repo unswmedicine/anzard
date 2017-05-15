@@ -29,11 +29,11 @@ def create_response(survey, email, babycode = 'babycode123', year_of_reg = "2005
   user = User.find_by_email(email)
   submitted_status = submitted ? Response::STATUS_SUBMITTED : Response::STATUS_UNSUBMITTED
   if id
-    Response.create!(survey: survey, baby_code: babycode, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status) do |r|
+    Response.create!(survey: survey, cycle_id: babycode, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status) do |r|
       r.id = id
     end 
   else
-    Response.create!(survey: survey, baby_code: babycode, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status)
+    Response.create!(survey: survey, cycle_id: babycode, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status)
   end
 end
 

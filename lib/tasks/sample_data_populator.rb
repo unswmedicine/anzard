@@ -163,7 +163,7 @@ def create_response(survey, profile, hospital, submit=false)
            end
   response = Response.create!(hospital: hospital,
                               submitted_status: status,
-                              baby_code: "#{prefix}-#{hospital.name}-#{rand(10000000)}",
+                              cycle_id: "#{prefix}-#{hospital.name}-#{rand(10000000)}",
                               survey: survey,
                               year_of_registration: year_of_reg,
                               user: User.all.sample)

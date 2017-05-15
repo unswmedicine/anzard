@@ -6,8 +6,8 @@ When /^hospital "([^"]*)" has submitted the following baby codes$/ do |hospital,
   table.hashes.each do |hash|
     survey = hash[:form]
     Factory.create(:response, user: user, hospital: user.hospital,
-                   submitted_status: Response::STATUS_SUBMITTED, baby_code: hash[:baby_code],
-                   year_of_registration: hash[:year],survey: Survey.find_by_name!(survey))
+                   submitted_status: Response::STATUS_SUBMITTED, cycle_id: hash[:cycle_id],
+                   year_of_registration: hash[:year], survey: Survey.find_by_name!(survey))
   end
 end
 When /^I should see the following baby codes$/ do |table|
@@ -35,7 +35,7 @@ When /^I should see the following baby codes$/ do |table|
 
     expected_codes[form_name] = {}
     hashes_by_year.each do |year, hashes|
-      expected_codes[form_name][year] = hashes.map{|hash| hash[:baby_code]}.sort
+      expected_codes[form_name][year] = hashes.map{|hash| hash[:cycle_id]}.sort
     end
   end
 

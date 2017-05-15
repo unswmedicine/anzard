@@ -361,7 +361,7 @@ describe BatchFile do
       end
 
       it "should reject records where the baby code is already in the system" do
-        create(:response, survey: survey, baby_code: "B2")
+        create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -380,7 +380,7 @@ describe BatchFile do
       end
 
       it "should reject records where the baby code is already in the system even with whitespace padding" do
-        create(:response, survey: survey, baby_code: "B2")
+        create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -399,7 +399,7 @@ describe BatchFile do
       end
 
       it "can detect both duplicate baby code and other errors on the same record" do
-        create(:response, survey: survey, baby_code: "B2")
+        create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")

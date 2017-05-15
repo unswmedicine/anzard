@@ -164,7 +164,7 @@ class BatchFile < ApplicationRecord
       @csv_row_count += 1
       baby_code = row[CYCLE_ID_COLUMN]
       baby_code.strip! unless baby_code.nil?
-      response = Response.new(survey: survey, baby_code: baby_code, user: user, hospital: hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      response = Response.new(survey: survey, cycle_id: baby_code, user: user, hospital: hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
       add_answers_from_supplementary_files(response, baby_code)
 
