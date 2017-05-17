@@ -22,8 +22,8 @@ describe SupplementaryFile do
       supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' was not a valid CSV file.")
     end
 
-    it "should reject file without a baby code column" do
-      supplementary_file = create_supplementary_file('no_baby_code_column.csv', 'my multi')
+    it "should reject file without a cycle id column" do
+      supplementary_file = create_supplementary_file('no_cycle_id_column.csv', 'my multi')
       supplementary_file.pre_process.should be false
       supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' did not contain a CYCLE_ID column.")
     end
@@ -46,14 +46,14 @@ describe SupplementaryFile do
       # this is a bit hard to express, so commenting for clarity.
       # what we're doing is taking a normalised set of answers and rearranging them to be de-normalised to suit the structure we have
       # e.g. a CSV would contain
-      # | BabyCODE | SurgeryDate | SurgeryName  |
+      # | CycleID | SurgeryDate | SurgeryName  |
       # | B1       | 2012-12-1   | blah1        |
       # | B1       | 2012-12-2   | blah2        |
       # | B2       | 2012-12-1   | blah1        |
       # | B2       | 2012-12-2   | blah2        |
       # | B2       | 2012-12-3   | blah3        |
       # and we want to turn that into something like this
-      # | BabyCODE | SurgeryDate1 | SurgeryName1  | SurgeryDate2 | SurgeryName2  | SurgeryDate3 | SurgeryName3 |
+      # | CycleID | SurgeryDate1 | SurgeryName1  | SurgeryDate2 | SurgeryName2  | SurgeryDate3 | SurgeryName3 |
       # | B1       | 2012-12-1    | blah1         |2012-12-2     | blah2         |              |              |
       # | B2       | 2012-12-1    | blah1         |2012-12-2     | blah2         |2012-12-3     | blah3        |
 
@@ -63,17 +63,17 @@ describe SupplementaryFile do
 
       denormalised = supp_file.as_denormalised_hash
       #File contents:
-      #BabyCODE,Date,Time
+      #CycleID,Date,Time
       #B1,2012-12-01,11:45
       #B1,2011-11-01,
       #B2,2011-08-30,01:05
       #B2,2010-03-04,13:23
       #B2,,11:53
       denormalised.size.should eq(2)
-      baby1 = denormalised['B1']
-      baby1.should eq({'Date1' => '2012-12-01', 'Date2' => '2011-11-01', 'Time1' => '11:45'})
-      baby2 = denormalised['B2']
-      baby2.should eq({'Date1' => '2011-08-30', 'Date2' => '2010-03-04', 'Time1' => '01:05', 'Time2' => '13:23', 'Time3' => '11:53'})
+      cycle1 = denormalised['B1']
+      cycle1.should eq({'Date1' => '2012-12-01', 'Date2' => '2011-11-01', 'Time1' => '11:45'})
+      cycle2 = denormalised['B2']
+      cycle2.should eq({'Date1' => '2011-08-30', 'Date2' => '2010-03-04', 'Time1' => '01:05', 'Time2' => '13:23', 'Time3' => '11:53'})
     end
   end
   

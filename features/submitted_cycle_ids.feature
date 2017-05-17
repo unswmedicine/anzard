@@ -1,7 +1,7 @@
-Feature: Submitted Baby Codes
+Feature: Submitted Cycle Ids
   In order to keep track of the submitted codes
   As a data provider or data provider supervisor
-  I want to view list of submitted baby codes
+  I want to view list of submitted cycle ids
 
   Background:
     Given I have the usual roles
@@ -22,37 +22,37 @@ Feature: Submitted Baby Codes
       | joe@intersect.org.au  | Joe        | Bloggs    | Data Provider            | H4         |
     And I have a survey with name "main"
     And I have a survey with name "followup"
-    And hospital "Right Wing" has submitted the following baby codes
-      | year | baby_code | form |
+    And hospital "Right Wing" has submitted the following cycle ids
+      | year | cycle_id | form |
       | 2012 | abcd      | main |
-    And hospital "H4" has submitted the following baby codes
-      | year | baby_code | form     |
-      | 2012 | baby1     | main     |
-      | 2012 | baby5     | followup |
-      | 2011 | baby6     | main     |
-    And hospital "Left Wing" has submitted the following baby codes
-      | year | baby_code | form     |
-      | 2011 | baby2     | followup |
-      | 2012 | baby3     | main     |
-      | 2010 | baby4     | main     |
+    And hospital "H4" has submitted the following cycle ids
+      | year | cycle_id | form     |
+      | 2012 | cycle1     | main     |
+      | 2012 | cycle5     | followup |
+      | 2011 | cycle6     | main     |
+    And hospital "Left Wing" has submitted the following cycle ids
+      | year | cycle_id | form     |
+      | 2011 | cycle2     | followup |
+      | 2012 | cycle3     | main     |
+      | 2010 | cycle4     | main     |
 
-  Scenario: Data provider can view the list of submitted baby codes
+  Scenario: Data provider can view the list of submitted cycle ids
     Given I am logged in as "fred@intersect.org.au"
     When I am on the home page
-    And I follow "Submitted Baby Codes"
-    Then I should be on the submitted baby codes page
-    And I should see the following baby codes
-    | form     | year | baby_code |
-    | followup | 2011 | baby2     |
-    | main     | 2012 | baby3     |
-    | main     | 2010 | baby4     |
+    And I follow "Submitted Cycle Ids"
+    Then I should be on the submitted cycle ids page
+    And I should see the following cycle ids
+    | form     | year | cycle_id |
+    | followup | 2011 | cycle2     |
+    | main     | 2012 | cycle3     |
+    | main     | 2010 | cycle4     |
 
-  Scenario: Administrator can not see the submitted baby codes link
+  Scenario: Administrator can not see the submitted cycle ids link
     Given I am logged in as "dan@intersect.org.au"
     When I am on the home page
-    Then I should not see link "Submitted Baby Codes"
+    Then I should not see link "Submitted Cycle Ids"
 
-  Scenario: Administrator will see error when opening submitted baby codes
+  Scenario: Administrator will see error when opening submitted cycle ids
     Given I am logged in as "dan@intersect.org.au"
-    Then I should get a security error when I visit the submitted baby codes page
+    Then I should get a security error when I visit the submitted cycle ids page
 

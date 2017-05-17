@@ -9,7 +9,7 @@ From the 'Data Entry Forms' tab on the home page, click on the 'New Data Entry F
 ![Start a new data entry form](/user_manual/assets/images/data_entry/start.png)
 *Fig 1. Starting a new data entry form*
 
-You will be asked to select the registration type, the year of registration and to enter the baby code. Once you have entered these click 'Save' to start the record. If you're unsure how to answer these questions please contact the ANZNN.
+You will be asked to select the registration type, the year of registration and to enter the cycle id. Once you have entered these click 'Save' to start the record. If you're unsure how to answer these questions please contact the ANZNN.
 
 ![New data entry form](/user_manual/assets/images/data_entry/new.png)
 *Fig 2. Entering key information about the new data entry form*

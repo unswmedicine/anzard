@@ -123,8 +123,8 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      it "should reject file without a baby code column" do
-        batch_file = process_batch_file('no_baby_code_column.csv', survey, user)
+      it "should reject file without a cycle id column" do
+        batch_file = process_batch_file('no_cycle_id_column.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not contain a CYCLE_ID column. Processing stopped on CSV row 0")
         batch_file.record_count.should be_nil
@@ -165,9 +165,9 @@ describe BatchFile do
         batch_file.problem_record_count.should == 0
         batch_file.record_count.should == 3
 
-        r1 = Response.find_by_baby_code!("B1")
-        r2 = Response.find_by_baby_code!("B2")
-        r3 = Response.find_by_baby_code!("B3")
+        r1 = Response.find_by_cycle_id!("B1")
+        r2 = Response.find_by_cycle_id!("B2")
+        r3 = Response.find_by_cycle_id!("B3")
 
         [r1, r2, r3].each do |r|
           r.survey.should eq(survey)
@@ -204,9 +204,9 @@ describe BatchFile do
         batch_file.problem_record_count.should == 0
         batch_file.record_count.should == 3
 
-        r1 = Response.find_by_baby_code!("B1")
-        r2 = Response.find_by_baby_code!("B2")
-        r3 = Response.find_by_baby_code!("B3")
+        r1 = Response.find_by_cycle_id!("B1")
+        r2 = Response.find_by_cycle_id!("B2")
+        r3 = Response.find_by_cycle_id!("B3")
 
         [r1, r2, r3].each do |r|
           r.survey.should eq(survey)
@@ -235,7 +235,7 @@ describe BatchFile do
     end
 
     describe "with validation errors" do
-      it "file that just has blank rows fails on baby code since baby codes are missing" do
+      it "file that just has blank rows fails on cycle id since cycle ids are missing" do
         batch_file = process_batch_file('blank_rows.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 1")
@@ -247,8 +247,8 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      it "file with missing baby codes should be rejected completely and no reports generated" do
-        batch_file = process_batch_file('missing_baby_code.csv', survey, user)
+      it "file with missing cycle ids should be rejected completely and no reports generated" do
+        batch_file = process_batch_file('missing_cycle_id.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 2")
         Response.count.should == 0
@@ -259,8 +259,8 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      it "file with duplicate baby codes within the file should be rejected completely and no reports generated" do
-        batch_file = process_batch_file('duplicate_baby_code.csv', survey, user)
+      it "file with duplicate cycle ids within the file should be rejected completely and no reports generated" do
+        batch_file = process_batch_file('duplicate_cycle_id.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
         Response.count.should == 0
@@ -271,8 +271,8 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      it "file with duplicate baby codes within the file (with whitespace padding) should be rejected completely and no reports generated" do
-        batch_file = process_batch_file('duplicate_baby_code_whitespace.csv', survey, user)
+      it "file with duplicate cycle ids within the file (with whitespace padding) should be rejected completely and no reports generated" do
+        batch_file = process_batch_file('duplicate_cycle_id_whitespace.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
         Response.count.should == 0
@@ -360,8 +360,8 @@ describe BatchFile do
         batch_file.detail_report_path.should_not be_nil
       end
 
-      it "should reject records where the baby code is already in the system" do
-        create(:response, survey: survey, baby_code: "B2")
+      it "should reject records where the cycle id is already in the system" do
+        create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -376,11 +376,11 @@ describe BatchFile do
         rows = CSV.read(csv_file)
         rows.size.should eq(2)
         rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Baby code B2 has already been used.'])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used.'])
       end
 
-      it "should reject records where the baby code is already in the system even with whitespace padding" do
-        create(:response, survey: survey, baby_code: "B2")
+      it "should reject records where the cycle id is already in the system even with whitespace padding" do
+        create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -395,11 +395,11 @@ describe BatchFile do
         rows = CSV.read(csv_file)
         rows.size.should eq(2)
         rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Baby code B2 has already been used.'])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used.'])
       end
 
-      it "can detect both duplicate baby code and other errors on the same record" do
-        create(:response, survey: survey, baby_code: "B2")
+      it "can detect both duplicate cycle id and other errors on the same record" do
+        create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
@@ -414,7 +414,7 @@ describe BatchFile do
         rows = CSV.read(csv_file)
         rows.size.should eq(3)
         rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Baby code B2 has already been used.'])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used.'])
         rows[2].should eq(['B2', 'TextMandatory', 'Error', '', 'This question is mandatory'])
       end
     end
@@ -571,9 +571,9 @@ describe BatchFile do
           batch_file.problem_record_count.should == 0
           batch_file.record_count.should == 3
 
-          b1_answer_hash = Response.find_by_baby_code!("B1").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
-          b2_answer_hash = Response.find_by_baby_code!("B2").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
-          b3_answer_hash = Response.find_by_baby_code!("B3").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+          b1_answer_hash = Response.find_by_cycle_id!("B1").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+          b2_answer_hash = Response.find_by_cycle_id!("B2").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+          b3_answer_hash = Response.find_by_cycle_id!("B3").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
 
           b1_answer_hash.size.should eq(7) #3 from multi-1, 0 from multi-2, 4 from main
           b1_answer_hash["Date1"].date_answer.should == Date.parse("2012-12-01")
@@ -627,7 +627,7 @@ describe BatchFile do
         pending
       end
 
-      describe "where the supplementary file contains baby codes not in the main file" do
+      describe "where the supplementary file contains cycle ids not in the main file" do
         pending
       end
 

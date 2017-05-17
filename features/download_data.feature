@@ -16,7 +16,7 @@ Feature: Download survey data
       | Sydney Childrens Hospital    | NSW   | SCH    |
       | Another One                  | NSW   | AO     |
     And I have responses
-      | survey   | year_of_registration | hospital          | baby_code | submitted_status |
+      | survey   | year_of_registration | hospital          | cycle_id | submitted_status |
       | Survey A | 2009                 | RPA               | A-2009-1  | Submitted        |
       | Survey A | 2009                 | Mercy Hospital    | A-2009-2  | Submitted        |
       | Survey A | 2011                 | Mercy Hospital    | A-2011-1  | Submitted        |

@@ -18,7 +18,7 @@ class ResponsesController < ApplicationController
 
   def submit
     @response.submit!
-    redirect_to root_path, notice: "Data Entry Form for #{@response.baby_code} to #{@response.survey.name} was submitted successfully."
+    redirect_to root_path, notice: "Data Entry Form for #{@response.cycle_id} to #{@response.survey.name} was submitted successfully."
   end
 
   def create
@@ -160,22 +160,22 @@ class ResponsesController < ApplicationController
     end
   end
 
-  def submitted_baby_codes
-    set_tab :submitted_baby_codes, :home
+  def submitted_cycle_ids
+    set_tab :submitted_cycle_ids, :home
 
-    @baby_codes_by_year_by_form = organised_baby_codes(current_user)
+    @cycle_ids_by_year_by_form = organised_cycle_ids(current_user)
   end
 
   private
 
-  def organised_baby_codes(user)
+  def organised_cycle_ids(user)
     hospital = user.hospital
     responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, hospital_id: hospital)
     responses_by_survey = responses.group_by {|response| response.survey }
     responses_by_survey_and_year = responses_by_survey.map do |survey, responses|
       responses_by_year = responses.group_by{|response| response.year_of_registration }
       ordered_stuff = responses_by_year.map do |year, responses|
-        [year, responses.map(&:baby_code).sort]
+        [year, responses.map(&:cycle_id).sort]
       end.sort_by {|year, _| -year}
 
       [survey.name, ordered_stuff]
@@ -233,7 +233,7 @@ class ResponsesController < ApplicationController
   end
 
   def create_params
-    params.require(:response).permit(:year_of_registration, :survey_id, :baby_code)
+    params.require(:response).permit(:year_of_registration, :survey_id, :cycle_id)
   end
 
 end

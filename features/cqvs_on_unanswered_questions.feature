@@ -52,7 +52,7 @@ Feature: In order to see error messages in the right place
     Then I should not see "QText must be present if QChoice == 1"
 
   Scenario: Warning shows up on response submission screen
-    Given "dataprovider@intersect.org.au" created a response to the "MySurvey" survey with babycode "abc"
+    Given "dataprovider@intersect.org.au" created a response to the "MySurvey" survey with cycleid "abc"
     And I am logged in as "dataprovider@intersect.org.au"
     And I am on the edit first response page
     And I store the following answers skipping assertion

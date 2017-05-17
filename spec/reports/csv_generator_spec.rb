@@ -54,7 +54,7 @@ describe CsvGenerator do
       q_text = create(:question, section: section1, question_order: 2, question_type: Question::TYPE_TEXT, code: 'TextQ')
       q_time = create(:question, section: section1, question_order: 4, question_type: Question::TYPE_TIME, code: 'TimeQ')
 
-      response1 = create(:response, hospital: create(:hospital, name: 'RNS', unit: 'IVF', site: 'HRL', site_name: 'HRL'), survey: survey, year_of_registration: 2009, baby_code: 'ABC-123')
+      response1 = create(:response, hospital: create(:hospital, name: 'RNS', unit: 'IVF', site: 'HRL', site_name: 'HRL'), survey: survey, year_of_registration: 2009, cycle_id: 'ABC-123')
       create(:answer, response: response1, question: q_choice, answer_value: '1')
       create(:answer, response: response1, question: q_date, answer_value: '25/02/2001')
       create(:answer, response: response1, question: q_decimal, answer_value: '15.5673')
@@ -64,7 +64,7 @@ describe CsvGenerator do
       response1.reload
       response1.save!
 
-      response2 = create(:response, hospital: create(:hospital, name: 'RNS', unit: 'IVF', site: 'BBB', site_name: 'BBB'), survey: survey, year_of_registration: 2011, baby_code: 'DEF-567')
+      response2 = create(:response, hospital: create(:hospital, name: 'RNS', unit: 'IVF', site: 'BBB', site_name: 'BBB'), survey: survey, year_of_registration: 2011, cycle_id: 'DEF-567')
       create(:answer, response: response2, question: q_integer, answer_value: '99')
       create(:answer, response: response2, question: q_text, answer_value: 'ABCdefg Ijkl')
       response2.reload
