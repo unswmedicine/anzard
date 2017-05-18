@@ -46,6 +46,7 @@ describe CrossQuestionValidation do
   describe "helpers" do
     ALL_OPERATORS = %w(* / + - % ** == != > < >= <= <=> === eql? equal? = += -+ *= /+ %= **= & | ^ ~ << >> and or && || ! not ?: .. ...)
     UNSAFE_OPERATORS = ALL_OPERATORS - CrossQuestionValidation::SAFE_OPERATORS
+    # ToDo: Text safe operators for textual constants
     describe 'safe operators' do
 
       it "should accept 'safe' operators" do
@@ -60,6 +61,7 @@ describe CrossQuestionValidation do
       end
     end
 
+    # ToDo: Test set operators for textual constants
     describe 'valid set operators' do
 
       it "should accept valid operators" do
@@ -74,6 +76,7 @@ describe CrossQuestionValidation do
       end
     end
 
+    # ToDo: text set conditions for textual constants
     describe 'set_meets_conditions' do
       it "should pass true statements" do
         CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "included", 5).should eq true
@@ -93,6 +96,7 @@ describe CrossQuestionValidation do
         CrossQuestionValidation.set_meets_condition?([1, 5], "range", 5.1).should eq false
       end
 
+      # ToDo: test unsafe operators are rejected for textual constant sets
       it "should reject statements with invalid operators" do
         CrossQuestionValidation.set_meets_condition?([1, 3, 5], "swirly", 0).should eq false
         CrossQuestionValidation.set_meets_condition?([1, 3, 5], "includified", 0).should eq false
@@ -112,6 +116,7 @@ describe CrossQuestionValidation do
         CrossQuestionValidation.const_meets_condition?(5, "<=", 3).should eq false
       end
 
+      # ToDo: test unsafe operators are rejected for textual constants
       it "should reject statements with unsafe operators" do
         CrossQuestionValidation.const_meets_condition?(0, UNSAFE_OPERATORS.first, 0).should eq false
         CrossQuestionValidation.const_meets_condition?(0, UNSAFE_OPERATORS.last, 0).should eq false
@@ -159,7 +164,7 @@ describe CrossQuestionValidation do
 
       describe 'present implies constant (textual constant)' do
         before :each do
-          @error_message = 'if q1 is present, q2 must be y'
+          @error_message = 'if q2 is present, q1 must be y'
           @q1 = create :question, section: @section, question_type: 'Text'
           @q2 = create :question, section: @section, question_type: 'Integer'
           create :cqv_present_implies_constant, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: 'y'
@@ -186,6 +191,21 @@ describe CrossQuestionValidation do
         it("accepts when RHS is specified constant and LHS is expected constant") { standard_cqv_test(1, 1, []) }
       end
 
+      describe 'constant implies constant (textual constant)' do
+        before :each do
+          @error_message = 'if q2 > 0, q1 must be y'
+          @q1 = create :question, section: @section, question_type: 'Text'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          create :cqv_const_implies_const, question: @q1, related_question: @q2, error_message: @error_message,
+                 conditional_operator: '>', conditional_constant: 0, operator: '==', constant: 'y'
+        end
+        it("handles nils") { standard_cqv_test({}, {}, []) }
+        it("doesn't reject the LHS when RHS not expected constant") { standard_cqv_test('n', 0, []) }
+        it("rejects when RHS is specified constant and LHS is not expected constant") { standard_cqv_test('n', 1, [@error_message]) }
+        it("accepts when RHS is specified constant and LHS is expected constant") { standard_cqv_test('y', 1, []) }
+      end
+
+      # ToDo: test for textual constants and sets
       describe 'constant implies set' do
         before :each do
           @error_message = 'q2 was != 0, q1 was not in specified set [1,3,5,7]'
@@ -203,6 +223,7 @@ describe CrossQuestionValidation do
         it("accepts when RHS is specified const and LHS is in expected set") { standard_cqv_test(1, 1, []) }
       end
 
+      # ToDo: test for textual constants and sets
       describe 'set implies set' do
         before :each do
           @error_message = 'q2  was in [2,4,6,8], q1 was not in specified set [1,3,5,7]'
@@ -236,6 +257,7 @@ describe CrossQuestionValidation do
         it("fails if the question is answered and the related question has an invalid answer") { standard_cqv_test("2011-12-12", "11:", [@error_message]) }
       end
 
+      # ToDo: test for textual constants
       describe 'const implies present' do
         before :each do
           @error_message = 'q2 must be answered if q1 is'
@@ -257,6 +279,7 @@ describe CrossQuestionValidation do
         it("fails if related question has an invalid answer and answer to question == constant") { standard_cqv_test("-1", "2011-12-", [@error_message]) }
       end
 
+      # ToDo: test for textual set
       describe 'set implies present' do
         before :each do
           @error_message = 'q2 must be answered if q1 is in [2..7]'
@@ -287,6 +310,7 @@ describe CrossQuestionValidation do
         it("fails if related question has an invalid answer and answer to question in range") { standard_cqv_test("3", "2011-12-", [@error_message]) }
       end
 
+      # ToDo: test for textual constants
       describe 'const implies one of const' do
         before :each do
           @error_message = 'q2 or q3 must be -1 if q1 is 99'
@@ -315,6 +339,7 @@ describe CrossQuestionValidation do
         @response = create :response, survey: @survey
       end
 
+      # ToDo: test for textual constants
       describe 'blank if constant (q must be blank if related q == constant)' do
         # e.g. If Died_ is 0, DiedDate must be blank (rule is on DiedDate)
         before :each do
@@ -339,6 +364,7 @@ describe CrossQuestionValidation do
         @response = create :response, survey: @survey
       end
 
+      # ToDo: test for textual constants
       describe 'present if constant (q must be present if related q == constant)' do
         # e.g. If Died_ is 0, DiedDate must be blank (rule is on DiedDate)
         before :each do
@@ -427,6 +453,8 @@ describe CrossQuestionValidation do
         it("accepts lt") { standard_cqv_test(Date.new(2012, 2, 1), Date.new(2012, 2, 2), []) }
         it("rejects eq") { standard_cqv_test(Date.new(2012, 2, 2), Date.new(2012, 2, 2), [@error_message]) }
       end
+
+      # ToDo: test for textual constant as offset
       describe "comparisons with offsets function normally" do
         #This isn't much to test here: We're utilising the other class' ability to use +/-, so as long
         # As it works for one case involving a 'complex' type, that's good enough.

@@ -160,19 +160,12 @@ class CrossQuestionValidation < ApplicationRecord
   register_checker 'present_implies_constant', lambda { |answer, related_answer, checker_params|
     # e.g. If StartCPAPDate is a date, CPAPhrs must be greater than 0 (answer = CPAPhrs, related = StartCPAPDate)
     # return if related is not present (i.e. not answered or not answered correctly)
-    # ToDo: treat const differently if it is not numerical
-    if checker_params[:constant].is_number?
-      constant = checker_params[:constant].to_f
-    else
-      constant = checker_params[:constant]
-    end
-    const_meets_condition?(answer.comparable_answer, checker_params[:operator], constant)
+    const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
   }
 
   register_checker 'const_implies_const', lambda { |answer, related_answer, checker_params|
-    # ToDo: treat const differently if it is not numerical
-    break true unless const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_f)
-    const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_f)
+    break true unless const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
+    const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
   }
 
   register_checker 'const_implies_set', lambda { |answer, related_answer, checker_params|
@@ -224,6 +217,7 @@ class CrossQuestionValidation < ApplicationRecord
 
     break true if [date1, time1, date2, time2].any? { |related_answer| unanswered?(related_answer) }
 
+    # ToDo: Check offset is numerical not textual
     offset = sanitise_offset(checker_params)
 
     datetime1 = aggregate_date_time(date1.answer_value, time1.answer_value)
@@ -245,6 +239,7 @@ class CrossQuestionValidation < ApplicationRecord
 
     datetime1 = aggregate_date_time(date1.answer_value, time1.answer_value)
     datetime2 = aggregate_date_time(date2.answer_value, time2.answer_value)
+    # ToDo: ensure offset is numerical not textual
     offset = sanitise_offset(checker_params)
 
     const_meets_condition?(datetime1, checker_params[:operator], datetime2 + offset)
