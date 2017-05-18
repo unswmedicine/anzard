@@ -157,6 +157,18 @@ describe CrossQuestionValidation do
         it("accepts when RHS is date and LHS is expected constant") { standard_cqv_test(-1, Date.new(2012, 2, 1), []) }
       end
 
+      describe 'present implies constant (textual constant)' do
+        before :each do
+          @error_message = 'if q1 is present, q2 must be y'
+          @q1 = create :question, section: @section, question_type: 'Text'
+          @q2 = create :question, section: @section, question_type: 'Integer'
+          create :cqv_present_implies_constant, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: 'y'
+        end
+        it("handles nils") { standard_cqv_test({}, {}, []) }
+        it("rejects when RHS is present and LHS is not expected constant") { standard_cqv_test('n', 0, [@error_message]) }
+        it("accepts when RHS is present and LHS is expected constant") { standard_cqv_test('y', 0, []) }
+      end
+
       describe 'constant implies constant' do
         before :each do
           @error_message = 'q2 was != 0, q1 was not > 0'

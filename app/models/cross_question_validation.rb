@@ -161,7 +161,12 @@ class CrossQuestionValidation < ApplicationRecord
     # e.g. If StartCPAPDate is a date, CPAPhrs must be greater than 0 (answer = CPAPhrs, related = StartCPAPDate)
     # return if related is not present (i.e. not answered or not answered correctly)
     # ToDo: treat const differently if it is not numerical
-    const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_f)
+    if checker_params[:constant].is_number?
+      constant = checker_params[:constant].to_f
+    else
+      constant = checker_params[:constant]
+    end
+    const_meets_condition?(answer.comparable_answer, checker_params[:operator], constant)
   }
 
   register_checker 'const_implies_const', lambda { |answer, related_answer, checker_params|
