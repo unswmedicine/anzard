@@ -166,6 +166,16 @@ describe CrossQuestionValidation do
       do_cqv_check(first, error)
     end
 
+    def three_question_cqv_test(val_first, val_second, val_third, error)
+      first = create :answer, response: @response, question: @q1, answer_value: val_first
+      second = create :answer, response: @response, question: @q2, answer_value: val_second
+      third = create :answer, response: @response, question: @q3, answer_value: val_third
+
+      @response.reload
+
+      do_cqv_check(first, error)
+    end
+
     describe "implications" do
       before :each do
         @response = create :response, survey: @survey
@@ -351,27 +361,36 @@ describe CrossQuestionValidation do
         it("fails if related question has an invalid answer and answer to question in range") { standard_cqv_test("3", "2011-12-", [@error_message]) }
       end
 
-      # ToDo: test for textual constants
       describe 'const implies one of const' do
         before :each do
           @error_message = 'q2 or q3 must be -1 if q1 is 99'
-          @q1 = create :question, section: @section, question_type: 'Choice'
+          @q1 = create :question, section: @section, question_type: 'Integer'
           @q2 = create :question, section: @section, question_type: 'Integer'
-          @q3 = create :question, section: @section, question_type: 'Choice'
+          @q3 = create :question, section: @section, question_type: 'Integer'
           @cqv1 = create :cqv_const_implies_one_of_const, question: @q1, related_question: nil, related_question_ids: [@q2.id, @q3.id], error_message: @error_message, operator: '==', constant: 99, conditional_operator: '==', conditional_constant: -1
         end
-        it("handles nils") do
-          v1 = 99
-          v2 = nil
-          v3 = nil
+        it("handles nils") { three_question_cqv_test(99, nil, nil, [@error_message]) }
+        it("passes when q1 is not 99 and neither q2 or q3 are -1") { three_question_cqv_test(0, 0, 0, []) }
+        it("fails when q1 is 99 but neither q2 or q3 are -1") { three_question_cqv_test(99, 0, 0, [@error_message]) }
+        it("passes when q1 is 99 and q2 is -1 but q3 is not") { three_question_cqv_test(99, -1, -0, []) }
+        it("passes when q1 is 99 and q2 is not -1 but q3 is") { three_question_cqv_test(99, 0, -1, []) }
+        it("passes when q1 is 99 and both q2 and q3 are -1") { three_question_cqv_test(99, -1, -1, []) }
+      end
 
-          first = create :answer, response: @response, question: @q1, answer_value: v1
-          second = create :answer, response: @response, question: @q2, answer_value: v2
-          third = create :answer, response: @response, question: @q3, answer_value: v3
-
-          err = @cqv1.check first
-          err.should eq @error_message
+      describe 'const implies one of const (textual constants)' do
+        before :each do
+          @error_message = 'q2 or q3 must be "yes" if q1 is "true"'
+          @q1 = create :question, section: @section, question_type: 'Text'
+          @q2 = create :question, section: @section, question_type: 'Text'
+          @q3 = create :question, section: @section, question_type: 'Text'
+          @cqv1 = create :cqv_const_implies_one_of_const, question: @q1, related_question: nil, related_question_ids: [@q2.id, @q3.id], error_message: @error_message, operator: '==', constant: 'true', conditional_operator: '==', conditional_constant: 'yes'
         end
+        it("handles nils") { three_question_cqv_test('true', nil, nil, [@error_message]) }
+        it("passes when q1 is not 'true' and neither q2 or q3 are 'yes'") { three_question_cqv_test('false', 'no', 'no', []) }
+        it("fails when q1 is 'true' but neither q2 or q3 are 'yes'")  { three_question_cqv_test('true', 'no', 'no', [@error_message]) }
+        it("passes when q1 is 'true' and q2 is 'yes' but q3 is not") { three_question_cqv_test('true', 'yes', 'no', []) }
+        it("passes when q1 is 'true' and q2 is not 'yes' but q3 is") { three_question_cqv_test('true', 'no', 'yes', []) }
+        it("passes when q1 is 'true' and both q2 and q3 are 'yes'") { three_question_cqv_test('true', 'yes', 'yes', []) }
       end
     end
 
@@ -529,8 +548,7 @@ describe CrossQuestionValidation do
         it("accepts lt") { standard_cqv_test(Date.new(2012, 2, 1), Date.new(2012, 2, 2), []) }
         it("rejects eq") { standard_cqv_test(Date.new(2012, 2, 2), Date.new(2012, 2, 2), [@error_message]) }
       end
-
-      # ToDo: test for textual constant as offset
+      
       describe "comparisons with offsets function normally" do
         #This isn't much to test here: We're utilising the other class' ability to use +/-, so as long
         # As it works for one case involving a 'complex' type, that's good enough.

@@ -171,6 +171,7 @@ class CrossQuestionValidation < ApplicationRecord
   register_checker 'const_implies_set', lambda { |answer, related_answer, checker_params|
     # ToDo: treat const differently if it is not numerical
     break true unless const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_f)
+    # ToDo: treat const set differently if it is not numerical
     set_meets_condition?(checker_params[:set], checker_params[:set_operator], answer.comparable_answer)
   }
 
@@ -279,14 +280,12 @@ class CrossQuestionValidation < ApplicationRecord
   }
 
   register_checker 'const_implies_one_of_const', lambda { |answer, related_answer, checker_params|
-    # ToDo: treat const differently if it is not numerical
-    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_f)
+    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
     # we know the answer meets the criteria, so now check if any of the related ones have the correct value
     results = checker_params[:related_question_ids].collect do |question_id|
       related_answer = answer.response.get_answer_to(question_id)
       if answered?(related_answer)
-        # ToDo: treat const differently if it is not numerical
-        const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_f)
+        const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
       else
         false
       end
