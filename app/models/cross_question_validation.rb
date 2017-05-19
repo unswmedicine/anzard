@@ -249,8 +249,7 @@ class CrossQuestionValidation < ApplicationRecord
 
   # runs even when related is not answered
   register_checker 'const_implies_present', lambda { |answer, related_answer, checker_params|
-    # ToDo: treat const differently if it is not numerical
-    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_f)
+    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
     # we know the answer meets the criteria, so now just check if related has been answered
     answered?(related_answer)
   }

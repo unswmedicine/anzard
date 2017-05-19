@@ -278,10 +278,9 @@ describe CrossQuestionValidation do
         it("fails if the question is answered and the related question has an invalid answer") { standard_cqv_test("2011-12-12", "11:", [@error_message]) }
       end
 
-      # ToDo: test for textual constants
       describe 'const implies present' do
         before :each do
-          @error_message = 'q2 must be answered if q1 is'
+          @error_message = 'q2 must be answered if q1 matches constant'
           @q1 = create :question, section: @section, question_type: 'Integer'
           @q2 = create :question, section: @section, question_type: 'Date'
           create :cqv_const_implies_present, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: -1
@@ -298,6 +297,27 @@ describe CrossQuestionValidation do
           do_cqv_check(a1, [])
         end
         it("fails if related question has an invalid answer and answer to question == constant") { standard_cqv_test("-1", "2011-12-", [@error_message]) }
+      end
+
+      describe 'const implies present (textual constant)' do
+        before :each do
+          @error_message = 'q2 must be answered if q1 matches constant'
+          @q1 = create :question, section: @section, question_type: 'Text'
+          @q2 = create :question, section: @section, question_type: 'Date'
+          create :cqv_const_implies_present, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: 'yes'
+        end
+        it("is not run if the question has a badly formed answer") { standard_cqv_test("ab", "2011-12-12", []) }
+        it("passes if both are answered and answer to question == constant") { standard_cqv_test("yes", "2011-12-12", []) }
+        it("passes if both are answered and answer to question != constant") { standard_cqv_test("no", "2011-12-12", []) }
+        it "fails if related question not answered and answer to question == constant" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "yes"
+          do_cqv_check(a1, [@error_message])
+        end
+        it "passes if related question not answered and answer to question != constant" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "no"
+          do_cqv_check(a1, [])
+        end
+        it("fails if related question has an invalid answer and answer to question == constant") { standard_cqv_test("yes", "2011-12-", [@error_message]) }
       end
 
       # ToDo: test for textual set
