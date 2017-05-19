@@ -236,7 +236,6 @@ describe CrossQuestionValidation do
         it("accepts when RHS is specified constant and LHS is expected constant") { standard_cqv_test('y', 1, []) }
       end
 
-      # ToDo: test for textual constants and sets
       describe 'constant implies set' do
         before :each do
           @error_message = 'q2 was != 0, q1 was not in specified set [1,3,5,7]'
@@ -252,6 +251,20 @@ describe CrossQuestionValidation do
         it("doesn't reject the LHS when RHS not expected constant") { standard_cqv_test(-1, 0, []) }
         it("rejects when RHS is specified const and LHS is not in expected set") { standard_cqv_test(0, 1, [@error_message]) }
         it("accepts when RHS is specified const and LHS is in expected set") { standard_cqv_test(1, 1, []) }
+      end
+      
+      describe 'constant implies set (textual constant and set)' do
+        before :each do
+          @error_message = 'if q2 == y, q1 must be included in specified set [a,b,c,d]'
+          @q1 = create :question, section: @section, question_type: 'Text'
+          @q2 = create :question, section: @section, question_type: 'Text'
+          create :cqv_const_implies_set, question: @q1, related_question: @q2, error_message: @error_message,
+                 conditional_operator: '==', conditional_constant: 'yes', set_operator: 'included', set: %w(a b c d)
+        end
+        it("handles nils") { standard_cqv_test({}, {}, []) }
+        it("doesn't reject the LHS when RHS not expected constant") { standard_cqv_test('z', 'no', []) }
+        it("rejects when RHS is specified const and LHS is not in expected set") { standard_cqv_test('z', 'yes', [@error_message]) }
+        it("accepts when RHS is specified const and LHS is in expected set") { standard_cqv_test('b', 'yes', []) }
       end
 
       # ToDo: test for textual constants and sets
