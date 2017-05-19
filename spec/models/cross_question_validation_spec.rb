@@ -402,11 +402,10 @@ describe CrossQuestionValidation do
         @response = create :response, survey: @survey
       end
 
-      # ToDo: test for textual constants
       describe 'present if constant (q must be present if related q == constant)' do
         # e.g. If Died_ is 0, DiedDate must be blank (rule is on DiedDate)
         before :each do
-          @error_message = 'if q2 == -1, q1 must be blank'
+          @error_message = 'if q2 == -1, q1 must be present'
           @q1 = create :question, section: @section, question_type: 'Integer'
           @q2 = create :question, section: @section, question_type: 'Integer'
           create :cqv_present_if_const, question: @q1, related_question: @q2, error_message: @error_message, conditional_operator: '==', conditional_constant: -1
@@ -420,6 +419,25 @@ describe CrossQuestionValidation do
         it("passes if q2 is not -1 and q1 is not blank") {} # rule won't be run
         it("passes when q2 is -1 and q1 is not blank") {} # rule won't be run
         it("fails when q2 is -1 and q1 is blank") { standard_cqv_test({}, -1, [@error_message]) }
+      end
+
+      describe 'present if constant (textual constant)' do
+        # e.g. If Died_ is y, DiedDate must be present (rule is on DiedDate)
+        before :each do
+          @error_message = 'if q2 == y, q1 must be present'
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Text'
+          create :cqv_present_if_const, question: @q1, related_question: @q2, error_message: @error_message, conditional_operator: '==', conditional_constant: 'y'
+        end
+        it "passes if q2 not answered but q1 is" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "7"
+          do_cqv_check(a1, [])
+        end
+        it("passes if q2 not answered and q1 answered") {} # rule won't be run
+        it("passes if q2 is not specified constant and q1 is blank") { standard_cqv_test({}, 'n', []) }
+        it("passes if q2 is not specified constant and q1 is not blank") {} # rule won't be run
+        it("passes when q2 is specified constant and q1 is not blank") {} # rule won't be run
+        it("fails when q2 is specified constant and q1 is blank") { standard_cqv_test({}, 'y', [@error_message]) }
       end
     end
 
