@@ -360,7 +360,6 @@ describe CrossQuestionValidation do
         @response = create :response, survey: @survey
       end
 
-      # ToDo: test for textual constants
       describe 'blank if constant (q must be blank if related q == constant)' do
         # e.g. If Died_ is 0, DiedDate must be blank (rule is on DiedDate)
         before :each do
@@ -377,6 +376,24 @@ describe CrossQuestionValidation do
         it("passes if q2 is not -1 and q1 is not blank") { standard_cqv_test(123, 0, []) }
         it("passes when q2 is -1 and q1 is blank") {} # rule won't be run }
         it("fails when q2 is -1 and q1 is not blank") { standard_cqv_test(123, -1, [@error_message]) }
+      end
+
+      describe 'blank if constant (textual constant)' do
+        # e.g. If Died_ is 0, DiedDate must be blank (rule is on DiedDate)
+        before :each do
+          @error_message = 'if q2 == n, q1 must be blank'
+          @q1 = create :question, section: @section, question_type: 'Integer'
+          @q2 = create :question, section: @section, question_type: 'Text'
+          create :cqv_blank_if_const, question: @q1, related_question: @q2, error_message: @error_message, conditional_operator: '==', conditional_constant: 'n'
+        end
+        it "passes if q2 not answered but q1 is" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "7"
+        end
+        it("passes if q2 not answered and q1 not answered") {} # rule won't be run
+        it("passes if q2 is not specified constant and q1 is blank") {} # rule won't be run }
+        it("passes if q2 is not specified constant and q1 is not blank") { standard_cqv_test(123, 'y', []) }
+        it("passes when q2 is specified constant and q1 is blank") {} # rule won't be run }
+        it("fails when q2 is specified constant and q1 is not blank") { standard_cqv_test(123, 'n', [@error_message]) }
       end
     end
 

@@ -182,9 +182,7 @@ class CrossQuestionValidation < ApplicationRecord
 
   register_checker 'blank_if_const', lambda { |answer, related_answer, checker_params|
     # E.g. If Died_ is 0, DiedDate must be blank (rule on DiedDate)
-
-    # ToDo: treat const differently if it is not numerical
-    related_meets_condition = const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_f)
+    related_meets_condition = const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
     break true unless related_meets_condition
     # now fail if answer is present, but  answer must be present if we got this far, so just fail
     false
