@@ -32,6 +32,7 @@ class CrossQuestionValidation < ApplicationRecord
     # return true/false if it passed/failed 
     if cqv.rule == 'comparison'
       cqv.errors[:base] << "#{cqv.operator} not included in #{SAFE_OPERATORS.inspect}" unless SAFE_OPERATORS.include?(cqv.operator)
+      cqv.errors[:base] << "invalid cqv offset \"#{cqv.constant}\" - constant offset must be an integer or decimal" unless (cqv.constant.blank? || cqv.constant.is_number?)
     end
   end
 
@@ -152,8 +153,7 @@ class CrossQuestionValidation < ApplicationRecord
   end
 
   register_checker 'comparison', lambda { |answer, related_answer, checker_params|
-    # ToDo: fail gracefully if constant offset is not numerical
-    offset = sanitise_offset(checker_params).to_f
+    offset = sanitise_offset(checker_params).to_f # Always cast offset to float, since there is no logical way to offset by text
     const_meets_condition?(answer.comparable_answer, checker_params[:operator], related_answer.answer_with_offset(offset))
   }
 

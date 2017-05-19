@@ -12,7 +12,28 @@ describe CrossQuestionValidation do
     context "should check that comparison CQVs have safe operators" do
       specify { build(:cross_question_validation, rule: 'comparison', operator: '').should_not be_valid }
       specify { build(:cross_question_validation, rule: 'comparison', operator: '>').should be_valid }
-      specify { build(:cross_question_validation, rule: 'comparison', operator: 'dodgy_operator').should_not be_valid }
+      specify do
+        cqv = build(:cross_question_validation, rule: 'comparison', operator: 'dodgy_operator')
+        cqv.should_not be_valid
+        cqv.errors.messages[:base].should include("dodgy_operator not included in #{%w(== <= >= < > !=)}")
+      end
+    end
+    context "should check that comparison CQVs have numerical offset constants" do
+      # Blank offset
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: nil).should be_valid }
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '').should be_valid }
+      # Numerical offset
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 0).should be_valid }
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '0').should be_valid }
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '-1.5').should be_valid }
+      # Invalid offset (any non-numerical text)
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'y').should_not be_valid }
+      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'one').should_not be_valid }
+      specify do
+        cqv = build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'some text')
+        cqv.should_not be_valid
+        cqv.errors.messages[:base].should include("invalid cqv offset \"some text\" - constant offset must be an integer or decimal")
+      end
     end
     it "should validate that the rule is one of the allowed rules" do
       CrossQuestionValidation.valid_rules.each do |value|
@@ -475,6 +496,22 @@ describe CrossQuestionValidation do
         end
         it "rejects X eq Y (offset -1) when Y = X" do
           create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: -1
+          standard_cqv_test(Date.new(2012, 2, 1), Date.new(2012, 2, 1), [@error_message])
+        end
+        it "accepts X eq Y (offset \"+1.00\") when Y = X-1" do
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: '1.00'
+          standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 2), [])
+        end
+        it "rejects X eq Y (offset \"+1.00\") when Y = X" do
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: '1.00'
+          standard_cqv_test(Date.new(2012, 2, 1), Date.new(2012, 2, 1), [@error_message])
+        end
+        it "accepts X eq Y (offset \"-1.00\") when Y = X+1" do
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: '-1.00'
+          standard_cqv_test(Date.new(2012, 2, 3), Date.new(2012, 2, 4), [])
+        end
+        it "rejects X eq Y (offset \"-1.00\") when Y = X" do
+          create :cross_question_validation, rule: 'comparison', operator: '==', question: @q1, related_question: @q2, error_message: @error_message, constant: '-1.00'
           standard_cqv_test(Date.new(2012, 2, 1), Date.new(2012, 2, 1), [@error_message])
         end
       end
