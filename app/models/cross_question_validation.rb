@@ -174,7 +174,6 @@ class CrossQuestionValidation < ApplicationRecord
   }
 
   register_checker 'set_implies_set', lambda { |answer, related_answer, checker_params|
-    # ToDo: treat const set differently if it is not numerical
     break true unless set_meets_condition?(checker_params[:conditional_set], checker_params[:conditional_set_operator], related_answer.comparable_answer)
     set_meets_condition?(checker_params[:set], checker_params[:set_operator], answer.comparable_answer)
   }
