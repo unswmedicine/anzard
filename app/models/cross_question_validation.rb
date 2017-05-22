@@ -219,6 +219,7 @@ class CrossQuestionValidation < ApplicationRecord
     related_answer.present? && related_answer.answer_value.present?
   }
 
+  # TODO: test me
   register_checker 'multi_hours_date_to_date', lambda { |answer, unused_related_answer, checker_params|
     related_ids = checker_params[:related_question_ids]
     date1 = answer.response.get_answer_to(related_ids[0])
@@ -228,8 +229,7 @@ class CrossQuestionValidation < ApplicationRecord
 
     break true if [date1, time1, date2, time2].any? { |related_answer| unanswered?(related_answer) }
 
-    # ToDo: Check offset is numerical not textual
-    offset = sanitise_offset(checker_params)
+    offset = sanitise_offset(checker_params).to_f # Always cast offset to float, since there is no logical way to offset by text
 
     datetime1 = aggregate_date_time(date1.answer_value, time1.answer_value)
     datetime2 = aggregate_date_time(date2.answer_value, time2.answer_value)
@@ -239,6 +239,7 @@ class CrossQuestionValidation < ApplicationRecord
     const_meets_condition?(answer.answer_value, checker_params[:operator], hour_difference + offset)
   }
 
+  # TODO: test me
   register_checker 'multi_compare_datetime_quad', lambda { |answer, unused_related_answer, checker_params|
     related_ids = checker_params[:related_question_ids]
     date1 = answer.response.get_answer_to(related_ids[0])
@@ -250,8 +251,8 @@ class CrossQuestionValidation < ApplicationRecord
 
     datetime1 = aggregate_date_time(date1.answer_value, time1.answer_value)
     datetime2 = aggregate_date_time(date2.answer_value, time2.answer_value)
-    # ToDo: ensure offset is numerical not textual
-    offset = sanitise_offset(checker_params)
+
+    offset = sanitise_offset(checker_params).to_f # Always cast offset to float, since there is no logical way to offset by text
 
     const_meets_condition?(datetime1, checker_params[:operator], datetime2 + offset)
   }
@@ -283,7 +284,6 @@ class CrossQuestionValidation < ApplicationRecord
     required_answer = answer.response.get_answer_to(related_ids[1])
 
     #Conditions (IF)
-    # ToDo: treat const set differently if it is not numerical
     break true unless set_meets_condition?(checker_params[:set], checker_params[:set_operator], answer.comparable_answer)
     break true unless answered?(date)
 
