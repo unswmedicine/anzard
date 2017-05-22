@@ -7,9 +7,10 @@ class CrossQuestionValidation < ApplicationRecord
   RULES_THAT_APPLY_EVEN_WHEN_RELATED_ANSWER_NIL = %w(present_implies_present const_implies_present set_implies_present blank_unless_present set_gest_wght_implies_present)
   RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(present_if_const)
 
-  # ToDo: set safe operators (== !=) and allowed set operators (included excluded) for textual constants
   SAFE_OPERATORS = %w(== <= >= < > !=)
+  SAFE_TEXT_OPERATORS = %w(== !=)
   ALLOWED_SET_OPERATORS = %w(included excluded range)
+  ALLOWED_SET_TEXT_OPERATORS = %w(included excluded)
 
   GEST_CODE = 'Gest'
   WGHT_CODE = 'Wght'
@@ -106,17 +107,31 @@ class CrossQuestionValidation < ApplicationRecord
     answer && !answer.answer_value.nil? && !answer.raw_answer
   end
 
-  def self.is_operator_safe?(operator)
-    SAFE_OPERATORS.include? operator
+  def self.is_operator_safe?(operator, is_textual_operator=false)
+    # Valid operator set is different if the operator is being applied to a String
+    if is_textual_operator
+      SAFE_TEXT_OPERATORS.include? operator
+    else
+      SAFE_OPERATORS.include? operator
+    end
   end
 
-  def self.is_set_operator_valid?(set_operator)
-    ALLOWED_SET_OPERATORS.include? set_operator
+  def self.is_set_operator_valid?(set_operator, set_has_textual_element=false)
+    # Valid operator set is different if the set contains a String element
+    if set_has_textual_element
+      ALLOWED_SET_TEXT_OPERATORS.include? set_operator
+    else
+      ALLOWED_SET_OPERATORS.include? set_operator
+    end
   end
 
   def self.set_meets_condition?(set, set_operator, value)
     return false unless set.is_a?(Array) && value.present?
-    return false unless is_set_operator_valid?(set_operator)
+    if set.contains_non_numerical_string? || (value.is_a?(String) && !value.is_number?)
+      return false unless is_set_operator_valid?(set_operator, true)
+    else
+      return false unless is_set_operator_valid?(set_operator, false)
+    end
 
     case set_operator
       when 'included'
@@ -131,11 +146,12 @@ class CrossQuestionValidation < ApplicationRecord
   end
 
   def self.const_meets_condition?(lhs, operator, rhs)
-    if is_operator_safe? operator
-      return lhs.send operator, rhs
+    if lhs.is_a?(String) && rhs.is_a?(String)
+      return lhs.send operator, rhs if is_operator_safe? operator, true
     else
-      return false
+      return lhs.send operator, rhs if is_operator_safe? operator, false
     end
+    return false
   end
 
   def self.aggregate_date_time(d, t)

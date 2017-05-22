@@ -7,7 +7,7 @@ class String
     false
   end
 
-  # Casts to float if string is a number
+  # Casts to float if string is a Integer or Decimal value.
   def to_float_if_number
     return self.to_f if self.is_number?
     self

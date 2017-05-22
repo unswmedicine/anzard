@@ -67,7 +67,7 @@ describe CrossQuestionValidation do
   describe "helpers" do
     ALL_OPERATORS = %w(* / + - % ** == != > < >= <= <=> === eql? equal? = += -+ *= /+ %= **= & | ^ ~ << >> and or && || ! not ?: .. ...)
     UNSAFE_OPERATORS = ALL_OPERATORS - CrossQuestionValidation::SAFE_OPERATORS
-    # ToDo: Text safe operators for textual constants
+    UNSAFE_TEXT_OPERATORS = ALL_OPERATORS - CrossQuestionValidation::SAFE_TEXT_OPERATORS
     describe 'safe operators' do
 
       it "should accept 'safe' operators" do
@@ -80,11 +80,20 @@ describe CrossQuestionValidation do
           CrossQuestionValidation.is_operator_safe?(op).should eq false
         end
       end
+
+      it "should accept 'safe' operators for textual validations" do
+        CrossQuestionValidation::SAFE_TEXT_OPERATORS.each do |op|
+          CrossQuestionValidation.is_operator_safe?(op, true).should eq true
+        end
+      end
+      it "should reject 'unsafe' operators for textual validations" do
+        UNSAFE_TEXT_OPERATORS.each do |op|
+          CrossQuestionValidation.is_operator_safe?(op, true).should eq false
+        end
+      end
     end
 
-    # ToDo: Test set operators for textual constants
     describe 'valid set operators' do
-
       it "should accept valid operators" do
         CrossQuestionValidation::ALLOWED_SET_OPERATORS.each do |op|
           CrossQuestionValidation.is_set_operator_valid?(op).should eq true
@@ -93,11 +102,20 @@ describe CrossQuestionValidation do
       it "should reject invalid operators" do
         CrossQuestionValidation.is_set_operator_valid?("invalid_operator").should eq false
         CrossQuestionValidation.is_set_operator_valid?("something_else").should eq false
+      end
 
+      it "should accept valid operators for sets with textual items" do
+        CrossQuestionValidation::ALLOWED_SET_TEXT_OPERATORS.each do |op|
+          CrossQuestionValidation.is_set_operator_valid?(op, true).should eq true
+        end
+      end
+      it "should reject invalid operators for sets with textual items" do
+        CrossQuestionValidation.is_set_operator_valid?("range", true).should eq false
+        CrossQuestionValidation.is_set_operator_valid?("invalid_operator", true).should eq false
+        CrossQuestionValidation.is_set_operator_valid?("something_else", true).should eq false
       end
     end
 
-    # ToDo: text set conditions for textual constants
     describe 'set_meets_conditions' do
       it "should pass true statements" do
         CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "included", 5).should eq true
@@ -107,6 +125,8 @@ describe CrossQuestionValidation do
         CrossQuestionValidation.set_meets_condition?([1, 5], "range", 5).should eq true
         CrossQuestionValidation.set_meets_condition?([1, 5], "range", 4.9).should eq true
         CrossQuestionValidation.set_meets_condition?([1, 5], "range", 1.1).should eq true
+        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "included", 'unknown').should eq true
+        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "excluded", 'all').should eq true
       end
 
       it "should reject false statements" do
@@ -115,12 +135,16 @@ describe CrossQuestionValidation do
         CrossQuestionValidation.set_meets_condition?([1, 5], "range", 0).should eq false
         CrossQuestionValidation.set_meets_condition?([1, 5], "range", 6).should eq false
         CrossQuestionValidation.set_meets_condition?([1, 5], "range", 5.1).should eq false
+        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "included", 'all').should eq false
+        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "excluded", 'unknown').should eq false
       end
 
-      # ToDo: test unsafe operators are rejected for textual constant sets
       it "should reject statements with invalid operators" do
         CrossQuestionValidation.set_meets_condition?([1, 3, 5], "swirly", 0).should eq false
         CrossQuestionValidation.set_meets_condition?([1, 3, 5], "includified", 0).should eq false
+        CrossQuestionValidation.set_meets_condition?(['a', 'b', 'c'], "range", 0).should eq false
+        CrossQuestionValidation.set_meets_condition?(['a', 'b', 'c'], "range", 'b').should eq false
+        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "range", 'no').should eq false
       end
     end
 
@@ -129,18 +153,25 @@ describe CrossQuestionValidation do
         CrossQuestionValidation.const_meets_condition?(0, "==", 0).should eq true
         CrossQuestionValidation.const_meets_condition?(5, "!=", 3).should eq true
         CrossQuestionValidation.const_meets_condition?(5, ">=", 3).should eq true
+        CrossQuestionValidation.const_meets_condition?('yes', "==", 'yes').should eq true
+        CrossQuestionValidation.const_meets_condition?('yes', "!=", 'no').should eq true
       end
 
       it "should reject false statements" do
         CrossQuestionValidation.const_meets_condition?(0, "<", 0).should eq false
         CrossQuestionValidation.const_meets_condition?(5, "==", 3).should eq false
         CrossQuestionValidation.const_meets_condition?(5, "<=", 3).should eq false
+        CrossQuestionValidation.const_meets_condition?('yes', "==", 'no').should eq false
+        CrossQuestionValidation.const_meets_condition?('yes', "!=", 'yes').should eq false
       end
 
-      # ToDo: test unsafe operators are rejected for textual constants
       it "should reject statements with unsafe operators" do
-        CrossQuestionValidation.const_meets_condition?(0, UNSAFE_OPERATORS.first, 0).should eq false
-        CrossQuestionValidation.const_meets_condition?(0, UNSAFE_OPERATORS.last, 0).should eq false
+        UNSAFE_OPERATORS.each do |operator|
+          CrossQuestionValidation.const_meets_condition?(0, operator, 0).should eq false
+        end
+        UNSAFE_TEXT_OPERATORS.each do |operator|
+          CrossQuestionValidation.const_meets_condition?('yes', operator, 'no').should eq false
+        end
       end
     end
   end

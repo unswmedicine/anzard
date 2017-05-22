@@ -88,8 +88,8 @@ describe String do
     it 'should return the string as provided when it is not a valid number' do
       strings = %w(a b c yes no 0x7a 0b1111010 2e-36 2-36 1.a 1.1.1 b5 5b one)
       strings.each do |s|
-        expect(n.to_float_if_number.is_a? Float).to eq false
-        expect(n.to_float_if_number).to eq n
+        expect(s.to_float_if_number.is_a? Float).to eq false
+        expect(s.to_float_if_number).to eq s
       end
     end
   end
