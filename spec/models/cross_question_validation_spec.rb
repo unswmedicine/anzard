@@ -196,7 +196,7 @@ describe CrossQuestionValidation do
       describe 'present implies constant (textual constant)' do
         before :each do
           @error_message = 'if q2 is present, q1 must be y'
-          @q1 = create :question, section: @section, question_type: 'Text'
+          @q1 = create :question, section: @section, question_type: 'Choice'
           @q2 = create :question, section: @section, question_type: 'Integer'
           create :cqv_present_implies_constant, question: @q1, related_question: @q2, error_message: @error_message, operator: '==', constant: 'y'
         end
@@ -225,7 +225,7 @@ describe CrossQuestionValidation do
       describe 'constant implies constant (textual constant)' do
         before :each do
           @error_message = 'if q2 > 0, q1 must be y'
-          @q1 = create :question, section: @section, question_type: 'Text'
+          @q1 = create :question, section: @section, question_type: 'Choice'
           @q2 = create :question, section: @section, question_type: 'Integer'
           create :cqv_const_implies_const, question: @q1, related_question: @q2, error_message: @error_message,
                  conditional_operator: '>', conditional_constant: 0, operator: '==', constant: 'y'
@@ -356,7 +356,6 @@ describe CrossQuestionValidation do
         it("fails if related question has an invalid answer and answer to question == constant") { standard_cqv_test("yes", "2011-12-", [@error_message]) }
       end
 
-      # ToDo: test for textual set
       describe 'set implies present' do
         before :each do
           @error_message = 'q2 must be answered if q1 is in [2..7]'
@@ -369,7 +368,7 @@ describe CrossQuestionValidation do
         it("passes if both are answered and answer to question is in middle of set") { standard_cqv_test("5", "2011-12-12", []) }
         it("passes if both are answered and answer to question is at end of set") { standard_cqv_test("7", "2011-12-12", []) }
         it "fails if related question not answered and answer to question is at start of set" do
-          a1 = create :answer, response: @response, question: @q1, answer_value: "2"
+          a1 = create :answer, response: @response, question: @q1, answer_value: 2
           do_cqv_check(a1, [@error_message])
         end
         it "fails if related question not answered and answer to question is in middle of set" do
@@ -385,6 +384,35 @@ describe CrossQuestionValidation do
           do_cqv_check(a1, [])
         end
         it("fails if related question has an invalid answer and answer to question in range") { standard_cqv_test("3", "2011-12-", [@error_message]) }
+      end
+
+      describe 'set implies present (textual set)' do
+        before :each do
+          @error_message = "q2 must be answered if q1 is in ['a', 'b', 'c', 'd', 'e']"
+          @q1 = create :question, section: @section, question_type: 'Choice'
+          @q2 = create :question, section: @section, question_type: 'Date'
+          create :cqv_set_implies_present, question: @q1, related_question: @q2, error_message: @error_message, set_operator: 'included', set: %w(a b c d e)
+        end
+        it("passes if both are answered and answer to question is at start of set") { standard_cqv_test("a", "2011-12-12", []) }
+        it("passes if both are answered and answer to question is in middle of set") { standard_cqv_test("c", "2011-12-12", []) }
+        it("passes if both are answered and answer to question is at end of set") { standard_cqv_test("e", "2011-12-12", []) }
+        it "fails if related question not answered and answer to question is at start of set" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "a"
+          do_cqv_check(a1, [@error_message])
+        end
+        it "fails if related question not answered and answer to question is in middle of set" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "c"
+          do_cqv_check(a1, [@error_message])
+        end
+        it "fails if related question not answered and answer to question is at end of set" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "e"
+          do_cqv_check(a1, [@error_message])
+        end
+        it "passes if related question not answered and answer to question is outside set" do
+          a1 = create :answer, response: @response, question: @q1, answer_value: "z"
+          do_cqv_check(a1, [])
+        end
+        it("fails if related question has an invalid answer and answer to question in set") { standard_cqv_test("c", "2011-12-", [@error_message]) }
       end
 
       describe 'const implies one of const' do
