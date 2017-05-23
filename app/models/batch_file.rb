@@ -183,11 +183,8 @@ class BatchFile < ApplicationRecord
     else
       responses.each do |r|
         r.submitted_status = Response::STATUS_SUBMITTED
+        r.save!
       end
-
-      #Using the activerecord-import gem to improve performance as it does 1 SQL insert per model (i.e. response and then answers) rather then 1 for each reponse.
-      Response.import responses, :validate => true, recursive: true
-
       set_outcome(STATUS_SUCCESS, MESSAGE_SUCCESS)
     end
     save!
