@@ -192,8 +192,8 @@ Feature: Cross Question Special Rules
       | question | related | rule        | error_message                   |
       | dob      | dob     | special_dob | DOB not in year of registration |
     And I am logged in as "data.provider@intersect.org.au"
-    And "data.provider@intersect.org.au" created a response to the "MySurvey" survey with babycode "babycode456" and year of registration "2012"
-    And I am on the response page for babycode456
+    And "data.provider@intersect.org.au" created a response to the "MySurvey" survey with cycleid "cycleid456" and year of registration "2012"
+    And I am on the response page for cycleid456
     When I store the following answers
       | question | answer   |
       | DOB      | 2011/1/1 |
@@ -206,8 +206,8 @@ Feature: Cross Question Special Rules
       | question | related | rule        | error_message                   |
       | dob      | dob     | special_dob | DOB not in year of registration |
     And I am logged in as "data.provider@intersect.org.au"
-    And "data.provider@intersect.org.au" created a response to the "MySurvey" survey with babycode "babycode456" and year of registration "2012"
-    And I am on the response page for babycode456
+    And "data.provider@intersect.org.au" created a response to the "MySurvey" survey with cycleid "cycleid456" and year of registration "2012"
+    And I am on the response page for cycleid456
     When I store the following answers
       | question | answer   |
       | DOB      | 2012/1/1 |

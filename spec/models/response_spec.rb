@@ -9,16 +9,10 @@ describe Response do
   end
 
   describe "Validations" do
-    it { should validate_presence_of :baby_code }
+    it { should validate_presence_of :cycle_id }
     it { should validate_presence_of :user }
     it { should validate_presence_of :survey_id }
     it { should validate_presence_of :year_of_registration }
-    it { should ensure_length_of(:baby_code).is_at_most(30) }
-    it "should reject non-alphanumeric except -_ strings for babycodes" do
-      build(:response, baby_code: '!').should_not be_valid
-      build(:response, baby_code: '-').should be_valid
-      build(:response, baby_code: '_').should be_valid
-    end
 
     it "should validate that submitted_status is one of the allowed types" do
       [Response::STATUS_SUBMITTED, Response::STATUS_UNSUBMITTED].each do |value|
@@ -28,22 +22,22 @@ describe Response do
       build(:response, submitted_status: "Blah").should_not be_valid
     end
 
-    it "should validate that baby code is unique within survey" do
-      first = create(:response, baby_code: "abcd")
-      second = build(:response, survey: first.survey, baby_code: first.baby_code)
+    it "should validate that cycle id is unique within survey" do
+      first = create(:response, cycle_id: "abcd")
+      second = build(:response, survey: first.survey, cycle_id: first.cycle_id)
       second.should_not be_valid
-      second.errors.full_messages.should eq(["Baby code abcd has already been used."])
-      diff_survey = build(:response, survey: create(:survey), baby_code: first.baby_code)
+      second.errors.full_messages.should eq(["Cycle ID abcd has already been used."])
+      diff_survey = build(:response, survey: create(:survey), cycle_id: first.cycle_id)
       diff_survey.should be_valid
     end
 
-    it "should strip leading/trailing spaces from baby codes before validating" do
-      first = create(:response, baby_code: " abcd ")
-      first.baby_code.should eq("abcd")
+    it "should strip leading/trailing spaces from cycle ids before validating" do
+      first = create(:response, cycle_id: " abcd ")
+      first.cycle_id.should eq("abcd")
 
-      second = build(:response, survey: first.survey, baby_code: " abcd")
+      second = build(:response, survey: first.survey, cycle_id: " abcd")
       second.should_not be_valid
-      second.errors.full_messages.should eq(["Baby code abcd has already been used."])
+      second.errors.full_messages.should eq(["Cycle ID abcd has already been used."])
     end
   end
 
@@ -73,30 +67,30 @@ describe Response do
       @survey_b = create(:survey)
       @hospital_a = create(:hospital)
       @hospital_b = create(:hospital)
-      @r1 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "1").id
-      @r2 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "2").id
-      @r3 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "3").id
-      @r4 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "4").id
-      @r5 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, baby_code: "5").id
-      @r6 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, baby_code: "6").id
-      @r7 = create(:response, survey: @survey_b, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, baby_code: "7").id
+      @r1 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "1").id
+      @r2 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "2").id
+      @r3 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "3").id
+      @r4 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "4").id
+      @r5 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "5").id
+      @r6 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "6").id
+      @r7 = create(:response, survey: @survey_b, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "7").id
       @r8 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
     end
 
     it "should return all submitted responses for survey when hospital and year of reg not provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
     end
 
     it "should filter by hospital when provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "").collect(&:id).should eq([@r1, @r2, @r3])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "", "").collect(&:id).should eq([@r1, @r2, @r3])
     end
 
     it "should filter by year of reg when provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "2001").collect(&:id).should eq([@r1, @r2, @r4])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "2001", "").collect(&:id).should eq([@r1, @r2, @r4])
     end
 
     it "should filter by hospital and year of reg when both provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "2001").collect(&:id).should eq([@r1, @r2])
+      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "2001", "").collect(&:id).should eq([@r1, @r2])
     end
   end
 

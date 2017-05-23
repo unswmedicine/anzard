@@ -2,5 +2,8 @@
  * This is a manifest file that'll automatically include all the stylesheets available in this directory
  * and any sub-directories. You're free to add application-wide styles to this file and they'll appear at
  * the top of the compiled file, but it's generally better to create a new file per style scope.
+ * Note: original_rails3_styling is used for legacy styling, as the upgrade to Rails 5 messed up styling.
+ *       Additional stylesheets are applied after original_rails3_styling to preserve some modularisation.
  *= require original_rails3_styling
+ *= require anznn
 */

@@ -7,7 +7,8 @@ FactoryGirl.define do
         states = %w(ACT NSW Qld SA NT Vic WA North\ Island South\ Island)
         states[n % states.length]
       end
-      sequence(:unit) { |n| "Some Unit #{n}"}
-      sequence(:site) { |n| "Some Unit #{n}"}
+      sequence(:unit) { |n| "Some Unit #{n}" }
+      sequence(:site) { |n| "Some Site #{n}" }
+      sequence(:site_name) { |n| "Some Site Name #{n}" }
     end
 end

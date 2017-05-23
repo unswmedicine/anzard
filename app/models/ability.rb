@@ -60,7 +60,7 @@ class Ability
 
         can :read, BatchFile, hospital_id: user.hospital_id
         can :create, BatchFile, hospital_id: user.hospital_id
-        can :submitted_baby_codes, Response
+        can :submitted_cycle_ids, Response
 
     when Role::DATA_PROVIDER_SUPERVISOR
         can :read, Response, hospital_id: user.hospital_id, submitted_status: Response::STATUS_UNSUBMITTED
@@ -71,7 +71,7 @@ class Ability
         can :read, BatchFile, hospital_id: user.hospital_id
         can :create, BatchFile, hospital_id: user.hospital_id
 
-        can :submitted_baby_codes, Response
+        can :submitted_cycle_ids, Response
       else
         raise "Unknown role #{user.role.name}"
     end

@@ -12,9 +12,9 @@ Feature: Navigation
     Given I have a user "other.provider@intersect.org.au" with role "Data Provider" and hospital "Other"
     Given I have a user "data.supervisor@intersect.org.au" with role "Data Provider Supervisor" and hospital "RPA"
     Given I have a user "admin@intersect.org.au" with role "Administrator"
-    Given "data.provider@intersect.org.au" created a response to the "survey" survey with babycode "babycode123" and year of registration "2009"
-    And "data.provider@intersect.org.au" created a response to the "survey" survey with babycode "babycode456" and year of registration "2011" and submitted it
-    And "other.provider@intersect.org.au" created a response to the "survey" survey with babycode "babyother" and year of registration "2007"
+    Given "data.provider@intersect.org.au" created a response to the "survey" survey with cycleid "cycleid123" and year of registration "2009"
+    And "data.provider@intersect.org.au" created a response to the "survey" survey with cycleid "cycleid456" and year of registration "2011" and submitted it
+    And "other.provider@intersect.org.au" created a response to the "survey" survey with cycleid "cycleother" and year of registration "2007"
 
   Scenario: See an informative message when there are no responses in progress
     Given I am logged in as "data.provider@intersect.org.au"
@@ -26,8 +26,8 @@ Feature: Navigation
     Given I am logged in as "<user>"
     When I am on the home page
     Then I should see "responses" table with
-      | Baby Code   | Registration Type | Created By  | Year of Registration |
-      | babycode123 | survey            | Fred Bloggs | 2009                 |
+      | Cycle Id   | Registration Type | Created By  | Year of Registration |
+      | cycleid123 | survey            | Fred Bloggs | 2009                 |
     And I should see link "Start New Data Entry Form"
   Examples:
     | user                             |
@@ -38,7 +38,7 @@ Feature: Navigation
     Given I am logged in as "<user>"
     When I am on the home page
     And I follow "Edit"
-    Then I should be on the response page for babycode123
+    Then I should be on the response page for cycleid123
   Examples:
     | user                             |
     | data.provider@intersect.org.au   |
@@ -48,7 +48,7 @@ Feature: Navigation
     Given I am logged in as "<user>"
     When I am on the home page
     And I follow "View Summary"
-    Then I should be on the response summary page for babycode123
+    Then I should be on the response summary page for cycleid123
   Examples:
     | user                             |
     | data.provider@intersect.org.au   |
@@ -59,7 +59,7 @@ Feature: Navigation
     Given I am logged in as "<user>"
     When I am on the home page
     And I follow "Review Answers"
-    Then I should be on the review answers page for babycode123
+    Then I should be on the review answers page for cycleid123
   Examples:
     | user                             |
     | data.provider@intersect.org.au   |
@@ -68,9 +68,9 @@ Feature: Navigation
 
   Scenario Outline: Data providers and data provider supervisors can only get to surveys from their own hospital
     Given I am logged in as "<user>"
-    When I go to the response page for babycode123
-    Then I should be on the response page for babycode123
-    And I should get a security error when I visit the response page for babyother
+    When I go to the response page for cycleid123
+    Then I should be on the response page for cycleid123
+    And I should get a security error when I visit the response page for cycleother
   Examples:
     | user                             |
     | data.provider@intersect.org.au   |
@@ -80,12 +80,12 @@ Feature: Navigation
     Given I am logged in as "admin@intersect.org.au"
     When I am on the home page
     Then I should see "responses" table with
-      | Baby Code   | Registration Type | Created By  |
-      | babycode123 | survey            | Fred Bloggs |
-      | babyother   | survey      | Fred Bloggs |
+      | Cycle Id   | Registration Type | Created By  |
+      | cycleid123 | survey            | Fred Bloggs |
+      | cycleother   | survey      | Fred Bloggs |
     And I should not see link "Start New Data Entry Form"
     And I should not see link "Edit"
     And I should see link "Review Answers"
     And I should see link "View Summary"
-    Then I should get a security error when I visit the response page for babyother
+    Then I should get a security error when I visit the response page for cycleother
     Then I should get a security error when I visit the new response page

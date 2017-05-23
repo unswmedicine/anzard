@@ -15,9 +15,9 @@
         = f.select :year_of_registration, year_of_registration_range, {:include_blank => "Please select"}, {:class => "medium"}
         = required
     .clearfix
-      = f.label :baby_code, "Cycle ID"
+      = f.label :cycle_id, "Cycle ID"
       .input
-        = f.text_field :baby_code
+        = f.text_field :cycle_id
         = required
     .actions
       = f.submit "Save", class: "btn primary"

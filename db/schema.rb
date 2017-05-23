@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170309044117) do
+ActiveRecord::Schema.define(version: 20170515011021) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -127,7 +127,7 @@ ActiveRecord::Schema.define(version: 20170309044117) do
   create_table "responses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "survey_id"
     t.integer  "user_id"
-    t.string   "baby_code"
+    t.string   "cycle_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "hospital_id"
