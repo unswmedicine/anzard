@@ -674,6 +674,69 @@ describe CrossQuestionValidation do
         end
       end
     end
+
+    #TODO complete test. Fails at the moment as the rule checker sees all related answers as nil resulting in early escape.
+    describe 'multi_hours_date_to_date' do
+      def do_mult_hours_date_check question_answer, date1_answer, time1_answer, date2_answer, time2_answer, error
+        first = create :answer, response: @response, question: @q1, answer_value: question_answer
+        second = create :answer, response: @response, question: @q2, answer_value: date1_answer
+        third = create :answer, response: @response, question: @q2, answer_value: time1_answer
+        fourth = create :answer, response: @response, question: @q2, answer_value: date2_answer
+        fifth = create :answer, response: @response, question: @q2, answer_value: time2_answer
+        @response.reload
+        do_cqv_check(first, error)
+      end
+
+      before :each do
+        @response = create :response, survey: @survey
+        @error_message = 'something went wrong'
+        @q1 = create :question, section: @section, question_type: 'Integer'
+        @q2 = create :question, section: @section, question_type: 'Date'
+        @q3 = create :question, section: @section, question_type: 'Time'
+        @q4 = create :question, section: @section, question_type: 'Date'
+        @q5 = create :question, section: @section, question_type: 'Time'
+      end
+
+      # TODO Pending test to be completed
+      pending do
+        describe '<=' do
+          before :each do
+            create :cqv_multi_hours_date_to_date, question: @q1, related_question: nil,
+                   related_question_ids: [@q2.id, @q3.id, @q4.id, @q5.id], error_message: @error_message, operator: '<='
+          end
+
+          it('passes as expected') { do_mult_hours_date_check(1, '2011-12-12', '11:54', '2011-12-12', '11:53', [@error_message]) }
+          it('fails as expected') { do_mult_hours_date_check(1, '2011-12-12', '11:53', '2011-12-12', '11:53', [@error_message]) }
+        end
+
+        describe '>=' do
+          before :each do
+            create :cqv_multi_hours_date_to_date, question: @q1, related_question: nil,
+                   related_question_ids: [@q2.id, @q3.id, @q4.id, @q5.id], error_message: @error_message, operator: '>='
+          end
+
+          it('passes as expected') { do_mult_hours_date_check(2, '2011-12-12', '11:54', '2011-12-12', '11:53', [@error_message]) }
+          it('fails as expected') { do_mult_hours_date_check(-1, '2011-12-12', '11:53', '2011-12-12', '11:53', [@error_message]) }
+        end
+
+        describe '==' do
+          before :each do
+            create :cqv_multi_hours_date_to_date, question: @q1, related_question: nil,
+                   related_question_ids: [@q2.id, @q3.id, @q4.id, @q5.id], error_message: @error_message, operator: '=='
+          end
+
+          it('passes as expected') { do_mult_hours_date_check(0, '2011-12-12', '11:53', '2011-12-12', '11:53', [@error_message]) }
+          it('fails as expected') { do_mult_hours_date_check(0, '2011-12-12', '11:54', '2011-12-12', '11:53', [@error_message]) }
+        end
+      end
+    end
+
+    #TODO complete test
+    describe 'multi_compare_datetime_quad' do
+      pending do
+
+      end
+    end
   end
 
   describe 'check if premature' do

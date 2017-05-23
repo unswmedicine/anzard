@@ -90,5 +90,15 @@ FactoryGirl.define do
       conditional_operator "=="
       conditional_constant -1
     end
+
+    factory :cqv_multi_hours_date_to_date do
+      sequence(:rule) { 'multi_hours_date_to_date' }
+      operator '<='
+    end
+
+    factory :cqv_multi_compare_datetime_quad do
+      sequence(:rule) { 'multi_compare_datetime_quad' }
+      operator '<='
+    end
   end
 end

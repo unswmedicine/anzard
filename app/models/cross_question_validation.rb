@@ -220,6 +220,7 @@ class CrossQuestionValidation < ApplicationRecord
   }
 
   # TODO: test me
+  # This rule is a 'comparison' comparing this answer with the difference (in hours) between two pairs of date/times.
   register_checker 'multi_hours_date_to_date', lambda { |answer, unused_related_answer, checker_params|
     related_ids = checker_params[:related_question_ids]
     date1 = answer.response.get_answer_to(related_ids[0])
@@ -240,6 +241,7 @@ class CrossQuestionValidation < ApplicationRecord
   }
 
   # TODO: test me
+  # This rule is a 'comparison' for two pairs of date/times. This rule should be applied to both the date and the time questions.
   register_checker 'multi_compare_datetime_quad', lambda { |answer, unused_related_answer, checker_params|
     related_ids = checker_params[:related_question_ids]
     date1 = answer.response.get_answer_to(related_ids[0])
