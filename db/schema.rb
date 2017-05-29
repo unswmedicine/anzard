@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170515011021) do
+ActiveRecord::Schema.define(version: 20170517233921) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -57,11 +57,11 @@ ActiveRecord::Schema.define(version: 20170515011021) do
     t.string  "rule"
     t.string  "error_message"
     t.string  "operator"
-    t.decimal "constant",                               precision: 65, scale: 15
+    t.string  "constant"
     t.string  "set_operator"
     t.string  "set"
     t.string  "conditional_operator"
-    t.decimal "conditional_constant",                   precision: 65, scale: 15
+    t.string  "conditional_constant"
     t.string  "conditional_set_operator"
     t.string  "conditional_set"
     t.string  "related_question_ids"
