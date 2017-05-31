@@ -289,152 +289,153 @@ class SpecialRules
     }
   
     CrossQuestionValidation.register_checker 'special_cool_hours', lambda { |answer, ununused_related_answer, checker_params|
-    #hours between |StartCoolDate+StartCoolTime - CeaseCoolDate+CeaseCoolTime| <=72
-    raise 'Can only be used on question StartCoolDate' unless answer.question.code == 'StartCoolDate'
+      #hours between |StartCoolDate+StartCoolTime - CeaseCoolDate+CeaseCoolTime| <=72
+      raise 'Can only be used on question StartCoolDate' unless answer.question.code == 'StartCoolDate'
 
-    start_cool_date = answer.response.comparable_answer_or_nil_for_question_with_code('StartCoolDate')
-    start_cool_time = answer.response.comparable_answer_or_nil_for_question_with_code('StartCoolTime')
-    cease_cool_date = answer.response.comparable_answer_or_nil_for_question_with_code('CeaseCoolDate')
-    cease_cool_time = answer.response.comparable_answer_or_nil_for_question_with_code('CeaseCoolTime')
-    break true unless start_cool_date && start_cool_time && cease_cool_date && cease_cool_time
+      start_cool_date = answer.response.comparable_answer_or_nil_for_question_with_code('StartCoolDate')
+      start_cool_time = answer.response.comparable_answer_or_nil_for_question_with_code('StartCoolTime')
+      cease_cool_date = answer.response.comparable_answer_or_nil_for_question_with_code('CeaseCoolDate')
+      cease_cool_time = answer.response.comparable_answer_or_nil_for_question_with_code('CeaseCoolTime')
+      break true unless start_cool_date && start_cool_time && cease_cool_date && cease_cool_time
 
-    datetime1 = CrossQuestionValidation.aggregate_date_time(start_cool_date, start_cool_time)
-    datetime2 = CrossQuestionValidation.aggregate_date_time(cease_cool_date, cease_cool_time)
-    hour_difference = (datetime2 - datetime1) / 1.hour
+      datetime1 = CrossQuestionValidation.aggregate_date_time(start_cool_date, start_cool_time)
+      datetime2 = CrossQuestionValidation.aggregate_date_time(cease_cool_date, cease_cool_time)
+      hour_difference = (datetime2 - datetime1) / 1.hour
 
-    hour_difference <= 120
-  }
+      hour_difference <= 120
+    }
 
-  CrossQuestionValidation.register_checker 'special_immun', lambda { |answer, ununused_related_answer, checker_params|
-    #If Gest<32|Wght<1500 and days(DOB and HomeDate|DiedDate)>=60, DateImmun must be a date
-    # dob is the best place to put this, even though its a bit weird
-    raise 'Can only be used on question DOB' unless answer.question.code == 'DOB'
+    CrossQuestionValidation.register_checker 'special_immun', lambda { |answer, ununused_related_answer, checker_params|
+      #If Gest<32|Wght<1500 and days(DOB and HomeDate|DiedDate)>=60, DateImmun must be a date
+      # dob is the best place to put this, even though its a bit weird
+      raise 'Can only be used on question DOB' unless answer.question.code == 'DOB'
 
-    # we're ok if DateImmun is filled
-    break true if answer.response.comparable_answer_or_nil_for_question_with_code('DateImmun')
-    # ok if not premature
-    break true unless CrossQuestionValidation.check_gest_wght(answer)
+      # we're ok if DateImmun is filled
+      break true if answer.response.comparable_answer_or_nil_for_question_with_code('DateImmun')
+      # ok if not premature
+      break true unless CrossQuestionValidation.check_gest_wght(answer)
 
-    home_date = answer.response.comparable_answer_or_nil_for_question_with_code('HomeDate')
-    died_date = answer.response.comparable_answer_or_nil_for_question_with_code('DiedDate')
-    # if home date is filled, use that
-    if home_date
-      days_diff = (home_date - answer.answer_value).to_i
-      days_diff < 60
-    elsif died_date
-      # if died date is filled, use that
-      days_diff = (died_date - answer.answer_value).to_i
-      days_diff < 60
-    else
-      # neither is filled, its ok
-      true
-    end
-  }
-
-  CrossQuestionValidation.register_checker 'special_date_of_assess', lambda { |answer, ununused_related_answer, checker_params|
-    #DateOfAssess must be greater than DOB+24 months (rule is on DateOfAssess)
-    raise 'Can only be used on question DateOfAssess' unless answer.question.code == 'DateOfAssess'
-
-    dob = answer.response.comparable_answer_or_nil_for_question_with_code('DOB')
-
-    break true unless dob
-    answer.answer_value > (dob + 24.months)
-  }
-
-  CrossQuestionValidation.register_checker 'special_height', lambda { |answer, ununused_related_answer, checker_params|
-    #If years between DOB and DateOfAssess is greater than 3, Hght must be between 50 and 100 (rule on Hght)
-    raise 'Can only be used on question Hght' unless answer.question.code == 'Hght'
-
-    dob = answer.response.comparable_answer_or_nil_for_question_with_code('DOB')
-    doa = answer.response.comparable_answer_or_nil_for_question_with_code('DateOfAssess')
-    break true unless dob && doa
-
-    if doa > (dob + 3.years)
-      answer.comparable_answer >= 50 && answer.comparable_answer <= 100
-    else
-      true
-    end
-  }
-
-
-  CrossQuestionValidation.register_checker 'special_length', lambda { |answer, ununused_related_answer, checker_params|
-    #If years between DOB and DateOfAssess is less than or equal to 3, than Length must be between 50 and 100 (rule on Length)
-    raise 'Can only be used on question Length' unless answer.question.code == 'Length'
-
-    dob = answer.response.comparable_answer_or_nil_for_question_with_code('DOB')
-    doa = answer.response.comparable_answer_or_nil_for_question_with_code('DateOfAssess')
-    break true unless dob && doa
-
-    if doa <= (dob + 3.years)
-      answer.comparable_answer >= 50 && answer.comparable_answer <= 100
-    else
-      true
-    end
-  }
-
-  CrossQuestionValidation.register_checker 'special_cochimplt', lambda { |answer, ununused_related_answer, checker_params|
-    #If Heartest is 2 or 4 and Hearaid is 1 or 2, Cochlmplt must be 1 or 2 (rule on CochImplt)
-    raise 'Can only be used on question CochImplt' unless answer.question.code == 'CochImplt'
-
-    heartest = answer.response.comparable_answer_or_nil_for_question_with_code('Heartest')
-    hearaid = answer.response.comparable_answer_or_nil_for_question_with_code('Hearaid')
-    break true unless heartest && [2, 4].include?(heartest) && hearaid && [1, 2].include?(hearaid)
-    [1, 2].include?(answer.comparable_answer)
-  }
-
-  CrossQuestionValidation.register_checker 'special_same_name_inf', lambda { |answer, ununused_related_answer, checker_params|
-    #If Name_inf2=Name_inf1, days between Date_inf1 and Date_inf2 >14
-
-    no_infection_questions = 4
-    /Date_Inf([1-#{no_infection_questions}])/.match(answer.question.code)
-    current_question_number = $1
-    raise "Can only be used on question Date_InfN - This is #{answer.question.code}, N=#{current_question_number}" unless current_question_number
-    current_question_number = current_question_number.to_i
-
-    names = []
-    dates = []
-    current_infection_name = nil
-    no_infection_questions.times do |idx|
-      if idx.eql?(current_question_number-1)
-        current_infection_name = answer.response.comparable_answer_or_nil_for_question_with_code("Name_Inf#{idx+1}")
+      home_date = answer.response.comparable_answer_or_nil_for_question_with_code('HomeDate')
+      died_date = answer.response.comparable_answer_or_nil_for_question_with_code('DiedDate')
+      # if home date is filled, use that
+      if home_date
+        days_diff = (home_date - answer.answer_value).to_i
+        days_diff < 60
+      elsif died_date
+        # if died date is filled, use that
+        days_diff = (died_date - answer.answer_value).to_i
+        days_diff < 60
       else
-
-        names[idx] = answer.response.comparable_answer_or_nil_for_question_with_code("Name_Inf#{idx+1}")
-        dates[idx] = answer.response.comparable_answer_or_nil_for_question_with_code("Date_Inf#{idx+1}")
+        # neither is filled, its ok
+        true
       end
-    end
+    }
 
+    CrossQuestionValidation.register_checker 'special_date_of_assess', lambda { |answer, ununused_related_answer, checker_params|
+      #DateOfAssess must be greater than DOB+24 months (rule is on DateOfAssess)
+      raise 'Can only be used on question DateOfAssess' unless answer.question.code == 'DateOfAssess'
 
-    break true unless current_infection_name
-    break true unless (names.compact.length > 0) && (dates.compact.length > 0)
-    passing = true
-    names.each_with_index do |name, idx|
-      if name.eql?(current_infection_name)
-        delta_days = (dates[idx] - answer.comparable_answer).to_i.abs
-        passing &= delta_days >= 14
-        #raise "#{delta_days.inspect}\n#{name.inspect}\n#{dates[idx].inspect}\n#{conflict.inspect}"
+      dob = answer.response.comparable_answer_or_nil_for_question_with_code('DOB')
+
+      break true unless dob
+      answer.answer_value > (dob + 24.months)
+    }
+
+    CrossQuestionValidation.register_checker 'special_height', lambda { |answer, ununused_related_answer, checker_params|
+      #If years between DOB and DateOfAssess is greater than 3, Hght must be between 50 and 100 (rule on Hght)
+      raise 'Can only be used on question Hght' unless answer.question.code == 'Hght'
+
+      dob = answer.response.comparable_answer_or_nil_for_question_with_code('DOB')
+      doa = answer.response.comparable_answer_or_nil_for_question_with_code('DateOfAssess')
+      break true unless dob && doa
+
+      if doa > (dob + 3.years)
+        answer.comparable_answer >= 50 && answer.comparable_answer <= 100
+      else
+        true
       end
-    end
+    }
 
-    passing
-  }
 
-  CrossQuestionValidation.register_checker 'special_rule22d', lambda { |answer, ununused_related_answer, checker_params|
-    #rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
-    raise 'Can only be used on question N_V_EGTH' unless answer.question.code == 'N_V_EGTH'
+    CrossQuestionValidation.register_checker 'special_length', lambda { |answer, ununused_related_answer, checker_params|
+      #If years between DOB and DateOfAssess is less than or equal to 3, than Length must be between 50 and 100 (rule on Length)
+      raise 'Can only be used on question Length' unless answer.question.code == 'Length'
 
-    n_v_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_EGTH')
-    n_s_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_EGTH')
-    n_eggs = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGS')
-    n_recvd = answer.response.comparable_answer_or_nil_for_question_with_code('N_RECVD')
-    n_donate = answer.response.comparable_answer_or_nil_for_question_with_code('N_DONATE')
-    n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
-    n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
-    n_egfz_s = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
-    n_egfz_v = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
+      dob = answer.response.comparable_answer_or_nil_for_question_with_code('DOB')
+      doa = answer.response.comparable_answer_or_nil_for_question_with_code('DateOfAssess')
+      break true unless dob && doa
 
-    break true if (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
-  }
+      if doa <= (dob + 3.years)
+        answer.comparable_answer >= 50 && answer.comparable_answer <= 100
+      else
+        true
+      end
+    }
+
+    CrossQuestionValidation.register_checker 'special_cochimplt', lambda { |answer, ununused_related_answer, checker_params|
+      #If Heartest is 2 or 4 and Hearaid is 1 or 2, Cochlmplt must be 1 or 2 (rule on CochImplt)
+      raise 'Can only be used on question CochImplt' unless answer.question.code == 'CochImplt'
+
+      heartest = answer.response.comparable_answer_or_nil_for_question_with_code('Heartest')
+      hearaid = answer.response.comparable_answer_or_nil_for_question_with_code('Hearaid')
+      break true unless heartest && [2, 4].include?(heartest) && hearaid && [1, 2].include?(hearaid)
+      [1, 2].include?(answer.comparable_answer)
+    }
+
+    CrossQuestionValidation.register_checker 'special_same_name_inf', lambda { |answer, ununused_related_answer, checker_params|
+      #If Name_inf2=Name_inf1, days between Date_inf1 and Date_inf2 >14
+
+      no_infection_questions = 4
+      /Date_Inf([1-#{no_infection_questions}])/.match(answer.question.code)
+      current_question_number = $1
+      raise "Can only be used on question Date_InfN - This is #{answer.question.code}, N=#{current_question_number}" unless current_question_number
+      current_question_number = current_question_number.to_i
+
+      names = []
+      dates = []
+      current_infection_name = nil
+      no_infection_questions.times do |idx|
+        if idx.eql?(current_question_number-1)
+          current_infection_name = answer.response.comparable_answer_or_nil_for_question_with_code("Name_Inf#{idx+1}")
+        else
+
+          names[idx] = answer.response.comparable_answer_or_nil_for_question_with_code("Name_Inf#{idx+1}")
+          dates[idx] = answer.response.comparable_answer_or_nil_for_question_with_code("Date_Inf#{idx+1}")
+        end
+      end
+
+
+      break true unless current_infection_name
+      break true unless (names.compact.length > 0) && (dates.compact.length > 0)
+      passing = true
+      names.each_with_index do |name, idx|
+        if name.eql?(current_infection_name)
+          delta_days = (dates[idx] - answer.comparable_answer).to_i.abs
+          passing &= delta_days >= 14
+          #raise "#{delta_days.inspect}\n#{name.inspect}\n#{dates[idx].inspect}\n#{conflict.inspect}"
+        end
+      end
+
+      passing
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule22d', lambda { |answer, ununused_related_answer, checker_params|
+      #rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
+      raise 'Can only be used on question N_V_EGTH' unless answer.question.code == 'N_V_EGTH'
+
+      n_v_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_EGTH')
+      n_s_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_EGTH')
+      n_eggs = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGS')
+      n_recvd = answer.response.comparable_answer_or_nil_for_question_with_code('N_RECVD')
+      n_donate = answer.response.comparable_answer_or_nil_for_question_with_code('N_DONATE')
+      n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+      n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
+      n_egfz_s = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
+      n_egfz_v = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
+
+      # Perform validation check
+      (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+    }
 
   end
 end
