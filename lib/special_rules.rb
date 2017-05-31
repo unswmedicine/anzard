@@ -25,7 +25,8 @@ class SpecialRules
     'special_rule22d' => 'N_V_EGTH',
     'special_rule17_a' => 'PR_CLIN',
     'special_rule_gest_iui_date' => 'PR_END_DT',
-    'special_rule_gest_et_date' => 'PR_END_DT'
+    'special_rule_gest_et_date' => 'PR_END_DT',
+    'special_rule_donor_1' => 'N_S_CLTH'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -66,7 +67,8 @@ class SpecialRules
                                  special_rule22d
                                  special_rule17_a
                                  special_rule_gest_iui_date
-                                 special_rule_gest_et_date)
+                                 special_rule_gest_et_date
+                                 special_rule_donor_1)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -487,6 +489,23 @@ class SpecialRules
 
       # Gest age is greater than 20 weeks (in days), check if n_deliv present
       !n_deliv.nil?
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_donor_1', lambda { |answer, ununused_related_answer, checker_params|
+      # ruleDonor1: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
+      raise 'Can only be used on question N_S_CLTH' unless answer.question.code == 'N_S_CLTH'
+
+      n_s_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
+      n_v_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
+      n_s_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
+      n_v_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
+      don_age = answer.response.comparable_answer_or_nil_for_question_with_code('DON_AGE')
+      thaw_don = answer.response.comparable_answer_or_nil_for_question_with_code('THAW_DON')
+
+      break true if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) <= 0
+      break true if don_age.nil?
+
+      !thaw_don.nil?
     }
 
   end
