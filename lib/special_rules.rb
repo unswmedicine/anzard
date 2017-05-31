@@ -23,6 +23,7 @@ class SpecialRules
     'special_length' => 'Length',
     'special_cochimplt' => 'CochImplt',
     'special_rule22d' => 'N_V_EGTH',
+    'special_rule17_a' => 'PR_CLIN',
   }
 
   def self.additional_cqv_validation(cqv)
@@ -60,7 +61,8 @@ class SpecialRules
                                  special_hmeo2_new
                                  special_same_name_inf
                                  special_pns
-                                 special_rule22d)
+                                 special_rule22d
+                                 special_rule17_a)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -435,6 +437,22 @@ class SpecialRules
 
       # Perform validation check
       (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule17_a', lambda { |answer, ununused_related_answer, checker_params|
+      # rule17a: if pr_clin is y or u, n_bl_et>0 |n_cl_et >0 | iui_date is a date/present
+      raise 'Can only be used on question PR_CLIN' unless answer.question.code == 'PR_CLIN'
+
+      p_r_clin = answer.response.comparable_answer_or_nil_for_question_with_code('PR_CLIN')
+      n_bl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET')
+      n_cl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET')
+      iui_date = answer.response.comparable_answer_or_nil_for_question_with_code('IUI_DATE')
+
+      # If pr_clin not y or u, then validation passes and no more checks required
+      break true unless (p_r_clin == 'y' || p_r_clin == 'u')
+
+      # pr_clin is y or u, so do other checks and return valid if one passes
+      n_bl_et > 0 || n_cl_et > 0 || !iui_date.nil?
     }
 
   end

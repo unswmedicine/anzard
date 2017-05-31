@@ -549,4 +549,73 @@ describe "Special Rules" do
       expect(@cqv.check(answer)).to eq('My error message')
     end
   end
+
+  describe "RULE: rule17_a" do
+    # rule17a: if pr_clin is y or u, n_bl_et>0 |n_cl_et >0 | iui_date is a date
+    before(:each) do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @pr_clin = create(:question, code: 'PR_CLIN', section: @section, question_type: Question::TYPE_CHOICE)
+      @n_bl_et = create(:question, code: 'N_BL_ET', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_cl_et = create(:question, code: 'N_CL_ET', section: @section, question_type: Question::TYPE_INTEGER)
+      @iui_date = create(:question, code: 'IUI_DATE', section: @section, question_type: Question::TYPE_DATE)
+      @cqv = create(:cross_question_validation, rule: 'special_rule17_a', question: @pr_clin, error_message: 'My error message', related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule17_a', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule17_a requires question code PR_CLIN but got Blah']
+    end
+
+    it 'should pass when pr_clin is not y or u and neither n_bl_et > 0 or n_cl_et > 0 or iui_date is a date' do
+      answer = create(:answer, question: @pr_clin, answer_value: 'n', response: @response)
+      create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
+      create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
+      # no answer object created for iui_date to represent it not being answered
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    ['y', 'u'].each do |pr_clin_trigger_value|
+      it "should fail when pr_clin is #{pr_clin_trigger_value} and neither n_bl_et > 0 or n_cl_et > 0 or iui_date is a date" do
+        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
+        create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
+        create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
+        # no answer object created for iui_date to represent it not being answered
+        answer.reload
+        expect(@cqv.check(answer)).to eq('My error message')
+      end
+
+      it "should pass when pr_clin is #{pr_clin_trigger_value} and n_bl_et > 0" do
+        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
+        create(:answer, question: @n_bl_et, answer_value: 1, response: @response)
+        create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
+        # no answer object created for iui_date to represent it not being answered
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      it "should pass when pr_clin is #{pr_clin_trigger_value} and n_cl_et > 0" do
+        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
+        create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
+        create(:answer, question: @n_cl_et, answer_value: 1, response: @response)
+        # no answer object created for iui_date to represent it not being answered
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      it "should pass when pr_clin is #{pr_clin_trigger_value} and iui_date is a date" do
+        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
+        create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
+        create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
+        create(:answer, question: @iui_date, answer_value: '2013-01-02', response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+    end
+  end
+
 end
