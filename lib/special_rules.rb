@@ -26,7 +26,8 @@ class SpecialRules
     'special_rule17_a' => 'PR_CLIN',
     'special_rule_gest_iui_date' => 'PR_END_DT',
     'special_rule_gest_et_date' => 'PR_END_DT',
-    'special_rule_donor_1' => 'N_S_CLTH'
+    'special_rule_donor_1' => 'N_S_CLTH',
+    'special_rule_don_age' => 'SURR'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -68,7 +69,8 @@ class SpecialRules
                                  special_rule17_a
                                  special_rule_gest_iui_date
                                  special_rule_gest_et_date
-                                 special_rule_donor_1)
+                                 special_rule_donor_1
+                                 special_rule_don_age)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -504,9 +506,23 @@ class SpecialRules
 
       break true if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) <= 0
       break true if don_age.nil?
-
       !thaw_don.nil?
     }
 
+    CrossQuestionValidation.register_checker 'special_rule_don_age', lambda { |answer, ununused_related_answer, checker_params|
+      # ruleDonAge: if surr=y & (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0, don_age must be present
+      raise 'Can only be used on question SURR' unless answer.question.code == 'SURR'
+
+      surr = answer.response.comparable_answer_or_nil_for_question_with_code('SURR')
+      n_s_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
+      n_v_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
+      n_s_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
+      n_v_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
+      don_age = answer.response.comparable_answer_or_nil_for_question_with_code('DON_AGE')
+
+      break true if surr != 'y'
+      break true if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) <= 0
+      !don_age.nil?
+    }
   end
 end

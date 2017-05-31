@@ -769,4 +769,67 @@ describe "Special Rules" do
     end
   end
 
+  describe 'Rule: rule_don_age' do
+    # ruleDonAge: if surr=y & (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0, don_age must be present
+    before :each do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @surr = create(:question, code: 'SURR', section: @section, question_type: Question::TYPE_CHOICE)
+      @n_s_clth = create(:question, code: 'N_S_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_v_clth = create(:question, code: 'N_V_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @don_age = create(:question, code: 'DON_AGE', section: @section, question_type: Question::TYPE_INTEGER)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_don_age', question: @surr, error_message: 'My error message', related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule_don_age', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule_don_age requires question code SURR but got Blah']
+    end
+
+    it 'should pass when surr != y' do
+      answer = create(:answer, question: @surr, answer_value: 'n', response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    describe 'when surr == y' do
+      before :each do
+        @answer = create(:answer, question: @surr, answer_value: 'y', response: @response)
+        @answer.reload
+      end
+
+      it 'should pass when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
+        create(:answer, question: @n_s_clth, answer_value: -1, response: @response)
+        create(:answer, question: @n_v_clth, answer_value: -1, response: @response)
+        create(:answer, question: @n_s_blth, answer_value: -1, response: @response)
+        create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
+
+      describe 'when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0' do
+        before :each do
+          create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
+          create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
+          create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
+          create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+          @answer.reload
+        end
+
+        it 'should fail when don_age is not present' do
+          expect(@cqv.check(@answer)).to eq('My error message')
+        end
+
+        it 'should pass when don_age is present' do
+          create(:answer, question: @don_age, answer_value: 20, response: @response)
+          expect(@cqv.check(@answer)).to be_nil
+        end
+      end
+    end
+  end
 end
