@@ -24,6 +24,8 @@ class SpecialRules
     'special_cochimplt' => 'CochImplt',
     'special_rule22d' => 'N_V_EGTH',
     'special_rule17_a' => 'PR_CLIN',
+    'special_rule_gest_iui_date' => 'PR_END_DT',
+    'special_rule_gest_et_date' => 'PR_END_DT'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -62,7 +64,9 @@ class SpecialRules
                                  special_same_name_inf
                                  special_pns
                                  special_rule22d
-                                 special_rule17_a)
+                                 special_rule17_a
+                                 special_rule_gest_iui_date
+                                 special_rule_gest_et_date)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -453,6 +457,36 @@ class SpecialRules
 
       # pr_clin is y or u, so do other checks and return valid if one passes
       n_bl_et > 0 || n_cl_et > 0 || !iui_date.nil?
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_gest_iui_date', lambda { |answer, ununused_related_answer, checker_params|
+      # rule_xx: if gestational age (pr_end_dt - iui_date) is greater than 20 weeks, n_deliv must be present
+      raise 'Can only be used on question PR_END_DT' unless answer.question.code == 'PR_END_DT'
+
+      pr_end_dt = answer.response.comparable_answer_or_nil_for_question_with_code('PR_END_DT')
+      iui_date = answer.response.comparable_answer_or_nil_for_question_with_code('IUI_DATE')
+      n_deliv = answer.response.comparable_answer_or_nil_for_question_with_code('N_DELIV')
+
+      # Pass if gest age is not greater than 20 weeks (in days)
+      break true if (pr_end_dt - iui_date) <= 140
+
+      # Gest age is greater than 20 weeks (in days), check if n_deliv present
+      !n_deliv.nil?
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_gest_et_date', lambda { |answer, ununused_related_answer, checker_params|
+      # rule_xx: if gestational age (pr_end_dt - et_date) is greater than 20 weeks, n_deliv must be present
+      raise 'Can only be used on question PR_END_DT' unless answer.question.code == 'PR_END_DT'
+
+      pr_end_dt = answer.response.comparable_answer_or_nil_for_question_with_code('PR_END_DT')
+      et_date = answer.response.comparable_answer_or_nil_for_question_with_code('ET_DATE')
+      n_deliv = answer.response.comparable_answer_or_nil_for_question_with_code('N_DELIV')
+
+      # Pass if gest age is not greater than 20 weeks (in days)
+      break true if (pr_end_dt - et_date) <= 140
+
+      # Gest age is greater than 20 weeks (in days), check if n_deliv present
+      !n_deliv.nil?
     }
 
   end
