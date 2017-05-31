@@ -620,7 +620,7 @@ describe "Special Rules" do
 
   describe "RULE: gest_iui_date" do
     # rule_xx: if gestational age (pr_end_dt - iui_date) is greater than 20 weeks, n_deliv must be present
-    before(:each) do
+    before :each do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
       @pr_end_dt = create(:question, code: 'PR_END_DT', section: @section, question_type: Question::TYPE_DATE)
@@ -637,33 +637,35 @@ describe "Special Rules" do
       expect(cqv.errors[:base]).to eq ['special_rule_gest_iui_date requires question code PR_END_DT but got Blah']
     end
 
-    it 'should pass if gestational age (pr_end_dt - iui_date) is not greater than 20 weeks and n_deliv is not present' do
+    it 'should pass if gestational age (pr_end_dt - iui_date) is not greater than 20 weeks' do
       answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-21', response: @response) # 20 week difference
       create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
-    it 'should fail if gestational age (pr_end_dt - iui_date) is greater than 20 weeks and n_deliv is not present' do
-      answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
-      create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
-      answer.reload
-      error = @cqv.check(answer)
-      expect(error).to eq('My error message')
-    end
+    describe 'when gestational age (pr_end_dt - iui_date) is greater than 20 weeks' do
+      before :each do
+        @answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
+        create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
+        @answer.reload
+      end
 
-    it 'should pass if gestational age (pr_end_dt - iui_date) is greater than 20 weeks and n_deliv is present' do
-      answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
-      create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
-      create(:answer, question: @n_deliv, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
+      it 'should fail if n_deliv is not present' do
+        expect(@cqv.check(@answer)).to eq('My error message')
+      end
+
+      it 'should pass if n_deliv is present' do
+        create(:answer, question: @n_deliv, answer_value: 1, response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
     end
   end
 
   describe "RULE: gest_et_date" do
     # rule_xx: if gestational age (pr_end_dt - et_date) is greater than 20 weeks, n_deliv must be present
-    before(:each) do
+    before :each do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
       @pr_end_dt = create(:question, code: 'PR_END_DT', section: @section, question_type: Question::TYPE_DATE)
@@ -680,32 +682,35 @@ describe "Special Rules" do
       expect(cqv.errors[:base]).to eq ['special_rule_gest_et_date requires question code PR_END_DT but got Blah']
     end
 
-    it 'should pass if gestational age (pr_end_dt - et_date) is not greater than 20 weeks and n_deliv is not present' do
+    it 'should pass if gestational age (pr_end_dt - et_date) is not greater than 20 weeks' do
       answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-21', response: @response) # 20 week difference
       create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
-    it 'should fail if gestational age (pr_end_dt - et_date) is greater than 20 weeks and n_deliv is not present' do
-      answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
-      create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to eq('My error message')
-    end
+    describe 'when gestational age (pr_end_dt - et_date) is greater than 20 weeks' do
+      before :each do
+        @answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
+        create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
+        @answer.reload
+      end
 
-    it 'should pass if gestational age (pr_end_dt - et_date) is greater than 20 weeks and n_deliv is present' do
-      answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
-      create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
-      create(:answer, question: @n_deliv, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
+      it 'should fail if n_deliv is not present' do
+        expect(@cqv.check(@answer)).to eq('My error message')
+      end
+
+      it 'should pass if n_deliv is present' do
+        create(:answer, question: @n_deliv, answer_value: 1, response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
     end
   end
 
   describe "RULE: ruleDonor1" do
     # ruleDonor1: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
-    before(:each) do
+    before :each do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
       @n_s_clth = create(:question, code: 'N_S_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
