@@ -27,7 +27,8 @@ class SpecialRules
     'special_rule_gest_iui_date' => 'PR_END_DT',
     'special_rule_gest_et_date' => 'PR_END_DT',
     'special_rule_donor_1' => 'N_S_CLTH',
-    'special_rule_don_age' => 'SURR'
+    'special_rule_don_age' => 'SURR',
+    'special_rule_1_mt' => 'N_EMBDISP'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -70,7 +71,8 @@ class SpecialRules
                                  special_rule_gest_iui_date
                                  special_rule_gest_et_date
                                  special_rule_donor_1
-                                 special_rule_don_age)
+                                 special_rule_don_age
+                                 special_rule_1_mt)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -472,7 +474,7 @@ class SpecialRules
       n_deliv = answer.response.comparable_answer_or_nil_for_question_with_code('N_DELIV')
 
       # Pass if gest age is not greater than 20 weeks (in days)
-      break true if (pr_end_dt - iui_date) <= 140
+      break true if (pr_end_dt - iui_date) <= 140 #ToDo: handle case where date is nil (unanswered)
 
       # Gest age is greater than 20 weeks (in days), check if n_deliv present
       !n_deliv.nil?
@@ -487,7 +489,7 @@ class SpecialRules
       n_deliv = answer.response.comparable_answer_or_nil_for_question_with_code('N_DELIV')
 
       # Pass if gest age is not greater than 20 weeks (in days)
-      break true if (pr_end_dt - et_date) <= 140
+      break true if (pr_end_dt - et_date) <= 140 #ToDo: handle case where date is nil (unanswered)
 
       # Gest age is greater than 20 weeks (in days), check if n_deliv present
       !n_deliv.nil?
@@ -504,7 +506,7 @@ class SpecialRules
       don_age = answer.response.comparable_answer_or_nil_for_question_with_code('DON_AGE')
       thaw_don = answer.response.comparable_answer_or_nil_for_question_with_code('THAW_DON')
 
-      break true if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) <= 0
+      break true if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) <= 0 #ToDo: handle case where int is nil (unanswered)
       break true if don_age.nil?
       !thaw_don.nil?
     }
@@ -521,8 +523,30 @@ class SpecialRules
       don_age = answer.response.comparable_answer_or_nil_for_question_with_code('DON_AGE')
 
       break true if surr != 'y'
-      break true if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) <= 0
+      break true if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) <= 0 #ToDo: handle case where int is nil (unanswered)
       !don_age.nil?
     }
+
+    CrossQuestionValidation.register_checker 'special_rule_1_mt', lambda { |answer, ununused_related_answer, checker_params|
+      # rule1mt: if n_embdisp =0, cyc_date-fdob must be ≥ 18 years & cyc_date-fdob must be <= 55 years
+      raise 'Can only be used on question N_EMBDISP' unless answer.question.code == 'N_EMBDISP'
+
+      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
+      cyc_date = answer.response.comparable_answer_or_nil_for_question_with_code('CYC_DATE')
+      fdob = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB')
+
+      break true if n_embdisp != 0
+      year_diff = age_in_completed_years(fdob, cyc_date)
+      year_diff >= 18 && year_diff <= 55
+    }
+  end
+
+  private
+
+  def self.age_in_completed_years (date_of_birth, other_date)
+    # Difference in years, less one if you have not had a birthday this year.
+    age = other_date.year - date_of_birth.year
+    age = age - 1 if (date_of_birth.month > other_date.month or (date_of_birth.month >= other_date.month and date_of_birth.day > other_date.day))
+    age
   end
 end

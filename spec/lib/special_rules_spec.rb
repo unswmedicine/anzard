@@ -832,4 +832,79 @@ describe "Special Rules" do
       end
     end
   end
+
+  describe 'Rule: rule1mt' do
+    # rule1mt: if n_embdisp =0, cyc_date-fdob must be ≥ 18 years & cyc_date-fdob must be <= 55 years
+    before :each do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
+      @cyc_date = create(:question, code: 'CYC_DATE', section: @section, question_type: Question::TYPE_DATE)
+      @fdob = create(:question, code: 'FDOB', section: @section, question_type: Question::TYPE_DATE)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_1_mt', question: @n_embdisp, error_message: 'My error message', related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule_1_mt', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule_1_mt requires question code N_EMBDISP but got Blah']
+    end
+
+    it 'should pass if n_embdisp != 0' do
+      [-1, 1].each do |val|
+        answer = create(:answer, question: @n_embdisp, answer_value: val, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+    end
+
+    describe 'when n_embdisp == 0' do
+      before :each do
+        @answer = create(:answer, question: @n_embdisp, answer_value: 0, response: @response)
+        @answer.reload
+      end
+
+      it 'should fail when cyc_date-fdob is < 18 years' do
+        # date difference is 18 years minus 1 day
+        create(:answer, question: @cyc_date, answer_value: '2017-12-31', response: @response)
+        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to eq('My error message')
+      end
+
+      it 'should fail when cyc_date-fdob is > 55 years' do
+        # date difference is 55 years plus 1 day
+        create(:answer, question: @cyc_date, answer_value: '2056-01-01', response: @response)
+        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to eq('My error message')
+      end
+
+      describe 'when cyc_date-fdob is ≥ 18 years & <= 55 years' do
+        it 'should pass when cyc_date-fdob is == 18 years' do
+          create(:answer, question: @cyc_date, answer_value: '2018-01-01', response: @response)
+          create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when cyc_date-fdob is == 55 years' do
+          create(:answer, question: @cyc_date, answer_value: '2055-01-01', response: @response)
+          create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when cyc_date-fdob is > 18 & < 55 years' do
+          create(:answer, question: @cyc_date, answer_value: '2035-10-15', response: @response)
+          create(:answer, question: @fdob, answer_value: '2000-11-06', response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+      end
+    end
+  end
+  
 end
