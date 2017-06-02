@@ -33,7 +33,7 @@ class CrossQuestionValidation < ApplicationRecord
     # return true/false if it passed/failed 
     if cqv.rule == 'comparison'
       cqv.errors[:base] << "#{cqv.operator} not included in #{SAFE_OPERATORS.inspect}" unless SAFE_OPERATORS.include?(cqv.operator)
-      cqv.errors[:base] << "invalid cqv offset \"#{cqv.constant}\" - constant offset must be an integer or decimal" unless (cqv.constant.blank? || cqv.constant.is_number?)
+      cqv.errors[:base] << "invalid cqv offset \"#{cqv.constant}\" - constant offset must be an integer or decimal"  if cqv.constant.is_a?(String) && !(cqv.constant.is_number? || cqv.constant.empty?)
     end
   end
 
@@ -162,6 +162,14 @@ class CrossQuestionValidation < ApplicationRecord
     checker_params[:constant].blank? ? 0 : checker_params[:constant]
   end
 
+  def self.sanitise_constant(constant)
+    if constant.is_a?(String) && constant.is_number?
+      constant.to_f
+    else
+      constant
+    end
+  end
+
   def self.check_gest_wght(answer)
      gest = answer.response.comparable_answer_or_nil_for_question_with_code(GEST_CODE)
     weight = answer.response.comparable_answer_or_nil_for_question_with_code(WGHT_CODE)
@@ -176,16 +184,16 @@ class CrossQuestionValidation < ApplicationRecord
   register_checker 'present_implies_constant', lambda { |answer, related_answer, checker_params|
     # e.g. If StartCPAPDate is a date, CPAPhrs must be greater than 0 (answer = CPAPhrs, related = StartCPAPDate)
     # return if related is not present (i.e. not answered or not answered correctly)
-    const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
+    const_meets_condition?(answer.comparable_answer, checker_params[:operator], sanitise_constant(checker_params[:constant]))
   }
 
   register_checker 'const_implies_const', lambda { |answer, related_answer, checker_params|
-    break true unless const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
-    const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
+    break true unless const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], sanitise_constant(checker_params[:conditional_constant]))
+    const_meets_condition?(answer.comparable_answer, checker_params[:operator], sanitise_constant(checker_params[:constant]))
   }
 
   register_checker 'const_implies_set', lambda { |answer, related_answer, checker_params|
-    break true unless const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
+    break true unless const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], sanitise_constant(checker_params[:conditional_constant]))
     set_meets_condition?(checker_params[:set], checker_params[:set_operator], answer.comparable_answer)
   }
 
@@ -196,7 +204,7 @@ class CrossQuestionValidation < ApplicationRecord
 
   register_checker 'blank_if_const', lambda { |answer, related_answer, checker_params|
     # E.g. If Died_ is 0, DiedDate must be blank (rule on DiedDate)
-    related_meets_condition = const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
+    related_meets_condition = const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], sanitise_constant(checker_params[:conditional_constant]))
     break true unless related_meets_condition
     # now fail if answer is present, but  answer must be present if we got this far, so just fail
     false
@@ -204,7 +212,7 @@ class CrossQuestionValidation < ApplicationRecord
 
   register_checker 'present_if_const', lambda { |answer, related_answer, checker_params|
     # E.g. If Gest < 32, LastO2 must be present
-    related_meets_condition = const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
+    related_meets_condition = const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], sanitise_constant(checker_params[:conditional_constant]))
     break true unless related_meets_condition
     # check if answer is answered
     answered?(answer)
@@ -266,7 +274,7 @@ class CrossQuestionValidation < ApplicationRecord
 
   # runs even when related is not answered
   register_checker 'const_implies_present', lambda { |answer, related_answer, checker_params|
-    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
+    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], sanitise_constant(checker_params[:constant]))
     # we know the answer meets the criteria, so now just check if related has been answered
     answered?(related_answer)
   }
@@ -294,12 +302,12 @@ class CrossQuestionValidation < ApplicationRecord
   }
 
   register_checker 'const_implies_one_of_const', lambda { |answer, related_answer, checker_params|
-    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], checker_params[:constant].to_float_if_number)
+    break true unless const_meets_condition?(answer.comparable_answer, checker_params[:operator], sanitise_constant(checker_params[:constant]))
     # we know the answer meets the criteria, so now check if any of the related ones have the correct value
     results = checker_params[:related_question_ids].collect do |question_id|
       related_answer = answer.response.get_answer_to(question_id)
       if answered?(related_answer)
-        const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], checker_params[:conditional_constant].to_float_if_number)
+        const_meets_condition?(related_answer.comparable_answer, checker_params[:conditional_operator], sanitise_constant(checker_params[:conditional_constant]))
       else
         false
       end
