@@ -733,8 +733,8 @@ describe CrossQuestionValidation do
 
     #TODO complete test
     describe 'multi_compare_datetime_quad' do
-      pending do
-
+      pending('test not implemented yet') do
+       fail
       end
     end
   end
@@ -773,6 +773,37 @@ describe CrossQuestionValidation do
       any_answer = create(:answer, response: response)
       any_answer.reload
       CrossQuestionValidation.check_gest_wght(any_answer).should eq(expected_result)
+    end
+  end
+
+  describe 'sanitise_constant' do
+    it 'should leave empty constants as is' do
+      expect(CrossQuestionValidation.sanitise_constant nil).to be_nil
+    end
+
+    it 'should leave numerical constants as is' do
+      expect(CrossQuestionValidation.sanitise_constant 1).to eq 1
+      expect(CrossQuestionValidation.sanitise_constant -1).to eq -1
+      expect(CrossQuestionValidation.sanitise_constant 1.5).to eq 1.5
+      expect(CrossQuestionValidation.sanitise_constant -1.5).to eq -1.5
+    end
+
+    it 'should leave non-numerical string constants as is' do
+      constants = ['a', 'b', 'c', 'yes', 'no', '0x7a', '0b1111010', '2e-36', '2-36', '1.a', '1.1.1', 'b5', '5b', 'on', "car's"]
+      constants.each do |constant|
+        expect(CrossQuestionValidation.sanitise_constant constant).to eq constant
+      end
+    end
+
+    it 'should convert numerical string constants to their numerical counterpart' do
+      constants = [{str: '0', num: 0}, {str: '+0', num: 0}, {str: '+0', num: 0}, {str: '-0', num: 0},
+          {str: '1', num: 1}, {str: '+1', num: 1}, {str: '-1', num: -1},
+          {str: '1.5', num: 1.5}, {str: '+1.5', num: 1.5}, {str: '-1.5', num: -1.5},
+          {str: '01', num: 1}, {str: '+01', num: 1}, {str: '-01', num: -1},
+          {str: '0.00', num: 0}, {str: '1.00', num: 1}, {str: '01.00', num: 1}]
+      constants.each do |constant|
+        expect(CrossQuestionValidation.sanitise_constant constant[:str]).to eq constant[:num]
+      end
     end
   end
 end
