@@ -30,7 +30,8 @@ class SpecialRules
     'special_rule_gest_et_date' => 'N_DELIV',
     'special_rule_thaw_don' => 'THAW_DON',
     'special_rule_don_age' => 'DON_AGE',
-    'special_rule_1_mt' => 'N_EMBDISP'
+    'special_rule_1_mt' => 'N_EMBDISP',
+    'special_rule_1_mtdisp' => 'N_EMBDISP'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -74,7 +75,8 @@ class SpecialRules
                                  special_rule_gest_et_date
                                  special_rule_thaw_don
                                  special_rule_don_age
-                                 special_rule_1_mt)
+                                 special_rule_1_mt
+                                 special_rule_1_mtdisp)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -550,6 +552,21 @@ class SpecialRules
       break true if cyc_date.nil? || fdob.nil?
       year_diff = age_in_completed_years(fdob, cyc_date)
       year_diff >= 18 && year_diff <= 55
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_1_mtdisp', lambda { |answer, ununused_related_answer, checker_params|
+      # rule1mtdisp: if n_embdisp >0, cyc_date-fdob must be ≥ 18 years & <= 70 years
+      # i.e. if n_embdisp > 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 70 years
+      raise 'Can only be used on question N_EMBDISP' unless answer.question.code == 'N_EMBDISP'
+
+      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
+      cyc_date = answer.response.comparable_answer_or_nil_for_question_with_code('CYC_DATE')
+      fdob = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB')
+
+      break true if n_embdisp <= 0
+      break true if cyc_date.nil? || fdob.nil?
+      year_diff = age_in_completed_years(fdob, cyc_date)
+      year_diff >= 18 && year_diff <= 70
     }
   end
 
