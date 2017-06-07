@@ -76,21 +76,4 @@ describe String do
       expect('0b1111010'.is_number?).to eq false
     end
   end
-
-  describe 'to_float_if_number' do
-    it 'should return a float when passed a valid number' do
-      valid_numbers = %w(0 1 -1 +1 1.5 -1.5 +1.5 0.00 1.00 01 01.00)
-      valid_numbers.each do |n|
-        expect(n.to_float_if_number.is_a? Float).to eq true
-      end
-    end
-
-    it 'should return the string as provided when it is not a valid number' do
-      strings = %w(a b c yes no 0x7a 0b1111010 2e-36 2-36 1.a 1.1.1 b5 5b one)
-      strings.each do |s|
-        expect(s.to_float_if_number.is_a? Float).to eq false
-        expect(s.to_float_if_number).to eq s
-      end
-    end
-  end
 end
