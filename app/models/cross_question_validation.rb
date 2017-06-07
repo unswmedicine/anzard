@@ -79,7 +79,7 @@ class CrossQuestionValidation < ApplicationRecord
 
 
     # don't bother checking if the question is unanswered or has an invalid answer
-    return nil if CrossQuestionValidation.unanswered?(answer) && !RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL.include?(rule)
+    return nil if CrossQuestionValidation.unanswered?(answer) && !RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL.include?(rule) && !SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL.include?(rule)
 
     # we have to filter the answers on the response rather than using find, as we want to check through as-yet unsaved answers as part of batch processing
     related_answer = answer.response.get_answer_to(related_question_id) if related_question_id

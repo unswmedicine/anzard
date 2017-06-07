@@ -626,7 +626,7 @@ describe "Special Rules" do
       @pr_end_dt = create(:question, code: 'PR_END_DT', section: @section, question_type: Question::TYPE_DATE)
       @iui_date = create(:question, code: 'IUI_DATE', section: @section, question_type: Question::TYPE_DATE)
       @n_deliv = create(:question, code: 'N_DELIV', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_iui_date', question: @pr_end_dt, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_iui_date', question: @n_deliv, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -634,31 +634,50 @@ describe "Special Rules" do
       q = create(:question, code: 'Blah')
       cqv = build(:cross_question_validation, rule: 'special_rule_gest_iui_date', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_gest_iui_date requires question code PR_END_DT but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_gest_iui_date requires question code N_DELIV but got Blah']
+    end
+
+    it 'should apply even when N_DELIV is unanswered' do
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_gest_iui_date')
+    end
+
+    it 'should pass if pr_end_dt is unanswered' do
+      answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+      create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should pass if iui_dt is unanswered' do
+      answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+      create(:answer, question: @pr_end_dt, answer_value: '2013-05-21', response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
     end
 
     it 'should pass if gestational age (pr_end_dt - iui_date) is not greater than 20 weeks' do
-      answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-21', response: @response) # 20 week difference
+      answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+      create(:answer, question: @pr_end_dt, answer_value: '2013-05-21', response: @response) # 20 week difference
       create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
     describe 'when gestational age (pr_end_dt - iui_date) is greater than 20 weeks' do
-      before :each do
-        @answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
-        create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
-        @answer.reload
-      end
-
       it 'should fail if n_deliv is not present' do
-        expect(@cqv.check(@answer)).to eq('My error message')
+        answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+        create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
+        create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to eq('My error message')
       end
 
       it 'should pass if n_deliv is present' do
-        create(:answer, question: @n_deliv, answer_value: 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
+        answer = create(:answer, question: @n_deliv, answer_value: 1, response: @response)
+        create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
+        create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
       end
     end
   end
@@ -671,7 +690,7 @@ describe "Special Rules" do
       @pr_end_dt = create(:question, code: 'PR_END_DT', section: @section, question_type: Question::TYPE_DATE)
       @et_date = create(:question, code: 'ET_DATE', section: @section, question_type: Question::TYPE_DATE)
       @n_deliv = create(:question, code: 'N_DELIV', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_et_date', question: @pr_end_dt, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_et_date', question: @n_deliv, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -679,37 +698,56 @@ describe "Special Rules" do
       q = create(:question, code: 'Blah')
       cqv = build(:cross_question_validation, rule: 'special_rule_gest_et_date', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_gest_et_date requires question code PR_END_DT but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_gest_et_date requires question code N_DELIV but got Blah']
+    end
+
+    it 'should apply even when N_DELIV is unanswered' do
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_gest_et_date')
+    end
+
+    it 'should pass if pr_end_dt is unanswered' do
+      answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+      create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should pass if et_date is unanswered' do
+      answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+      create(:answer, question: @et_date, answer_value: '2013-05-21', response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
     end
 
     it 'should pass if gestational age (pr_end_dt - et_date) is not greater than 20 weeks' do
-      answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-21', response: @response) # 20 week difference
+      answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+      create(:answer, question: @pr_end_dt, answer_value: '2013-05-21', response: @response) # 20 week difference
       create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
     describe 'when gestational age (pr_end_dt - et_date) is greater than 20 weeks' do
-      before :each do
-        @answer = create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
-        create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
-        @answer.reload
-      end
-
       it 'should fail if n_deliv is not present' do
-        expect(@cqv.check(@answer)).to eq('My error message')
+        answer = create(:answer, question: @n_deliv, answer_value: nil, response: @response)
+        create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
+        create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to eq('My error message')
       end
 
       it 'should pass if n_deliv is present' do
-        create(:answer, question: @n_deliv, answer_value: 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
+        answer = create(:answer, question: @n_deliv, answer_value: 1, response: @response)
+        create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
+        create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
       end
     end
   end
 
-  describe "RULE: ruleDonor1" do
-    # ruleDonor1: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
+  describe "RULE: ruleThawDon" do
+    # ruleThawDon: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
     before :each do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
@@ -719,57 +757,104 @@ describe "Special Rules" do
       @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @don_age = create(:question, code: 'DON_AGE', section: @section, question_type: Question::TYPE_INTEGER)
       @thaw_don = create(:question, code: 'THAW_DON', section: @section, question_type: Question::TYPE_CHOICE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_donor_1', question: @n_s_clth, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_thaw_don', question: @thaw_don, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_donor_1', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_thaw_don', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_donor_1 requires question code N_S_CLTH but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_thaw_don requires question code THAW_DON but got Blah']
     end
 
-    it 'should pass when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
-      answer = create(:answer, question: @n_s_clth, answer_value: 0, response: @response)
-      create(:answer, question: @n_v_clth, answer_value: 0, response: @response)
-      create(:answer, question: @n_s_blth, answer_value: 0, response: @response)
-      create(:answer, question: @n_v_blth, answer_value: 0, response: @response)
+    it 'should apply even when THAW_DON is unanswered' do
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_thaw_don')
+    end
+
+    it 'should pass when don_age is not complete' do
+      answer = create(:answer, question: @thaw_don, answer_value: nil, response: @response)
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
-    describe 'when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0' do
+    describe 'when don_age is complete' do
       before :each do
-        @answer = create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+        @answer = create(:answer, question: @thaw_don, answer_value: nil, response: @response)
+        create(:answer, question: @don_age, answer_value: 20, response: @response)
         @answer.reload
       end
 
-      it 'should pass when don_age is not complete' do
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      describe 'when don_age is complete' do
-        it 'should fail if thaw_don is not complete' do
-          create(:answer, question: @don_age, answer_value: 20, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to eq('My error message')
-        end
-
-        it 'should pass if thaw_don is complete' do
-          create(:answer, question: @don_age, answer_value: 20, response: @response)
-          create(:answer, question: @thaw_don, answer_value: 0, response: @response)
+      describe 'when n_s_clth is unanswered' do
+        it 'should pass when (n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
+          create(:answer, question: @n_v_clth, answer_value: -1, response: @response)
+          create(:answer, question: @n_s_blth, answer_value: -1, response: @response)
+          create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
           @answer.reload
           expect(@cqv.check(@answer)).to be_nil
         end
+
+        describe 'when n_v_clth is unanswered' do
+          it 'should pass when (n_s_blth + n_v_blth) is not greater than 0' do
+            create(:answer, question: @n_s_blth, answer_value: -1, response: @response)
+            create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
+            @answer.reload
+            expect(@cqv.check(@answer)).to be_nil
+          end
+
+          describe 'when n_s_blth is unanswered' do
+            it 'should pass when n_v_blth is not greater than 0' do
+              create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
+              @answer.reload
+              expect(@cqv.check(@answer)).to be_nil
+            end
+
+            describe 'when n_v_blth is unanswered' do
+              it 'should pass' do
+                expect(@cqv.check(@answer)).to be_nil
+              end
+            end
+          end
+        end
       end
+
+      it 'should pass when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
+        create(:answer, question: @n_s_clth, answer_value: 0, response: @response)
+        create(:answer, question: @n_v_clth, answer_value: 0, response: @response)
+        create(:answer, question: @n_s_blth, answer_value: 0, response: @response)
+        create(:answer, question: @n_v_blth, answer_value: 0, response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
+
+      describe 'when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0' do
+        before :each do
+          create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
+          create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
+          create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
+          create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+          @answer.reload
+        end
+
+        it 'should fail if thaw_don is not complete' do
+          expect(@cqv.check(@answer)).to eq('My error message')
+        end
+      end
+    end
+
+    it 'should pass if don_age is complete, (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and thaw_don is complete' do
+      answer = create(:answer, question: @thaw_don, answer_value: 0, response: @response)
+      create(:answer, question: @don_age, answer_value: 20, response: @response)
+      create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
+      create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
+      create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
+      create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
     end
   end
 
-  describe 'Rule: rule_don_age' do
+  describe 'Rule: ruleDonAge' do
     # ruleDonAge: if surr=y & (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0, don_age must be present
     before :each do
       @survey = create(:survey)
@@ -780,7 +865,7 @@ describe "Special Rules" do
       @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @don_age = create(:question, code: 'DON_AGE', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_don_age', question: @surr, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_don_age', question: @don_age, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -788,19 +873,58 @@ describe "Special Rules" do
       q = create(:question, code: 'Blah')
       cqv = build(:cross_question_validation, rule: 'special_rule_don_age', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_don_age requires question code SURR but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_don_age requires question code DON_AGE but got Blah']
+    end
+
+    it 'should apply even when DON_AGE is unanswered' do
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_don_age')
     end
 
     it 'should pass when surr != y' do
-      answer = create(:answer, question: @surr, answer_value: 'n', response: @response)
+      answer = create(:answer, question: @don_age, answer_value: nil, response: @response)
+      create(:answer, question: @surr, answer_value: 'n', response: @response)
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
     describe 'when surr == y' do
       before :each do
-        @answer = create(:answer, question: @surr, answer_value: 'y', response: @response)
+        @answer = create(:answer, question: @don_age, answer_value: nil, response: @response)
+        create(:answer, question: @surr, answer_value: 'y', response: @response)
         @answer.reload
+      end
+
+      describe 'when n_s_clth is unanswered' do
+        it 'should pass when (n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
+          create(:answer, question: @n_v_clth, answer_value: -1, response: @response)
+          create(:answer, question: @n_s_blth, answer_value: -1, response: @response)
+          create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        describe 'when n_v_clth is unanswered' do
+          it 'should pass when (n_s_blth + n_v_blth) is not greater than 0' do
+            create(:answer, question: @n_s_blth, answer_value: -1, response: @response)
+            create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
+            @answer.reload
+            expect(@cqv.check(@answer)).to be_nil
+          end
+
+          describe 'when n_s_blth is unanswered' do
+            it 'should pass when n_v_blth is not greater than 0' do
+              create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
+              @answer.reload
+              expect(@cqv.check(@answer)).to be_nil
+            end
+
+            describe 'when n_v_blth is unanswered' do
+              it 'should pass' do
+                expect(@cqv.check(@answer)).to be_nil
+              end
+            end
+          end
+        end
       end
 
       it 'should pass when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
@@ -824,17 +948,23 @@ describe "Special Rules" do
         it 'should fail when don_age is not present' do
           expect(@cqv.check(@answer)).to eq('My error message')
         end
-
-        it 'should pass when don_age is present' do
-          create(:answer, question: @don_age, answer_value: 20, response: @response)
-          expect(@cqv.check(@answer)).to be_nil
-        end
       end
+    end
+
+    it 'should pass when surr == y, (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is present' do
+      answer = create(:answer, question: @don_age, answer_value: 20, response: @response)
+      create(:answer, question: @surr, answer_value: 'y', response: @response)
+      create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
+      create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
+      create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
+      create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+      expect(@cqv.check(answer)).to be_nil
     end
   end
 
   describe 'Rule: rule1mt' do
     # rule1mt: if n_embdisp =0, cyc_date-fdob must be ≥ 18 years & cyc_date-fdob must be <= 55 years
+    # i.e if n_embdisp == 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 55 years
     before :each do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
@@ -864,6 +994,18 @@ describe "Special Rules" do
       before :each do
         @answer = create(:answer, question: @n_embdisp, answer_value: 0, response: @response)
         @answer.reload
+      end
+
+      it 'should pass when cyc_date is unanswered' do
+        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
+
+      it 'should pass when fdob is unanswered' do
+        create(:answer, question: @cyc_date, answer_value: '2000-01-01', response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
       end
 
       it 'should fail when cyc_date-fdob is < 18 years' do
