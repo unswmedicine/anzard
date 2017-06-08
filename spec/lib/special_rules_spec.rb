@@ -1266,4 +1266,53 @@ describe "Special Rules" do
     end
   end
 
+  describe 'Rule: rule_stim_1st' do
+    # ruleStim1st: if stim_1st=y, opu_date must be complete| can_date must be complete
+    before :each do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @stim_1st = create(:question, code: 'STIM_1ST', section: @section, question_type: Question::TYPE_CHOICE)
+      @opu_date = create(:question, code: 'OPU_DATE', section: @section, question_type: Question::TYPE_DATE)
+      @can_date = create(:question, code: 'CAN_DATE', section: @section, question_type: Question::TYPE_DATE)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_stim_1st', question: @stim_1st, error_message: 'My error message', related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule_stim_1st', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule_stim_1st requires question code STIM_1ST but got Blah']
+    end
+
+    it 'should pass if stim_1st == n' do
+      answer = create(:answer, question: @stim_1st, answer_value: 'n', response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    describe 'when stim_1st == y' do
+      before :each do
+        @answer = create(:answer, question: @stim_1st, answer_value: 'y', response: @response)
+        @answer.reload
+      end
+
+      it 'should fail if neither opu_date or can_date is answered' do
+        expect(@cqv.check(@answer)).to eq('My error message')
+      end
+
+      it 'should pass if opu_date is answered' do
+        create(:answer, question: @opu_date, answer_value: '2000-01-01', response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
+
+      it 'should pass if can_date is answered' do
+        create(:answer, question: @can_date, answer_value: '2000-01-01', response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
+    end
+  end
+
 end
