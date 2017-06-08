@@ -24,14 +24,15 @@ class SpecialRules
     'special_height' => 'Hght',
     'special_length' => 'Length',
     'special_cochimplt' => 'CochImplt',
-    'special_rule22d' => 'N_V_EGTH',
-    'special_rule17_a' => 'PR_CLIN',
+    'special_rule_22_d' => 'N_V_EGTH',
+    'special_rule_17_a' => 'PR_CLIN',
     'special_rule_gest_iui_date' => 'N_DELIV',
     'special_rule_gest_et_date' => 'N_DELIV',
     'special_rule_thaw_don' => 'THAW_DON',
     'special_rule_don_age' => 'DON_AGE',
     'special_rule_1_mt' => 'N_EMBDISP',
-    'special_rule_1_mtdisp' => 'N_EMBDISP'
+    'special_rule_1_mtdisp' => 'N_EMBDISP',
+    'special_rule_24' => 'N_FERT'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -69,14 +70,15 @@ class SpecialRules
                                  special_hmeo2_new
                                  special_same_name_inf
                                  special_pns
-                                 special_rule22d
-                                 special_rule17_a
+                                 special_rule_22_d
+                                 special_rule_17_a
                                  special_rule_gest_iui_date
                                  special_rule_gest_et_date
                                  special_rule_thaw_don
                                  special_rule_don_age
                                  special_rule_1_mt
-                                 special_rule_1_mtdisp)
+                                 special_rule_1_mtdisp
+                                 special_rule_24)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -435,7 +437,7 @@ class SpecialRules
       passing
     }
 
-    CrossQuestionValidation.register_checker 'special_rule22d', lambda { |answer, ununused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_rule_22_d', lambda { |answer, ununused_related_answer, checker_params|
       #rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
       raise 'Can only be used on question N_V_EGTH' unless answer.question.code == 'N_V_EGTH'
 
@@ -450,10 +452,10 @@ class SpecialRules
       n_egfz_v = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
 
       # Perform validation check
-      (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+      (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v) #ToDo: handle nil case where question is unanswered
     }
 
-    CrossQuestionValidation.register_checker 'special_rule17_a', lambda { |answer, ununused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_rule_17_a', lambda { |answer, ununused_related_answer, checker_params|
       # rule17a: if pr_clin is y or u, n_bl_et>0 |n_cl_et >0 | iui_date is a date/present
       raise 'Can only be used on question PR_CLIN' unless answer.question.code == 'PR_CLIN'
 
@@ -567,6 +569,20 @@ class SpecialRules
       break true if cyc_date.nil? || fdob.nil?
       year_diff = age_in_completed_years(fdob, cyc_date)
       year_diff >= 18 && year_diff <= 70
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_24', lambda { |answer, ununused_related_answer, checker_params|
+      # rule24: n_ivf + n_icsi >=n_fert
+      # i.e. n_fert <= n_ivf + n_icsi
+      raise 'Can only be used on question N_FERT' unless answer.question.code == 'N_FERT'
+
+      n_fert = answer.response.comparable_answer_or_nil_for_question_with_code('N_FERT')
+      n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+      n_ivf = 0 if n_ivf.nil?
+      n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
+      n_icsi = 0 if n_icsi.nil?
+
+      n_fert <= (n_ivf + n_icsi)
     }
   end
 
