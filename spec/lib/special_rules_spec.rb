@@ -1195,4 +1195,75 @@ describe "Special Rules" do
     end
   end
 
+  describe 'Rule: rule26h' do
+    # rule26h: if et_date is a date, n_cl_et must be >=0 | n_bl_et must be >=0
+    before :each do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @et_date = create(:question, code: 'ET_DATE', section: @section, question_type: Question::TYPE_DATE)
+      @n_cl_et = create(:question, code: 'N_CL_ET', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_bl_et = create(:question, code: 'N_BL_ET', section: @section, question_type: Question::TYPE_INTEGER)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_26_h', question: @et_date, error_message: 'My error message', related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule_26_h', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule_26_h requires question code ET_DATE but got Blah']
+    end
+
+    describe 'when et_date is a date' do
+      before :each do
+        @answer = create(:answer, question: @et_date, answer_value: '2000-01-01', response: @response)
+        @answer.reload
+      end
+
+      it 'should fail when neither n_cl_et or n_bl_et is answered' do
+        expect(@cqv.check(@answer)).to eq('My error message')
+      end
+
+      describe 'when n_cl_et is answered and n_bl_et is unanswered' do
+        it 'should pass if n_cl_et > 0' do
+          create(:answer, question: @n_cl_et, answer_value: 1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass if n_cl_et == 0' do
+          create(:answer, question: @n_cl_et, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should fail when n_cl_et < 0' do
+          create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to eq('My error message')
+        end
+      end
+
+      describe 'when n_cl_et is unanswered and n_bl_et is answered' do
+        it 'should pass if n_bl_et > 0' do
+          create(:answer, question: @n_bl_et, answer_value: 1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass if n_bl_et == 0' do
+          create(:answer, question: @n_bl_et, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should fail when n_bl_et < 0' do
+          create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to eq('My error message')
+        end
+      end
+    end
+  end
+
 end

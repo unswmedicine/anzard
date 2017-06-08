@@ -32,7 +32,8 @@ class SpecialRules
     'special_rule_don_age' => 'DON_AGE',
     'special_rule_1_mt' => 'N_EMBDISP',
     'special_rule_1_mtdisp' => 'N_EMBDISP',
-    'special_rule_24' => 'N_FERT'
+    'special_rule_24' => 'N_FERT',
+    'special_rule_26_h' => 'ET_DATE'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -78,7 +79,8 @@ class SpecialRules
                                  special_rule_don_age
                                  special_rule_1_mt
                                  special_rule_1_mtdisp
-                                 special_rule_24)
+                                 special_rule_24
+                                 special_rule_26_h)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
       # An error_flag if PNS==-1 and (Gest>=32 and Wght>=1500)
@@ -583,6 +585,18 @@ class SpecialRules
       n_icsi = 0 if n_icsi.nil?
 
       n_fert <= (n_ivf + n_icsi)
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_26_h', lambda { |answer, ununused_related_answer, checker_params|
+      # rule26h: if et_date is a date, n_cl_et must be >=0 | n_bl_et must be >=0
+      raise 'Can only be used on question ET_DATE' unless answer.question.code == 'ET_DATE'
+
+      et_date = answer.response.comparable_answer_or_nil_for_question_with_code('ET_DATE')
+      n_cl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET')
+      n_bl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET')
+
+      !et_date.nil? && ((!n_cl_et.nil? && n_cl_et >= 0) || (!n_bl_et.nil? && n_bl_et >= 0))
+    }
     }
   end
 
