@@ -482,7 +482,7 @@ describe "Special Rules" do
     end
   end
 
-  describe "RULE: rule22d" do
+  describe 'RULE: rule22d' do
     # rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
     before(:each) do
       @survey = create(:survey)
@@ -507,50 +507,125 @@ describe "Special Rules" do
       expect(cqv.errors[:base]).to eq ['special_rule_22_d requires question code N_V_EGTH but got Blah']
     end
 
-    it 'should pass when n_v_egth sum equal to n_donate sum' do
-      answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
-      create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
-      create(:answer, question: @n_eggs, answer_value: 0, response: @response)
-      create(:answer, question: @n_recvd, answer_value: 0, response: @response)
-      create(:answer, question: @n_donate, answer_value: 0, response: @response)
-      create(:answer, question: @n_ivf, answer_value: 0, response: @response)
-      create(:answer, question: @n_icsi, answer_value: 0, response: @response)
-      create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
-      create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+    it 'should apply even when N_V_EGTH is unanswered' do
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_22_d')
+    end
+
+    it 'should pass when all questions are unanswered' do
+      answer = create(:answer, question: @n_v_egth, answer_value: nil, response: @response)
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
-    it 'should pass when n_v_egth sum greater than n_donate sum' do
-      answer = create(:answer, question: @n_v_egth, answer_value: 1, response: @response)
-      create(:answer, question: @n_s_egth, answer_value: 1, response: @response)
-      create(:answer, question: @n_eggs, answer_value: 1, response: @response)
-      create(:answer, question: @n_recvd, answer_value: 1, response: @response)
-      create(:answer, question: @n_donate, answer_value: 0, response: @response)
-      create(:answer, question: @n_ivf, answer_value: 0, response: @response)
-      create(:answer, question: @n_icsi, answer_value: 0, response: @response)
-      create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
-      create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
+    describe 'when only one question is answered' do
+      it 'should pass when N_V_EGTH is the only question answered' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      describe 'when N_V_EGTH is unanswered' do
+        before :each do
+          @answer = create(:answer, question: @n_v_egth, answer_value: nil, response: @response)
+          @answer.reload
+        end
+
+        it 'should pass when only N_S_EGTH is answered' do
+          create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGGS is answered' do
+          create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_RECVD is answered' do
+          create(:answer, question: @n_recvd, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_DONATE is answered' do
+          create(:answer, question: @n_donate, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_IVF is answered' do
+          create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_ICSI is answered' do
+          create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGFZ_S is answered' do
+          create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGFZ_V is answered' do
+          create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+      end
     end
 
-    it 'should fail when n_v_egth sum less than n_donate sum' do
-      answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
-      create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
-      create(:answer, question: @n_eggs, answer_value: 0, response: @response)
-      create(:answer, question: @n_recvd, answer_value: 0, response: @response)
-      create(:answer, question: @n_donate, answer_value: 1, response: @response)
-      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
-      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
-      create(:answer, question: @n_egfz_s, answer_value: 1, response: @response)
-      create(:answer, question: @n_egfz_v, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to eq('My error message')
+    describe 'when all questions are answered' do
+      it 'should pass when n_v_egth sum equal to n_donate sum' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+        create(:answer, question: @n_recvd, answer_value: 0, response: @response)
+        create(:answer, question: @n_donate, answer_value: 0, response: @response)
+        create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+        create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      it 'should pass when n_v_egth sum greater than n_donate sum' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 1, response: @response)
+        create(:answer, question: @n_s_egth, answer_value: 1, response: @response)
+        create(:answer, question: @n_eggs, answer_value: 1, response: @response)
+        create(:answer, question: @n_recvd, answer_value: 1, response: @response)
+        create(:answer, question: @n_donate, answer_value: 0, response: @response)
+        create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+        create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      it 'should fail when n_v_egth sum less than n_donate sum' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+        create(:answer, question: @n_recvd, answer_value: 0, response: @response)
+        create(:answer, question: @n_donate, answer_value: 1, response: @response)
+        create(:answer, question: @n_ivf, answer_value: 1, response: @response)
+        create(:answer, question: @n_icsi, answer_value: 1, response: @response)
+        create(:answer, question: @n_egfz_s, answer_value: 1, response: @response)
+        create(:answer, question: @n_egfz_v, answer_value: 1, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to eq('My error message')
+      end
     end
   end
 
-  describe "RULE: rule17_a" do
+  describe 'RULE: rule17_a' do
     # rule17a: if pr_clin is y or u, n_bl_et>0 |n_cl_et >0 | iui_date is a date
     before(:each) do
       @survey = create(:survey)
@@ -570,55 +645,52 @@ describe "Special Rules" do
       expect(cqv.errors[:base]).to eq ['special_rule_17_a requires question code PR_CLIN but got Blah']
     end
 
-    it 'should pass when pr_clin is not y or u and neither n_bl_et > 0 or n_cl_et > 0 or iui_date is a date' do
+    it 'should pass when pr_clin is not y or u' do
       answer = create(:answer, question: @pr_clin, answer_value: 'n', response: @response)
-      create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
-      create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
-      # no answer object created for iui_date to represent it not being answered
       answer.reload
       expect(@cqv.check(answer)).to be_nil
     end
 
     ['y', 'u'].each do |pr_clin_trigger_value|
-      it "should fail when pr_clin is #{pr_clin_trigger_value} and neither n_bl_et > 0 or n_cl_et > 0 or iui_date is a date" do
-        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
-        create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
-        create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
-        # no answer object created for iui_date to represent it not being answered
-        answer.reload
-        expect(@cqv.check(answer)).to eq('My error message')
-      end
+      describe "when pr_clin is #{pr_clin_trigger_value}" do
+        before :each do
+          @answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
+          @answer.reload
+        end
 
-      it "should pass when pr_clin is #{pr_clin_trigger_value} and n_bl_et > 0" do
-        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
-        create(:answer, question: @n_bl_et, answer_value: 1, response: @response)
-        create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
-        # no answer object created for iui_date to represent it not being answered
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
+        it 'should fail when neither n_bl_et, n_cl_et or iui_date is answered' do
+          expect(@cqv.check(@answer)).to eq('My error message')
+        end
 
-      it "should pass when pr_clin is #{pr_clin_trigger_value} and n_cl_et > 0" do
-        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
-        create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
-        create(:answer, question: @n_cl_et, answer_value: 1, response: @response)
-        # no answer object created for iui_date to represent it not being answered
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
+        it 'should fail when neither n_bl_et or n_cl_et is greater than 0 and iui_date is unanswered' do
+          create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
+          create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to eq('My error message')
+        end
 
-      it "should pass when pr_clin is #{pr_clin_trigger_value} and iui_date is a date" do
-        answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
-        create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
-        create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
-        create(:answer, question: @iui_date, answer_value: '2013-01-02', response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
+        it 'should pass when n_bl_et > 0' do
+          create(:answer, question: @n_bl_et, answer_value: 1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when n_cl_et > 0' do
+          create(:answer, question: @n_cl_et, answer_value: 1, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when iui_date is a date' do
+          create(:answer, question: @iui_date, answer_value: '2013-01-02', response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
       end
     end
   end
 
-  describe "RULE: gest_iui_date" do
+  describe 'RULE: gest_iui_date' do
     # rule_xx: if gestational age (pr_end_dt - iui_date) is greater than 20 weeks, n_deliv must be present
     before :each do
       @survey = create(:survey)
@@ -682,7 +754,7 @@ describe "Special Rules" do
     end
   end
 
-  describe "RULE: gest_et_date" do
+  describe 'RULE: gest_et_date' do
     # rule_xx: if gestational age (pr_end_dt - et_date) is greater than 20 weeks, n_deliv must be present
     before :each do
       @survey = create(:survey)
@@ -746,7 +818,7 @@ describe "Special Rules" do
     end
   end
 
-  describe "RULE: ruleThawDon" do
+  describe 'RULE: ruleThawDon' do
     # ruleThawDon: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
     before :each do
       @survey = create(:survey)

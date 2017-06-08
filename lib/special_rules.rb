@@ -9,7 +9,8 @@ class SpecialRules
   CEASE_HI_FLO_DATE_CODE = 'CeaseHiFloDate'
   HOME_DATE_CODE = 'HomeDate'
 
-  RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(special_rule_gest_iui_date special_rule_gest_et_date special_rule_thaw_don special_rule_don_age)
+  RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(special_rule_22_d special_rule_gest_iui_date special_rule_gest_et_date
+    special_rule_thaw_don special_rule_don_age)
 
   RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES = {
     'special_o2_a' => 'O2_36wk_',
@@ -445,18 +446,18 @@ class SpecialRules
       #rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
       raise 'Can only be used on question N_V_EGTH' unless answer.question.code == 'N_V_EGTH'
 
-      n_v_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_EGTH')
-      n_s_egth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_EGTH')
-      n_eggs = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGS')
-      n_recvd = answer.response.comparable_answer_or_nil_for_question_with_code('N_RECVD')
-      n_donate = answer.response.comparable_answer_or_nil_for_question_with_code('N_DONATE')
-      n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
-      n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
-      n_egfz_s = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
-      n_egfz_v = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
+      n_v_egth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_EGTH')
+      n_s_egth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_EGTH')
+      n_eggs = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGS')
+      n_recvd = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_RECVD')
+      n_donate = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_DONATE')
+      n_ivf = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+      n_icsi = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
+      n_egfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
+      n_egfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
 
       # Perform validation check
-      (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v) #ToDo: handle nil case where question is unanswered
+      (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
     }
 
     CrossQuestionValidation.register_checker 'special_rule_17_a', lambda { |answer, ununused_related_answer, checker_params|
@@ -472,7 +473,7 @@ class SpecialRules
       break true unless (p_r_clin == 'y' || p_r_clin == 'u')
 
       # pr_clin is y or u, so do other checks and return valid if one passes
-      n_bl_et > 0 || n_cl_et > 0 || !iui_date.nil?
+      (!n_bl_et.nil? && n_bl_et > 0) || (!n_cl_et.nil? && n_cl_et > 0) || !iui_date.nil?
     }
 
     CrossQuestionValidation.register_checker 'special_rule_gest_iui_date', lambda { |answer, ununused_related_answer, checker_params|
@@ -509,14 +510,10 @@ class SpecialRules
       # ruleThawDon: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
       raise 'Can only be used on question THAW_DON' unless answer.question.code == 'THAW_DON'
 
-      n_s_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
-      n_s_clth = 0 if n_s_clth.nil?
-      n_v_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
-      n_v_clth = 0 if n_v_clth.nil?
-      n_s_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
-      n_s_blth = 0 if n_s_blth.nil?
-      n_v_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
-      n_v_blth = 0 if n_v_blth.nil?
+      n_s_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
+      n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
+      n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
+      n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
       don_age = answer.response.comparable_answer_or_nil_for_question_with_code('DON_AGE')
       thaw_don = answer.response.comparable_answer_or_nil_for_question_with_code('THAW_DON')
 
@@ -530,14 +527,10 @@ class SpecialRules
       raise 'Can only be used on question DON_AGE' unless answer.question.code == 'DON_AGE'
 
       surr = answer.response.comparable_answer_or_nil_for_question_with_code('SURR')
-      n_s_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
-      n_s_clth = 0 if n_s_clth.nil?
-      n_v_clth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
-      n_v_clth = 0 if n_v_clth.nil?
-      n_s_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
-      n_s_blth = 0 if n_s_blth.nil?
-      n_v_blth = answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
-      n_v_blth = 0 if n_v_blth.nil?
+      n_s_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
+      n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
+      n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
+      n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
       don_age = answer.response.comparable_answer_or_nil_for_question_with_code('DON_AGE')
 
       break true if surr != 'y'
@@ -581,10 +574,8 @@ class SpecialRules
       raise 'Can only be used on question N_FERT' unless answer.question.code == 'N_FERT'
 
       n_fert = answer.response.comparable_answer_or_nil_for_question_with_code('N_FERT')
-      n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
-      n_ivf = 0 if n_ivf.nil?
-      n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
-      n_icsi = 0 if n_icsi.nil?
+      n_ivf = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+      n_icsi = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
 
       n_fert <= (n_ivf + n_icsi)
     }
@@ -620,5 +611,11 @@ class SpecialRules
     age = other_date.year - date_of_birth.year
     age = age - 1 if (date_of_birth.month > other_date.month or (date_of_birth.month >= other_date.month and date_of_birth.day > other_date.day))
     age
+  end
+
+  def self.answer_or_0_if_nil (answer)
+    result = 0
+    result = answer if !answer.nil?
+    result
   end
 end
