@@ -9,8 +9,8 @@ class SpecialRules
   CEASE_HI_FLO_DATE_CODE = 'CeaseHiFloDate'
   HOME_DATE_CODE = 'HomeDate'
 
-  RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(special_rule_22_d special_rule_gest_iui_date special_rule_gest_et_date
-    special_rule_thaw_don special_rule_don_age)
+  RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(special_rule_22_d special_rule_26_e special_rule_gest_iui_date
+    special_rule_gest_et_date special_rule_thaw_don special_rule_don_age)
 
   RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES = {
     'special_o2_a' => 'O2_36wk_',
@@ -26,6 +26,7 @@ class SpecialRules
     'special_length' => 'Length',
     'special_cochimplt' => 'CochImplt',
     'special_rule_22_d' => 'N_V_EGTH',
+    'special_rule_26_e' => 'N_S_CLTH',
     'special_rule_17_a' => 'PR_CLIN',
     'special_rule_gest_iui_date' => 'N_DELIV',
     'special_rule_gest_et_date' => 'N_DELIV',
@@ -74,6 +75,7 @@ class SpecialRules
                                  special_same_name_inf
                                  special_pns
                                  special_rule_22_d
+                                 special_rule_26_e
                                  special_rule_17_a
                                  special_rule_gest_iui_date
                                  special_rule_gest_et_date
@@ -458,6 +460,27 @@ class SpecialRules
 
       # Perform validation check
       (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_26_e', lambda { |answer, ununused_related_answer, checker_params|
+      # rule26e: (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
+      raise 'Can only be used on question N_S_CLTH' unless answer.question.code == 'N_S_CLTH'
+
+      n_s_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
+      n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
+      n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
+      n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
+      n_fert = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_FERT')
+      n_embrec = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBREC')
+      n_bl_et = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET')
+      n_cl_et = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET')
+      n_clfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_S')
+      n_clfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_V')
+      n_blfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_BLFZ_S')
+      n_blfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_BLFZ_V')
+      n_embdisp = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
+
+      (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
     }
 
     CrossQuestionValidation.register_checker 'special_rule_17_a', lambda { |answer, ununused_related_answer, checker_params|
