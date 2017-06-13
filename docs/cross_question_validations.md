@@ -25,7 +25,7 @@ A cross question validation file contains 15 columns, which can be thought of in
 Any extra columns not listed above will be ignored by the application.
 
 
-##Description Columns
+## Description Columns
 All fields except related_question_code/list are mandatory. Either (but not both) of relate_question_code/list must be supplied.
 
 Column | Description | Usage
@@ -96,16 +96,16 @@ Column | Valid Data
  special_cochimplt                | If Heartest is 2 or 4 and Hearaid is 1 or 2, Cochlmplt must be 1 or 2                                                                                                   
 
 ### Expected Columns
-![Expected Columns](https://github.com/IntersectAustralia/anzard/raw/master/doc/developer/expected_columns.png)
+![Expected Columns](https://github.com/IntersectAustralia/anzard/raw/master/docs/developer/expected_columns.png)
 
 ### Operators
 Operator | Description
 ---|---
 == | Equal to
 <= | Less than or equal to
->= | Greater than or equal to
-< | Strictly less than
-> | Strictly greater than
+\>=| Greater than or equal to
+<  | Strictly less than
+\> | Strictly greater than
 != | Not equal to
  
 ### Set Operators
