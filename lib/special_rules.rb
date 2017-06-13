@@ -9,8 +9,8 @@ class SpecialRules
   CEASE_HI_FLO_DATE_CODE = 'CeaseHiFloDate'
   HOME_DATE_CODE = 'HomeDate'
 
-  RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(special_rule_22_d special_rule_26_e special_rule_gest_iui_date
-    special_rule_gest_et_date special_rule_thaw_don special_rule_don_age)
+  RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(special_rule_comp1 special_rule_comp3 special_rule_gest_iui_date
+    special_rule_gest_et_date special_rule_thaw_don special_rule_surr)
 
   RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES = {
     'special_o2_a' => 'O2_36wk_',
@@ -25,17 +25,17 @@ class SpecialRules
     'special_height' => 'Hght',
     'special_length' => 'Length',
     'special_cochimplt' => 'CochImplt',
-    'special_rule_22_d' => 'N_V_EGTH',
-    'special_rule_26_e' => 'N_S_CLTH',
-    'special_rule_17_a' => 'PR_CLIN',
+    'special_rule_comp1' => 'N_V_EGTH',
+    'special_rule_comp2' => 'N_FERT',
+    'special_rule_comp3' => 'N_S_CLTH',
+    'special_rule_mtage' => 'N_EMBDISP',
+    'special_rule_mtagedisp' => 'N_EMBDISP',
+    'special_rule_pr_clin' => 'PR_CLIN',
     'special_rule_gest_iui_date' => 'N_DELIV',
     'special_rule_gest_et_date' => 'N_DELIV',
     'special_rule_thaw_don' => 'THAW_DON',
-    'special_rule_don_age' => 'DON_AGE',
-    'special_rule_1_mt' => 'N_EMBDISP',
-    'special_rule_1_mtdisp' => 'N_EMBDISP',
-    'special_rule_24' => 'N_FERT',
-    'special_rule_26_h' => 'ET_DATE',
+    'special_rule_surr' => 'DON_AGE',
+    'special_rule_et_date' => 'ET_DATE',
     'special_rule_stim_1st' => 'STIM_1ST'
   }
 
@@ -74,17 +74,17 @@ class SpecialRules
                                  special_hmeo2_new
                                  special_same_name_inf
                                  special_pns
-                                 special_rule_22_d
-                                 special_rule_26_e
-                                 special_rule_17_a
+                                 special_rule_comp1
+                                 special_rule_comp2
+                                 special_rule_comp3
+                                 special_rule_mtage
+                                 special_rule_mtagedisp
+                                 special_rule_pr_clin
                                  special_rule_gest_iui_date
                                  special_rule_gest_et_date
                                  special_rule_thaw_don
-                                 special_rule_don_age
-                                 special_rule_1_mt
-                                 special_rule_1_mtdisp
-                                 special_rule_24
-                                 special_rule_26_h
+                                 special_rule_surr
+                                 special_rule_et_date
                                  special_rule_stim_1st)
     CrossQuestionValidation.register_checker 'special_pns', lambda { |answer, unused_related_answer, unused_checker_params|
       # It should not be an error_flag if PNS==-1 and (Gest<32 or Wght<1500).
@@ -444,7 +444,7 @@ class SpecialRules
       passing
     }
 
-    CrossQuestionValidation.register_checker 'special_rule_22_d', lambda { |answer, ununused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_rule_comp1', lambda { |answer, ununused_related_answer, checker_params|
       #rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
       raise 'Can only be used on question N_V_EGTH' unless answer.question.code == 'N_V_EGTH'
 
@@ -462,7 +462,19 @@ class SpecialRules
       (n_v_egth + n_s_egth + n_eggs + n_recvd) >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
     }
 
-    CrossQuestionValidation.register_checker 'special_rule_26_e', lambda { |answer, ununused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_rule_comp2', lambda { |answer, ununused_related_answer, checker_params|
+      # rule24: n_ivf + n_icsi >=n_fert
+      # i.e. n_fert <= n_ivf + n_icsi
+      raise 'Can only be used on question N_FERT' unless answer.question.code == 'N_FERT'
+
+      n_fert = answer.response.comparable_answer_or_nil_for_question_with_code('N_FERT')
+      n_ivf = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+      n_icsi = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
+
+      n_fert <= (n_ivf + n_icsi)
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_comp3', lambda { |answer, ununused_related_answer, checker_params|
       # rule26e: (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
       raise 'Can only be used on question N_S_CLTH' unless answer.question.code == 'N_S_CLTH'
 
@@ -483,7 +495,37 @@ class SpecialRules
       (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
     }
 
-    CrossQuestionValidation.register_checker 'special_rule_17_a', lambda { |answer, ununused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_rule_mtage', lambda { |answer, ununused_related_answer, checker_params|
+      # rule1mt: if n_embdisp =0, cyc_date-fdob must be ≥ 18 years & cyc_date-fdob must be <= 55 years
+      # i.e if n_embdisp == 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 55 years
+      raise 'Can only be used on question N_EMBDISP' unless answer.question.code == 'N_EMBDISP'
+
+      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
+      cyc_date = answer.response.comparable_answer_or_nil_for_question_with_code('CYC_DATE')
+      fdob = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB')
+
+      break true if n_embdisp != 0
+      break true if cyc_date.nil? || fdob.nil?
+      year_diff = age_in_completed_years(fdob, cyc_date)
+      year_diff >= 18 && year_diff <= 55
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_mtagedisp', lambda { |answer, ununused_related_answer, checker_params|
+      # rule1mtdisp: if n_embdisp >0, cyc_date-fdob must be ≥ 18 years & <= 70 years
+      # i.e. if n_embdisp > 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 70 years
+      raise 'Can only be used on question N_EMBDISP' unless answer.question.code == 'N_EMBDISP'
+
+      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
+      cyc_date = answer.response.comparable_answer_or_nil_for_question_with_code('CYC_DATE')
+      fdob = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB')
+
+      break true if n_embdisp <= 0
+      break true if cyc_date.nil? || fdob.nil?
+      year_diff = age_in_completed_years(fdob, cyc_date)
+      year_diff >= 18 && year_diff <= 70
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_pr_clin', lambda { |answer, ununused_related_answer, checker_params|
       # rule17a: if pr_clin is y or u, n_bl_et>0 |n_cl_et >0 | iui_date is a date/present
       raise 'Can only be used on question PR_CLIN' unless answer.question.code == 'PR_CLIN'
 
@@ -545,7 +587,7 @@ class SpecialRules
       !thaw_don.nil?
     }
 
-    CrossQuestionValidation.register_checker 'special_rule_don_age', lambda { |answer, ununused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_rule_surr', lambda { |answer, ununused_related_answer, checker_params|
       # ruleDonAge: if surr=y & (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0, don_age must be present
       raise 'Can only be used on question DON_AGE' unless answer.question.code == 'DON_AGE'
 
@@ -561,49 +603,7 @@ class SpecialRules
       !don_age.nil?
     }
 
-    CrossQuestionValidation.register_checker 'special_rule_1_mt', lambda { |answer, ununused_related_answer, checker_params|
-      # rule1mt: if n_embdisp =0, cyc_date-fdob must be ≥ 18 years & cyc_date-fdob must be <= 55 years
-      # i.e if n_embdisp == 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 55 years
-      raise 'Can only be used on question N_EMBDISP' unless answer.question.code == 'N_EMBDISP'
-
-      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
-      cyc_date = answer.response.comparable_answer_or_nil_for_question_with_code('CYC_DATE')
-      fdob = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB')
-
-      break true if n_embdisp != 0
-      break true if cyc_date.nil? || fdob.nil?
-      year_diff = age_in_completed_years(fdob, cyc_date)
-      year_diff >= 18 && year_diff <= 55
-    }
-
-    CrossQuestionValidation.register_checker 'special_rule_1_mtdisp', lambda { |answer, ununused_related_answer, checker_params|
-      # rule1mtdisp: if n_embdisp >0, cyc_date-fdob must be ≥ 18 years & <= 70 years
-      # i.e. if n_embdisp > 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 70 years
-      raise 'Can only be used on question N_EMBDISP' unless answer.question.code == 'N_EMBDISP'
-
-      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
-      cyc_date = answer.response.comparable_answer_or_nil_for_question_with_code('CYC_DATE')
-      fdob = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB')
-
-      break true if n_embdisp <= 0
-      break true if cyc_date.nil? || fdob.nil?
-      year_diff = age_in_completed_years(fdob, cyc_date)
-      year_diff >= 18 && year_diff <= 70
-    }
-
-    CrossQuestionValidation.register_checker 'special_rule_24', lambda { |answer, ununused_related_answer, checker_params|
-      # rule24: n_ivf + n_icsi >=n_fert
-      # i.e. n_fert <= n_ivf + n_icsi
-      raise 'Can only be used on question N_FERT' unless answer.question.code == 'N_FERT'
-
-      n_fert = answer.response.comparable_answer_or_nil_for_question_with_code('N_FERT')
-      n_ivf = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
-      n_icsi = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
-
-      n_fert <= (n_ivf + n_icsi)
-    }
-
-    CrossQuestionValidation.register_checker 'special_rule_26_h', lambda { |answer, ununused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_rule_et_date', lambda { |answer, ununused_related_answer, checker_params|
       # rule26h: if et_date is a date, n_cl_et must be >=0 | n_bl_et must be >=0
       raise 'Can only be used on question ET_DATE' unless answer.question.code == 'ET_DATE'
 

@@ -482,7 +482,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'RULE: rule22d' do
+  describe 'RULE: special_rule_comp1' do
     # rule22d: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
     before(:each) do
       @survey = create(:survey)
@@ -496,19 +496,19 @@ describe "Special Rules" do
       @n_icsi = create(:question, code: 'N_ICSI', section: @section, question_type: Question::TYPE_INTEGER)
       @n_egfz_s = create(:question, code: 'N_EGFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
       @n_egfz_v = create(:question, code: 'N_EGFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_22_d', question: @n_v_egth, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_comp1', question: @n_v_egth, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_22_d', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_comp1', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_22_d requires question code N_V_EGTH but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_comp1 requires question code N_V_EGTH but got Blah']
     end
 
     it 'should apply even when N_V_EGTH is not answered' do
-      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_22_d')
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_comp1')
     end
 
     it 'should pass when no questions are answered' do
@@ -625,7 +625,66 @@ describe "Special Rules" do
     end
   end
 
-  describe 'Rule: rule_26_e' do
+  describe 'Rule: special_rule_comp2' do
+    # rule24: n_ivf + n_icsi >=n_fert
+    # i.e. n_fert <= n_ivf + n_icsi
+    before :each do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @n_fert = create(:question, code: 'N_FERT', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_ivf = create(:question, code: 'N_IVF', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_icsi = create(:question, code: 'N_ICSI', section: @section, question_type: Question::TYPE_INTEGER)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_comp2', question: @n_fert, error_message: 'My error message', related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule_comp2', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule_comp2 requires question code N_FERT but got Blah']
+    end
+
+    it 'should treat n_icsi as 0 if unanswered' do
+      answer = create(:answer, question: @n_fert, answer_value: 0, response: @response)
+      create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should treat n_ivf as 0 if unanswered' do
+      answer = create(:answer, question: @n_fert, answer_value: 0, response: @response)
+      create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should pass if n_fert < (n_ivf + n_icsi)' do
+      answer = create(:answer, question: @n_fert, answer_value: 1, response: @response)
+      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
+      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should pass if n_fert == (n_ivf + n_icsi)' do
+      answer = create(:answer, question: @n_fert, answer_value: 2, response: @response)
+      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
+      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    it 'should fail if n_fert > (n_ivf + n_icsi)' do
+      answer = create(:answer, question: @n_fert, answer_value: 3, response: @response)
+      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
+      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to eq('My error message')
+    end
+  end
+
+  describe 'Rule: special_rule_comp3' do
     # rule26e: (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
     before(:each) do
       @survey = create(:survey)
@@ -643,19 +702,19 @@ describe "Special Rules" do
       @n_blfz_s = create(:question, code: 'N_BLFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
       @n_blfz_v = create(:question, code: 'N_BLFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
       @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_26_e', question: @n_s_clth, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_comp3', question: @n_s_clth, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_26_e', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_comp3', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_26_e requires question code N_S_CLTH but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_comp3 requires question code N_S_CLTH but got Blah']
     end
 
     it 'should apply even when N_S_CLTH is not answered' do
-      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_26_e')
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_comp3')
     end
 
     it 'should pass when no questions are answered' do
@@ -812,7 +871,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'RULE: rule_17_a' do
+  describe 'RULE: special_rule_pr_clin' do
     # rule17a: if pr_clin is y or u, n_bl_et>0 |n_cl_et >0 | iui_date is a date
     before(:each) do
       @survey = create(:survey)
@@ -821,15 +880,15 @@ describe "Special Rules" do
       @n_bl_et = create(:question, code: 'N_BL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @n_cl_et = create(:question, code: 'N_CL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @iui_date = create(:question, code: 'IUI_DATE', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_17_a', question: @pr_clin, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_pr_clin', question: @pr_clin, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_17_a', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_pr_clin', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_17_a requires question code PR_CLIN but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_pr_clin requires question code PR_CLIN but got Blah']
     end
 
     it 'should pass when pr_clin is not y or u' do
@@ -877,7 +936,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'RULE: gest_iui_date' do
+  describe 'RULE: special_rule_gest_iui_date' do
     # rule_xx: if gestational age (pr_end_dt - iui_date) is greater than 20 weeks, n_deliv must be present
     before :each do
       @survey = create(:survey)
@@ -1005,7 +1064,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'RULE: ruleThawDon' do
+  describe 'RULE: special_rule_thaw_don' do
     # ruleThawDon: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
     before :each do
       @survey = create(:survey)
@@ -1113,7 +1172,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'Rule: ruleDonAge' do
+  describe 'Rule: special_rule_surr' do
     # ruleDonAge: if surr=y & (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0, don_age must be present
     before :each do
       @survey = create(:survey)
@@ -1124,19 +1183,19 @@ describe "Special Rules" do
       @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @don_age = create(:question, code: 'DON_AGE', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_don_age', question: @don_age, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_surr', question: @don_age, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_don_age', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_surr', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_don_age requires question code DON_AGE but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_surr requires question code DON_AGE but got Blah']
     end
 
     it 'should apply even when DON_AGE is unanswered' do
-      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_don_age')
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_surr')
     end
 
     it 'should pass when surr != y' do
@@ -1221,7 +1280,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'Rule: rule1mt' do
+  describe 'Rule: special_rule_mtage' do
     # rule1mt: if n_embdisp =0, cyc_date-fdob must be ≥ 18 years & cyc_date-fdob must be <= 55 years
     # i.e if n_embdisp == 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 55 years
     before :each do
@@ -1230,15 +1289,15 @@ describe "Special Rules" do
       @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
       @cyc_date = create(:question, code: 'CYC_DATE', section: @section, question_type: Question::TYPE_DATE)
       @fdob = create(:question, code: 'FDOB', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_1_mt', question: @n_embdisp, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_mtage', question: @n_embdisp, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_1_mt', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_mtage', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_1_mt requires question code N_EMBDISP but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_mtage requires question code N_EMBDISP but got Blah']
     end
 
     it 'should pass if n_embdisp != 0' do
@@ -1308,7 +1367,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'Rule: rule1mtdisp' do
+  describe 'Rule: special_rule_mtagedisp' do
     # rule1mtdisp: if n_embdisp >0, cyc_date-fdob must be ≥ 18 years & <= 70 years
     # i.e. if n_embdisp > 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 70 years
     before :each do
@@ -1317,15 +1376,15 @@ describe "Special Rules" do
       @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
       @cyc_date = create(:question, code: 'CYC_DATE', section: @section, question_type: Question::TYPE_DATE)
       @fdob = create(:question, code: 'FDOB', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_1_mtdisp', question: @n_embdisp, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_mtagedisp', question: @n_embdisp, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_1_mtdisp', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_mtagedisp', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_1_mtdisp requires question code N_EMBDISP but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_mtagedisp requires question code N_EMBDISP but got Blah']
     end
 
     it 'should pass if n_embdisp <= 0' do
@@ -1395,66 +1454,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'Rule: rule24' do
-    # rule24: n_ivf + n_icsi >=n_fert
-    # i.e. n_fert <= n_ivf + n_icsi
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @n_fert = create(:question, code: 'N_FERT', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_ivf = create(:question, code: 'N_IVF', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_icsi = create(:question, code: 'N_ICSI', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_24', question: @n_fert, error_message: 'My error message', related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
-
-    it 'should raise an error if used on the wrong question' do
-      q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_24', question: q)
-      expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_24 requires question code N_FERT but got Blah']
-    end
-
-    it 'should treat n_icsi as 0 if unanswered' do
-      answer = create(:answer, question: @n_fert, answer_value: 0, response: @response)
-      create(:answer, question: @n_ivf, answer_value: 0, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
-    end
-
-    it 'should treat n_ivf as 0 if unanswered' do
-      answer = create(:answer, question: @n_fert, answer_value: 0, response: @response)
-      create(:answer, question: @n_icsi, answer_value: 0, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
-    end
-
-    it 'should pass if n_fert < (n_ivf + n_icsi)' do
-      answer = create(:answer, question: @n_fert, answer_value: 1, response: @response)
-      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
-      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
-    end
-
-    it 'should pass if n_fert == (n_ivf + n_icsi)' do
-      answer = create(:answer, question: @n_fert, answer_value: 2, response: @response)
-      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
-      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
-    end
-
-    it 'should fail if n_fert > (n_ivf + n_icsi)' do
-      answer = create(:answer, question: @n_fert, answer_value: 3, response: @response)
-      create(:answer, question: @n_ivf, answer_value: 1, response: @response)
-      create(:answer, question: @n_icsi, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to eq('My error message')
-    end
-  end
-
-  describe 'Rule: rule26h' do
+  describe 'Rule: special_rule_et_date' do
     # rule26h: if et_date is a date, n_cl_et must be >=0 | n_bl_et must be >=0
     before :each do
       @survey = create(:survey)
@@ -1462,15 +1462,15 @@ describe "Special Rules" do
       @et_date = create(:question, code: 'ET_DATE', section: @section, question_type: Question::TYPE_DATE)
       @n_cl_et = create(:question, code: 'N_CL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @n_bl_et = create(:question, code: 'N_BL_ET', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_26_h', question: @et_date, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_et_date', question: @et_date, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
     it 'should raise an error if used on the wrong question' do
       q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_26_h', question: q)
+      cqv = build(:cross_question_validation, rule: 'special_rule_et_date', question: q)
       expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_26_h requires question code ET_DATE but got Blah']
+      expect(cqv.errors[:base]).to eq ['special_rule_et_date requires question code ET_DATE but got Blah']
     end
 
     describe 'when et_date is a date' do
@@ -1525,7 +1525,7 @@ describe "Special Rules" do
     end
   end
 
-  describe 'Rule: rule_stim_1st' do
+  describe 'Rule: special_rule_stim_1st' do
     # ruleStim1st: if stim_1st=y, opu_date must be complete| can_date must be complete
     before :each do
       @survey = create(:survey)
