@@ -73,27 +73,8 @@ Column | Valid Data
  
  ### Specialised Rules
  Rule                             | Description                                                                                                                                                             
- ---|-----------                        
- set_gest_wght_implies_present    | If this question meets (set expression) and (Gest < 32 | Wght < 1500), related_question must be answered                                                                
- special_cool_hours               | hours between |StartCoolDate+StartCoolTime - CeaseCoolDate+CeaseCoolTime| <=72                                                                                          
- special_dob                      | DOB must be in the same year of registration                                                                                                                            
- special_hmeo2                    | If HmeO2 is -1 and (Gest must be <32 or Wght must be <1500) and HomeDate must be a date and HomeDate must be the same as LastO2                                         
- special_immun                    | If Gest<32 OR Wght<1500 and days(DOB AND (HomeDate OR DiedDate))>=60, DateImmun must be a date                                                                          
- special_namesurg2                | If DateSurg2=DateSurg1, Surg_Desc2 must not be the same as Surg_Desc1                                                                                                   
- special_namesurg3                | If DateSurg3=DateSurg2, Surg_Desc3 must not be the same as Surg_Desc2                                                                                                   
- special_o2_a                     | If O2_36wk_ is -1 and (Gest must be <32 or Wght must be <1500) then (Gest+Gestdays + weeks(DOB and the latest date of (LastO2 OR CeaseCPAPDate OR CeaseHiFloDate))) >36 
- special_rop_prem_rop             | If ROPeligibleExam is -1 and (Gest is <32 OR Wght is <1500), ROP must be between 0 and 4                                                                                
- special_rop_prem_rop_retmaturity | If ROPeligibleExam is -1 and (Gest is <32 OR Wght is <1500) and ROP is between 0 and 4, Retmaturity must be -1 or 0                                                     
- special_rop_prem_rop_roprx_1     | If ROPeligibleExam is -1 and (Gest is <32 OR Wght is <1500) and ROP is 0 or 1 or 5, ROPRx must be 0                                                                     
- special_rop_prem_rop_roprx_2     | If ROPeligibleExam is -1 and (Gest is <32 OR Wght is <1500) and ROP is 3 or 4, ROPRx must be -1                                                                         
- special_rop_prem_rop_vegf_1      | If ROPeligibleExam is -1 and (Gest is <32 OR Wght is <1500) and ROP is between 1 and 4, ROP_VEGF must be 0 or -1                                                        
- special_rop_prem_rop_vegf_2      | If ROPeligibleExam is -1 and (Gest is <32 OR Wght is <1500) and ROP is 0, ROP_VEGF must be 0                                                                            
- special_same_name_inf            | There must be more than 14 days between instances of the same infection.                                                                                                
- special_usd6wk_dob_weeks         | If (related_question_code) is (conditional_set & c_s_operator) and (Gest is <32 OR Wght is <1500), Weeks between (question_code) and DOB is (set & set_operator)        
- special_date_of_assess           | DateOfAssess must be greater than DOB+24 months                                                                                                                         
- special_height                   | If years between DOB and DateOfAssess is greater than 3, Hght must be between 50 and 100                                                                               
- special_length                   | If years between DOB and DateOfAssess is less than or equal to 3, than Length must be between 50 and 100                                                                
- special_cochimplt                | If Heartest is 2 or 4 and Hearaid is 1 or 2, Cochlmplt must be 1 or 2                                                                                                   
+ ---|-----------
+                                                                                                 
 
 ### Expected Columns
 ![Expected Columns](https://github.com/IntersectAustralia/anzard/raw/master/docs/developer/expected_columns.png)

@@ -739,43 +739,6 @@ describe CrossQuestionValidation do
     end
   end
 
-  describe 'check if premature' do
-    before(:each) do
-      @gest_q = create(:question, code: 'Gest', question_type: Question::TYPE_INTEGER)
-      @wght_q = create(:question, code: 'Wght', section: @gest_q.section, question_type: Question::TYPE_INTEGER)
-    end
-
-    it 'should return false if neither gest nor gest wgt answered' do
-      check_gest_wght(nil, nil, nil)       # it returns nil for false in this case
-
-    end
-    it 'should return true if gest < 32 OR wght < 1500' do
-      check_gest_wght(31, nil, true)
-      check_gest_wght(31, 1499, true)
-      check_gest_wght(31, 1500, true)
-      check_gest_wght(31, 1501, true)
-
-      check_gest_wght(32, nil, nil)# it returns nil for false in this case
-      check_gest_wght(32, 1499, true)
-      check_gest_wght(32, 1500, false)
-      check_gest_wght(32, 1501, false)
-
-      check_gest_wght(33, nil, nil)# it returns nil for false in this case
-      check_gest_wght(33, 1499, true)
-      check_gest_wght(33, 1500, false)
-      check_gest_wght(33, 1501, false)
-    end
-
-    def check_gest_wght(gest, wght, expected_result)
-      response = create(:response, survey: @gest_q.section.survey)
-      create(:answer, question: @gest_q, answer_value: gest, response: response) unless gest.nil?
-      create(:answer, question: @wght_q, answer_value: wght, response: response) unless wght.nil?
-      any_answer = create(:answer, response: response)
-      any_answer.reload
-      CrossQuestionValidation.check_gest_wght(any_answer).should eq(expected_result)
-    end
-  end
-
   describe 'sanitise_constant' do
     it 'should leave empty constants as is' do
       expect(CrossQuestionValidation.sanitise_constant nil).to be_nil
