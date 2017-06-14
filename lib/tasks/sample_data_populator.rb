@@ -25,8 +25,7 @@ end
 
 def create_responses(big)
   Response.delete_all
-  main = Survey.where(:name => 'ANZNN data form').first
-  followup = Survey.where(:name => 'ANZNN follow-up data form').first
+  main = Survey.where(:name => 'ANZARD data form').first
 
   # remove the one dataprovider is linked to as we'll create those separately
   dp_hospital = User.find_by_email!('dataprovider@intersect.org.au').hospital
@@ -37,27 +36,18 @@ def create_responses(big)
   count3 = big ? 500 : 50
 
   count1.times { create_response(main, ALL_MANDATORY, hospitals.sample) }
-  count1.times { create_response(followup, ALL_MANDATORY, hospitals.sample) }
   count2.times { create_response(main, ALL, hospitals.sample) }
-  count2.times { create_response(followup, ALL, hospitals.sample) }
   #count2.times { create_response(main, FEW, hospitals.sample) }
-  #count2.times { create_response(followup, FEW, hospitals.sample) }
 
   create_response(main, ALL_MANDATORY, dp_hospital)
-  create_response(followup, ALL_MANDATORY, dp_hospital)
   create_response(main, ALL, dp_hospital)
-  create_response(followup, ALL, dp_hospital)
   #create_response(main, FEW, dp_hospital)
-  #create_response(followup, FEW, dp_hospital)
 
   create_batch_files(main)
-  create_batch_files(followup)
 
   # create some submitted ones (this is a bit dodgy since they aren't valid, but its too hard to create valid ones in code)
   count3.times { create_response(main, ALL_MANDATORY, hospitals.sample, true) }
-  count3.times { create_response(followup, ALL_MANDATORY, hospitals.sample, true) }
   count3.times { create_response(main, ALL, hospitals.sample, true) }
-  count3.times { create_response(followup, ALL, hospitals.sample, true) }
 
 end
 
@@ -71,9 +61,7 @@ def create_surveys
   CrossQuestionValidation.delete_all
   SupplementaryFile.delete_all
 
-  create_survey_from_lib_tasks("ANZNN data form", "main_questions.csv", "main_question_options.csv", "main_cross_question_validations.csv", 'test_data/survey/real_survey')
-  create_survey_from_lib_tasks("ANZNN follow-up data form", "followup_questions.csv", "followup_question_options.csv", "followup_cross_question_validations.csv", 'test_data/survey/real_survey')
-  #create_survey_from_lib_tasks("Test data form", "test_survey_questions.csv", "test_survey_question_options.csv", "test_cross_question_validations.csv")
+  create_survey_from_lib_tasks("ANZARD data form", "main_questions.csv", "main_question_options.csv", "main_cross_question_validations.csv", 'test_data/survey/real_survey')
 end
 
 def create_survey_from_lib_tasks(name, question_file, options_file, cross_question_validations_file, dir='lib/tasks')
