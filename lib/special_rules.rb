@@ -38,6 +38,7 @@ class SpecialRules
 
     # add to the list of rules with no related question
     CrossQuestionValidation.rules_with_no_related_question += %w(
+      special_dob
       special_rule_comp1
       special_rule_comp2
       special_rule_comp3
@@ -50,6 +51,11 @@ class SpecialRules
       special_rule_surr
       special_rule_et_date
       special_rule_stim_1st)
+
+    CrossQuestionValidation.register_checker 'special_dob', lambda { |answer, unused_related_answer, checker_params|
+      # DOB must be in the same year as the year of registration
+      answer.date_answer.year == answer.response.year_of_registration
+    }
 
     CrossQuestionValidation.register_checker 'special_rule_comp1', lambda { |answer, ununused_related_answer, checker_params|
       #special_rule_comp1: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v

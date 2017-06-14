@@ -77,6 +77,7 @@ const_implies_one_of_const  | If this answer meants (constant expression), then 
 ### Specialised Rules
 Rule                       | Question Code | Description                                                                                                                                                             
 ---------------------------|---------------|------------
+special_dob                |               | DOB must be in the same year as the year of registration
 special_rule_comp1         | N_V_EGTH      | (n_v_egth + n_s_egth + n_eggs + n_recvd) must be >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
 special_rule_comp2         | N_FERT        | n_fert must be <= (n_ivf + n_icsi)
 special_rule_comp3         | N_S_CLTH      | (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
