@@ -4,19 +4,13 @@ class CrossQuestionValidation < ApplicationRecord
   cattr_accessor(:rules_with_no_related_question) { [] }
   cattr_accessor(:rule_checkers) { {} }
 
-  RULES_THAT_APPLY_EVEN_WHEN_RELATED_ANSWER_NIL = %w(present_implies_present const_implies_present set_implies_present blank_unless_present set_gest_wght_implies_present)
+  RULES_THAT_APPLY_EVEN_WHEN_RELATED_ANSWER_NIL = %w(present_implies_present const_implies_present set_implies_present blank_unless_present)
   RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(present_if_const)
 
   SAFE_OPERATORS = %w(== <= >= < > !=)
   SAFE_TEXT_OPERATORS = %w(== !=)
   ALLOWED_SET_OPERATORS = %w(included excluded range)
   ALLOWED_SET_TEXT_OPERATORS = %w(included excluded)
-
-  GEST_CODE = 'Gest'
-  WGHT_CODE = 'Wght'
-
-  GEST_LT = 32
-  WGHT_LT = 1500
 
   belongs_to :question
   belongs_to :related_question, class_name: 'Question'
@@ -79,7 +73,7 @@ class CrossQuestionValidation < ApplicationRecord
 
 
     # don't bother checking if the question is unanswered or has an invalid answer
-    return nil if CrossQuestionValidation.unanswered?(answer) && !RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL.include?(rule)
+    return nil if CrossQuestionValidation.unanswered?(answer) && !RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL.include?(rule) && !SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL.include?(rule)
 
     # we have to filter the answers on the response rather than using find, as we want to check through as-yet unsaved answers as part of batch processing
     related_answer = answer.response.get_answer_to(related_question_id) if related_question_id
@@ -168,12 +162,6 @@ class CrossQuestionValidation < ApplicationRecord
     else
       constant
     end
-  end
-
-  def self.check_gest_wght(answer)
-     gest = answer.response.comparable_answer_or_nil_for_question_with_code(GEST_CODE)
-    weight = answer.response.comparable_answer_or_nil_for_question_with_code(WGHT_CODE)
-    (gest && gest < GEST_LT) || (weight && weight < WGHT_LT)
   end
 
   register_checker 'comparison', lambda { |answer, related_answer, checker_params|
@@ -313,15 +301,6 @@ class CrossQuestionValidation < ApplicationRecord
       end
     end
     results.include?(true)
-  }
-
-  # runs even when related is not answered
-  register_checker 'set_gest_wght_implies_present', lambda { |answer, related_answer, checker_params|
-    # e.g. If IVH is 1-4 and (Gest is <32|Wght is <1500), Ventricles must be between 0 and 3
-    # Q = IVH, related = Ventricles
-    break true unless set_meets_condition?(checker_params[:set], checker_params[:set_operator], answer.comparable_answer)
-    break true unless check_gest_wght(answer)
-    answered?(related_answer)
   }
 
 end

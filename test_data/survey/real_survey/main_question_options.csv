@@ -1,283 +1,81 @@
 code,option_order,option_value,label,hint_text
-Prevprem,0,0,No previous preterm birth,
-Prevprem,1,-1,"Yes, there was a previous preterm birth",
-Prevprem,2,99,Unknown,
-PrevPnd,0,0,No previous perinatal death,
-PrevPnd,1,-1,"Yes, there was a previous perinatal death",
-PrevPnd,2,99,Unknown,
-AssistConc,0,1,None,no infertility treatment used for this pregnancy
-AssistConc,1,2,Hyperovulation,any hormone therapy used to stimulate ovulation
-AssistConc,2,3,IVF/GIFT etc.,"any method of in-vitro fertilisation. Includes in-vitro fertilisation, gamete intra- fallopian transfer(GIFT), zygote intra fallopian transfer, etc."
-AssistConc,3,4,Other,"other infertility treatment not mentioned above, including artificial insemination."
-AssistConc,4,0,Unknown,information not available.
-Ethnicity,0,1,Aboriginal,"is a person of Aboriginal or Torres Strait Islander descent who identifies as an Aboriginal or Torres Strait Islander and is accepted as such by the community in which she lives. If yes, must answer 'Indigenous Status'."
-Ethnicity,1,2,Asian,"all whose ethnic background originates from the countries of Asia, South East Asia and Indian subcontinent. For example, Fijian Indian."
-Ethnicity,2,3,Caucasian,"all of Caucasoid heritage, including European, Russian, Middle Eastern and Arabic."
-Ethnicity,3,4,Other,"includes African Negroes, American Blacks and Indians and Inuit. There is a separate category for Pacific Islander and Maori."
-Ethnicity,4,5,Pacific Islander,"all from Pacific Islander background, including Samoan, Cook Islands Maori, Niuean, Tokelauan, and other Pacific Islands groups e.g., Hawaiian, Tahitian. Excludes Maori."
-Ethnicity,5,6,Maori,a person of New Zealand Maori descent who identifies as Maori.
-Ethnicity,6,0,Unknown,information not available.
-Indig,0,1,Aboriginal but not Torres Strait Islander origin,
-Indig,1,2,Torres Strait Islander but not Aboriginal origin,
-Indig,2,3,Aboriginal and Torres Strait Island origin,
-Indig,3,4,Neither Aboriginal nor Torres Strait Islander origin,
-Indig,4,0,Unknown,Information not available
-ReferSource,0,1,Booked at tertiary obstetric hospital,Mother booked into a hospital with a neonatal intensive care unit and was not transferred during the most recent admission.
-ReferSource,1,2,In-utero transfer from obstetric hospital,"Mother transferred during most recent admission, baby in utero."
-ReferSource,2,3,Ex-utero retrieval,"Baby transferred from any other hospital by a retrieval team with specialist neonatal training, using appropriate equipment. This includes transfers by NETS and WANTS."
-ReferSource,3,4,Ex-utero transfer,Baby transferred from any other hospital by a non specialist transfer method. This includes transport by ambulance.
-ReferSource,4,5,Other,"Includes born in transit, not booked."
-ReferSource,5,6,Booked at this level II unit,"Mother booked into this non-tertiary hospital, no neonatal intensive care unit (for level II units only)."
-ReferSource,6,7,In-utero transfer to this level II unit,"Mother transferred during most recent admission, baby in utero (for level II units only)."
-ReferSource,7,8,Ex-utero retrieval to this level II unit,Baby retrieved from any other hospital by a specialist neonatal transport retrieval team using appropriate equipment (for level II units only).
-ReferSource,8,9,Ex-utero transfer to this level II unit,"Baby transferred from any other hospital, by a non-specialist transfer method. This includes transport by ambulance (for level II units only)."
-ReferSource,9,0,Unknown,Information not available.
-PresentingProb,0,1,Preterm pre-labour rupture of membranes,"Confirmed spontaneous rupture of membrane (ROM) occurring prior to the onset of labour, and before 37 completed weeks' gestation. ROM is defined as the obvious gush of clear amniotic fluid from the vagina, or (if fluid is available) by differentiation with urine and vaginal secretions."
-PresentingProb,1,2,Preterm labour,"The presence of regular painful contractions, leading to progressive effacement and dilatation of the cervix, eventually leading to the birth of the baby, and commencing before 37 completed weeks' gestation."
-PresentingProb,2,3,Hypertension in pregnancy,"A systolic blood pressure >=140 mmHg and/or diastolic blood pressure >=90 mmHg, or a rise in systolic blood pressure >=25 mmHg and/or a rise in diastolic blood pressure >=15 mmHg from blood pressure reading before conception or in the first trimester (confirmed by two readings six hours apart)."
-PresentingProb,3,4,Antpartum haemorrhage,Significant haemorrhage in the time from 200 weeks gestation to the end of second stage of labour. Excludes a 'show'.
-PresentingProb,4,5,Suspected intrauterine growth restriction,A condition where this fetus fails to reach its genetically predetermined full growth potential due to intrinsic or extrinsic factors. Based on more than one obstetric ultrasound.
-PresentingProb,5,6,Fetal distress,Any 'distress' or compromise of this fetus leading to intervention by the obstetric team.
-PresentingProb,6,7,Other,"Other significant antenatal complication, not specified."
-PresentingProb,7,8,None,No presenting problem. Baby must be born at term.
-PresentingProb,8,9,Antenatal diagnosis of fetal malformation,Fetal malformation diagnosed prior to birth by any method. This prenatal diagnosis may or may not be confirmed after birth.
-PresentingProb,9,0,Unknown,Presenting problem is unknown.
-Other_prob,0,0,No antenatal complication present,
-Other_prob,1,-1,"Yes, antenatal complications were present",
-Other_prob,2,99,Unknown,
-PTL,0,0,"No, labour did not commence in the preterm period",
-PTL,1,-1,"Yes, labour commenced in the preterm period",
-PTL,2,99,Unknown,
-PET,0,0,No hypertension in pregnancy detected,
-PET,1,-1,"Yes, hypertension in pregnancy diagnosed",
-PET,2,99,Unknown,
-APH,0,0,No antepartum haemorrhage noted,
-APH,1,-1,"Yes, antepartum haemorrhage",
-APH,2,99,Unknown,
-IUGR,0,0,No intrauterine growth restriction present or suspected,
-IUGR,1,-1,"Yes, intrauterine growth restriction was present or suspected",
-IUGR,2,99,Unknown,
-F_distress,0,0,No intervention necessary,
-F_distress,1,-1,"Yes, obstetric intervention required for fetal compromise",
-F_distress,2,99,Unknown,
-Other,0,0,No other significant antenatal complication,
-Other,1,-1,"Yes, other significant antenatal complication",
-Other,2,99,Unknown,
-ANDiag_,0,0,No fetal malformation detected prior to birth,
-ANDiag_,1,-1,"Yes, fetal malformation detected prior to birth",
-ANDiag_,2,99,Unknown,
-MomAntib,0,0,No antibiotic given,
-MomAntib,1,-1,"Yes, antibiotic given",
-MomAntib,2,99,Unknown,Information not available.
-Steroids,0,1,None,Corticosteroids not ever given during this pregnancy at a time likely to enhance fetal lung maturation.
-Steroids,1,2,"Incomplete, less than 24 hours",First dose given at less than 24 hours prior to this baby's birth.
-Steroids,2,3,Complete,"More than one dose of corticosteroids give, and first dose was given more than 24 hours and the last dose less than 8 days before baby's birth."
-Steroids,3,4,More than 7 days,"Steroids given more than 7 days before the baby's birth. If two courses given, and one is 'complete', use complete."
-Steroids,4,0,Unknown,Information not available.
-MgSO4,1,1,MgSO4 not given at all,
-MgSO4,2,2,MgSO4 course finished >6 hrs before birth (likely to be ineffective),
-MgSO4,3,3,MgSO4 given as IM injection within 6 hrs of birth,
-MgSO4,4,4,MgSO4 given for <4 hrs within 6 hrs time slot (incomplete course),
-MgSO4,5,5,MgSO4 given by infusion over 4 hrs or more thin 6 hrs of birth (complete course),
-MgSO4,6,6,MgSO4 given but details not known,
-MgSO4,7,7,Unknown,Information not available
-Plurality,0,0,Singleton,Only one baby born.
-Plurality,1,1,Twins,Two babies
-Plurality,2,2,Triplets,Three babies
-Plurality,3,3,Quads,Four babies
-Plurality,4,4,Quintuplets,Five babies
-Plurality,5,5,Sextuplets,Six babies
-Plurality,6,6,Other,
-Plurality,7,99,Not stated,
-BrthOrd,0,0,Singleton,
-BrthOrd,1,1,First of a multiple birth,
-BrthOrd,2,2,Second of a multiple birth,
-BrthOrd,3,3,Third of a multiple birth,
-BrthOrd,4,4,Fourth of a multiple birth,
-BrthOrd,5,5,Fifth of a multiple birth,
-BrthOrd,6,6,Sixth of a multiple birth,
-BrthOrd,7,7,Other,
-BrthOrd,8,99,Not stated,
-Sex,0,1,Male,
-Sex,1,2,Female,
-Sex,2,3,Ambiguous - or indeterminate.,
-Sex,3,0,Unknown,Information not available.
-PlBrth,0,1,Non tertiary hospital,Born in a hospital without a level III neonatal intensive care nursery.
-PlBrth,1,2,Tertiary hospital,Born in a hospital with a level III neonatal intensive care nursery.
-PlBrth,2,3,Home birth,Birth planned for and occurred at home.
-PlBrth,3,4,Born before arrival,"Born at home (unplanned event), or in an ambulance, or any other area outside a hospital with obstetric facilities."
-PlBrth,4,0,Unknown,Information not available
-Present_n,0,1,Cephalic,
-Present_n,1,2,Breech,
-Present_n,2,3,Other,
-Present_n,3,0,Unknown,
-Delivery,0,1,Vaginal,"Vaginal birth, includes vaginal breech."
-Delivery,1,2,Instrument,"Vaginal birth using instrument, includes forceps, rotations, and vacuum extractions."
-Delivery,2,3,Caesarean section in labour,"Caesarean performed after the commencement of labour (regular painful contractions, leading to progressive effacement and dilatation of cervix, eventually leading to the birth of the baby)."
-Delivery,3,4,"Caesarean section, no labour",Caesarean section performed prior to labour commencing.
-Intubated,0,0,"No, intubation not necessary in labour ward",
-Intubated,1,-1,"Yes, intubation necessary in labour ward",
-Intubated,2,99,Unknown,
-Anom,0,0,"No, major congenital anomaly not found",
-Anom,1,-1,"Yes, major congenital anomaly found",
-Anom,2,99,Unknown,
-AdditionalAnomalies,0,0,"No, All present anomalies have been listed",
-AdditionalAnomalies,1,-1,"Yes, there are more anomalies than can be listed here",
-AdditionalAnomalies,2,99,"Unknown. All of the above anomaly fields are filled, but there might be more.",
-Resp,0,1,Normal,No respiratory disease noted; no respiratory support given.
-Resp,1,2,Non-specific,Any non-specific respiratory distress in term or preterm babies requiring support (includes superseded categories of Transient tachypnoea of the newborn [02] and Immature lung [07] and aspiration of amniotic fluid or blood.
-Resp,2,3,Hyaline membrane disease,"Increasing respiratory distress or oxygen requirements, or need for ventilator support from the first six hours of life with a chest x-ray showing generalised reticulo-granular pattern, with or without air bronchogram. This is normally a five day illness and babies who are treated with surfactant who have no respiratory illness beyond 24 hours of age probably did not have HMD in the first place and should be coded as having non-specific respiratory distress."
-Resp,3,4,Meconium aspiration,"Respiratory distress presenting from immediately after birth to 12 hours of age. Hypoxia, tachypnoea, gasping respirations, and often signs of underlying asphyxia. Chest x-ray shows over-expansion of lungs with widespread coarse, fluffy infiltrates. Infants who require respiratory support for <24 hours should not be coded as MAS. They should be coded as non-specific respiratory disease."
-Resp,4,5,Pneumonia,"Respiratory distress with proven or suspected infection(toxic blood count), and chest x-ray showing persisting opacities."
-Resp,5,6,Persistent primary pulmonary hypertension (without co-existing lung disease),"Echo cardiac (shunting) or clinical evidence, oxygen requirement unexplained by chest x-ray or loud P2, or differential pre and post-ductal TCPO2."
-Resp,6,7,Superseded,
-Resp,7,8,Apnoea,"Recurrent pauses in breathing of more than 20 seconds, or for less than 20 seconds and associated with bradycardia (heart rate <100) or desaturation requiring intervention."
-Resp,8,9,Congenital malformation,"Congenital malformation was the primary reason for respiratory distress, e.g. diaphragmatic hernia - must also be listed under congenital malformation field."
-Resp,9,10,Other,Unspecified other respiratory disease.
-Resp,10,11,Peri-surgical,Indication fro respiratory support is surgical intervention. Must also be listed under Neonatal surgery field.
-Resp,11,12,Newborn encephalopathy/Hypoxic ischemic encephalopathy,"A clinically defined syndrome of disturbed neurological function in an baby with difficulties in initiating and maintaining respiration, depression of tone and reflexes, subnormal level of consciousness and often with seizures. Birth asphyxia should be included here. Metabolic Encephalopathy +/- seizures due to metabolic disturbance such as hypoglycaemia, hyponatraemia, hypernatraemia, hypocalcaemia or CNS infection(meningitis or encephalitis) should not be included, it should be coded as 10."
-Resp,12,0,Unknown,Information not available
-Surf,0,1,None,No artificial surfactant ever given to this baby.
-Surf,1,2,Exosurf,Any treatment using 'Exosurf'.
-Surf,2,3,Survanta,Any treatment using 'Survanta'.
-Surf,3,4,Both,Any combination of surfactant.
-Surf,4,5,Other,Use of other surfactant.
-Surf,5,6,Curosurf,Use of curosurf
-Surf,6,7,Curosurf and Survanta,
-Surf,7,0,Unknown,Information not available
-ALLeak,0,0,No air leak requiring drainage present,
-ALLeak,1,-1,"Yes, air leak requiring drainage present",
-ALLeak,2,99,Unknown,
-HiFlo,0,0,Nasal high flow never initiated,
-HiFlo,1,-1,"Yes, nasal high flow was used for >4 hours",
-HiFlo,2,99,Unknown,
-HFOV,0,0,High frequency ventilating never initiated,
-HFOV,1,-1,"Yes, high frequency ventilation was initiated",
-HFOV,2,99,Unknown,
-NO_,0,0,Nitric oxide therapy never used,
-NO_,1,-1,"Yes, nitric oxide therapy used",
-NO_,2,99,Unknown,
-ECMO_,0,0,ECMO never initiated,
-ECMO_,1,-1,"Yes, ECMO initiated",
-ECMO_,2,99,Unknown,
-O2_36wk_,0,0,No chronic lung disease,
-O2_36wk_,1,-1,"Yes, the baby did have chronic lung disease",
-O2_36wk_,2,99,Unknown,
-HmeO2,0,0,No supplemental oxygen used at home,
-HmeO2,1,-1,"Yes, home oxygen therapy",
-HmeO2,2,99,Unknown,
-NEC_,0,0,No necrotising enterocolitis proven,
-NEC_,1,-1,"Yes, necrotising enterocolitis proven",
-NEC_,2,99,Unknown,
-Infection_,0,0,No congenital fungal or bacterial or viral infection noted,
-Infection_,1,-1,"Yes, congenital fungal or bacterial or viral infection noted",
-Infection_,2,99,Unknown,
-Infection_Type1,0,-1,Early infection (bacterial or fungal),
-Infection_Type1,1,0,Late infection (bacterial or fungal),
-Infection_Type1,2,2,Viral infection ,
-Infection_Type2,0,-1,Early infection (bacterial or fungal),
-Infection_Type2,1,0,Late infection (bacterial or fungal),
-Infection_Type2,2,2,Viral infection ,
-Infection_Type3,0,-1,Early infection (bacterial or fungal),
-Infection_Type3,1,0,Late infection (bacterial or fungal),
-Infection_Type3,2,2,Viral infection ,
-Infection_Type4,0,-1,Early infection (bacterial or fungal),
-Infection_Type4,1,0,Late infection (bacterial or fungal),
-Infection_Type4,2,2,Viral infection ,
-AdditionalInfections,0,0,"No, All present infections have been listed",
-AdditionalInfections,1,-1,"Yes, there are more infections than can be listed here",
-AdditionalInfections,2,99,"Unknown. All of the above infection fields are filled, but there might be more.",
-Surgery_,0,0,No neonatal surgery,
-Surgery_,1,-1,"Yes, major surgery took place during this admission",
-Surgery_,2,99,Unknown,
-AdditionalSurgeries,0,0,"No, All surgeries have been listed",
-AdditionalSurgeries,1,-1,"Yes, there are more surgeries than can be listed here",
-AdditionalSurgeries,2,99,"Unknown. All of the above surgery fields are filled, but there might be more.",
-PNS,0,0,Parenteral nutrition never initiated,
-PNS,1,-1,"Yes, parenteral nutrition initiated",
-PNS,2,99,Unknown,
-Hmegavage,0,0,No home gavage feeding,
-Hmegavage,1,-1,Yes,
-Hmegavage,2,99,Unknown,
-hypotherm,0,0,No therapeutic hypothermia,
-hypotherm,1,-1,Yes,
-hypotherm,2,99,Unknown,
-Hypothermceased,0,0,Not ceased before 72 hours,
-Hypothermceased,1,1,Palliation,
-Hypothermceased,2,2,Recognised as not fulfilling standard criteria for cooling,
-Hypothermceased,3,3,Fulfilled standard criteria for cooling but clinical improvement suggests no need,
-Hypothermceased,4,4,Qualification equivocal with change of clinical decision making,
-Hypothermceased,5,5,Severe coagulopathy not responding to blood products,
-Hypothermceased,6,6,Hypotension not responding to inotrope,
-Hypothermceased,7,7,Severe PPHN refractory to iNO,
-Hypothermceased,8,8,Arrhythmia,
-Hypothermceased,9,9,Reason for early cessation not unknown,
-Bmonset,0,0,No breast milk given,
-Bmonset,1,-1,"Yes, mother provided breast milk for baby at initiation of enteral feeding",
-Bmonset,2,99,Unknown,
-Bmdischarge,0,0,No baby not receiving breast milk,
-Bmdischarge,1,-1,"Yes, mother still providing break milk for her baby at discharge from hospital",
-Bmdischarge,2,99,Unknown,
-IVH,0,0,None,Ultrasound/post mortem shows no haemorrhage.
-IVH,1,1,Grade 1,Subependymal germinal matrix haemorrhage.
-IVH,2,2,Grade 2,Intraventricular haemorrhage with no ventricular distension.
-IVH,3,3,Grade 3,Intraventricular haemorrhage with ventricle distended with blood.
-IVH,4,4,Grade 4,Intraparenchymal haemorrhage.
-IVH,5,5,Not examined,by ultrasound or by post mortem examination.
-Ventricles,0,1,No dilatation,Ventricle size is less than or equal to 97th centile.
-Ventricles,1,2,Dilatation,"Ventricles size >97th centile for gestation, but <= 4mm."
-Ventricles,2,3,Hydrocephalus,Ventricles size is >4mm (larger than 97th centile for gestation) or hydrocephalus present that required s shunt or any form of drainage (permanent or transient).
-Ventricles,3,0,Unknown,"Information not available, includes not scanned."
-Cysts,0,1,No cysts,No cystic lesions seen on ultrasound
-Cysts,1,2,Porencephalic cyst(s),Parenchymal lesions corresponding to grade 4 intraventricular haemorrhage.
-Cysts,2,3,Periventricular leukomalacia,Refers to the ischemic brain injury affecting the periventricular white matter in the boundary zones supplied by terminal branches of the both the centripetal and centrifugal arteries.
-Cysts,3,4,Encephaloclastic porencephaly,Relatively late development of extensive echo-dense and cystic lesions involving the periphery of the cerebrum.
-Cysts,4,0,Unknown,"Information not available, includes not scanned."
-ROPeligibleExam,0,0,"No, baby did not meet local criteria for an examination of eyes",
-ROPeligibleExam,1,-1,"Yes, did meet local criteria for an examination for retinopathy of prematurity",
-ROPeligibleExam,2,99,Unknown,
-ROP,0,0,None,"Examined, no changes seen."
-ROP,1,1,Stage I,Demarcation line separating avascular from vascular retinal regions.
-ROP,2,2,Stage II,Ridge - demarcation line increased in volume to extend out of the plane of the retina.
-ROP,3,3,Stage III,"Ridge with extra retinal fibrovascular proliferation. May be continuous with posterior edge of ridge or posterior but disconnected from the ridge, or into the vitreous."
-ROP,4,4,Stage IV,"Retinal detachment. In Stage IV the detachment is subtotal, and for Stage V there is total detachment."
-ROP,5,5,Not examined,No eye examination performed.
-Retmaturity,0,0,No,
-Retmaturity,1,-1,Yes,
-Retmaturity,2,99,Unknown,
-ROPRx,0,0,No therapy for retinopathy of prematurity received,
-ROPRx,1,-1,"Yes, therapy given for retinopathy of prematurity",
-ROPRx,2,99,Unknown,
-ROP_VEGF,0,0,"No (VEGF), inhibitor therapy not used",
-ROP_VEGF,1,-1,"Yes (VEGF), inhibitor therapy given for retinopathy of prematurity",
-ROP_VEGF,2,99,Unknown,
-Died_,0,0,"No, survived to discharge to home",
-Died_,1,-1,"Yes, died during first hospitalisation",
-Died_,2,99,Unknown,
-AdditionalCauses,0,0,"No, All causes of death have been listed",
-AdditionalCauses,1,-1,"Yes, there are more causes of death than can be listed here",
-AdditionalCauses,2,99,"Unknown. All of the above cause of death fields are filled, but there might be more.",
-Autopsy_,0,0,No post mortem was performed,
-Autopsy_,1,-1,"Yes, a post mortem was performed",
-Autopsy_,2,99,Unknown,
-CongAbnmDeath,0,0,No,
-CongAbnmDeath,1,-1,"Yes, death is attributable to congenital malformation",
-CongAbnmDeath,2,99,Unknown,
-T_fer_,0,0,"No, never transferred",
-T_fer_,1,-1,"Yes, transferred",
-T_fer_,2,99,Unknown,
-NursLevel1,0,1,Level I type of care,
-NursLevel1,1,2,Level II type of care,
-NursLevel1,2,3,Level III type of care,
-NursLevel2,0,1,Level I type of care,
-NursLevel2,1,2,Level II type of care,
-NursLevel2,2,3,Level III type of care,
-NursLevel3,0,1,Level I type of care,
-NursLevel3,1,2,Level II type of care,
-NursLevel3,2,3,Level III type of care,
-NursLevel4,0,1,Level I type of care,
-NursLevel4,1,2,Level II type of care,
-NursLevel4,2,3,Level III type of care,
-AdditionalTransfers,0,0,"No, All transfers have been listed",
-AdditionalTransfers,1,-1,"Yes, there are more transfers than can be listed here",
-AdditionalTransfers,2,99,"Unknown. All of the above transfer fields are filled, but there might be more.",
+CI_TUBE,0,n,No,No - Subfertility is not due to tubal disease
+CI_TUBE,1,y,Yes,Yes - Subfertility is due to tubal disease
+CI_ENDO,0,n,No,No - Subfertility is not due to endometriosis 
+CI_ENDO,1,y,Yes,Yes - Subfertility is due to endometriosis 
+CI_OTH,0,n,No,No - Subfertility is not due to other female factors
+CI_OTH,1,y,Yes,Yes - Subfertility is due to other female factors 
+CI_MALE,0,n,No,No - Subfertility is not due to male factors
+CI_MALE,1,y,Yes,Yes - Subfertility is due to male factors 
+CI_UNEX,0,n,No,"No - If answered yes to CI_TUBE, CI_ENDO, CI_OTH, CI_MALE"
+CI_UNEX,1,y,Yes,"Yes - if answered no to CI_TUBE, CI_ENDO, CI_OTH, CI_MALE"
+PREG_20W,0,n,No,No- The female patient has not had a pregnancy of 20 or more weeks
+PREG_20W,1,y,Yes,Yes - The female patient has had a pregnancy of 20 or more weeks
+PREG_20W,2,u,Unknown,Unknown
+SURR,0,n,No,No - a surrogacy arrangement is not involved in this cycle
+SURR,1,y,Yes,Yes - a surrogagcy arrangment is involved in this cycle
+OV_STIM,0,n,No,No - FSH stimulation was not given
+OV_STIM,1,y,Yes,Yes - FSH stimulation was given
+STIM_1ST,0,n,No,No - The current fresh cycle is not the patients first FSH stimulated cycle for OPU
+STIM_1ST,1,y,Yes,Yes - the current fresh cycle is the patients first FSH stimulated cycle for OPU
+STIM_1ST,2,u,Unknown,Unknown - unknown whether the patient had FSH stimulated cycle for OPU before
+SP_SITE,0,e,e - Ejaculate,Site of sperm extraction: ejaculated
+SP_SITE,1,t,t - Testicular,Site of sperm extraction: testicular
+SP_SITE,2,p,p - Epidydimal,Site of sperm extraction: epididymal (whether by open biopsy or by PESA)
+SP_SITE,3,o,o - Other,Site of sperm extraction: other
+SP_SITE,4,u,u - Unknown,Site of sperm extraction:unknown
+SP_PERSN,0,h,h - Husband/Partner,Sperm provided by husband/partner
+SP_PERSN,1,k,k - Known donor,Sperm provided by known donor
+SP_PERSN,2,a,a - Anonymous donor,Sperm provided by anonymous donor
+SP_PERSN,3,u,u - Unknown,Unknown sperm provider 
+PGD,0,n,No,No- No PGD undertaken
+PGD,1,y,Yes,Yes - Fresh and thaw cycles where preimplantation genetic diagnosis in any form (including aneuploidy screening or sex selection) has been performed on any of the embryos (transferred or not)
+ASS_HATC,0,n,No,No- No assisted hatching 
+ASS_HATC,1,y,Yes,Yes- Fresh and Thaw cycles where assisted hatching in any form has been performed on any of the embryos (transferred or not)
+THAW_DON,0,o,o - donated oocyte,"If thawed/warmed embryos were originally from donated oocytes, record this field as ìoî."
+THAW_DON,1,e,e - donated embryo,"If thawed/warmed embryos were donated embryos, record this field as ìeî."
+EMB_ICSI,0,n,No,ICSI not used
+EMB_ICSI,1,y,Yes,Answer YES if any of the transferred embryos fertilised by ICSI.
+PR_CLIN,0,n,No,No clinical pregnancy recorded
+PR_CLIN,1,y,Yes,Clinical pregnancy recorded
+PR_ECTOP,0,n,n - No,Not ectopi or heterotopic
+PR_ECTOP,1,e,e - ectopic,If this pregnancy is an ectopic pregnancy
+PR_ECTOP,2,h,h - heterotopic,If pregnancy is combined ectopic and uterine pregnancy (heterotopic).
+PR_TOP,0,n,No,No termination of pregnancy
+PR_TOP,1,y,Yes,Elective termination of pregnancy
+PR_REDUC,0,n,No,No selective reduction of pregnancy
+PR_REDUC,1,y,Yes,selective reduction was performed due to fetal abnormality/other reasons
+CS,0,n,No,Not caesarean delivery 
+CS,1,y,Yes,Caesarean delivery
+BAB1_OUT,0,s,s - Stillbirth,
+BAB1_OUT,1,l,l - Livebirth / survived,
+BAB1_OUT,2,n,n - Livebirth / died - Neonatal death ,
+BAB1_OUT,3,u,u - baby born but outcome unknown ,
+BAB1_SEX,0,m,m- Male,
+BAB1_SEX,1,f,f - Female,
+BAB1_SEX,2,u,u - Unknown sex,
+BAB2_OUT,0,s,s - Stillbirth,
+BAB2_OUT,1,l,l - Livebirth / survived,
+BAB2_OUT,2,n,n - Livebirth / died - Neonatal death ,
+BAB2_OUT,3,u,u - baby born but outcome unknown ,
+BAB2_SEX,0,m,m- Male,
+BAB2_SEX,1,f,f - Female,
+BAB2_SEX,2,u,u - Unknown sex,
+BAB3_OUT,0,s,s - Stillbirth,
+BAB3_OUT,1,l,l - Livebirth / survived,
+BAB3_OUT,2,n,n - Livebirth / died - Neonatal death ,
+BAB3_OUT,3,u,u - baby born but outcome unknown ,
+BAB3_SEX,0,m,m- Male,
+BAB3_SEX,1,f,f - Female,
+BAB3_SEX,2,u,u - Unknown sex,
+BAB4_OUT,0,s,s - Stillbirth,
+BAB4_OUT,1,l,l - Livebirth / survived,
+BAB4_OUT,2,n,n - Livebirth / died - Neonatal death ,
+BAB4_OUT,3,u,u - baby born but outcome unknown ,
+BAB4_SEX,0,m,m- Male,
+BAB4_SEX,1,f,f - Female,
+BAB4_SEX,2,u,u - Unknown sex,
+MORB_ADM,0,n,No,No hospital admission due to fertility treatment
+MORB_ADM,1,y,Yes,"yes where the female partner is admitted to hospital with any condition (excluding any pregnancy-related issues, such as ectopic pregnancy) that could be in any way related to fertility treatment"
+MRB_OHSS,0,n,No,No OHSS
+MRB_OHSS,1,y,Yes,Yes if OHSS occurred

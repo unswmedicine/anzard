@@ -8,9 +8,9 @@
 development:
   adapter: mysql2
   host: localhost
-  database: anznn-dev
-  username: anznn
-  password: anznn
+  database: anzard-dev
+  username: anzard
+  password: anzard
   pool: 5
   timeout: 5000
 
@@ -20,9 +20,9 @@ development:
 test: &test
   adapter: mysql2
   host: localhost
-  database: anznn-test
-  username: anznn
-  password: anznn
+  database: anzard-test
+  username: anzard
+  password: anzard
   pool: 5
   timeout: 5000
 
