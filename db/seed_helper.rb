@@ -19,11 +19,11 @@ def create_clinics
   clinics.each do |hash|
     #Hospital.create!(hash)
 
-    hospital = Hospital.new(name: hash['name'].strip,
-                            state:hash['state'].strip,
-                            unit: hash['unit'].strip,
-                            site: hash['site'].strip,
-                            site_name: hash['site_name'].strip)
+    hospital = Hospital.new(name: hash['Unit_Name'].strip,
+                            state:hash['State'].strip,
+                            unit: hash['Unit'].strip,
+                            site: hash['Site'].strip,
+                            site_name: hash['Site_Name'].strip)
     hospital.save!
   end
 end
