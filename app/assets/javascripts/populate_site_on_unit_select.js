@@ -1,11 +1,11 @@
 $(window).load(function () {
-    $('#hospital_id').change(function() {
+    $('#clinic_id').change(function() {
         $.ajax({
             type: 'GET',
             url: 'get_sites',
             dataType: 'json',
             async: true,
-            data: {unit_id: $("#hospital_id option:selected").val()},
+            data: {unit_id: $("#clinic_id option:selected").val()},
             success: function (data) {
                 var options = '<option value="">ALL</option>';
                 for (var x = 0; x < data.length; x++) {

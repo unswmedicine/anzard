@@ -4,13 +4,13 @@ Feature: Home page
   I want sensible navigation from the home page
 
   Background:
-    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to hospital "RPA"
+    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to clinic "RPA"
     And I have a survey with name "survey" and questions
       | question  |
       | Choice Q1 |
       | Choice Q2 |
-    Given I have a user "other.provider@intersect.org.au" with role "Data Provider" and hospital "Other"
-    Given I have a user "data.supervisor@intersect.org.au" with role "Data Provider Supervisor" and hospital "RPA"
+    Given I have a user "other.provider@intersect.org.au" with role "Data Provider" and clinic "Other"
+    Given I have a user "data.supervisor@intersect.org.au" with role "Data Provider Supervisor" and clinic "RPA"
     Given I have a user "admin@intersect.org.au" with role "Administrator"
 
   Scenario Outline: For data providers and supervisors, home page should have responses and batch uploads tabs and should default to responses

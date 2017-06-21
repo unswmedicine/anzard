@@ -10,7 +10,7 @@ Feature: Approve access requests
       | email                   | first_name | last_name |
       | first@intersect.org.au  | First      | User      |
       | second@intersect.org.au | Second     | User      |
-    And I have hospitals
+    And I have clinics
       | state | name       | abbrev |
       | NSW   | Left Wing  | Left   |
       | NSW   | Right Wing | Right  |
@@ -119,36 +119,36 @@ Feature: Approve access requests
     And I should see field "Role" with value "Administrator"
 
 
-##Scenarios relating to assigning a hospital to an approved user
+##Scenarios relating to assigning a clinic to an approved user
 
   @wip @javascript
-  Scenario: Superusers aren't assigned to a hospital when approved
+  Scenario: Superusers aren't assigned to a clinic when approved
     pending "capybarra still sees hidden things"
     Given I am on the access requests page
     And I follow "Approve" for "second@intersect.org.au"
     And I select "Administrator" from "Role"
-    Then I should not see "Hospital"
+    Then I should not see "Clinic"
 
   @javascript
-  Scenario: Non-superusers can be assigned to a hospital when approved
+  Scenario: Non-superusers can be assigned to a clinic when approved
     Given I am on the access requests page
     And I follow "Approve" for "second@intersect.org.au"
     And I select "Data Provider" from "Role"
-    Then I should see "Hospital"
+    Then I should see "Clinic"
 
-    And I select "Left Wing" from "Hospital"
+    And I select "Left Wing" from "Clinic"
     And I press "Approve"
     And I am on the list users page
     When I follow "View Details" for "second@intersect.org.au"
-    And I should see field "Hospital" with value "Left Wing (NSW)"
+    And I should see field "Clinic" with value "Left Wing (NSW)"
 
-  Scenario: Non-superusers must be assigned to a hospital when approved
+  Scenario: Non-superusers must be assigned to a clinic when approved
     Given I am on the access requests page
     And I follow "Approve" for "second@intersect.org.au"
     And I select "Data Provider" from "Role"
-    And I select blank from "Hospital"
+    And I select blank from "Clinic"
     And I press "Approve"
-    Then I should see "All non-superusers must be assigned a hospital"
+    Then I should see "All non-superusers must be assigned a clinic"
 
 
-    ##END Scenarios relating to assigning a hospital to an approved user
+    ##END Scenarios relating to assigning a clinic to an approved user

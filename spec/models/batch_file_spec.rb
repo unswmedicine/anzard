@@ -9,18 +9,18 @@ describe BatchFile do
     create_survey("some_name", question_file, options_file, cross_question_validations_file)
   end
   let(:user) { create(:user) }
-  let(:hospital) { create(:hospital) }
+  let(:clinic) { create(:clinic) }
 
   describe "Associations" do
     it { should belong_to(:user) }
-    it { should belong_to(:hospital) }
+    it { should belong_to(:clinic) }
     it { should have_many(:supplementary_files) }
   end
 
   describe "Validations" do
     it { should validate_presence_of(:user_id) }
     it { should validate_presence_of(:survey_id) }
-    it { should validate_presence_of(:hospital_id) }
+    it { should validate_presence_of(:clinic_id) }
     it { should validate_presence_of(:year_of_registration) }
   end
 
@@ -172,7 +172,7 @@ describe BatchFile do
         [r1, r2, r3].each do |r|
           r.survey.should eq(survey)
           r.user.should eq(user)
-          r.hospital.should eq(hospital)
+          r.clinic.should eq(clinic)
           r.submitted_status.should eq(Response::STATUS_SUBMITTED)
           r.batch_file.id.should eq(batch_file.id)
           r.year_of_registration.should eq(2008)
@@ -211,7 +211,7 @@ describe BatchFile do
         [r1, r2, r3].each do |r|
           r.survey.should eq(survey)
           r.user.should eq(user)
-          r.hospital.should eq(hospital)
+          r.clinic.should eq(clinic)
           r.submitted_status.should eq(Response::STATUS_SUBMITTED)
           r.batch_file.id.should eq(batch_file.id)
         end
@@ -434,7 +434,7 @@ describe BatchFile do
 
       it "accepts number range issues if forced to" do
         # sad path covered earlier
-        batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/number_out_of_range.csv', 'text/csv'), survey: survey, user: user, hospital: hospital, year_of_registration: 2009)
+        batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/number_out_of_range.csv', 'text/csv'), survey: survey, user: user, clinic: clinic, year_of_registration: 2009)
         batch_file.process
         batch_file.reload
 
@@ -661,14 +661,14 @@ describe BatchFile do
   end
 
   def process_batch_file(file_name, survey, user, year_of_registration=2009)
-    batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + file_name, 'text/csv'), survey: survey, user: user, hospital: hospital, year_of_registration: year_of_registration)
+    batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + file_name, 'text/csv'), survey: survey, user: user, clinic: clinic, year_of_registration: year_of_registration)
     batch_file.process
     batch_file.reload
     batch_file
   end
 
   def process_batch_file_with_supplementaries(file_name, user, supp_files)
-    batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + file_name, 'text/csv'), survey: survey_with_multis, user: user, hospital: hospital, year_of_registration: 2009)
+    batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + file_name, 'text/csv'), survey: survey_with_multis, user: user, clinic: clinic, year_of_registration: 2009)
     supp_files.each_pair do |multi_name, supp_file_name|
       file = Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + supp_file_name, 'text/csv')
       batch_file.supplementary_files.create!(multi_name: multi_name, file: file)

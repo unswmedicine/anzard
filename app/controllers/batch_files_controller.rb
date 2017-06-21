@@ -29,7 +29,7 @@ class BatchFilesController < ApplicationController
 
   def create
     @batch_file.user = current_user
-    @batch_file.hospital = current_user.hospital
+    @batch_file.clinic = current_user.clinic
     if @batch_file.save
       supplementaries = params[:supplementary_files]
       if supplementaries

@@ -26,10 +26,10 @@ Given /^I have a user "([^"]*)" with role "([^"]*)"$/ do |email, role|
   create_user_with_role(email, role)
 end
 
-Given /^I have a user "([^"]*)" with role "([^"]*)" and hospital "([^"]*)"$/ do |email, role, hospital|
+Given /^I have a user "([^"]*)" with role "([^"]*)" and clinic "([^"]*)"$/ do |email, role, clinic|
   create_usual_roles
   user = create_user_with_role(email, role)
-  link_user_to_hospital(user, hospital)
+  link_user_to_clinic(user, clinic)
 end
 
 Given /^"([^"]*)" has name "([^"]*)" "([^"]*)"$/ do |email, first, last|
@@ -39,10 +39,10 @@ Given /^"([^"]*)" has name "([^"]*)" "([^"]*)"$/ do |email, first, last|
   u.save!
 end
 
-Given /^I am logged in as "([^"]*)" and have role "([^"]*)" and I'm linked to hospital "([^"]*)"$/ do |email, role, hospital_name|
+Given /^I am logged in as "([^"]*)" and have role "([^"]*)" and I'm linked to clinic "([^"]*)"$/ do |email, role, clinic_name|
   create_usual_roles
   user = create_user_with_role(email, role) unless User.find_by_email(email)
-  link_user_to_hospital(user, hospital_name)
+  link_user_to_clinic(user, clinic_name)
   log_in(email)
 end
 
@@ -93,8 +93,8 @@ Given /^I have the usual roles$/ do
   create_usual_roles
 end
 
-Given /^"([^"]*)" has hospital "([^"]*)"$/ do |email, hospital|
-  link_user_to_hospital(User.find_by_email!(email), hospital)
+Given /^"([^"]*)" has clinic "([^"]*)"$/ do |email, clinic|
+  link_user_to_clinic(User.find_by_email!(email), clinic)
 end
 
 
@@ -105,8 +105,8 @@ def create_usual_roles
 end
 
 def create_user_with_role(email, role_name)
-  hospital = role_name == Role::SUPER_USER ? nil : Factory(:hospital)
-  user = Factory(:user, :email => email, :password => "Pas$w0rd", :status => 'A', hospital: hospital)
+  clinic = role_name == Role::SUPER_USER ? nil : Factory(:clinic)
+  user = Factory(:user, :email => email, :password => "Pas$w0rd", :status => 'A', clinic: clinic)
   role = Role.find_by_name!(role_name)
   user.role_id = role.id
   user.save!
@@ -121,9 +121,9 @@ def log_in(email)
   click_button("Log in")
 end
 
-def link_user_to_hospital(user, hospital_name)
-  hospital = Clinic.find_by_name(hospital_name)
-  hospital ||= Factory(:hospital, name: hospital_name)
-  user.hospital = hospital
+def link_user_to_clinic(user, clinic_name)
+  clinic = Clinic.find_by_unit_name(clinic_name)
+  clinic ||= Factory(:clinic, name: clinic_name)
+  user.clinic = clinic
   user.save!
 end

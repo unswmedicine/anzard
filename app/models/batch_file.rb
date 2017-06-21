@@ -32,7 +32,7 @@ class BatchFile < ApplicationRecord
 
   validates_presence_of :survey_id
   validates_presence_of :user_id
-  validates_presence_of :hospital_id
+  validates_presence_of :clinic_id
   validates_presence_of :file_file_name
   validates_presence_of :year_of_registration
 
@@ -164,7 +164,7 @@ class BatchFile < ApplicationRecord
       @csv_row_count += 1
       cycle_id = row[CYCLE_ID_COLUMN]
       cycle_id.strip! unless cycle_id.nil?
-      response = Response.new(survey: survey, cycle_id: cycle_id, user: user, hospital: hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
       add_answers_from_supplementary_files(response, cycle_id)
 

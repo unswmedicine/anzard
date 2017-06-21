@@ -4,7 +4,7 @@ describe User do
   describe "Associations" do
     it { should belong_to(:role) }
     it { should have_many(:responses) }
-    it { should belong_to(:hospital) }
+    it { should belong_to(:clinic) }
   end
 
   describe "Named Scopes" do
@@ -179,7 +179,7 @@ describe User do
     it { should validate_presence_of :email }
     it { should validate_presence_of :password }
 
-    it "should validate presence of a hospital UNLESS user has no role OR user is a super user" do
+    it "should validate presence of a clinic UNLESS user has no role OR user is a super user" do
       #NB: this could also be if they are inactive instead of no role, however this works fine
       research_role = create(:role, :name => 'Data Provider')
 
@@ -190,7 +190,7 @@ describe User do
       users << create(:user, :role => research_role, :status => 'A', :email => 'user3@intersect.org.au')
 
       users.each do |u|
-        u.hospital = nil
+        u.clinic = nil
       end
 
       users[0].should be_valid
@@ -199,26 +199,26 @@ describe User do
 
     end
 
-    it "should clear the hospital on before validation if a user becomes a super user" do
+    it "should clear the clinic on before validation if a user becomes a super user" do
       super_role = create(:role, :name => Role::SUPER_USER)
-      hospital = create(:hospital)
-      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :hospital => hospital)
-      user1.hospital.should eq(hospital)
+      clinic = create(:clinic)
+      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :clinic => clinic)
+      user1.clinic.should eq(clinic)
 
       user1.role = super_role
       user1.should be_valid
-      user1.hospital.should eq(nil)
+      user1.clinic.should eq(nil)
 
     end
 
-    it "should never clear the hospital for regular users" do
-      hospital = create(:hospital)
-      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :hospital => hospital)
+    it "should never clear the clinic for regular users" do
+      clinic = create(:clinic)
+      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :clinic => clinic)
 
       user1.should be_valid
       user1.save
       user1a = User.find_by_email('user1@intersect.org.au')
-      user1a.hospital.should eq(hospital)
+      user1a.clinic.should eq(clinic)
 
 
     end

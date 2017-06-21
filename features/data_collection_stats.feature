@@ -1,19 +1,19 @@
 Feature: View Stats
   In order to find out how data collection is progressing
   As an admin
-  I want to see a breakdown by survey, hospital and year of registration
+  I want to see a breakdown by survey, clinic and year of registration
 
   Background:
     Given I have the usual roles
     And I have a user "admin@intersect.org.au" with role "Administrator"
     And I have year of registration range configured as "2000" to "2010"
-    And I have hospitals
+    And I have clinics
       | name                         | state |
       | RPA                          | NSW   |
       | Royal North Shore            | NSW   |
-      | Mercy Hospital               | Vic   |
-      | The Royal Childrens Hospital | Vic   |
-      | Sydney Childrens Hospital    | NSW   |
+      | Mercy Clinic               | Vic   |
+      | The Royal Childrens Clinic | Vic   |
+      | Sydney Childrens Clinic    | NSW   |
       | Another One                  | NSW   |
     And I have a survey with name "Survey A"
     And I have a survey with name "Survey B"
@@ -31,20 +31,20 @@ Feature: View Stats
       | Another One                  | none             | none           | none             | none           | none             | none           |
       | Royal North Shore            | none             | none           | none             | none           | none             | none           |
       | RPA                          | 5                | 3              | 3                | none           | 4                | 8              |
-      | Sydney Childrens Hospital    | 1                | 1              | 1                | 2              | 1                | 3              |
+      | Sydney Childrens Clinic    | 1                | 1              | 1                | 2              | 1                | 3              |
       | Vic                          |                  |                |                  |                |                  |                |
-      | Mercy Hospital               | 1                | 3              | 2                | none           | 3                | 8              |
-      | The Royal Childrens Hospital | 6                | none           | 8                | none           | 10               | 2              |
+      | Mercy Clinic               | 1                | 3              | 2                | none           | 3                | 8              |
+      | The Royal Childrens Clinic | 6                | none           | 8                | none           | 10               | 2              |
     And I should see survey stats table for "Survey B" with
       |                              | 2009 In Progress | 2009 Submitted | 2010 In Progress | 2010 Submitted | 2011 In Progress | 2011 Submitted |
       | NSW                          |                  |                |                  |                |                  |                |
       | Another One                  | none             | none           | none             | none           | none             | none           |
       | Royal North Shore            | none             | 12             | none             | 3              | 2                | 2              |
       | RPA                          | none             | none           | none             | 1              | 2                | 6              |
-      | Sydney Childrens Hospital    | none             | none           | none             | none           | 1                | none           |
+      | Sydney Childrens Clinic    | none             | none           | none             | none           | 1                | none           |
       | Vic                          |                  |                |                  |                |                  |                |
-      | Mercy Hospital               | none             | none           | none             | 1              | none             | 6              |
-      | The Royal Childrens Hospital | none             | none           | none             | none           | none             | none           |
+      | Mercy Clinic               | none             | none           | none             | 1              | none             | 6              |
+      | The Royal Childrens Clinic | none             | none           | none             | none           | none             | none           |
 
   Scenario: Data providers can't see stats
     Given I am logged in as "dp@intersect.org.au" and have role "Data Provider"

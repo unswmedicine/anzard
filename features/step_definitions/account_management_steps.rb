@@ -6,11 +6,11 @@ end
 
 Given /^I have users$/ do |table|
   table.hashes.each do |hash|
-    hospital_name = hash.delete('hospital')
+    clinic_name = hash.delete('clinic')
     role_name = hash.delete('role')
     role = role_name.blank? ? nil : Role.find_by_name!(role_name)
-    hospital = hospital_name.blank? ? nil : Clinic.find_by_name!(hospital_name)
-    Factory(:user, hash.merge(status: 'A', hospital: hospital, role: role))
+    clinic = clinic_name.blank? ? nil : Clinic.find_by_unit_name!(clinic_name)
+    Factory(:user, hash.merge(status: 'A', clinic: clinic, role: role))
   end
 end
 
@@ -51,7 +51,7 @@ Given /^"([^"]*)" has role "([^"]*)"$/ do |email, role_name|
   user = User.find_by_email!(email)
   role = Role.find_by_name!(role_name)
   user.role = role
-  user.hospital = nil if role_name == "Administrator"
+  user.clinic = nil if role_name == "Administrator"
   user.save!(:validate => false)
 end
 

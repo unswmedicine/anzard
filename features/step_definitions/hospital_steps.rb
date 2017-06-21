@@ -1,5 +1,5 @@
-Given /^I have hospitals$/ do |table|
+Given /^I have clinics$/ do |table|
   table.hashes.each do |hash|
-    Factory(:hospital, hash)
+    Factory(:clinic, hash)
   end
 end

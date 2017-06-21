@@ -9,7 +9,7 @@ Feature: Administer users
       | email                          | first_name    | last_name |
       | first@intersect.org.au         | First         | User      |
       | administrator@intersect.org.au | Administrator | Superuser |
-    And I have hospitals
+    And I have clinics
       | state | name       | abbrev |
       | NSW   | Left Wing  | Left   |
       | NSW   | Right Wing | Right  |
@@ -114,43 +114,43 @@ Feature: Administer users
     Then I should be on the list users page
     And I should see "Access level can not be set. This user has previously been rejected as a spammer."
 
-##Scenarios relating to assigning a hospital to an approved user
+##Scenarios relating to assigning a clinic to an approved user
 
   @javascript
-  Scenario: Changing a user's role to superuser clears their hospital selection
+  Scenario: Changing a user's role to superuser clears their clinic selection
     Given I am on the edit role page for first@intersect.org.au
-    And I should see "Hospital"
+    And I should see "Clinic"
     And I select "Administrator" from "Role"
     #capybarra still sees hidden things ><
-#    Then I should not see "Hospital"
+#    Then I should not see "Clinic"
     And I press "Save"
     And I should see that the "access level" update succeeded for first@intersect.org.au
     And I should be on the user details page for first@intersect.org.au
-    And I should not see "Hospital"
+    And I should not see "Clinic"
 
   @javascript
-  Scenario: Changing a user's role from superuser to a regular role allows selection of a hospital
+  Scenario: Changing a user's role from superuser to a regular role allows selection of a clinic
     Given I have a user "other_super@intersect.org.au" with role "Administrator"
     And I have role "other role"
     And I am on the edit role page for other_super@intersect.org.au
     #capybarra still sees hidden things ><
-#    And I should not see "Hospital"
+#    And I should not see "Clinic"
     And I select "other role" from "Role"
-    Then I should see "Hospital"
-    And I select "Left Wing" from "Hospital"
+    Then I should see "Clinic"
+    And I select "Left Wing" from "Clinic"
     And I press "Save"
     And I should see that the "access level" update succeeded for other_super@intersect.org.au
     And I should be on the user details page for other_super@intersect.org.au
-    And I should see field "Hospital" with value "Left Wing (NSW)"
+    And I should see field "Clinic" with value "Left Wing (NSW)"
 
-  Scenario: Changing a user's role from superuser to a regular role requires selection of a hospital
+  Scenario: Changing a user's role from superuser to a regular role requires selection of a clinic
     Given I have a user "other_super@intersect.org.au" with role "Administrator"
     And I have role "other role"
     And I am on the edit role page for other_super@intersect.org.au
     And I select "other role" from "Role"
-    And I select blank from "Hospital"
+    And I select blank from "Clinic"
     And I press "Save"
-    Then I should see "All non-superusers must be assigned a hospital"
+    Then I should see "All non-superusers must be assigned a clinic"
 
-    ##END Scenarios relating to assigning a hospital to an approved user
+    ##END Scenarios relating to assigning a clinic to an approved user
 

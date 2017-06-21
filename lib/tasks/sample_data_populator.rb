@@ -28,26 +28,26 @@ def create_responses(big)
   main = Survey.where(:name => 'ANZARD data form').first
 
   # remove the one dataprovider is linked to as we'll create those separately
-  dp_hospital = User.find_by_email!('dataprovider@intersect.org.au').hospital
-  hospitals = Clinic.where.not(id: dp_hospital.id)
+  dp_clinic = User.find_by_email!('dataprovider@intersect.org.au').clinic
+  clinics = Clinic.where.not(id: dp_clinic.id)
 
   count1 = big ? 100 : 20
   count2 = big ? 30 : 5
   count3 = big ? 500 : 50
 
-  count1.times { create_response(main, ALL_MANDATORY, hospitals.sample) }
-  count2.times { create_response(main, ALL, hospitals.sample) }
-  #count2.times { create_response(main, FEW, hospitals.sample) }
+  count1.times { create_response(main, ALL_MANDATORY, clinics.sample) }
+  count2.times { create_response(main, ALL, clinics.sample) }
+  #count2.times { create_response(main, FEW, clinics.sample) }
 
-  create_response(main, ALL_MANDATORY, dp_hospital)
-  create_response(main, ALL, dp_hospital)
-  #create_response(main, FEW, dp_hospital)
+  create_response(main, ALL_MANDATORY, dp_clinic)
+  create_response(main, ALL, dp_clinic)
+  #create_response(main, FEW, dp_clinic)
 
   create_batch_files(main)
 
   # create some submitted ones (this is a bit dodgy since they aren't valid, but its too hard to create valid ones in code)
-  count3.times { create_response(main, ALL_MANDATORY, hospitals.sample, true) }
-  count3.times { create_response(main, ALL, hospitals.sample, true) }
+  count3.times { create_response(main, ALL_MANDATORY, clinics.sample, true) }
+  count3.times { create_response(main, ALL, clinics.sample, true) }
 
 end
 
@@ -92,12 +92,12 @@ def create_test_users
   set_role("supervisor2@intersect.org.au", "Data Provider Supervisor", Clinic.last.id)
 end
 
-def set_role(email, role, hospital_id=nil)
+def set_role(email, role, clinic_id=nil)
   user = User.find_by_email(email)
   role = Role.find_by_name(role)
-  hospital = Clinic.find(hospital_id) unless hospital_id.nil?
+  clinic = Clinic.find(clinic_id) unless clinic_id.nil?
   user.role = role
-  user.hospital = hospital
+  user.clinic = clinic
   user.save!
 end
 
@@ -139,7 +139,7 @@ def load_password
 
 end
 
-def create_response(survey, profile, hospital, submit=false)
+def create_response(survey, profile, clinic, submit=false)
   status = Response::STATUS_UNSUBMITTED
   year_of_reg = 2007
   base_date = random_date_in(2007)
@@ -151,9 +151,9 @@ def create_response(survey, profile, hospital, submit=false)
              when FEW
                "small"
            end
-  response = Response.create!(hospital: hospital,
+  response = Response.create!(clinic: clinic,
                               submitted_status: status,
-                              cycle_id: "#{prefix}-#{hospital.name}-#{rand(10000000)}",
+                              cycle_id: "#{prefix}-#{clinic.unit_name}-#{rand(10000000)}",
                               survey: survey,
                               year_of_registration: year_of_reg,
                               user: User.all.sample)

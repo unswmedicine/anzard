@@ -1,11 +1,11 @@
-When /^hospital "([^"]*)" has submitted the following cycle ids$/ do |hospital, table|
+When /^clinic "([^"]*)" has submitted the following cycle ids$/ do |clinic, table|
   # table is a | 2012 | abcd      | main |pending
-  hospital = Clinic.find_by_name!(hospital)
+  clinic = Clinic.find_by_unit_name!(clinic)
   roles = Role.where(name: [Role::DATA_PROVIDER, Role::DATA_PROVIDER_SUPERVISOR])
-  user = hospital.users.where(role_id: roles).first!
+  user = clinic.users.where(role_id: roles).first!
   table.hashes.each do |hash|
     survey = hash[:form]
-    Factory.create(:response, user: user, hospital: user.hospital,
+    Factory.create(:response, user: user, clinic: user.clinic,
                    submitted_status: Response::STATUS_SUBMITTED, cycle_id: hash[:cycle_id],
                    year_of_registration: hash[:year], survey: Survey.find_by_name!(survey))
   end

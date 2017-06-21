@@ -24,14 +24,14 @@
               Submitted
       %tbody
         - data_columns = stats.years.size * 2
-        - hospitals.each do |state|
+        - clinics.each do |state|
           %tr
             %th{colspan: (data_columns + 1)}= state[0]
 
-          - state[1].each do |hospital|
-            - hospital_name, hospital_id = hospital
+          - state[1].each do |clinic|
+            - clinic_unit_name, clinic_id = clinic
             %tr
-              %td= hospital_name
+              %td= clinic_unit_name
               - stats.years.each do |year|
-                %td= stats.response_count(year, Response::STATUS_UNSUBMITTED, hospital_id)
-                %td= stats.response_count(year, Response::STATUS_SUBMITTED, hospital_id)
+                %td= stats.response_count(year, Response::STATUS_UNSUBMITTED, clinic_id)
+                %td= stats.response_count(year, Response::STATUS_SUBMITTED, clinic_id)

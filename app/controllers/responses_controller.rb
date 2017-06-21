@@ -5,7 +5,7 @@ class ResponsesController < ApplicationController
 
   expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
   expose(:surveys) { SURVEYS.values }
-  expose(:hospitals) { Clinic.hospitals_by_state }
+  expose(:clinics) { Clinic.clinics_by_state }
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
   def new
@@ -23,7 +23,7 @@ class ResponsesController < ApplicationController
 
   def create
     @response.user = current_user
-    @response.hospital_id = current_user.hospital_id
+    @response.clinic_id = current_user.clinic_id
     @response.submitted_status = Response::STATUS_UNSUBMITTED
     if @response.save
       redirect_to edit_response_path(@response, section: @response.survey.first_section.id), notice: 'Data entry form created'
@@ -107,7 +107,7 @@ class ResponsesController < ApplicationController
   def download
     set_tab :download, :home
     @survey_id = params[:survey_id]
-    @hospital_id = params[:hospital_id]
+    @clinic_id = params[:clinic_id]
     @year_of_registration = params[:year_of_registration]
     @site_id = params[:site_id]
 
@@ -115,7 +115,7 @@ class ResponsesController < ApplicationController
       @errors = ["Please select a registration type"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(@survey_id, @hospital_id, @year_of_registration, @site_id)
+      generator = CsvGenerator.new(@survey_id, @clinic_id, @year_of_registration, @site_id)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
@@ -169,8 +169,8 @@ class ResponsesController < ApplicationController
   private
 
   def organised_cycle_ids(user)
-    hospital = user.hospital
-    responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, hospital_id: hospital)
+    clinic = user.clinic
+    responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, clinic_id: clinic)
     responses_by_survey = responses.group_by {|response| response.survey }
     responses_by_survey_and_year = responses_by_survey.map do |survey, responses|
       responses_by_year = responses.group_by{|response| response.year_of_registration }

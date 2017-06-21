@@ -80,7 +80,7 @@ module NavigationHelpers
       prepare_download_responses_path
 
     when /the download link for the first survey/
-      download_responses_path(survey_id: Survey.first.id, hospital_id: "", year_of_registration: "")
+      download_responses_path(survey_id: Survey.first.id, clinic_id: "", year_of_registration: "")
 
     when /the submitted cycle ids page/
         submitted_cycle_ids_responses_path

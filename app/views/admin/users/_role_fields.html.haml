@@ -2,26 +2,26 @@
   = f.label :role_id, "Role"
   .input
     = f.collection_select :role_id, @roles, :id, :name, {include_blank: ""}, {class: 'large'}
-.clearfix#hospital_fields
-  = f.label :hospital_id, "Clinic"
+.clearfix#clinic_fields
+  = f.label :clinic_id, "Clinic"
   .input
-    = f.select :hospital_id, grouped_options_for_select(Clinic.hospitals_by_state_with_site_name, @user.hospital_id), {include_blank: ""}
+    = f.select :clinic_id, grouped_options_for_select(Clinic.clinics_by_state_with_site_name, @user.clinic_id), {include_blank: ""}
 
 
 :javascript
   $(window).load(function() {
-    hide_hospital_if_required();
+    hide_clinic_if_required();
   });
 
   $('#user_role_id').change(function() {
-    hide_hospital_if_required();
+    hide_clinic_if_required();
   });
 
-  function hide_hospital_if_required() {
+  function hide_clinic_if_required() {
     if ($('#user_role_id :selected').text() == "#{Role.super_user_role}") {
-      $('#hospital_fields').hide();
+      $('#clinic_fields').hide();
     } else {
-      $('#hospital_fields').show();
+      $('#clinic_fields').show();
     }
   }
 

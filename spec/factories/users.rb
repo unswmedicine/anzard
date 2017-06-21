@@ -6,7 +6,7 @@ FactoryGirl.define do
     sequence(:email) { |n| "#{n}@intersect.org.au" }
 
     factory :user do
-      association :hospital
+      association :clinic
     end
 
     factory :super_user do

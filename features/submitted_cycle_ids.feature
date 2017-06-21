@@ -5,16 +5,16 @@ Feature: Submitted Cycle Ids
 
   Background:
     Given I have the usual roles
-    And I have hospitals
+    And I have clinics
       | state | name       |
-      | NSW   | Hospital 2 |
-      | Vic   | Hospital 3 |
+      | NSW   | Clinic 2 |
+      | Vic   | Clinic 3 |
       | Vic   | H4         |
       | NSW   | Left Wing  |
       | Vic   | Right Wing |
       | Vic   | Only Wing  |
     And I have users
-      | email                 | first_name | last_name | role                     | hospital   |
+      | email                 | first_name | last_name | role                     | clinic   |
       | fred@intersect.org.au | Fred       | Jones     | Data Provider Supervisor | Left Wing  |
       | dan@intersect.org.au  | TheManDan  | Superuser | Administrator            |            |
       | anna@intersect.org.au | Anna       | Smith     | Data Provider            | Right Wing |
@@ -22,15 +22,15 @@ Feature: Submitted Cycle Ids
       | joe@intersect.org.au  | Joe        | Bloggs    | Data Provider            | H4         |
     And I have a survey with name "main"
     And I have a survey with name "followup"
-    And hospital "Right Wing" has submitted the following cycle ids
+    And clinic "Right Wing" has submitted the following cycle ids
       | year | cycle_id | form |
       | 2012 | abcd      | main |
-    And hospital "H4" has submitted the following cycle ids
+    And clinic "H4" has submitted the following cycle ids
       | year | cycle_id | form     |
       | 2012 | cycle1     | main     |
       | 2012 | cycle5     | followup |
       | 2011 | cycle6     | main     |
-    And hospital "Left Wing" has submitted the following cycle ids
+    And clinic "Left Wing" has submitted the following cycle ids
       | year | cycle_id | form     |
       | 2011 | cycle2     | followup |
       | 2012 | cycle3     | main     |
