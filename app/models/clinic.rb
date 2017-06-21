@@ -1,4 +1,4 @@
-class Hospital < ApplicationRecord
+class Clinic < ApplicationRecord
 
   has_many :users
   has_many :responses

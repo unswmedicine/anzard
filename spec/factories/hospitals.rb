@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :hospital do
-      sequence(:name) { |n| "Some Hospital #{n}" }
+      sequence(:name) { |n| "Some Clinic #{n}" }
       sequence(:state) do |n| #Pick a random, real state
         states = %w(ACT NSW Qld SA NT Vic WA North\ Island South\ Island)
         states[n % states.length]

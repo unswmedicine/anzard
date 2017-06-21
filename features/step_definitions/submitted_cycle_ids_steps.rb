@@ -1,6 +1,6 @@
 When /^hospital "([^"]*)" has submitted the following cycle ids$/ do |hospital, table|
   # table is a | 2012 | abcd      | main |pending
-  hospital = Hospital.find_by_name!(hospital)
+  hospital = Clinic.find_by_name!(hospital)
   roles = Role.where(name: [Role::DATA_PROVIDER, Role::DATA_PROVIDER_SUPERVISOR])
   user = hospital.users.where(role_id: roles).first!
   table.hashes.each do |hash|

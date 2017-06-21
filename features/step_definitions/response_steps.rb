@@ -464,11 +464,11 @@ Given /^I fill in the year of registration range with "([^"]*)" and "([^"]*)"$/ 
 end
 
 When /^I have a range of responses$/ do
-  rpa = Hospital.find_by_name!("RPA")
-  rns = Hospital.find_by_name!("Royal North Shore")
-  mh = Hospital.find_by_name!("Mercy Hospital")
-  rc = Hospital.find_by_name!("The Royal Childrens Hospital")
-  sc = Hospital.find_by_name!("Sydney Childrens Hospital")
+  rpa = Clinic.find_by_name!("RPA")
+  rns = Clinic.find_by_name!("Royal North Shore")
+  mh = Clinic.find_by_name!("Mercy Clinic")
+  rc = Clinic.find_by_name!("The Royal Childrens Clinic")
+  sc = Clinic.find_by_name!("Sydney Childrens Clinic")
 
   survey_a = Survey.find_by_name!("Survey A")
   survey_b = Survey.find_by_name!("Survey B")
@@ -525,7 +525,7 @@ Given /^I have responses$/ do |table|
     survey_name = attrs.delete('survey')
     survey = survey_name.blank? ? Factory(:survey) : Survey.find_by_name!(survey_name)
     hospital_name = attrs.delete('hospital')
-    hospital = hospital_name.blank? ? Factory(:hospital) : Hospital.find_by_name!(hospital_name)
+    hospital = hospital_name.blank? ? Factory(:hospital) : Clinic.find_by_name!(hospital_name)
     user = Factory(:user, hospital: hospital)
     Factory(:response, attrs.merge(survey: survey, user: user, hospital: hospital))
   end

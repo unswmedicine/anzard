@@ -8,7 +8,7 @@ class Response < ApplicationRecord
   COMPLETE_WITH_WARNINGS = 'Complete with warnings'
 
   belongs_to :user
-  belongs_to :hospital
+  belongs_to :clinic
   belongs_to :batch_file
   belongs_to :survey
 

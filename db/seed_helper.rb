@@ -13,7 +13,7 @@ def create_config_items
 end
 
 def create_clinics
-  Hospital.delete_all
+  Clinic.delete_all
 
   clinics = read_hashes_from_csv(Rails.root.join("db/seed_files", "clinics.csv"))
   clinics.each do |hash|

@@ -122,7 +122,7 @@ def log_in(email)
 end
 
 def link_user_to_hospital(user, hospital_name)
-  hospital = Hospital.find_by_name(hospital_name)
+  hospital = Clinic.find_by_name(hospital_name)
   hospital ||= Factory(:hospital, name: hospital_name)
   user.hospital = hospital
   user.save!

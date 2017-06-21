@@ -20,7 +20,7 @@ class CsvGenerator
     name_parts = [survey.name.parameterize(separator: "_")]
 
     unless hospital_id.blank?
-      hospital = Hospital.where(unit: hospital_id).first
+      hospital = Clinic.where(unit: hospital_id).first
       name_parts << hospital.name.parameterize("_")
     end
     

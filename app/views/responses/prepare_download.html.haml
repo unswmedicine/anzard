@@ -18,7 +18,7 @@
     .clearfix
       = label_tag :hospital_id, "Clinic"
       .input
-        = select_tag :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state_and_unique_by_unit, @hospital_id), {prompt: "ALL", class: 'large'}
+        = select_tag :hospital_id, grouped_options_for_select(Clinic.hospitals_by_state_and_unique_by_unit, @hospital_id), {prompt: "ALL", class: 'large'}
         = required
     .clearfix
       = label_tag :site_id, "Site"

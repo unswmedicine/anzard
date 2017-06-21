@@ -5,7 +5,7 @@ class ResponsesController < ApplicationController
 
   expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
   expose(:surveys) { SURVEYS.values }
-  expose(:hospitals) { Hospital.hospitals_by_state }
+  expose(:hospitals) { Clinic.hospitals_by_state }
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
   def new
@@ -126,7 +126,7 @@ class ResponsesController < ApplicationController
   end
 
   def get_sites
-    render json: Hospital.where(unit: params["unit_id"])
+    render json: Clinic.where(unit: params["unit_id"])
   end
 
   def batch_delete

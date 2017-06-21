@@ -21,7 +21,7 @@ class BatchFile < ApplicationRecord
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
 
   belongs_to :user
-  belongs_to :hospital
+  belongs_to :clinic
   has_many :supplementary_files
 
   has_attached_file :file, :styles => {}, :path => :make_file_path

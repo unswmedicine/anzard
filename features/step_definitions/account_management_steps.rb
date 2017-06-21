@@ -9,7 +9,7 @@ Given /^I have users$/ do |table|
     hospital_name = hash.delete('hospital')
     role_name = hash.delete('role')
     role = role_name.blank? ? nil : Role.find_by_name!(role_name)
-    hospital = hospital_name.blank? ? nil : Hospital.find_by_name!(hospital_name)
+    hospital = hospital_name.blank? ? nil : Clinic.find_by_name!(hospital_name)
     Factory(:user, hash.merge(status: 'A', hospital: hospital, role: role))
   end
 end

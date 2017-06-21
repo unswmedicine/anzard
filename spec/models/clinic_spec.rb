@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 
-describe Hospital do
+describe Clinic do
   describe "Associations" do
     it { should have_many(:users) }
     it { should have_many(:responses) }
@@ -17,13 +17,13 @@ describe Hospital do
   describe "Grouping Hospitals By State" do
     it "should put the states in alphabetic order then the hospitals under then in alphabetic order" do
       rpa = create(:hospital, state: "NSW", name: "RPA").id
-      royal_childrens = create(:hospital, state: "Vic", name: "The Royal Childrens Hospital").id
+      royal_childrens = create(:hospital, state: "Vic", name: "The Royal Childrens Clinic").id
       campbelltown = create(:hospital, state: "NSW", name: "Campbelltown").id
       liverpool = create(:hospital, state: "NSW", name: "Liverpool").id
-      mercy = create(:hospital, state: "Vic", name: "Mercy Hospital").id
+      mercy = create(:hospital, state: "Vic", name: "Mercy Clinic").id
       royal_ad = create(:hospital, state: "SA", name: "Royal Adelaide").id
 
-      output = Hospital.hospitals_by_state
+      output = Clinic.hospitals_by_state
       output.size.should eq(3)
       output[0][0].should eq("NSW")
       output[1][0].should eq("SA")
@@ -31,7 +31,7 @@ describe Hospital do
 
       output[0][1].should eq([["Campbelltown", campbelltown], ["Liverpool", liverpool], ["RPA", rpa]])
       output[1][1].should eq([["Royal Adelaide", royal_ad]])
-      output[2][1].should eq([["Mercy Hospital", mercy], ["The Royal Childrens Hospital", royal_childrens]])
+      output[2][1].should eq([["Mercy Clinic", mercy], ["The Royal Childrens Clinic", royal_childrens]])
     end
   end
 

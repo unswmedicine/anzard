@@ -62,7 +62,7 @@ Given /^I have batch uploads$/ do |table|
     survey = Survey.find_by_name!(attrs.delete("survey"))
     uploader = User.find_by_email!(attrs.delete("created_by"))
     hospital_name = attrs.delete("hospital")
-    hospital = Hospital.find_by_name(hospital_name)
+    hospital = Clinic.find_by_name(hospital_name)
     hospital ||= Factory(:hospital, name: hospital_name)
     summary = attrs.delete("summary report") == "true"
     detail = attrs.delete("detail report") == "true"
@@ -117,7 +117,7 @@ def check_batch_file(survey_name, email, hospital_name)
   file = BatchFile.last
   file.survey.should eq(Survey.find_by_name!(survey_name))
   file.user.should eq(User.find_by_email!(email))
-  file.hospital.should eq(Hospital.find_by_name!(hospital_name))
+  file.hospital.should eq(Clinic.find_by_name!(hospital_name))
   # since the test env is configured to store files in tmp, we look for them there
   ext = File.extname(file.file_file_name)
   expected_path = Rails.root.join("tmp/#{file.id}#{ext}").to_s
