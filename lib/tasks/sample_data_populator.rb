@@ -70,6 +70,7 @@ def create_survey_from_lib_tasks(name, question_file, options_file, cross_questi
 end
 
 def create_test_users
+  create_user(email: "admin@intersect.org.au", first_name: "Administrator", last_name: "Intersect")
   create_user(email: "georgina@intersect.org.au", first_name: "Georgina", last_name: "Edwards")
   create_user(email: "alexb@intersect.org.au", first_name: "Alex", last_name: "Bradner")
   create_user(email: "kali@intersect.org.au", first_name: "Kali", last_name: "Waterford")
@@ -80,6 +81,7 @@ def create_test_users
   create_user(email: "supervisor2@intersect.org.au", first_name: "Data", last_name: "Supervisor2")
   create_unapproved_user(email: "unapproved1@intersect.org.au", first_name: "Unapproved", last_name: "One")
   create_unapproved_user(email: "unapproved2@intersect.org.au", first_name: "Unapproved", last_name: "Two")
+  set_role("admin@intersect.org.au", "Administrator")
   set_role("georgina@intersect.org.au", "Administrator")
   set_role("alexb@intersect.org.au", "Administrator")
   set_role("kali@intersect.org.au", "Administrator")
