@@ -6,7 +6,13 @@ FactoryGirl.define do
     sequence(:email) { |n| "#{n}@intersect.org.au" }
 
     factory :user do
-      association :clinic
+      transient do
+        clinics_count 0
+      end
+
+      after(:create) do |user, evaluator|
+        create_list(:clinic, evaluator.clinics_count, users: [user])
+      end
     end
 
     factory :super_user do

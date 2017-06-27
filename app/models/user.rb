@@ -16,7 +16,7 @@ class User < ApplicationRecord
   validates_presence_of :first_name
   validates_presence_of :last_name
   validates_presence_of :status
-  validates_presence_of :clinic_id, unless: Proc.new { |user|  user.role.blank? || user.super_user? }
+  validates_presence_of :clinics, unless: Proc.new { |user|  user.role.blank? || user.super_user? }
 
   validates_length_of :first_name, maximum: 255
   validates_length_of :last_name, maximum: 255
@@ -160,7 +160,7 @@ class User < ApplicationRecord
   private
 
   def clear_super_user_clinic
-    self.clinic = nil if self.super_user?
+    self.clinics.clear if self.super_user?
   end
 
   def initialize_status
