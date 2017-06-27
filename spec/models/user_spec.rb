@@ -4,7 +4,8 @@ describe User do
   describe "Associations" do
     it { should belong_to(:role) }
     it { should have_many(:responses) }
-    it { should belong_to(:clinic) }
+    it { should have_many(:clinic_allocations) }
+    it { should have_many(:clinics) }
   end
 
   describe "Named Scopes" do

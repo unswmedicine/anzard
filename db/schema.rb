@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170621073406) do
+ActiveRecord::Schema.define(version: 20170626021424) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -42,6 +42,15 @@ ActiveRecord::Schema.define(version: 20170621073406) do
     t.string   "detail_report_path"
     t.integer  "year_of_registration"
     t.index ["survey_id"], name: "index_batch_files_on_survey_id", using: :btree
+  end
+
+  create_table "clinic_allocations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "clinic_id"
+    t.integer  "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["clinic_id"], name: "index_clinic_allocations_on_clinic_id", using: :btree
+    t.index ["user_id"], name: "index_clinic_allocations_on_user_id", using: :btree
   end
 
   create_table "clinics", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -186,7 +195,6 @@ ActiveRecord::Schema.define(version: 20170621073406) do
     t.integer  "role_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "clinic_id"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end

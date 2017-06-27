@@ -10,7 +10,8 @@ class User < ApplicationRecord
 
   belongs_to :role
   has_many :responses
-  belongs_to :clinic, optional: true
+  has_many :clinic_allocations
+  has_many :clinics, through: :clinic_allocations
 
   validates_presence_of :first_name
   validates_presence_of :last_name

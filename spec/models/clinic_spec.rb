@@ -3,6 +3,7 @@ require 'rails_helper'
 
 describe Clinic do
   describe "Associations" do
+    it { should have_many(:clinic_allocations)}
     it { should have_many(:users) }
     it { should have_many(:responses) }
   end

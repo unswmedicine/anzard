@@ -1,6 +1,7 @@
 class Clinic < ApplicationRecord
 
-  has_many :users
+  has_many :clinic_allocations
+  has_many :users, through: :clinic_allocations
   has_many :responses
 
   validates_presence_of :state
