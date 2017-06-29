@@ -10,7 +10,6 @@ class Clinic < ApplicationRecord
   # validates_presence_of :site_name
   validates_presence_of :site_code
 
-  validates_uniqueness_of :unit_code
   validates_uniqueness_of :site_code, scope: :unit_code
 
   WITHOUT_SITE_NAME = "without_site_name"
