@@ -28,6 +28,7 @@ def create_responses(big)
   main = Survey.where(:name => 'ANZARD data form').first
 
   # remove the one dataprovider is linked to as we'll create those separately
+  # ToDo: update data populator to appropriately get the set of data provider clinics and then not use them
   dp_clinic = User.find_by_email!('dataprovider@intersect.org.au').clinic
   clinics = Clinic.where.not(id: dp_clinic.id)
 
@@ -97,6 +98,7 @@ def set_role(email, role, clinic_id=nil)
   role = Role.find_by_name(role)
   clinic = Clinic.find(clinic_id) unless clinic_id.nil?
   user.role = role
+  # ToDo: add specified clinic to set of user clinics
   user.clinic = clinic
   user.save!
 end

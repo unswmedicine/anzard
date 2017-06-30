@@ -13,8 +13,10 @@ class Admin::UsersController < Admin::AdminBaseController
 
     @clinic_filter = params[:clinic_filter]
     if @clinic_filter == "None"
+      # ToDo: update user clinic filter so that it gets all users with no associated clinics
       @users = @users.where("users.clinic_id IS NULL")
     elsif !@clinic_filter.blank?
+      # ToDo: update user clinic filter so that it gets all users who are associated with the specified clinic
       @users = @users.where(clinic_id: @clinic_filter)
     end
   end
@@ -70,6 +72,7 @@ class Admin::UsersController < Admin::AdminBaseController
       redirect_to(edit_role_admin_user_path(@user), alert: "Please select a role for the user.")
     else
       @user.role_id = params[:user][:role_id]
+      # ToDo: deal with assigning the user clinics when updating the approved user role
       @user.clinic_id = params[:user][:clinic_id]
       if !@user.check_number_of_superusers(params[:id], current_user.id)
         redirect_to(edit_role_admin_user_path(@user), alert: "Only one superuser exists. You cannot change this role.")
@@ -86,6 +89,7 @@ class Admin::UsersController < Admin::AdminBaseController
       redirect_to(edit_approval_admin_user_path(@user), alert: "Please select a role for the user.")
     else
       @user.role_id = params[:user][:role_id]
+      # Todo: deal with updating the user clinics when approving a user request
       @user.clinic_id = params[:user][:clinic_id]
       if @user.save
         @user.approve_access_request

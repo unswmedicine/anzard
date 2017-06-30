@@ -6,6 +6,7 @@ class CsvGenerator
 
   def initialize(survey_id, clinic_id, year_of_registration, site_id)
     self.survey_id = survey_id
+    # ToDo: update CSV generator so that it adds the appropriate user clinic to the generated response CSV
     self.clinic_id = clinic_id
     self.year_of_registration = year_of_registration
     self.site_id = site_id

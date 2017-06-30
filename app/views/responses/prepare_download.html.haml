@@ -18,6 +18,7 @@
     .clearfix
       = label_tag :clinic_id, "Clinic"
       .input
+        -# ToDo: determine if download response by clinic requires updating of @clinic_id
         = select_tag :clinic_id, grouped_options_for_select(Clinic.clinics_by_state_and_unique_by_unit, @clinic_id), {prompt: "ALL", class: 'large'}
         = required
     .clearfix

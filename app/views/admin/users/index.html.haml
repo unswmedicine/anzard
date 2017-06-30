@@ -28,6 +28,7 @@
         %td= user.email
         %td= user.role.name if user.role
         %td= user.clinic.present? ? "#{user.clinic.unit_name} ("+ ((user.clinic.site_name + " - ") if user.clinic.site_name.present?) +"#{user.clinic.state})" : "(None)"
+        -# ToDo: deal with deisplaying all user clinic associations (rather than the current first clinic hotfix)
         %td
           - if user.status == 'A'
             Active

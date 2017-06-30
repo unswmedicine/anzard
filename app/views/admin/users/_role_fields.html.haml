@@ -5,6 +5,7 @@
 .clearfix#clinic_fields
   = f.label :clinic_id, "Clinic"
   .input
+    -# ToDo: update view so that form options includes all clinics user is associated with
     = f.select :clinic_id, grouped_options_for_select(Clinic.clinics_by_state_with_site_name, @user.clinic_id), {include_blank: ""}
 
 
