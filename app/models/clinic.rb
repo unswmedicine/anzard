@@ -7,7 +7,7 @@ class Clinic < ApplicationRecord
   validates_presence_of :state
   validates_presence_of :unit_name
   validates_presence_of :unit_code
-  # validates_presence_of :site_name
+  validates_presence_of :site_name
   validates_presence_of :site_code
 
   validates_uniqueness_of :site_code, scope: :unit_code
@@ -15,6 +15,18 @@ class Clinic < ApplicationRecord
   WITHOUT_SITE_NAME = "without_site_name"
   WITH_SITE_NAME = "with_site_name"
   WITH_UNIT = "with_unit"
+
+  def unit_name_with_code
+    "(#{unit_code}) #{unit_name}"
+  end
+
+  def site_name_with_full_code
+    "(#{unit_code}-#{site_code}) #{site_name}"
+  end
+
+  def self.clinics_with_unit_code(unit_code)
+    where(unit_code: unit_code)
+  end
 
   def self.clinics_by_state
     clinics_by_state_with_unit_or_with_or_without_site_name(WITHOUT_SITE_NAME)

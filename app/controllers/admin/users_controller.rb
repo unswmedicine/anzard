@@ -9,7 +9,7 @@ class Admin::UsersController < Admin::AdminBaseController
     sort = sort_column + ' ' + sort_direction
     sort = sort + ", email ASC" unless sort_column == "email" # add email as a secondary sort so its predictable when there's multiple values
 
-    @users = User.deactivated_or_approved.includes(:role).includes(:clinic).order(sort)
+    @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
 
     @clinic_filter = params[:clinic_filter]
     if @clinic_filter == "None"
@@ -89,8 +89,7 @@ class Admin::UsersController < Admin::AdminBaseController
       redirect_to(edit_approval_admin_user_path(@user), alert: "Please select a role for the user.")
     else
       @user.role_id = params[:user][:role_id]
-      # Todo: deal with updating the user clinics when approving a user request
-      @user.clinic_id = params[:user][:clinic_id]
+      @user.clinics = Clinic.find(params[:user][:clinics].reject{ |clinic_id| clinic_id.blank? })
       if @user.save
         @user.approve_access_request
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")

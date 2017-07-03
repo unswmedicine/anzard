@@ -2,11 +2,22 @@
   = f.label :role_id, "Role"
   .input
     = f.collection_select :role_id, @roles, :id, :name, {include_blank: ""}, {class: 'large'}
-.clearfix#clinic_fields
-  = f.label :clinic_id, "Clinic"
+
+.clearfix#clinic_units
+  = label_tag 'Unit'
   .input
+    -# ToDo: figure out how to get list of unique clinic unit names and ids and then use that to populate the clinics in the site list
+    -#= select_tag 'Unit', options_from_collection_for_select(Clinic.all, :unit_code, :unit_name_with_code)
+    -#= select_tag 'Unit', options_from_collection_for_select(Clinic.all, :unit_code, :unit_name_with_code), include_blank: true
+  -#= select_tag 'Unit', grouped_options_for_select(Clinic.clinics_by_state_and_unique_by_unit), include_blank: true
+
+.clearfix
+  = f.label :clinics, "Sites"
+  .input#clinic_sites
     -# ToDo: update view so that form options includes all clinics user is associated with
-    = f.select :clinic_id, grouped_options_for_select(Clinic.clinics_by_state_with_site_name, @user.clinic_id), {include_blank: ""}
+    = f.collection_check_boxes :clinics, Clinic.all, :id, :site_name_with_full_code do |clinic|
+      .clinic_site
+        = clinic.label(class: 'check_box_label') { clinic.check_box + clinic.text }
 
 
 :javascript
