@@ -22,7 +22,7 @@ class CsvGenerator
 
     unless clinic_id.blank?
       # ToDo: update so that this searches on unit_code (as this is what clinic_id is referring to here)
-      clinic = Clinic.find(clinic_id)
+      clinic = Clinic.find_by_unit_code(clinic_id)
       name_parts << clinic.unit_name.parameterize(separator: '_')
       unless clinic.site_name.blank?
         name_parts << clinic.site_name.parameterize(separator: '_')
