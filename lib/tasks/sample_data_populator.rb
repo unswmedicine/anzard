@@ -28,9 +28,8 @@ def create_responses(big)
   main = Survey.where(:name => 'ANZARD data form').first
 
   # remove the one dataprovider is linked to as we'll create those separately
-  # ToDo: update data populator to appropriately get the set of data provider clinics and then not use them
-  dp_clinic = User.find_by_email!('dataprovider@intersect.org.au').clinic
-  clinics = Clinic.where.not(id: dp_clinic.id)
+  dp_clinics = User.find_by_email!('dataprovider@intersect.org.au').clinics
+  clinics = Clinic.where.not(id: dp_clinics.pluck(:id))
 
   count1 = big ? 100 : 20
   count2 = big ? 30 : 5
@@ -40,8 +39,8 @@ def create_responses(big)
   count2.times { create_response(main, ALL, clinics.sample) }
   #count2.times { create_response(main, FEW, clinics.sample) }
 
-  create_response(main, ALL_MANDATORY, dp_clinic)
-  create_response(main, ALL, dp_clinic)
+  create_response(main, ALL_MANDATORY, dp_clinics.first)
+  create_response(main, ALL, dp_clinics.first)
   #create_response(main, FEW, dp_clinic)
 
   create_batch_files(main)
@@ -96,10 +95,8 @@ end
 def set_role(email, role, clinic_id=nil)
   user = User.find_by_email(email)
   role = Role.find_by_name(role)
-  clinic = Clinic.find(clinic_id) unless clinic_id.nil?
   user.role = role
-  # ToDo: add specified clinic to set of user clinics
-  user.clinic = clinic
+  user.clinics = [Clinic.find(clinic_id)] unless clinic_id.nil?
   user.save!
 end
 
