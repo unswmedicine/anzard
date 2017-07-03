@@ -6,7 +6,7 @@ class CsvGenerator
 
   def initialize(survey_id, clinic_id, year_of_registration, site_id)
     self.survey_id = survey_id
-    # ToDo: update CSV generator so that it adds the appropriate user clinic to the generated response CSV
+    # ToDo: (ANZARD-16 / ANZARD-38) update CSV generator so that it adds the appropriate user clinic to the generated response CSV
     self.clinic_id = clinic_id
     self.year_of_registration = year_of_registration
     self.site_id = site_id
@@ -21,6 +21,7 @@ class CsvGenerator
     name_parts = [survey.name.parameterize(separator: '_')]
 
     unless clinic_id.blank?
+      # ToDo: update so that this searches on unit_code (as this is what clinic_id is referring to here)
       clinic = Clinic.find(clinic_id)
       name_parts << clinic.unit_name.parameterize(separator: '_')
       unless clinic.site_name.blank?

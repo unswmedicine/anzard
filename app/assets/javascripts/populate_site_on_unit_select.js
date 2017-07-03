@@ -1,5 +1,6 @@
 $(window).load(function () {
     // Populates Site on Unit select function used when preparing the download of completed responses by an admin
+    // ToDo: update to use the right clinic attribute names (could also refactor element ids to be consistent with the approval unit/site function)
     $('#clinic_id').change(function() {
         $.ajax({
             type: 'GET',

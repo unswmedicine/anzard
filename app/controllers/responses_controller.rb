@@ -23,7 +23,7 @@ class ResponsesController < ApplicationController
 
   def create
     @response.user = current_user
-    # ToDo: deal with determining which of the user clinics to associate the data form response to
+    # ToDo: (ANZARD-16 / ANZARD-38) deal with determining which of the user clinics to associate the data form response to
     @response.clinic_id = current_user.clinic_id
     @response.submitted_status = Response::STATUS_UNSUBMITTED
     if @response.save
@@ -127,7 +127,7 @@ class ResponsesController < ApplicationController
   end
 
   def get_sites
-    # ToDo: change unit_id to unit_code
+    # ToDo: (ANZARD-16 / ANZARD-38) change unit_id to unit_code
     render json: Clinic.where(unit: params["unit_id"])
   end
 
@@ -171,7 +171,7 @@ class ResponsesController < ApplicationController
   private
 
   def organised_cycle_ids(user)
-    # ToDo: deal with getting cycle ids for all user clinics
+    # ToDo: (ANZARD-16 / ANZARD-38) deal with getting cycle ids for all user clinics
     clinic = user.clinic
     responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, clinic_id: clinic)
     responses_by_survey = responses.group_by {|response| response.survey }
