@@ -12,12 +12,15 @@ class Admin::UsersController < Admin::AdminBaseController
     @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
 
     @clinic_filter = params[:clinic_filter]
-    if @clinic_filter == "None"
-      # ToDo: update user clinic filter so that it gets all users with no associated clinics
-      @users = @users.where("users.clinic_id IS NULL")
+    if @clinic_filter == 'None'
+      @users = @users.where('users.id NOT IN (SELECT user_id FROM clinic_allocations)')
     elsif !@clinic_filter.blank?
-      # ToDo: update user clinic filter so that it gets all users who are associated with the specified clinic
-      @users = @users.where(clinic_id: @clinic_filter)
+      matching_clinic_allocations = ClinicAllocation.where(clinic_id: @clinic_filter, user_id: @users.pluck(:id))
+      if matching_clinic_allocations.nil?
+        @users = nil
+      else
+        @users = @users.where(id: matching_clinic_allocations.pluck(:user_id))
+      end
     end
   end
 
