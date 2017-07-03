@@ -59,6 +59,7 @@ Anznn::Application.routes.draw do
           patch :update_role
           get :edit_approval
           patch :approve
+          get :get_sites
 
         end
       end

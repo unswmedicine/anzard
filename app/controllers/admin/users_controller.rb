@@ -99,6 +99,11 @@ class Admin::UsersController < Admin::AdminBaseController
     end
   end
 
+
+  def get_sites
+    render json: Clinic.where(unit_code: params['unit_code'])
+  end
+
   private
   def sort_column
     ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : "email"

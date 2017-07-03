@@ -127,6 +127,7 @@ class ResponsesController < ApplicationController
   end
 
   def get_sites
+    # ToDo: change unit_id to unit_code
     render json: Clinic.where(unit: params["unit_id"])
   end
 
