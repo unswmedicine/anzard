@@ -1,6 +1,7 @@
 class Ability
   include CanCan::Ability
 
+  # ToDo: add unit tests for abilities
   def initialize(user)
 
     # aliases for user management actions

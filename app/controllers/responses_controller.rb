@@ -171,8 +171,8 @@ class ResponsesController < ApplicationController
 
   def organised_cycle_ids(user)
     # ToDo: (ANZARD-16 / ANZARD-38) deal with getting cycle ids for all user clinics
-    clinic = user.clinic
-    responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, clinic_id: clinic)
+    clinics = user.clinics
+    responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, clinic_id: clinics)
     responses_by_survey = responses.group_by {|response| response.survey }
     responses_by_survey_and_year = responses_by_survey.map do |survey, responses|
       responses_by_year = responses.group_by{|response| response.year_of_registration }
