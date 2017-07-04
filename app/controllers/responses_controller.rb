@@ -108,15 +108,15 @@ class ResponsesController < ApplicationController
   def download
     set_tab :download, :home
     @survey_id = params[:survey_id]
-    @clinic_id = params[:clinic_id]
+    @unit_code = params[:unit_code]
     @year_of_registration = params[:year_of_registration]
-    @site_id = params[:site_id]
+    @site_code = params[:site_code]
 
     if @survey_id.blank?
       @errors = ["Please select a registration type"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(@survey_id, @clinic_id, @year_of_registration, @site_id)
+      generator = CsvGenerator.new(@survey_id, @unit_code, @year_of_registration, @site_code)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
@@ -127,8 +127,7 @@ class ResponsesController < ApplicationController
   end
 
   def get_sites
-    # ToDo: (ANZARD-16 / ANZARD-38) change unit_id to unit_code
-    render json: Clinic.where(unit: params["unit_id"])
+    render json: Clinic.where(unit_code: params['unit_code'])
   end
 
   def batch_delete

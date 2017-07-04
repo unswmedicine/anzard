@@ -1,13 +1,12 @@
 $(window).load(function () {
     // Populates Site on Unit select function used when preparing the download of completed responses by an admin
-    // ToDo: update to use the right clinic attribute names (could also refactor element ids to be consistent with the approval unit/site function)
-    $('#clinic_id').change(function() {
+    $('#unit_code').change(function() {
         $.ajax({
             type: 'GET',
             url: 'get_sites',
             dataType: 'json',
             async: true,
-            data: {unit_id: $("#clinic_id option:selected").val()},
+            data: {unit_code: $("#unit_code option:selected").val()},
             success: function (data) {
                 var options = '<option value="">ALL</option>';
                 for (var x = 0; x < data.length; x++) {
@@ -15,7 +14,7 @@ $(window).load(function () {
                         options += '<option value="' + data[x]['site_code'] + '">' + data[x]['site_name'] + ' (' + data[x]['site_code'] + ')' + '</option>';
                     }
                 }
-                $('#site_id').html(options);
+                $('#site_code').html(options);
             }
         });
     });

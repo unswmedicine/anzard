@@ -11,7 +11,7 @@ describe CsvGenerator do
     end
 
     it "includes survey name and clinic when clinic set" do
-      expect(CsvGenerator.new(survey.id, clinic.id, "", "").csv_filename).to eq("survey_one_royal_north_shore_kent_street.csv")
+      expect(CsvGenerator.new(survey.id, clinic.unit_code, "", "").csv_filename).to eq("survey_one_royal_north_shore_kent_street.csv")
 
     end
 
@@ -21,7 +21,7 @@ describe CsvGenerator do
     end
 
     it "includes survey name, clinic and year of registration when all are set" do
-      expect(CsvGenerator.new(survey.id, clinic.id, "2009", "").csv_filename).to eq("survey_one_royal_north_shore_kent_street_2009.csv")
+      expect(CsvGenerator.new(survey.id, clinic.unit_code, "2009", "").csv_filename).to eq("survey_one_royal_north_shore_kent_street_2009.csv")
 
     end
 
@@ -34,7 +34,7 @@ describe CsvGenerator do
   describe "Checking for emptiness" do
     it "returns true if there's no matching records" do
       expect(Response).to receive(:for_survey_clinic_and_year_of_registration).with(survey, clinic.id, "2009", "").and_return([])
-      expect(CsvGenerator.new(survey.id, clinic.id, "2009", "")).to be_empty
+      expect(CsvGenerator.new(survey.id, clinic.unit_code, "2009", "")).to be_empty
     end
 
     it "returns false if there's matching records" do

@@ -2,27 +2,25 @@ require 'csv'
 class CsvGenerator
 
   BASIC_HEADERS = %w(TreatmentData YearOfTreatment UnitName SiteName UnitID SiteID CYCLE_ID)
-  attr_accessor :survey_id, :clinic_id, :year_of_registration, :records, :survey, :question_codes, :site_id
+  attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code
 
-  def initialize(survey_id, clinic_id, year_of_registration, site_id)
+  def initialize(survey_id, unit_code, year_of_registration, site_code)
     self.survey_id = survey_id
-    # ToDo: (ANZARD-16 / ANZARD-38) update CSV generator so that it adds the appropriate user clinic to the generated response CSV
-    self.clinic_id = clinic_id
+    self.unit_code = unit_code
+    self.site_code = site_code
     self.year_of_registration = year_of_registration
-    self.site_id = site_id
 
     self.survey = SURVEYS[survey_id.to_i]
     self.question_codes = survey.ordered_questions.collect(&:code)
 
-    self.records = Response.for_survey_clinic_and_year_of_registration(survey, clinic_id, year_of_registration, site_id)
+    self.records = Response.for_survey_clinic_and_year_of_registration(survey, unit_code, year_of_registration, site_code)
   end
 
   def csv_filename
     name_parts = [survey.name.parameterize(separator: '_')]
 
-    unless clinic_id.blank?
-      # ToDo: update so that this searches on unit_code (as this is what clinic_id is referring to here)
-      clinic = Clinic.find_by_unit_code(clinic_id)
+    unless unit_code.blank?
+      clinic = Clinic.find_by_unit_code(unit_code)
       name_parts << clinic.unit_name.parameterize(separator: '_')
       unless clinic.site_name.blank?
         name_parts << clinic.site_name.parameterize(separator: '_')
