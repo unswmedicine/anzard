@@ -33,11 +33,9 @@ class Ability
       can :force_submit, BatchFile do |batch_file|
         batch_file.force_submittable?
       end
-      # Todo: (ANZARD-16 / ANZARD-38) update ability so user (supervisor role) can submit response for all of their clinics
-      can :submit, Response, clinic_id: user.clinic_id, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: [Response::COMPLETE, Response::COMPLETE_WITH_WARNINGS]
+      can :submit, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: [Response::COMPLETE, Response::COMPLETE_WITH_WARNINGS]
     elsif user.role.name == Role::DATA_PROVIDER
-      # Todo: (ANZARD-16 / ANZARD-38) update ability so user (provider role) can submit response to all of their clinics
-      can :submit, Response, clinic_id: user.clinic_id, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: Response::COMPLETE
+      can :submit, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: Response::COMPLETE
     end
 
     case user.role.name
@@ -58,26 +56,26 @@ class Ability
         can :manage, ConfigurationItem
 
       when Role::DATA_PROVIDER
-        # ToDo: (ANZARD-16 / ANZARD-38) Update data provider ability so that they can read, create and update responses for all of their clinics
-        can :read, Response, clinic_id: user.clinic_id, submitted_status: Response::STATUS_UNSUBMITTED
-        can :create, Response, clinic_id: user.clinic_id
-        can :update, Response, clinic_id: user.clinic_id, submitted_status: Response::STATUS_UNSUBMITTED
+        can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :new, Response
+        can :create, Response, clinic_id: user.clinic_ids
+        can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
 
         # ToDo: (ANZARD-16 / ANZARD-38) Update data provider ability so that they can read and create batch files for all of their clinics
-        can :read, BatchFile, clinic_id: user.clinic_id
-        can :create, BatchFile, clinic_id: user.clinic_id
+        can :read, BatchFile, clinic_id: user.clinic_ids
+        can :create, BatchFile, clinic_id: user.clinic_ids
         can :submitted_cycle_ids, Response
 
       when Role::DATA_PROVIDER_SUPERVISOR
-        # ToDo: (ANZARD-16 / ANZARD-38) Update data supervisor ability so that they can read, create, update and destroy responses for all of their clinics
-        can :read, Response, clinic_id: user.clinic_id, submitted_status: Response::STATUS_UNSUBMITTED
-        can :create, Response, clinic_id: user.clinic_id
-        can :update, Response, clinic_id: user.clinic_id, submitted_status: Response::STATUS_UNSUBMITTED
-        can :destroy, Response, clinic_id: user.clinic_id
+        can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :new, Response
+        can :create, Response, clinic_id: user.clinic_ids
+        can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :destroy, Response, clinic_id: user.clinic_ids
 
         # ToDo: (ANZARD-16 / ANZARD-38) Update data supervisor ability so that they can read and create batch files for all of their clinics
-        can :read, BatchFile, clinic_id: user.clinic_id
-        can :create, BatchFile, clinic_id: user.clinic_id
+        can :read, BatchFile, clinic_id: user.clinic_ids
+        can :create, BatchFile, clinic_id: user.clinic_ids
 
         can :submitted_cycle_ids, Response
       else

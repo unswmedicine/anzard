@@ -23,8 +23,6 @@ class ResponsesController < ApplicationController
 
   def create
     @response.user = current_user
-    # ToDo: (ANZARD-16 / ANZARD-38) deal with determining which of the user clinics to associate the data form response to
-    @response.clinic_id = current_user.clinic_id
     @response.submitted_status = Response::STATUS_UNSUBMITTED
     if @response.save
       redirect_to edit_response_path(@response, section: @response.survey.first_section.id), notice: 'Data entry form created'
@@ -170,7 +168,6 @@ class ResponsesController < ApplicationController
   private
 
   def organised_cycle_ids(user)
-    # ToDo: (ANZARD-16 / ANZARD-38) deal with getting cycle ids for all user clinics
     clinics = user.clinics
     responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, clinic_id: clinics)
     responses_by_survey = responses.group_by {|response| response.survey }
@@ -235,7 +232,7 @@ class ResponsesController < ApplicationController
   end
 
   def create_params
-    params.require(:response).permit(:year_of_registration, :survey_id, :cycle_id)
+    params.require(:response).permit(:year_of_registration, :survey_id, :cycle_id, :clinic_id)
   end
 
 end
