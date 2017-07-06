@@ -164,6 +164,7 @@ class BatchFile < ApplicationRecord
       @csv_row_count += 1
       cycle_id = row[CYCLE_ID_COLUMN]
       cycle_id.strip! unless cycle_id.nil?
+      # ToDo: (ANZARD-16) associate each response in the batch file with the clinic id corresponding to the unit and site code within that CSV row
       response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
       add_answers_from_supplementary_files(response, cycle_id)
