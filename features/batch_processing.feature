@@ -4,7 +4,7 @@ Feature: Processing batch files
   I want to the system to process my batch file
 
   Background:
-    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to hospital "RPA"
+    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to clinic "RPA"
     And I have the standard survey setup
 
   Scenario Outline: Invalid files that get rejected before validation

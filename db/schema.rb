@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170517233921) do
+ActiveRecord::Schema.define(version: 20170626021424) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -35,13 +35,32 @@ ActiveRecord::Schema.define(version: 20170517233921) do
     t.integer  "file_file_size"
     t.datetime "file_updated_at"
     t.string   "status"
-    t.integer  "hospital_id"
+    t.integer  "clinic_id"
     t.string   "message"
     t.integer  "record_count"
     t.string   "summary_report_path"
     t.string   "detail_report_path"
     t.integer  "year_of_registration"
     t.index ["survey_id"], name: "index_batch_files_on_survey_id", using: :btree
+  end
+
+  create_table "clinic_allocations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "clinic_id"
+    t.integer  "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["clinic_id"], name: "index_clinic_allocations_on_clinic_id", using: :btree
+    t.index ["user_id"], name: "index_clinic_allocations_on_user_id", using: :btree
+  end
+
+  create_table "clinics", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "state"
+    t.string   "unit_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "unit_code"
+    t.integer  "site_code"
+    t.string   "site_name"
   end
 
   create_table "configuration_items", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -83,16 +102,6 @@ ActiveRecord::Schema.define(version: 20170517233921) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
   end
 
-  create_table "hospitals", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "state"
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "unit"
-    t.integer  "site"
-    t.string   "site_name"
-  end
-
   create_table "question_options", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "question_id"
     t.string   "option_value"
@@ -130,7 +139,7 @@ ActiveRecord::Schema.define(version: 20170517233921) do
     t.string   "cycle_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "hospital_id"
+    t.integer  "clinic_id"
     t.string   "submitted_status"
     t.integer  "batch_file_id"
     t.integer  "year_of_registration"
@@ -186,7 +195,6 @@ ActiveRecord::Schema.define(version: 20170517233921) do
     t.integer  "role_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "hospital_id"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end

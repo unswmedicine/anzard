@@ -4,8 +4,8 @@ Feature: Delete Data Entry Forms in Progress
     I want to be able to delete Data Entry Forms in progress
 
     Background:
-        Given I have a user "data.provider@intersect.org.au" with role "Data Provider" and hospital "RPA"
-        Given I am logged in as "data.supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to hospital "RPA"
+        Given I have a user "data.provider@intersect.org.au" with role "Data Provider" and clinic "RPA"
+        Given I am logged in as "data.supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to clinic "RPA"
         And I have a survey with name "survey" and questions
           | question  | mandatory |
           | Choice Q1 |    true   |

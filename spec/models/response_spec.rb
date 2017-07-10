@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Response do
   describe "Associations" do
     it { should belong_to :user }
-    it { should belong_to :hospital }
+    it { should belong_to :clinic }
     it { should have_many :answers }
     it { should belong_to :batch_file }
   end
@@ -61,36 +61,36 @@ describe Response do
     end
   end
 
-  describe "Getting submitted responses by survey, hospital and year of reg" do
+  describe "Getting submitted responses by survey, clinic and year of reg" do
     before(:each) do
       @survey_a = create(:survey)
       @survey_b = create(:survey)
-      @hospital_a = create(:hospital)
-      @hospital_b = create(:hospital)
-      @r1 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "1").id
-      @r2 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "2").id
-      @r3 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "3").id
-      @r4 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "4").id
-      @r5 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "5").id
-      @r6 = create(:response, survey: @survey_a, hospital: @hospital_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "6").id
-      @r7 = create(:response, survey: @survey_b, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "7").id
-      @r8 = create(:response, survey: @survey_a, hospital: @hospital_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
+      @clinic_a = create(:clinic)
+      @clinic_b = create(:clinic)
+      @r1 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "1").id
+      @r2 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "2").id
+      @r3 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "3").id
+      @r4 = create(:response, survey: @survey_a, clinic: @clinic_b, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "4").id
+      @r5 = create(:response, survey: @survey_a, clinic: @clinic_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "5").id
+      @r6 = create(:response, survey: @survey_a, clinic: @clinic_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "6").id
+      @r7 = create(:response, survey: @survey_b, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "7").id
+      @r8 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
     end
 
-    it "should return all submitted responses for survey when hospital and year of reg not provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
+    it "should return all submitted responses for survey when clinic and year of reg not provided" do
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
     end
 
-    it "should filter by hospital when provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "", "").collect(&:id).should eq([@r1, @r2, @r3])
+    it "should filter by clinic when provided" do
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.id, "", "").collect(&:id).should eq([@r1, @r2, @r3])
     end
 
     it "should filter by year of reg when provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, "", "2001", "").collect(&:id).should eq([@r1, @r2, @r4])
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "2001", "").collect(&:id).should eq([@r1, @r2, @r4])
     end
 
-    it "should filter by hospital and year of reg when both provided" do
-      Response.for_survey_hospital_and_year_of_registration(@survey_a, @hospital_a.id, "2001", "").collect(&:id).should eq([@r1, @r2])
+    it "should filter by clinic and year of reg when both provided" do
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.id, "2001", "").collect(&:id).should eq([@r1, @r2])
     end
   end
 

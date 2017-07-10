@@ -8,13 +8,13 @@ Feature: Delete batches of responses
     And I have a user "administrator@intersect.org.au" with role "Administrator"
     And I am logged in as "administrator@intersect.org.au"
     And I have year of registration range configured as "2000" to "2010"
-    And I have hospitals
+    And I have clinics
       | name                         | state |
       | RPA                          | NSW   |
       | Royal North Shore            | NSW   |
-      | Mercy Hospital               | Vic   |
-      | The Royal Childrens Hospital | Vic   |
-      | Sydney Childrens Hospital    | NSW   |
+      | Mercy Clinic               | Vic   |
+      | The Royal Childrens Clinic | Vic   |
+      | Sydney Childrens Clinic    | NSW   |
       | Another One                  | NSW   |
     And I have a survey with name "Survey A"
     And I have a survey with name "Survey B"

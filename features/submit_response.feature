@@ -9,8 +9,8 @@ Feature: Submit Response
   Background:
     Given I have the usual roles
     And I have a user "superuser@intersect.org.au" with role "Administrator"
-    And I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to hospital "ABC Hospital"
-    And I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to hospital "ABC Hospital"
+    And I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to clinic "ABC Clinic"
+    And I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to clinic "ABC Clinic"
     And I have a survey with name "The Survey" and questions
       | section | question   | question_type | number_min | mandatory |
       | 1       | Text Qn    | Text          |            | true      |

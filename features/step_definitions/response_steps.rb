@@ -29,11 +29,11 @@ def create_response(survey, email, cycleid = 'cycleid123', year_of_reg = "2005",
   user = User.find_by_email(email)
   submitted_status = submitted ? Response::STATUS_SUBMITTED : Response::STATUS_UNSUBMITTED
   if id
-    Response.create!(survey: survey, cycle_id: cycleid, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status) do |r|
+    Response.create!(survey: survey, cycle_id: cycleid, year_of_registration: year_of_reg, user: user, clinic: user.clinic, submitted_status: submitted_status) do |r|
       r.id = id
     end 
   else
-    Response.create!(survey: survey, cycle_id: cycleid, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status)
+    Response.create!(survey: survey, cycle_id: cycleid, year_of_registration: year_of_reg, user: user, clinic: user.clinic, submitted_status: submitted_status)
   end
 end
 
@@ -464,11 +464,11 @@ Given /^I fill in the year of registration range with "([^"]*)" and "([^"]*)"$/ 
 end
 
 When /^I have a range of responses$/ do
-  rpa = Hospital.find_by_name!("RPA")
-  rns = Hospital.find_by_name!("Royal North Shore")
-  mh = Hospital.find_by_name!("Mercy Hospital")
-  rc = Hospital.find_by_name!("The Royal Childrens Hospital")
-  sc = Hospital.find_by_name!("Sydney Childrens Hospital")
+  rpa = Clinic.find_by_unit_name!("RPA")
+  rns = Clinic.find_by_unit_name!("Royal North Shore")
+  mh = Clinic.find_by_unit_name!("Mercy Clinic")
+  rc = Clinic.find_by_unit_name!("The Royal Childrens Clinic")
+  sc = Clinic.find_by_unit_name!("Sydney Childrens Clinic")
 
   survey_a = Survey.find_by_name!("Survey A")
   survey_b = Survey.find_by_name!("Survey B")
@@ -490,12 +490,12 @@ When /^I have a range of responses$/ do
   create_responses({unsubmitted: [0, 0, 1], submitted: [0, 0, 0]}, sc, survey_b)
 end
 
-def create_responses(counts, hospital, survey)
-  user = Factory(:user, hospital: hospital)
+def create_responses(counts, clinic, survey)
+  user = Factory(:user, clinic: clinic)
   counts[:unsubmitted].each_with_index do |required_number, index|
     required_number.times do |i|
       Factory(:response,
-              hospital: hospital,
+              clinic: clinic,
               submitted_status: Response::STATUS_UNSUBMITTED,
               survey: survey,
               year_of_registration: (2009 + index),
@@ -506,7 +506,7 @@ def create_responses(counts, hospital, survey)
   counts[:submitted].each_with_index do |required_number, index|
     required_number.times do |i|
       Factory(:response,
-              hospital: hospital,
+              clinic: clinic,
               submitted_status: Response::STATUS_SUBMITTED,
               survey: survey,
               year_of_registration: (2009 + index),
@@ -524,10 +524,10 @@ Given /^I have responses$/ do |table|
   table.hashes.each do |attrs|
     survey_name = attrs.delete('survey')
     survey = survey_name.blank? ? Factory(:survey) : Survey.find_by_name!(survey_name)
-    hospital_name = attrs.delete('hospital')
-    hospital = hospital_name.blank? ? Factory(:hospital) : Hospital.find_by_name!(hospital_name)
-    user = Factory(:user, hospital: hospital)
-    Factory(:response, attrs.merge(survey: survey, user: user, hospital: hospital))
+    clinic_name = attrs.delete('clinic')
+    clinic = clinic_name.blank? ? Factory(:clinic) : Clinic.find_by_unit_name!(clinic_name)
+    user = Factory(:user, clinic: clinic)
+    Factory(:response, attrs.merge(survey: survey, user: user, clinic: clinic))
   end
 end
 

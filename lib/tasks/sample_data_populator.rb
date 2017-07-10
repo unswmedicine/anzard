@@ -28,26 +28,26 @@ def create_responses(big)
   main = Survey.where(:name => 'ANZARD data form').first
 
   # remove the one dataprovider is linked to as we'll create those separately
-  dp_hospital = User.find_by_email!('dataprovider@intersect.org.au').hospital
-  hospitals = Hospital.where.not(id: dp_hospital.id)
+  dp_clinics = User.find_by_email!('dataprovider@intersect.org.au').clinics
+  clinics = Clinic.where.not(id: dp_clinics.pluck(:id))
 
   count1 = big ? 100 : 20
   count2 = big ? 30 : 5
   count3 = big ? 500 : 50
 
-  count1.times { create_response(main, ALL_MANDATORY, hospitals.sample) }
-  count2.times { create_response(main, ALL, hospitals.sample) }
-  #count2.times { create_response(main, FEW, hospitals.sample) }
+  count1.times { create_response(main, ALL_MANDATORY, clinics.sample) }
+  count2.times { create_response(main, ALL, clinics.sample) }
+  #count2.times { create_response(main, FEW, clinics.sample) }
 
-  create_response(main, ALL_MANDATORY, dp_hospital)
-  create_response(main, ALL, dp_hospital)
-  #create_response(main, FEW, dp_hospital)
+  create_response(main, ALL_MANDATORY, dp_clinics.first)
+  create_response(main, ALL, dp_clinics.first)
+  #create_response(main, FEW, dp_clinic)
 
   create_batch_files(main)
 
   # create some submitted ones (this is a bit dodgy since they aren't valid, but its too hard to create valid ones in code)
-  count3.times { create_response(main, ALL_MANDATORY, hospitals.sample, true) }
-  count3.times { create_response(main, ALL, hospitals.sample, true) }
+  count3.times { create_response(main, ALL_MANDATORY, clinics.sample, true) }
+  count3.times { create_response(main, ALL, clinics.sample, true) }
 
 end
 
@@ -70,6 +70,7 @@ def create_survey_from_lib_tasks(name, question_file, options_file, cross_questi
 end
 
 def create_test_users
+  create_user(email: "admin@intersect.org.au", first_name: "Administrator", last_name: "Intersect")
   create_user(email: "georgina@intersect.org.au", first_name: "Georgina", last_name: "Edwards")
   create_user(email: "alexb@intersect.org.au", first_name: "Alex", last_name: "Bradner")
   create_user(email: "kali@intersect.org.au", first_name: "Kali", last_name: "Waterford")
@@ -80,22 +81,22 @@ def create_test_users
   create_user(email: "supervisor2@intersect.org.au", first_name: "Data", last_name: "Supervisor2")
   create_unapproved_user(email: "unapproved1@intersect.org.au", first_name: "Unapproved", last_name: "One")
   create_unapproved_user(email: "unapproved2@intersect.org.au", first_name: "Unapproved", last_name: "Two")
+  set_role("admin@intersect.org.au", "Administrator")
   set_role("georgina@intersect.org.au", "Administrator")
   set_role("alexb@intersect.org.au", "Administrator")
   set_role("kali@intersect.org.au", "Administrator")
   set_role("ryan@intersect.org.au", "Administrator")
-  set_role("dataprovider@intersect.org.au", "Data Provider", Hospital.first.id)
-  set_role("supervisor@intersect.org.au", "Data Provider Supervisor", Hospital.first.id)
-  set_role("dataprovider2@intersect.org.au", "Data Provider", Hospital.last.id)
-  set_role("supervisor2@intersect.org.au", "Data Provider Supervisor", Hospital.last.id)
+  set_role("dataprovider@intersect.org.au", "Data Provider", Clinic.first.id)
+  set_role("supervisor@intersect.org.au", "Data Provider Supervisor", Clinic.first.id)
+  set_role("dataprovider2@intersect.org.au", "Data Provider", Clinic.last.id)
+  set_role("supervisor2@intersect.org.au", "Data Provider Supervisor", Clinic.last.id)
 end
 
-def set_role(email, role, hospital_id=nil)
+def set_role(email, role, clinic_id=nil)
   user = User.find_by_email(email)
   role = Role.find_by_name(role)
-  hospital = Hospital.find(hospital_id) unless hospital_id.nil?
   user.role = role
-  user.hospital = hospital
+  user.clinics = [Clinic.find(clinic_id)] unless clinic_id.nil?
   user.save!
 end
 
@@ -137,7 +138,7 @@ def load_password
 
 end
 
-def create_response(survey, profile, hospital, submit=false)
+def create_response(survey, profile, clinic, submit=false)
   status = Response::STATUS_UNSUBMITTED
   year_of_reg = 2007
   base_date = random_date_in(2007)
@@ -149,9 +150,9 @@ def create_response(survey, profile, hospital, submit=false)
              when FEW
                "small"
            end
-  response = Response.create!(hospital: hospital,
+  response = Response.create!(clinic: clinic,
                               submitted_status: status,
-                              cycle_id: "#{prefix}-#{hospital.name}-#{rand(10000000)}",
+                              cycle_id: "#{prefix}-#{clinic.unit_name}-#{rand(10000000)}",
                               survey: survey,
                               year_of_registration: year_of_reg,
                               user: User.all.sample)

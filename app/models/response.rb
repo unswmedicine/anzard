@@ -8,7 +8,7 @@ class Response < ApplicationRecord
   COMPLETE_WITH_WARNINGS = 'Complete with warnings'
 
   belongs_to :user
-  belongs_to :hospital
+  belongs_to :clinic
   belongs_to :batch_file
   belongs_to :survey
 
@@ -17,7 +17,7 @@ class Response < ApplicationRecord
   validates_presence_of :cycle_id
   validates_presence_of :user
   validates_presence_of :survey_id
-  validates_presence_of :hospital_id
+  validates_presence_of :clinic_id
   validates_presence_of :year_of_registration
   validates_inclusion_of :submitted_status, in: [STATUS_UNSUBMITTED, STATUS_SUBMITTED]
   validates_uniqueness_of :cycle_id, scope: :survey_id
@@ -46,12 +46,12 @@ class Response < ApplicationRecord
     self.survey_id = survey.id
   end
 
-  def self.for_survey_hospital_and_year_of_registration(survey, hospital_id, year_of_registration, site_id)
+  def self.for_survey_clinic_and_year_of_registration(survey, unit_code, year_of_registration, site_code)
     results = submitted.for_survey(survey).order(:cycle_id)
-    results = results.joins(:hospital).where(:hospitals => {:unit => hospital_id}) unless hospital_id.blank?
-    results = results.joins(:hospital).where(:hospitals => {:site => site_id}) unless site_id.blank?
+    results = results.joins(:clinic).where(:clinics => {:unit_code => unit_code}) unless unit_code.blank?
+    results = results.joins(:clinic).where(:clinics => {:site_code => site_code}) unless site_code.blank?
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
-    results.includes([:hospital])
+    results.includes([:clinic])
   end
 
   def self.count_per_survey_and_year_of_registration(survey_id, year)

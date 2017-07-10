@@ -1,27 +1,32 @@
 .clearfix
-  = f.label :role_id, "Role"
+  = f.label :role_id, 'Role'
   .input
     = f.collection_select :role_id, @roles, :id, :name, {include_blank: ""}, {class: 'large'}
-.clearfix#hospital_fields
-  = f.label :hospital_id, "Clinic"
-  .input
-    = f.select :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state_with_site_name, @user.hospital_id), {include_blank: ""}
 
+.clearfix#clinic_units
+  = label_tag :clinic_unit, 'Clinic'
+  .input
+    = select_tag :clinic_unit, grouped_options_for_select(Clinic.clinics_by_state_and_unique_by_unit), include_blank: true, class: 'large'
+
+.clearfix
+  = f.label :clinics, 'Sites'
+  .input#user_clinics
+    -# Placeholder for the list of clinic sites that gets populated by AJAX upon selection of a clinic unit
 
 :javascript
   $(window).load(function() {
-    hide_hospital_if_required();
+    hide_clinic_if_required();
   });
 
   $('#user_role_id').change(function() {
-    hide_hospital_if_required();
+    hide_clinic_if_required();
   });
 
-  function hide_hospital_if_required() {
+  function hide_clinic_if_required() {
     if ($('#user_role_id :selected').text() == "#{Role.super_user_role}") {
-      $('#hospital_fields').hide();
+      $('#clinic_fields').hide();
     } else {
-      $('#hospital_fields').show();
+      $('#clinic_fields').show();
     }
   }
 

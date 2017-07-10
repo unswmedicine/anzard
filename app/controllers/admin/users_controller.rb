@@ -1,6 +1,6 @@
 class Admin::UsersController < Admin::AdminBaseController
 
-  ALLOWED_SORT_COLUMNS = %w(email first_name last_name hospitals.name roles.name status last_sign_in_at)
+  ALLOWED_SORT_COLUMNS = %w(email first_name last_name clinics.name roles.name status last_sign_in_at)
   load_and_authorize_resource
   helper_method :sort_column, :sort_direction
 
@@ -9,13 +9,18 @@ class Admin::UsersController < Admin::AdminBaseController
     sort = sort_column + ' ' + sort_direction
     sort = sort + ", email ASC" unless sort_column == "email" # add email as a secondary sort so its predictable when there's multiple values
 
-    @users = User.deactivated_or_approved.includes(:role).includes(:hospital).order(sort)
+    @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
 
-    @hospital_filter = params[:hospital_filter]
-    if @hospital_filter == "None"
-      @users = @users.where("users.hospital_id IS NULL")
-    elsif !@hospital_filter.blank?
-      @users = @users.where(hospital_id: @hospital_filter)
+    @clinic_filter = params[:clinic_filter]
+    if @clinic_filter == 'None'
+      @users = @users.where('users.id NOT IN (SELECT user_id FROM clinic_allocations)')
+    elsif !@clinic_filter.blank?
+      matching_clinic_allocations = ClinicAllocation.where(clinic_id: @clinic_filter, user_id: @users.pluck(:id))
+      if matching_clinic_allocations.nil?
+        @users = nil
+      else
+        @users = @users.where(id: matching_clinic_allocations.pluck(:user_id))
+      end
     end
   end
 
@@ -70,13 +75,14 @@ class Admin::UsersController < Admin::AdminBaseController
       redirect_to(edit_role_admin_user_path(@user), alert: "Please select a role for the user.")
     else
       @user.role_id = params[:user][:role_id]
-      @user.hospital_id = params[:user][:hospital_id]
+      # ToDo: (ANZARD-32) Handle updating the user role ensuring to not allow the changing of units
+      @user.clinics = Clinic.find(params[:user][:clinics].reject{ |clinic_id| clinic_id.blank? })
       if !@user.check_number_of_superusers(params[:id], current_user.id)
         redirect_to(edit_role_admin_user_path(@user), alert: "Only one superuser exists. You cannot change this role.")
       elsif @user.save
         redirect_to(admin_user_path(@user), notice: "The access level for #{@user.email} was successfully updated.")
       else
-        redirect_to(edit_role_admin_user_path(@user), alert: "All non-superusers must be assigned a hospital")
+        redirect_to(edit_role_admin_user_path(@user), alert: "All non-superusers must be assigned a clinic")
       end
     end
   end
@@ -86,14 +92,19 @@ class Admin::UsersController < Admin::AdminBaseController
       redirect_to(edit_approval_admin_user_path(@user), alert: "Please select a role for the user.")
     else
       @user.role_id = params[:user][:role_id]
-      @user.hospital_id = params[:user][:hospital_id]
+      @user.clinics = Clinic.find(params[:user][:clinics].reject{ |clinic_id| clinic_id.blank? })
       if @user.save
         @user.approve_access_request
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")
       else
-        redirect_to(edit_approval_admin_user_path(@user), alert: "All non-superusers must be assigned a hospital")
+        redirect_to(edit_approval_admin_user_path(@user), alert: "All non-superusers must be assigned a clinic")
       end
     end
+  end
+
+
+  def get_sites
+    render json: Clinic.where(unit_code: params['unit_code'])
   end
 
   private

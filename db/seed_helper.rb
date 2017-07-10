@@ -13,17 +13,15 @@ def create_config_items
 end
 
 def create_clinics
-  Hospital.delete_all
+  Clinic.delete_all
 
   clinics = read_hashes_from_csv(Rails.root.join("db/seed_files", "clinics.csv"))
   clinics.each do |hash|
-    #Hospital.create!(hash)
-
-    hospital = Hospital.new(name: hash['Unit_Name'].strip,
-                            state:hash['State'].strip,
-                            unit: hash['Unit'].strip,
-                            site: hash['Site'].strip,
-                            site_name: hash['Site_Name'].strip)
-    hospital.save!
+    clinic = Clinic.new(state:hash['State'].strip,
+                        unit_name: hash['Unit_Name'].strip,
+                        unit_code: hash['Unit_Code'].strip,
+                        site_name: hash['Site_Name'].strip,
+                        site_code: hash['Site_Code'].strip)
+    clinic.save!
   end
 end

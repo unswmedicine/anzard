@@ -1,6 +1,7 @@
 class Ability
   include CanCan::Ability
 
+  # ToDo: add unit tests for abilities
   def initialize(user)
 
     # aliases for user management actions
@@ -32,15 +33,16 @@ class Ability
       can :force_submit, BatchFile do |batch_file|
         batch_file.force_submittable?
       end
-      can :submit, Response, hospital_id: user.hospital_id, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: [Response::COMPLETE, Response::COMPLETE_WITH_WARNINGS]
+      can :submit, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: [Response::COMPLETE, Response::COMPLETE_WITH_WARNINGS]
     elsif user.role.name == Role::DATA_PROVIDER
-      can :submit, Response, hospital_id: user.hospital_id, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: Response::COMPLETE
+      can :submit, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: Response::COMPLETE
     end
 
     case user.role.name
       when Role::SUPER_USER
         can :read, User
         can :update, User
+        can :get_sites, User
 
         can :read, Response
         can :stats, Response
@@ -54,22 +56,32 @@ class Ability
         can :manage, ConfigurationItem
 
       when Role::DATA_PROVIDER
-        can :read, Response, hospital_id: user.hospital_id, submitted_status: Response::STATUS_UNSUBMITTED
-        can :create, Response, hospital_id: user.hospital_id
-        can :update, Response, hospital_id: user.hospital_id, submitted_status: Response::STATUS_UNSUBMITTED
+        can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :new, Response
+        can :create, Response, clinic_id: user.clinic_ids
+        can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
 
-        can :read, BatchFile, hospital_id: user.hospital_id
-        can :create, BatchFile, hospital_id: user.hospital_id
+        # ToDo: (ANZARD-16 / ANZARD-38) Update data provider ability so that they can read and create batch files for all of their clinics
+        can :read, BatchFile, clinic_id: user.clinic_ids
+        can :new, BatchFile
+        # ToDo: add batch file restriction so provider can only create a batch file for their clinics.
+        # can :create, BatchFile, clinic_id: user.clinic_ids
+        can :create, BatchFile
         can :submitted_cycle_ids, Response
 
-    when Role::DATA_PROVIDER_SUPERVISOR
-        can :read, Response, hospital_id: user.hospital_id, submitted_status: Response::STATUS_UNSUBMITTED
-        can :create, Response, hospital_id: user.hospital_id
-        can :update, Response, hospital_id: user.hospital_id, submitted_status: Response::STATUS_UNSUBMITTED
-        can :destroy, Response, hospital_id: user.hospital_id
+      when Role::DATA_PROVIDER_SUPERVISOR
+        can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :new, Response
+        can :create, Response, clinic_id: user.clinic_ids
+        can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :destroy, Response, clinic_id: user.clinic_ids
 
-        can :read, BatchFile, hospital_id: user.hospital_id
-        can :create, BatchFile, hospital_id: user.hospital_id
+        # ToDo: (ANZARD-16 / ANZARD-38) Update data supervisor ability so that they can read and create batch files for all of their clinics
+        can :read, BatchFile, clinic_id: user.clinic_ids
+        can :new, BatchFile
+        # ToDo: add batch file restriction so supervisor can only create a batch file for their clinics.
+        # can :create, BatchFile, clinic_id: user.clinic_ids
+        can :create, BatchFile
 
         can :submitted_cycle_ids, Response
       else
