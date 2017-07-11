@@ -76,7 +76,7 @@ class Admin::UsersController < Admin::AdminBaseController
     else
       @user.role_id = params[:user][:role_id]
       # ToDo: (ANZARD-32) Handle updating the user role ensuring to not allow the changing of units
-      @user.clinics = Clinic.find(params[:user][:clinics].reject{ |clinic_id| clinic_id.blank? })
+      @user.clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
       if !@user.check_number_of_superusers(params[:id], current_user.id)
         redirect_to(edit_role_admin_user_path(@user), alert: "Only one superuser exists. You cannot change this role.")
       elsif @user.save

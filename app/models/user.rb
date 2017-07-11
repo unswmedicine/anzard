@@ -157,6 +157,15 @@ class User < ApplicationRecord
     user.role.super_user?
   end
 
+  def unit_code
+    # Users can only be allocated to a single clinic Unit, Admins are assigned to none
+    if self.clinics.empty?
+      nil
+    else
+      self.clinics.first.unit_code
+    end
+  end
+
   private
 
   def clear_super_user_clinic
