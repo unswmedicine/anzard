@@ -87,7 +87,6 @@ class Admin::UsersController < Admin::AdminBaseController
         elsif @user.save
           redirect_to(admin_user_path(@user), notice: "The access level for #{@user.email} was successfully updated.")
         else
-
           redirect_to(edit_role_admin_user_path(@user), alert: "All non-superusers must be assigned a clinic")
         end
       end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170626021424) do
+ActiveRecord::Schema.define(version: 20170712040648) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -35,12 +35,12 @@ ActiveRecord::Schema.define(version: 20170626021424) do
     t.integer  "file_file_size"
     t.datetime "file_updated_at"
     t.string   "status"
-    t.integer  "clinic_id"
     t.string   "message"
     t.integer  "record_count"
     t.string   "summary_report_path"
     t.string   "detail_report_path"
     t.integer  "year_of_registration"
+    t.integer  "clinic_id"
     t.index ["survey_id"], name: "index_batch_files_on_survey_id", using: :btree
   end
 
@@ -195,6 +195,7 @@ ActiveRecord::Schema.define(version: 20170626021424) do
     t.integer  "role_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "allocated_unit_code"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end

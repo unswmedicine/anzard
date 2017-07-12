@@ -8,6 +8,10 @@ describe ClinicAllocation do
   end
 
   describe 'Validations' do
+    it { should validate_presence_of(:user) }
+    it { should validate_presence_of(:user_id) }
+    it { should validate_presence_of(:clinic) }
+    it { should validate_presence_of(:clinic_id) }
     it { should validate_uniqueness_of(:user_id).scoped_to(:clinic_id).with_message('has already been added to specified Clinic') }
 
     describe 'user can only be allocated to clinics within same unit' do
@@ -22,6 +26,7 @@ describe ClinicAllocation do
         clinic2 = create(:clinic, unit_code: 100, site_code: 2, unit_name: 'unit 100', site_name: 'site 2')
         allocation1 = create(:clinic_allocation, user: user, clinic: clinic1)
         expect(allocation1).to be_valid
+
         allocation2 = build(:clinic_allocation, user: user, clinic: clinic2)
         expect(allocation2).to be_valid
       end
@@ -29,15 +34,50 @@ describe ClinicAllocation do
       it 'should not allow a user to be associated with multiple clinics from different units' do
         user = create(:user)
         clinic1 = create(:clinic, unit_code: 100, site_code: 1, unit_name: 'unit 100', site_name: 'site 1')
-        clinic2 = create(:clinic, unit_code: 200, site_code: 1, unit_name: 'unit 200', site_name: 'site 1')
         allocation1 = create(:clinic_allocation, user: user, clinic: clinic1)
         expect(allocation1).to be_valid
+
+        clinic2 = create(:clinic, unit_code: 200, site_code: 1, unit_name: 'unit 200', site_name: 'site 1')
         allocation2 = build(:clinic_allocation, user: user, clinic: clinic2)
         expect(allocation2).to_not be_valid
         expect(allocation2.errors[:clinic_id]).to eq(['User is already allocated to clinic unit_code 100'])
       end
     end
 
+    it 'should not allow a user to have all of their associations with one unit removed and added to a new unit' do
+      user = create(:user)
+      clinic1 = create(:clinic, unit_code: 100, site_code: 1, unit_name: 'unit 100', site_name: 'site 1')
+      allocation1 = create(:clinic_allocation, user: user, clinic: clinic1)
+      expect(allocation1).to be_valid
+      allocation1.delete
+
+      clinic2 = create(:clinic, unit_code: 200, site_code: 1, unit_name: 'unit 200', site_name: 'site 1')
+      allocation2 = build(:clinic_allocation, user: user, clinic: clinic2)
+      expect(allocation2).to_not be_valid
+      expect(allocation2.errors[:clinic_id]).to eq(['User is already allocated to clinic unit_code 100'])
+    end
+  end
+
+  describe 'allocate clinic unit code to user' do
+    it 'should allocate the clinic unit code to the user if previously nil' do
+      user = create(:user)
+      clinic = create(:clinic, unit_code: 100, site_code: 1, unit_name: 'unit 100', site_name: 'site 1')
+      create(:clinic_allocation, user: user, clinic: clinic)
+      expect(user.allocated_unit_code).to eq(100)
+    end
+
+    it 'should not overwrite any existing user clinic unit code allocation' do
+      user = create(:user)
+      clinic1 = create(:clinic, unit_code: 100, site_code: 1, unit_name: 'unit 100', site_name: 'site 1')
+      create(:clinic_allocation, user: user, clinic: clinic1)
+      expect(user.allocated_unit_code).to eq(100)
+
+      clinic2 = create(:clinic, unit_code: 200, site_code: 1, unit_name: 'unit 200', site_name: 'site 1')
+      allocation2 = build(:clinic_allocation, user: user, clinic: clinic2)
+      expect(allocation2).to_not be_valid
+      expect(allocation2.errors[:clinic_id]).to eq(['User is already allocated to clinic unit_code 100'])
+      expect(user.allocated_unit_code).to eq(100)
+    end
   end
 
 end
