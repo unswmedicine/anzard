@@ -8,7 +8,7 @@
   .input
     = select_tag :clinic_unit, grouped_options_for_select(Clinic.clinics_by_state_and_unique_by_unit, @user.allocated_unit_code), include_blank: true, disabled: disable_unit_select, class: 'large'
 
-.clearfix
+.clearfix#clinic_sites
   = f.label :clinic_ids, 'Sites'
   .input#user_clinics
     -# Collection checkbox used for initial rendering and editing access level. The content of this input is replaced by JS when the user selects a different unit.
@@ -27,9 +27,11 @@
 
   function hide_clinic_if_required() {
     if ($('#user_role_id :selected').text() == "#{Role.super_user_role}") {
-      $('#clinic_fields').hide();
+      $('#clinic_units').hide();
+      $('#clinic_sites').hide();
     } else {
-      $('#clinic_fields').show();
+      $('#clinic_units').show();
+      $('#clinic_sites').show();
     }
   }
 
