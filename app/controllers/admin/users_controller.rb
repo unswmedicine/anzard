@@ -1,6 +1,6 @@
 class Admin::UsersController < Admin::AdminBaseController
 
-  ALLOWED_SORT_COLUMNS = %w(email first_name last_name clinics.name roles.name status last_sign_in_at)
+  ALLOWED_SORT_COLUMNS = %w(email first_name last_name allocated_unit_code roles.name status last_sign_in_at)
   load_and_authorize_resource
   helper_method :sort_column, :sort_direction
 
