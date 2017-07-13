@@ -49,11 +49,9 @@
       - else
         = @user.last_sign_in_at.localtime.strftime("%d/%m/%Y %I:%M%p")
   = render_field "Role", (@user.role ? @user.role.name : "(None set)")
-  -# ToDo: (ANZARD-33) Display all user clinics in a more user friendly manner on this page (User Details)
   - if @user.clinics.count > 0
-    - clinics_list = ''
-    - @user.clinics.each { |clinic| clinics_list += "#{clinic.unit_name} - #{clinic.site_name} (#{clinic.state}), "}
-    = render_field 'Clinics', clinics_list
+    = render_field 'Clinic', @user.clinics.first.unit_name_with_code
+    = render_field 'Site(s)', @user.clinics.map { |clinic| "#{clinic.site_name_with_code} - #{clinic.state}" }.join(', ')
   = render_field_with_block "Status" do
     - if @user.status == 'A'
       Active
