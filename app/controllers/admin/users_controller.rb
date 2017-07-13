@@ -98,7 +98,7 @@ class Admin::UsersController < Admin::AdminBaseController
       redirect_to(edit_approval_admin_user_path(@user), alert: "Please select a role for the user.")
     else
       @user.role_id = params[:user][:role_id]
-      @user.clinics = Clinic.find(params[:user][:clinics].reject{ |clinic_id| clinic_id.blank? })
+      @user.clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
       if @user.save
         @user.approve_access_request
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")
