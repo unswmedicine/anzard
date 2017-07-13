@@ -20,6 +20,10 @@ class Clinic < ApplicationRecord
     "(#{unit_code}) #{unit_name}"
   end
 
+  def site_name_with_code
+    "(#{site_code}) #{site_name}"
+  end
+
   def site_name_with_full_code
     "(#{unit_code}-#{site_code}) #{site_name}"
   end
