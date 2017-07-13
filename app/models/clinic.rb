@@ -32,10 +32,6 @@ class Clinic < ApplicationRecord
     where(unit_code: unit_code)
   end
 
-  def self.clinics_by_state
-    clinics_by_state_with_unit_or_with_or_without_site_name(WITHOUT_SITE_NAME)
-  end
-
   def self.clinics_by_state_with_site_name
     clinics_by_state_with_unit_or_with_or_without_site_name(WITH_SITE_NAME)
   end
@@ -47,16 +43,13 @@ class Clinic < ApplicationRecord
   private
 
   def self.clinics_by_state_with_unit_or_with_or_without_site_name(with_site_name_or_unit)
-    clinics = order(:unit_name).all
+    clinics = order(:unit_name, :site_name).all
     grouped = clinics.group_by(&:state)
 
     output = case with_site_name_or_unit
-               when WITHOUT_SITE_NAME
-                 grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.unit_name, h.id] }] }
                when WITH_SITE_NAME
                  grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.site_name.blank? ?  h.unit_name : h.unit_name + ' - ' + h.site_name, h.id] }] }
                when WITH_UNIT
-                 # Todo: figure out why this is using unit_code as the value rather than the clinic id
                  grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.unit_name + ' (' + h.unit_code.to_s + ')', h.unit_code] }] }
              end
 
