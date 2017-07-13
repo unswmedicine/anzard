@@ -79,7 +79,7 @@ class Admin::UsersController < Admin::AdminBaseController
       updated_user_clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
       if updated_user_clinics.empty? && !@user.super_user?
         # Don't modify clinic association (which doesn't revert if clinic is invalid) if clinic set is empty and user isn't admin.
-        redirect_to(edit_role_admin_user_path(@user), alert: "All non-superusers must be assigned a clinic")
+        redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Clinic and Site(s)')
       else
         @user.clinics = updated_user_clinics
         if !@user.check_number_of_superusers(params[:id], current_user.id)
@@ -87,7 +87,7 @@ class Admin::UsersController < Admin::AdminBaseController
         elsif @user.save
           redirect_to(admin_user_path(@user), notice: "The access level for #{@user.email} was successfully updated.")
         else
-          redirect_to(edit_role_admin_user_path(@user), alert: "All non-superusers must be assigned a clinic")
+          redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Clinic and Site(s)')
         end
       end
     end
@@ -103,7 +103,7 @@ class Admin::UsersController < Admin::AdminBaseController
         @user.approve_access_request
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")
       else
-        redirect_to(edit_approval_admin_user_path(@user), alert: "All non-superusers must be assigned a clinic")
+        redirect_to(edit_approval_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Clinic and Site(s)')
       end
     end
   end
