@@ -7,21 +7,12 @@ class Admin::UsersController < Admin::AdminBaseController
   def index
     set_tab :users, :admin_navigation
     sort = sort_column + ' ' + sort_direction
-    sort = sort + ", email ASC" unless sort_column == "email" # add email as a secondary sort so its predictable when there's multiple values
+    sort = sort + ', email ASC' unless sort_column == 'email' # add email as a secondary sort so its predictable when there's multiple values
 
     @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
-
-    @clinic_filter = params[:clinic_filter]
-    if @clinic_filter == 'None'
-      @users = @users.where('users.id NOT IN (SELECT user_id FROM clinic_allocations)')
-    elsif !@clinic_filter.blank?
-      matching_clinic_allocations = ClinicAllocation.where(clinic_id: @clinic_filter, user_id: @users.pluck(:id))
-      if matching_clinic_allocations.nil?
-        @users = nil
-      else
-        @users = @users.where(id: matching_clinic_allocations.pluck(:user_id))
-      end
-    end
+    @clinic_filter = { unit: params[:clinic_unit_filter], unit_and_site: params[:clinic_site_filter] }
+    filter_users @clinic_filter[:unit], Clinic.where(unit_code: @clinic_filter[:unit])
+    filter_users @clinic_filter[:unit_and_site], @clinic_filter[:unit_and_site]
   end
 
   def show
@@ -124,6 +115,19 @@ class Admin::UsersController < Admin::AdminBaseController
 
   def user_params
     params.require(:user).permit(:email, :password, :password_confirmation, :first_name, :last_name)
+  end
+
+  def filter_users(selected_filter_option, clinic_ids)
+    if selected_filter_option == 'None'
+      @users = @users.where('users.id NOT IN (SELECT user_id FROM clinic_allocations)')
+    elsif !selected_filter_option.blank?
+      matching_clinic_allocations = ClinicAllocation.where(clinic_id: clinic_ids, user_id: @users.pluck(:id))
+      if matching_clinic_allocations.nil?
+        @users = nil
+      else
+        @users = @users.where(id: matching_clinic_allocations.pluck(:user_id))
+      end
+    end
   end
 
 end

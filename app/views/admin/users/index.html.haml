@@ -1,14 +1,22 @@
 - content_for :tabs do
-  = render "tabs"
+  = render 'tabs'
 
 - title 'Current Users'
-= form_tag admin_users_path, method: :get do
-  = label_tag :clinic_filter, 'Filter by clinic'
-  &nbsp;
-  = select_tag :clinic_filter, clinic_filter_options(@clinic_filter), {class: 'large'}
+
+= form_tag admin_users_path, method: :get, id:'filter_by_unit', class: 'user_filter' do
+  = label_tag :clinic_unit_filter, 'Filter by Clinic'
+  = select_tag :clinic_unit_filter, clinic_unit_filter_options(@clinic_filter[:unit]), {class: 'large'}
   = hidden_field_tag :sort, sort_column
   = hidden_field_tag :direction, sort_direction
-  = submit_tag "Filter"
+  = submit_tag 'Filter'
+
+= form_tag admin_users_path, method: :get, id: 'filter_by_site', class: 'user_filter'  do
+  = label_tag :clinic_site_filter, 'Filter by Site'
+  = select_tag :clinic_site_filter, clinic_site_filter_options(@clinic_filter[:unit_and_site]), {class: 'large'}
+  = hidden_field_tag :sort, sort_column
+  = hidden_field_tag :direction, sort_direction
+  = submit_tag 'Filter'
+
 %table#users
   %thead
     %tr.sortable
