@@ -99,7 +99,7 @@ def set_role(email, role, clinic_id=nil)
   unless clinic_id.nil?
     clinic = Clinic.find(clinic_id)
     user.clinics = [clinic]
-    user.allocated_unit_code = [clinic.unit_code]
+    user.allocated_unit_code = clinic.unit_code
   end
   user.save!
 end
