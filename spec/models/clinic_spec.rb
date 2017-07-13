@@ -36,7 +36,7 @@ describe Clinic do
 
     describe 'Grouping of Clinics by State with Site Name' do
       it 'should group the clinics by state and then order the clinics alphabetically by state, then unit name, then site name' do
-        output = Clinic.clinics_by_state_with_site_name
+        output = Clinic.clinics_by_state_with_clinic_id
         expect(output.size).to eq(3)
         expect(output[0][0]).to eq('NSW')
         expect(output[1][0]).to eq('SA')
@@ -50,7 +50,7 @@ describe Clinic do
 
     describe 'Grouping of Clinics by State and unique by Unit' do
       it 'should group the clinics by state and then order the clinics alphabetically by state, then unit name, where each unit name is only displayed once' do
-        output = Clinic.clinics_by_state_and_unique_by_unit
+        output = Clinic.units_by_state_with_unit_code
         expect(output.size).to eq(3)
         expect(output[0][0]).to eq('NSW')
         expect(output[1][0]).to eq('SA')

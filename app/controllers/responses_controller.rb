@@ -5,7 +5,7 @@ class ResponsesController < ApplicationController
 
   expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
   expose(:surveys) { SURVEYS.values }
-  expose(:clinics) { Clinic.clinics_by_state_with_site_name }
+  expose(:clinics) { Clinic.clinics_by_state_with_clinic_id }
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
   def new

@@ -6,7 +6,7 @@
 .clearfix#clinic_units
   = label_tag :clinic_unit, 'Clinic'
   .input
-    = select_tag :clinic_unit, grouped_options_for_select(Clinic.clinics_by_state_and_unique_by_unit, @user.allocated_unit_code), include_blank: true, disabled: disable_unit_select, class: 'large'
+    = select_tag :clinic_unit, grouped_options_for_select(Clinic.units_by_state_with_unit_code, @user.allocated_unit_code), include_blank: true, disabled: disable_unit_select, class: 'large'
 
 .clearfix#clinic_sites
   = f.label :clinic_ids, 'Sites'
