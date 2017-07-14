@@ -1,0 +1,21 @@
+- content_for :tabs do
+  = render 'admin/users/tabs'
+
+- title 'Clinics'
+
+%table#clinics
+  %thead
+    %tr.sortable
+      %th= sortable 'unit_code'
+      %th= sortable 'unit_name'
+      %th= sortable 'site_code'
+      %th= sortable 'site_name'
+      %th= sortable 'state'
+  %tbody
+    - @clinics.each do |clinic|
+      %tr{class: cycle('field_bg', 'field_nobg')}
+        %td= clinic.unit_code
+        %td= clinic.unit_name
+        %td= clinic.site_code
+        %td= clinic.site_name
+        %td= clinic.state

@@ -55,6 +55,8 @@ class Ability
 
         can :manage, ConfigurationItem
 
+        can :read, Clinic
+
       when Role::DATA_PROVIDER
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :new, Response
