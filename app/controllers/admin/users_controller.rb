@@ -1,13 +1,14 @@
 class Admin::UsersController < Admin::AdminBaseController
 
   ALLOWED_SORT_COLUMNS = %w(email first_name last_name allocated_unit_code roles.name status last_sign_in_at)
+  SECONDARY_SORT_COLUMN = 'email'
   load_and_authorize_resource
   helper_method :sort_column, :sort_direction
 
   def index
     set_tab :users, :admin_navigation
     sort = sort_column + ' ' + sort_direction
-    sort = sort + ', email ASC' unless sort_column == 'email' # add email as a secondary sort so its predictable when there's multiple values
+    sort = sort + ", #{SECONDARY_SORT_COLUMN} ASC" unless sort_column == SECONDARY_SORT_COLUMN # add secondary sort so its predictable when there's multiple values
 
     @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
     @clinic_filter = { unit: params[:clinic_unit_filter], unit_and_site: params[:clinic_site_filter] }
@@ -106,7 +107,7 @@ class Admin::UsersController < Admin::AdminBaseController
 
   private
   def sort_column
-    ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : 'email'
+    ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : SECONDARY_SORT_COLUMN
   end
 
   def sort_direction
