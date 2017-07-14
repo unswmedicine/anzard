@@ -20,6 +20,10 @@ class ClinicsController < ApplicationController
     end
   end
 
+  def edit
+
+  end
+
   private
   def sort_column
     ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : DEFAULT_SORT_COLUMN
@@ -27,6 +31,10 @@ class ClinicsController < ApplicationController
 
   def sort_direction
     %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
+  end
+
+  def clinic_params
+    params.require(:clinic).permit(:site_code)
   end
 
 end

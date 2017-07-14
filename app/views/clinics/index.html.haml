@@ -18,6 +18,7 @@
       %th= sortable 'site_code'
       %th= sortable 'site_name'
       %th= sortable 'state'
+      %th Actions
   %tbody
     - @clinics.each do |clinic|
       %tr{class: cycle('field_bg', 'field_nobg')}
@@ -26,3 +27,6 @@
         %td= clinic.site_code
         %td= clinic.site_name
         %td= clinic.state
+        %td
+          - if can?(:edit, clinic)
+            = link_to 'Edit Details', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn'

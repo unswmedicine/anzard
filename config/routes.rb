@@ -24,7 +24,7 @@ Anznn::Application.routes.draw do
     end
   end
 
-  resources :clinics, :only => [:index]
+  resources :clinics, :only => [:index, :edit]
 
   resources :configuration_items, :only => [] do
     collection do
