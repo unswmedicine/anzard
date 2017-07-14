@@ -20,8 +20,19 @@ class ClinicsController < ApplicationController
     end
   end
 
-  def edit
+  def new
+  end
 
+  def create
+    @clinic = Clinic.new(clinic_params)
+    if @clinic.save
+      redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully created."
+    else
+      redirect_to(new_clinic_path(@clinic), alert: @clinic.errors.full_messages.first)
+    end
+  end
+
+  def edit
   end
 
   def update
@@ -43,7 +54,7 @@ class ClinicsController < ApplicationController
   end
 
   def clinic_params
-    params.require(:clinic).permit(:site_name)
+    params.require(:clinic).permit(:unit_code, :unit_name, :site_code, :site_name, :state)
   end
 
 end

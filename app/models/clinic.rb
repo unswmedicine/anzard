@@ -4,11 +4,11 @@ class Clinic < ApplicationRecord
   has_many :users, through: :clinic_allocations
   has_many :responses
 
-  validates_presence_of :state
-  validates_presence_of :unit_name
   validates_presence_of :unit_code
-  validates_presence_of :site_name
+  validates_presence_of :unit_name
   validates_presence_of :site_code
+  validates_presence_of :site_name
+  validates_presence_of :state
 
   validates_uniqueness_of :site_code, scope: :unit_code
 

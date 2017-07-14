@@ -10,6 +10,8 @@
   = hidden_field_tag :direction, sort_direction
   = submit_tag 'Filter'
 
+= link_to 'New Clinic', new_clinic_path, id: 'new_clinic', class: 'btn'
+
 %table#clinics
   %thead
     %tr.sortable

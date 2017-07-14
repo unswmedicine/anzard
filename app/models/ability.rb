@@ -58,6 +58,8 @@ class Ability
         can :read, Clinic
         can :edit, Clinic
         can :update, Clinic
+        can :new, Clinic
+        can :create, Clinic
 
       when Role::DATA_PROVIDER
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
