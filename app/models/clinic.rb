@@ -12,12 +12,15 @@ class Clinic < ApplicationRecord
 
   validates_uniqueness_of :site_code, scope: :unit_code
 
-  WITHOUT_SITE_NAME = "without_site_name"
-  WITH_SITE_NAME = "with_site_name"
-  WITH_UNIT = "with_unit"
+  GROUP_BY_STATE_WITH_CLINIC = 0
+  GROUP_BY_STATE_WITH_UNIT = 1
 
   def unit_name_with_code
     "(#{unit_code}) #{unit_name}"
+  end
+
+  def site_name_with_code
+    "(#{site_code}) #{site_name}"
   end
 
   def site_name_with_full_code
@@ -28,38 +31,33 @@ class Clinic < ApplicationRecord
     where(unit_code: unit_code)
   end
 
-  def self.clinics_by_state
-    clinics_by_state_with_unit_or_with_or_without_site_name(WITHOUT_SITE_NAME)
+  # Returns all Clinics grouped by State in the format [[State], [Unit Name - Site Name', Clinic_id_1], [Unit Name - Site Name', Clinic_id_2], ...]
+  def self.clinics_by_state_with_clinic_id
+    group_clinics(GROUP_BY_STATE_WITH_CLINIC)
   end
 
-  def self.clinics_by_state_with_site_name
-    clinics_by_state_with_unit_or_with_or_without_site_name(WITH_SITE_NAME)
-  end
-
-  def self.clinics_by_state_and_unique_by_unit
-    clinics_by_state_with_unit_or_with_or_without_site_name(WITH_UNIT)
+  # Returns all Units grouped by State in the format [[State], [Unit Name (Unit Code)', Clinic_1_unit_code], [Unit Name - Site Name', Clinic_id_2_unit_code], ...]
+  def self.units_by_state_with_unit_code
+    group_clinics(GROUP_BY_STATE_WITH_UNIT)
   end
 
   private
 
-  def self.clinics_by_state_with_unit_or_with_or_without_site_name(with_site_name_or_unit)
-    clinics = order(:unit_name).all
+  def self.group_clinics(grouping_type=GROUP_BY_STATE_WITH_CLINIC)
+    clinics = order(:unit_name, :site_name).all
     grouped = clinics.group_by(&:state)
 
-    output = case with_site_name_or_unit
-               when WITHOUT_SITE_NAME
-                 grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.unit_name, h.id] }] }
-               when WITH_SITE_NAME
-                 grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.site_name.blank? ?  h.unit_name : h.unit_name + ' - ' + h.site_name, h.id] }] }
-               when WITH_UNIT
-                 # Todo: figure out why this is using unit_code as the value rather than the clinic id
-                 grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.unit_name + ' (' + h.unit_code.to_s + ')', h.unit_code] }] }
-             end
+    if grouping_type == GROUP_BY_STATE_WITH_CLINIC
+      output = grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.site_name.blank? ?  h.unit_name : h.unit_name + ' - ' + h.site_name, h.id] }] }
+    elsif grouping_type == GROUP_BY_STATE_WITH_UNIT
+      output = grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.unit_name + ' (' + h.unit_code.to_s + ')', h.unit_code] }] }
+    end
 
     output.each do |key, value|
       value.uniq!
     end
     output.sort { |a, b| a[0] <=> b[0] }
   end
+
 
 end

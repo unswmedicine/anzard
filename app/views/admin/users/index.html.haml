@@ -1,14 +1,22 @@
 - content_for :tabs do
-  = render "tabs"
+  = render 'tabs'
 
 - title 'Current Users'
-= form_tag admin_users_path, method: :get do
-  = label_tag :clinic_filter, 'Filter by clinic'
-  &nbsp;
-  = select_tag :clinic_filter, clinic_filter_options(@clinic_filter), {class: 'large'}
+
+= form_tag admin_users_path, method: :get, id:'filter_by_unit', class: 'user_filter' do
+  = label_tag :clinic_unit_filter, 'Filter by Unit'
+  = select_tag :clinic_unit_filter, clinic_unit_filter_options(@clinic_filter[:unit]), {class: 'large'}
   = hidden_field_tag :sort, sort_column
   = hidden_field_tag :direction, sort_direction
-  = submit_tag "Filter"
+  = submit_tag 'Filter'
+
+= form_tag admin_users_path, method: :get, id: 'filter_by_site', class: 'user_filter'  do
+  = label_tag :clinic_site_filter, 'Filter by Site'
+  = select_tag :clinic_site_filter, clinic_site_filter_options(@clinic_filter[:unit_and_site]), {class: 'large'}
+  = hidden_field_tag :sort, sort_column
+  = hidden_field_tag :direction, sort_direction
+  = submit_tag 'Filter'
+
 %table#users
   %thead
     %tr.sortable
@@ -16,7 +24,8 @@
       %th= sortable 'last_name'
       %th= sortable 'email'
       %th= sortable 'roles.name', 'Role'
-      %th Clinic
+      %th= sortable 'allocated_unit_code', 'Unit'
+      %th Sites
       %th= sortable 'status'
       %th= sortable 'last_sign_in_at', 'Last signed in'
       %th Actions
@@ -27,13 +36,14 @@
         %td= user.last_name
         %td= user.email
         %td= user.role.name if user.role
-        -# ToDo: (ANZARD-33) Display all user clinics in a more user friendly manner on this page (Current Users)
-        - if !user.clinics.first.nil?
-          - user_clinics = "#{user.clinics.first.unit_name} (" + user.clinics.first.site_name + " - #{user.clinics.first.state})"
-          - user_clinics += " + #{user.clinics.count - 1} others" if user.clinics.count - 1 > 0
-          %td= user_clinics
+        - if user.clinics.empty?
+          %td (None)
+          %td (None)
         - else
-          %td= '(None)'
+          - user_clinics = "#{user.clinics.first.site_name} (#{user.clinics.first.state})"
+          - user_clinics += " & #{user.clinics.count - 1} other site#{'s' if user.clinics.count > 2}" if user.clinics.count > 1
+          %td= user.clinics.first.unit_name_with_code
+          %td= user_clinics
         %td
           - if user.status == 'A'
             Active

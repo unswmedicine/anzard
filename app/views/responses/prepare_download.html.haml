@@ -16,9 +16,9 @@
         = select_tag :survey_id, options_from_collection_for_select(surveys, :id, :name, @survey_id), {class: "large", prompt: "Please select"}
         = required
     .clearfix
-      = label_tag :unit_code, "Clinic"
+      = label_tag :unit_code, 'Unit'
       .input
-        = select_tag :unit_code, grouped_options_for_select(Clinic.clinics_by_state_and_unique_by_unit, @unit_code), {prompt: "ALL", class: 'large'}
+        = select_tag :unit_code, grouped_options_for_select(Clinic.units_by_state_with_unit_code, @unit_code), {prompt: "ALL", class: 'large'}
         = required
     .clearfix
       = label_tag :site_code, "Site"

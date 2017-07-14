@@ -4,12 +4,12 @@
   - if @user.pending_approval?
     .user_details_menu
       - if can?(:approve, @user) then
-        = link_to "Approve", edit_approval_admin_user_path(@user), method: :get, class: 'btn'
+        = link_to 'Approve', edit_approval_admin_user_path(@user), method: :get, class: 'btn'
         &nbsp;
       - if can?(:reject, @user) then
-        = link_to "Reject", reject_admin_user_path(@user), method: :put, class: 'btn'
+        = link_to 'Reject', reject_admin_user_path(@user), method: :put, class: 'btn'
         &nbsp;
-        = link_to "Reject as Spam", reject_as_spam_admin_user_path(@user), method: :put, class: 'btn'
+        = link_to 'Reject as Spam', reject_as_spam_admin_user_path(@user), method: :put, class: 'btn'
         &nbsp;
       = link_to 'Back', access_requests_admin_users_path, class: 'btn'
 
@@ -20,10 +20,10 @@
         &nbsp;
       - if can?(:deactivate, User)
         - if @user == current_user
-          = link_to "Deactivate", deactivate_admin_user_path(@user), confirm: "This is the user you are currently logged is as. Are you sure you want to deactivate it?" , method: :put, class: 'btn'
+          = link_to 'Deactivate', deactivate_admin_user_path(@user), confirm: 'This is the user you are currently logged is as. Are you sure you want to deactivate it?' , method: :put, class: 'btn'
           &nbsp;
         - else
-          = link_to "Deactivate", deactivate_admin_user_path(@user), method: :put, class: 'btn'
+          = link_to 'Deactivate', deactivate_admin_user_path(@user), method: :put, class: 'btn'
           &nbsp;
       = link_to 'Back', admin_users_path, class: 'btn'
 
@@ -33,28 +33,26 @@
         = link_to 'Edit Access Level', edit_role_admin_user_path(@user), class: 'btn'
         &nbsp;
       - if can?(:activate, User)
-        = link_to "Activate", activate_admin_user_path(@user), method: :put, class: 'btn'
+        = link_to 'Activate', activate_admin_user_path(@user), method: :put, class: 'btn'
         &nbsp;
       = link_to 'Back', admin_users_path, class: 'btn'
 
 #userdetails
   %h2 Details
-  = render_field "Email", @user.email
-  = render_field "First name", @user.first_name
-  = render_field "Last name", @user.last_name
+  = render_field 'Email', @user.email
+  = render_field 'First name', @user.first_name
+  = render_field 'Last name', @user.last_name
   - if !@user.pending_approval?
-    = render_field_with_block "Last Logged In" do
+    = render_field_with_block 'Last Logged In' do
       - if @user.last_sign_in_at.nil?
         Never logged in
       - else
-        = @user.last_sign_in_at.localtime.strftime("%d/%m/%Y %I:%M%p")
-  = render_field "Role", (@user.role ? @user.role.name : "(None set)")
-  -# ToDo: (ANZARD-33) Display all user clinics in a more user friendly manner on this page (User Details)
+        = @user.last_sign_in_at.localtime.strftime('%d/%m/%Y %I:%M%p')
+  = render_field 'Role', (@user.role ? @user.role.name : '(None set)')
   - if @user.clinics.count > 0
-    - clinics_list = ''
-    - @user.clinics.each { |clinic| clinics_list += "#{clinic.unit_name} - #{clinic.site_name} (#{clinic.state}), "}
-    = render_field 'Clinics', clinics_list
-  = render_field_with_block "Status" do
+    = render_field 'Unit', @user.clinics.first.unit_name_with_code
+    = render_field 'Site(s)', @user.clinics.map { |clinic| "#{clinic.site_name_with_code} - #{clinic.state}" }.join(', ')
+  = render_field_with_block 'Status' do
     - if @user.status == 'A'
       Active
     - elsif @user.status == 'D'
