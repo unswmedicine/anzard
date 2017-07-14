@@ -1,0 +1,28 @@
+- title 'Clinics'
+
+- content_for :tabs do
+  = render 'admin/users/tabs'
+
+= form_tag clinics_path, method: :get, id:'filter_by_unit', class: 'listing_filter' do
+  = label_tag :clinics_unit_filter, 'Filter by Unit'
+  = select_tag :clinics_unit_filter, clinics_unit_filter_options(@clinic_filter[:unit]), {class: 'large'}
+  = hidden_field_tag :sort, sort_column
+  = hidden_field_tag :direction, sort_direction
+  = submit_tag 'Filter'
+
+%table#clinics
+  %thead
+    %tr.sortable
+      %th= sortable 'unit_code'
+      %th= sortable 'unit_name'
+      %th= sortable 'site_code'
+      %th= sortable 'site_name'
+      %th= sortable 'state'
+  %tbody
+    - @clinics.each do |clinic|
+      %tr{class: cycle('field_bg', 'field_nobg')}
+        %td= clinic.unit_code
+        %td= clinic.unit_name
+        %td= clinic.site_code
+        %td= clinic.site_name
+        %td= clinic.state

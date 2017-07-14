@@ -24,6 +24,8 @@ Anznn::Application.routes.draw do
     end
   end
 
+  resources :clinics, :only => [:index]
+
   resources :configuration_items, :only => [] do
     collection do
       get :edit_year_of_registration
