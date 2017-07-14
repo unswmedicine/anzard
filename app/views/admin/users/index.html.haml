@@ -4,7 +4,7 @@
 - title 'Current Users'
 
 = form_tag admin_users_path, method: :get, id:'filter_by_unit', class: 'user_filter' do
-  = label_tag :clinic_unit_filter, 'Filter by Clinic'
+  = label_tag :clinic_unit_filter, 'Filter by Unit'
   = select_tag :clinic_unit_filter, clinic_unit_filter_options(@clinic_filter[:unit]), {class: 'large'}
   = hidden_field_tag :sort, sort_column
   = hidden_field_tag :direction, sort_direction
@@ -24,7 +24,7 @@
       %th= sortable 'last_name'
       %th= sortable 'email'
       %th= sortable 'roles.name', 'Role'
-      %th= sortable 'allocated_unit_code', 'Clinic'
+      %th= sortable 'allocated_unit_code', 'Unit'
       %th Sites
       %th= sortable 'status'
       %th= sortable 'last_sign_in_at', 'Last signed in'

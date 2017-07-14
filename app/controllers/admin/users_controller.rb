@@ -25,16 +25,16 @@ class Admin::UsersController < Admin::AdminBaseController
 
   def deactivate
     if !@user.check_number_of_superusers(params[:id], current_user.id)
-      redirect_to(admin_user_path(@user), alert: "You cannot deactivate this account as it is the only account with Administrator privileges.")
+      redirect_to(admin_user_path(@user), alert: 'You cannot deactivate this account as it is the only account with Administrator privileges.')
     else
       @user.deactivate
-      redirect_to(admin_user_path(@user), notice: "The user has been deactivated.")
+      redirect_to(admin_user_path(@user), notice: 'The user has been deactivated.')
     end
   end
 
   def activate
     @user.activate
-    redirect_to(admin_user_path(@user), notice: "The user has been activated.")
+    redirect_to(admin_user_path(@user), notice: 'The user has been activated.')
   end
 
   def reject
@@ -50,9 +50,9 @@ class Admin::UsersController < Admin::AdminBaseController
 
   def edit_role
     if @user == current_user
-      flash.now[:alert] = "You are changing the access level of the user you are logged in as."
+      flash.now[:alert] = 'You are changing the access level of the user you are logged in as.'
     elsif @user.rejected?
-      redirect_to(admin_users_path, alert: "Access level can not be set. This user has previously been rejected as a spammer.")
+      redirect_to(admin_users_path, alert: 'Access level can not be set. This user has previously been rejected as a spammer.')
     end
     @roles = Role.by_name
   end
@@ -63,22 +63,22 @@ class Admin::UsersController < Admin::AdminBaseController
 
   def update_role
     if params[:user][:role_id].blank?
-      redirect_to(edit_role_admin_user_path(@user), alert: "Please select a role for the user.")
+      redirect_to(edit_role_admin_user_path(@user), alert: 'Please select a role for the user.')
     else
       @user.role_id = params[:user][:role_id]
       # ToDo: Refactor as this duplicates the user clinic validation which isn't ideal.
       updated_user_clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
       if updated_user_clinics.empty? && !@user.super_user?
         # Don't modify clinic association (which doesn't revert if clinic is invalid) if clinic set is empty and user isn't admin.
-        redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Clinic and Site(s)')
+        redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')
       else
         @user.clinics = updated_user_clinics
         if !@user.check_number_of_superusers(params[:id], current_user.id)
-          redirect_to(edit_role_admin_user_path(@user), alert: "Only one superuser exists. You cannot change this role.")
+          redirect_to(edit_role_admin_user_path(@user), alert: 'Only one superuser exists. You cannot change this role.')
         elsif @user.save
           redirect_to(admin_user_path(@user), notice: "The access level for #{@user.email} was successfully updated.")
         else
-          redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Clinic and Site(s)')
+          redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')
         end
       end
     end
@@ -86,7 +86,7 @@ class Admin::UsersController < Admin::AdminBaseController
 
   def approve
     if params[:user][:role_id].blank?
-      redirect_to(edit_approval_admin_user_path(@user), alert: "Please select a role for the user.")
+      redirect_to(edit_approval_admin_user_path(@user), alert: 'Please select a role for the user.')
     else
       @user.role_id = params[:user][:role_id]
       @user.clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
@@ -94,7 +94,7 @@ class Admin::UsersController < Admin::AdminBaseController
         @user.approve_access_request
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")
       else
-        redirect_to(edit_approval_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Clinic and Site(s)')
+        redirect_to(edit_approval_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')
       end
     end
   end
@@ -106,11 +106,11 @@ class Admin::UsersController < Admin::AdminBaseController
 
   private
   def sort_column
-    ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : "email"
+    ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : 'email'
   end
 
   def sort_direction
-    %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
   end
 
   def user_params
