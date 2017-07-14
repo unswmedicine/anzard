@@ -12,7 +12,12 @@ class ClinicsController < ApplicationController
     sort = sort_column + ' ' + sort_direction
     sort = sort + ", #{SECONDARY_SORT_COLUMN} ASC" unless sort_column == SECONDARY_SORT_COLUMN # add secondary sort so its predictable when there's multiple values
 
-    @clinics = Clinic.all.order(sort)
+    @clinic_filter = { unit: params[:clinics_unit_filter] }
+    if !@clinic_filter[:unit].blank?
+      @clinics = Clinic.where(unit_code: @clinic_filter[:unit]).order(sort)
+    else
+      @clinics = Clinic.all.order(sort)
+    end
   end
 
   private

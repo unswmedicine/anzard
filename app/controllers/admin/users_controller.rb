@@ -11,7 +11,7 @@ class Admin::UsersController < Admin::AdminBaseController
     sort = sort + ", #{SECONDARY_SORT_COLUMN} ASC" unless sort_column == SECONDARY_SORT_COLUMN # add secondary sort so its predictable when there's multiple values
 
     @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
-    @clinic_filter = { unit: params[:clinic_unit_filter], unit_and_site: params[:clinic_site_filter] }
+    @clinic_filter = { unit: params[:users_clinic_unit_filter], unit_and_site: params[:users_clinic_site_filter] }
     filter_users @clinic_filter[:unit], Clinic.where(unit_code: @clinic_filter[:unit])
     filter_users @clinic_filter[:unit_and_site], @clinic_filter[:unit_and_site]
   end
