@@ -52,6 +52,7 @@ class Clinic < ApplicationRecord
                when WITH_SITE_NAME
                  grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.site_name.blank? ?  h.unit_name : h.unit_name + ' - ' + h.site_name, h.id] }] }
                when WITH_UNIT
+                 # Todo: figure out why this is using unit_code as the value rather than the clinic id
                  grouped.collect { |state, clinics| [state, clinics.collect { |h| [h.unit_name + ' (' + h.unit_code.to_s + ')', h.unit_code] }] }
              end
 

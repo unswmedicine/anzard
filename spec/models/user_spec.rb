@@ -211,6 +211,7 @@ describe User do
       user1.role = super_role
       user1.should be_valid
       user1.clinics.count.should eq(0)
+      expect(user1.allocated_unit_code).to eq(nil)
 
     end
 
@@ -223,6 +224,7 @@ describe User do
       user1a = User.find_by_email('user1@intersect.org.au')
       user1a.clinics.count.should eq(1)
       user1a.clinics.should include(clinic)
+      expect(user1.allocated_unit_code).to eq(clinic.unit_code)
 
     end
 

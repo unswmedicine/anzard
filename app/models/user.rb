@@ -160,7 +160,10 @@ class User < ApplicationRecord
   private
 
   def clear_super_user_clinic
-    self.clinics.clear if self.super_user?
+    if self.super_user?
+      self.clinics.clear
+      self.allocated_unit_code = nil
+    end
   end
 
   def initialize_status
