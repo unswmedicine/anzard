@@ -68,11 +68,15 @@ describe Clinic do
       @clinic = create(:clinic, state: 'NSW', unit_code: 101, unit_name: 'IVF Australia', site_code: 1, site_name: 'North Shore')
     end
 
+    it 'should display unit_site_code as unit code and site code in brackets separated by a hyphen' do
+      expect(@clinic.unit_site_code).to eq('(101-1)')
+    end
+
     it 'should display unit_name_with_code as unit code in brackets followed by the unit name' do
       expect(@clinic.unit_name_with_code).to eq('(101) IVF Australia')
     end
 
-    it 'shuold display site_name_with_code as site code in brackets followed by the site name' do
+    it 'should display site_name_with_code as site code in brackets followed by the site name' do
       expect(@clinic.site_name_with_code).to eq('(1) North Shore')
     end
 

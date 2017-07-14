@@ -24,6 +24,15 @@ class ClinicsController < ApplicationController
 
   end
 
+  def update
+    @clinic.site_name = params[:clinic][:site_name]
+    if @clinic.save
+      redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully updated."
+    else
+      redirect_to(edit_clinic_path(@clinic), alert: @clinic.errors.full_messages.first)
+    end
+  end
+
   private
   def sort_column
     ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : DEFAULT_SORT_COLUMN
@@ -34,7 +43,7 @@ class ClinicsController < ApplicationController
   end
 
   def clinic_params
-    params.require(:clinic).permit(:site_code)
+    params.require(:clinic).permit(:site_name)
   end
 
 end

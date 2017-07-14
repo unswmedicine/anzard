@@ -1,6 +1,6 @@
 - title 'Edit Clinic'
 
-= form_for(@clinic, url: edit_clinic_path(@clinic)) do |f|
+= form_for(@clinic, url: clinic_path(@clinic)) do |f|
   = render 'shared/error_messages', target: @clinic
   .clearfix
     = f.label :unit_code, 'Unit Code'

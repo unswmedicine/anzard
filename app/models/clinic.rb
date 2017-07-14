@@ -15,6 +15,10 @@ class Clinic < ApplicationRecord
   GROUP_BY_STATE_WITH_CLINIC = 0
   GROUP_BY_STATE_WITH_UNIT = 1
 
+  def unit_site_code
+    "(#{unit_code}-#{site_code})"
+  end
+
   def unit_name_with_code
     "(#{unit_code}) #{unit_name}"
   end
