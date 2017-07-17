@@ -12,6 +12,9 @@ class Clinic < ApplicationRecord
 
   validates_uniqueness_of :site_code, scope: :unit_code
 
+  PERMITTED_STATES = %w(ACT NSW NT QLD SA TAS VIC WA NZ)
+  validates_inclusion_of :state, in: PERMITTED_STATES, message: "must be one of #{PERMITTED_STATES.to_s}"
+
   GROUP_BY_STATE_WITH_CLINIC = 0
   GROUP_BY_STATE_WITH_UNIT = 1
 

@@ -16,6 +16,13 @@ describe Clinic do
     it { should validate_presence_of(:site_code) }
 
     it { should validate_uniqueness_of(:site_code).scoped_to(:unit_code) }
+    it { should validate_inclusion_of(:state).in_array(Clinic::PERMITTED_STATES).with_message("must be one of #{Clinic::PERMITTED_STATES.to_s}")}
+  end
+
+  describe 'Permitted States' do
+    it 'should only allow Australian states and New Zealand' do
+      expect(Clinic::PERMITTED_STATES).to eq(%w(ACT NSW NT QLD SA TAS VIC WA NZ))
+    end
   end
 
   describe 'Grouping of Clinics' do
