@@ -24,7 +24,6 @@ class ClinicsController < ApplicationController
   end
 
   def create
-    # ToDo: handle in some way validating that unit code and name is not duplicate when creating in new Unit, but allow pre-existing unit when creating new Site
     @clinic = Clinic.new(clinic_params)
     if @clinic.save
       redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully created."

@@ -19,6 +19,27 @@ describe Clinic do
     it { should validate_numericality_of(:site_code).is_greater_than_or_equal_to(0) }
 
     it { should validate_inclusion_of(:state).in_array(Clinic::PERMITTED_STATES).with_message("must be one of #{Clinic::PERMITTED_STATES.to_s}")}
+
+    describe 'no unit duplication' do
+      it 'should allow creation of clinics from different units' do
+        create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Coffs Harbour', site_code: 1)
+        clinic = build(:clinic, state: 'NSW', unit_name: 'IVF Australia', unit_code: 101, site_name: 'North Shore', site_code: 1)
+        expect(clinic).to be_valid
+      end
+
+      it 'should allow creation of clinics from the same unit' do
+        create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Coffs Harbour', site_code: 1)
+        clinic = build(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Newcastle', site_code: 5)
+        expect(clinic).to be_valid
+      end
+
+      it 'should not allow creation of clinics that have the same unit code but different unit name' do
+        create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Coffs Harbour', site_code: 1)
+        clinic = build(:clinic, state: 'VIC', unit_name: 'Genea typo', unit_code: 103, site_name: 'Newcastle', site_code: 5)
+        expect(clinic).to_not be_valid
+        expect(clinic.errors[:clinic_id]).to eq(['already exists with that Unit Code under a different Unit Name'])
+      end
+    end
   end
 
   describe 'Permitted States' do

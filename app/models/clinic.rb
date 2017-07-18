@@ -14,10 +14,17 @@ class Clinic < ApplicationRecord
   validates_numericality_of :unit_code, greater_than_or_equal_to: 0
   validates_numericality_of :site_code, greater_than_or_equal_to: 0
 
-  # Todo: validate all Clinics with same Unit Code must have same Unit Name
-
   PERMITTED_STATES = %w(ACT NSW NT QLD SA TAS VIC WA NZ)
   validates_inclusion_of :state, in: PERMITTED_STATES, message: "must be one of #{PERMITTED_STATES.to_s}"
+
+  validate :no_unit_with_same_code_and_different_name
+
+  def no_unit_with_same_code_and_different_name
+    units_with_same_code_and_different_name = Clinic.where(unit_code: unit_code).where.not(unit_name: unit_name)
+    if units_with_same_code_and_different_name.count > 0
+      errors.add(:clinic_id, 'already exists with that Unit Code under a different Unit Name')
+    end
+  end
 
   GROUP_BY_STATE_WITH_CLINIC = 0
   GROUP_BY_STATE_WITH_UNIT = 1
