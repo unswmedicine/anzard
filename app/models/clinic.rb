@@ -12,6 +12,10 @@ class Clinic < ApplicationRecord
 
   validates_uniqueness_of :site_code, scope: :unit_code
 
+  # Todo: validate all Clinics with same Unit Code must have same Unit Name
+
+  # Todo: validate unit code and site code can only be positive integers
+
   PERMITTED_STATES = %w(ACT NSW NT QLD SA TAS VIC WA NZ)
   validates_inclusion_of :state, in: PERMITTED_STATES, message: "must be one of #{PERMITTED_STATES.to_s}"
 
@@ -46,6 +50,12 @@ class Clinic < ApplicationRecord
   # Returns all Units grouped by State in the format [[State], [Unit Name (Unit Code)', Clinic_1_unit_code], [Unit Name - Site Name', Clinic_id_2_unit_code], ...]
   def self.units_by_state_with_unit_code
     group_clinics(GROUP_BY_STATE_WITH_UNIT)
+  end
+
+  # Returns a list of all distinct Units, ordered by unit code
+  def self.distinct_unit_list
+    units = order(:unit_code).pluck('DISTINCT unit_code, unit_name')
+    units.map{ |code, name| {unit_code: code, unit_name: name}}
   end
 
   private

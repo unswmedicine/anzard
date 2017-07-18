@@ -27,17 +27,17 @@ describe Clinic do
 
   describe 'Grouping of Clinics' do
     before :each do
-      @genea_1 = create(:clinic, state: 'Vic', unit_name: 'Genea', unit_code: 103, site_name: 'Coffs Harbour', site_code: 1)
-      @genea_2 = create(:clinic, state: 'Vic', unit_name: 'Genea', unit_code: 103, site_name: 'Newcastle', site_code: 5)
-      @genea_3 = create(:clinic, state: 'Vic', unit_name: 'Genea', unit_code: 103, site_name: 'Kent Street', site_code: 0)
-      @genea_4 = create(:clinic, state: 'Vic', unit_name: 'Genea', unit_code: 103, site_name: 'Illawarra', site_code: 2)
+      @genea_1 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Coffs Harbour', site_code: 1)
+      @genea_2 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Newcastle', site_code: 5)
+      @genea_3 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Kent Street', site_code: 0)
+      @genea_4 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Illawarra', site_code: 2)
 
       @ivf_aus_1 = create(:clinic, state: 'NSW', unit_name: 'IVF Australia', unit_code: 101, site_name: 'North Shore', site_code: 1)
       @ivf_aus_2 = create(:clinic, state: 'NSW', unit_name: 'IVF Australia', unit_code: 101, site_name: 'Eastern Suburbs', site_code: 7)
 
       @demeter = create(:clinic, state: 'NSW', unit_name: 'Demeter Laboratories', unit_code: 109, site_name: 'Liverpool', site_code: 0)
       @monash_ivf = create(:clinic, state: 'NSW', unit_name: 'Monash IVF Reproductive Medicine', unit_code: 105, site_name: 'Albury', site_code: 0)
-      @qfg = create(:clinic, state: 'Vic', unit_name: 'QFG', unit_code: 302, site_name: 'Mackay', site_code: 1)
+      @qfg = create(:clinic, state: 'VIC', unit_name: 'QFG', unit_code: 302, site_name: 'Mackay', site_code: 1)
       @city_fertility = create(:clinic, state: 'SA', unit_name: 'City Fertility Centre', unit_code: 307, site_name: 'Adelaide', site_code: 4)
     end
 
@@ -47,7 +47,7 @@ describe Clinic do
         expect(output.size).to eq(3)
         expect(output[0][0]).to eq('NSW')
         expect(output[1][0]).to eq('SA')
-        expect(output[2][0]).to eq('Vic')
+        expect(output[2][0]).to eq('VIC')
 
         expect(output[0][1]).to eq([['Demeter Laboratories - Liverpool', @demeter.id], ['IVF Australia - Eastern Suburbs', @ivf_aus_2.id], ['IVF Australia - North Shore', @ivf_aus_1.id], ['Monash IVF Reproductive Medicine - Albury', @monash_ivf.id]])
         expect(output[1][1]).to eq([['City Fertility Centre - Adelaide', @city_fertility.id]])
@@ -61,12 +61,38 @@ describe Clinic do
         expect(output.size).to eq(3)
         expect(output[0][0]).to eq('NSW')
         expect(output[1][0]).to eq('SA')
-        expect(output[2][0]).to eq('Vic')
+        expect(output[2][0]).to eq('VIC')
 
         expect(output[0][1]).to eq([['Demeter Laboratories (109)', 109], ['IVF Australia (101)', 101], ['Monash IVF Reproductive Medicine (105)', 105]])
         expect(output[1][1]).to eq([['City Fertility Centre (307)', 307]])
         expect(output[2][1]).to eq([['Genea (103)', 103], ['QFG (302)', 302]])
       end
+    end
+  end
+
+  describe 'Retrieving of Units' do
+    before :each do
+      @genea_1 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Coffs Harbour', site_code: 1)
+      @genea_2 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Newcastle', site_code: 5)
+      @genea_3 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Kent Street', site_code: 0)
+      @genea_4 = create(:clinic, state: 'VIC', unit_name: 'Genea', unit_code: 103, site_name: 'Illawarra', site_code: 2)
+
+      @ivf_aus_1 = create(:clinic, state: 'NSW', unit_name: 'IVF Australia', unit_code: 101, site_name: 'North Shore', site_code: 1)
+      @ivf_aus_2 = create(:clinic, state: 'NSW', unit_name: 'IVF Australia', unit_code: 101, site_name: 'Eastern Suburbs', site_code: 7)
+
+      @demeter = create(:clinic, state: 'NSW', unit_name: 'Demeter Laboratories', unit_code: 109, site_name: 'Liverpool', site_code: 0)
+      @monash_ivf = create(:clinic, state: 'NSW', unit_name: 'Monash IVF Reproductive Medicine', unit_code: 105, site_name: 'Albury', site_code: 0)
+      @qfg = create(:clinic, state: 'VIC', unit_name: 'QFG', unit_code: 302, site_name: 'Mackay', site_code: 1)
+      @city_fertility = create(:clinic, state: 'SA', unit_name: 'City Fertility Centre', unit_code: 307, site_name: 'Adelaide', site_code: 4)
+    end
+
+    it 'should return a set of all unique pairs of Unit Codes and Unit Names in the system' do
+      output = Clinic.distinct_unit_list
+      expect(output.size).to eq(6)
+      expect(output).to eq([{unit_code: 101, unit_name: 'IVF Australia'}, {unit_code: 103, unit_name: 'Genea'},
+                            {unit_code: 105, unit_name: 'Monash IVF Reproductive Medicine'},
+                            {unit_code: 109, unit_name: 'Demeter Laboratories'}, {unit_code: 302, unit_name: 'QFG'},
+                            {unit_code: 307, unit_name: 'City Fertility Centre'}])
     end
   end
 
