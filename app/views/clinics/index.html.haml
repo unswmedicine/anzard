@@ -33,4 +33,4 @@
         %td= clinic.state
         %td
           - if can?(:edit, clinic)
-            = link_to 'Edit Details', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn'
+            = link_to 'Edit Site', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn'
