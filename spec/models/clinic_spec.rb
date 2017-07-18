@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-
 describe Clinic do
   describe 'Associations' do
     it { should have_many(:clinic_allocations)}
