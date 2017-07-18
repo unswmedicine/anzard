@@ -11,10 +11,10 @@ class Clinic < ApplicationRecord
   validates_presence_of :state
 
   validates_uniqueness_of :site_code, scope: :unit_code
+  validates_numericality_of :unit_code, greater_than_or_equal_to: 0
+  validates_numericality_of :site_code, greater_than_or_equal_to: 0
 
   # Todo: validate all Clinics with same Unit Code must have same Unit Name
-
-  # Todo: validate unit code and site code can only be positive integers
 
   PERMITTED_STATES = %w(ACT NSW NT QLD SA TAS VIC WA NZ)
   validates_inclusion_of :state, in: PERMITTED_STATES, message: "must be one of #{PERMITTED_STATES.to_s}"

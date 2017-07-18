@@ -16,6 +16,9 @@ describe Clinic do
     it { should validate_presence_of(:site_code) }
 
     it { should validate_uniqueness_of(:site_code).scoped_to(:unit_code) }
+    it { should validate_numericality_of(:unit_code).is_greater_than_or_equal_to(0) }
+    it { should validate_numericality_of(:site_code).is_greater_than_or_equal_to(0) }
+
     it { should validate_inclusion_of(:state).in_array(Clinic::PERMITTED_STATES).with_message("must be one of #{Clinic::PERMITTED_STATES.to_s}")}
   end
 
