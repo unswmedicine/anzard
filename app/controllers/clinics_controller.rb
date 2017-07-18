@@ -44,6 +44,18 @@ class ClinicsController < ApplicationController
     end
   end
 
+  def edit_unit
+  end
+
+  def update_unit
+    if params[:updated_unit_name].blank?
+      redirect_to(edit_unit_clinics_path, alert: 'Unit Name cannot be blank')
+    else
+      Clinic.where(unit_code: params[:selected_unit_code]).update_all(unit_name: params[:updated_unit_name])
+      redirect_to clinics_path, notice: "Unit #{params[:selected_unit_code]} was successfully updated."
+    end
+  end
+
   private
   def sort_column
     ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : DEFAULT_SORT_COLUMN
