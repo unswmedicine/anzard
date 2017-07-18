@@ -20,7 +20,7 @@
         = f.text_field :cycle_id
         = required
     .clearfix
-      = label_tag 'unit', 'Clinic'
+      = label_tag 'unit', 'Unit'
       .input
         = text_field_tag 'unit', current_user.clinics.first.unit_name_with_code, disabled: true # All user clinics are from the same unit
     .clearfix
