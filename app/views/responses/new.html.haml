@@ -12,7 +12,7 @@
     .clearfix
       = f.label :year_of_registration, "Year of Treatment"
       .input
-        = f.select :year_of_registration, year_of_registration_range, {:include_blank => "Please select"}, {:class => "medium"}
+        = f.select :year_of_registration, year_of_registration_range.reverse, {:include_blank => "Please select"}, {:class => "medium"}
         = required
     .clearfix
       = f.label :cycle_id, "Cycle ID"
