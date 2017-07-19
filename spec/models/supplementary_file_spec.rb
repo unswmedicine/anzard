@@ -28,6 +28,7 @@ describe SupplementaryFile do
       supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' did not contain a CYCLE_ID column.")
     end
 
+    # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: File has contents that are not what they are reported to be"
     it "should reject files that are empty" do
       supplementary_file = create_supplementary_file('empty.csv', 'my multi')
       supplementary_file.pre_process.should be false

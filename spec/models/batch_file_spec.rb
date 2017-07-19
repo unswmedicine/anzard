@@ -133,6 +133,7 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
+      # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: File has contents that are not what they are reported to be"
       it "should reject files that are empty" do
         batch_file = process_batch_file('empty.csv', survey, user)
         batch_file.status.should eq("Failed")
