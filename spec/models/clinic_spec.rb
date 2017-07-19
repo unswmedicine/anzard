@@ -14,7 +14,7 @@ describe Clinic do
     it { should validate_presence_of(:unit_code) }
     it { should validate_presence_of(:site_name) }
     it { should validate_presence_of(:site_code) }
-    it { should validate_presence_of(:active) }
+    it { should validate_inclusion_of(:active).in_array([true, false]) }
 
     it { should validate_uniqueness_of(:site_code).scoped_to(:unit_code) }
   end
@@ -83,16 +83,28 @@ describe Clinic do
   end
 
   describe 'Clinics with Unit Code' do
-    it 'should return all clinics with the matching unit code' do
-      c1_1 = create(:clinic, state: 'NSW', unit_code: 501, unit_name: 'IVF Australia', site_code: 13, site_name: 'North Shore')
-      c1_2 = create(:clinic, state: 'ACT', unit_code: 501, unit_name: 'IVF Australia', site_code: 27, site_name: 'Eastern Suburbs')
-      c2_1 = create(:clinic, state: 'NSW', unit_code: 503, unit_name: 'Genea', site_code: 61, site_name: 'Liverpool')
-      c2_2 = create(:clinic, state: 'NSW', unit_code: 503, unit_name: 'Genea', site_code: 43, site_name: 'RPAH')
-      c3 = create(:clinic, state: 'QLD', unit_code: 512, unit_name: 'Cairns Fertility Centre', site_code: 20, site_name: 'Cairns')
-      expect(Clinic.clinics_with_unit_code(501)).to eq([c1_1, c1_2])
-      expect(Clinic.clinics_with_unit_code(503)).to eq([c2_1, c2_2])
-      expect(Clinic.clinics_with_unit_code(512)).to eq([c3])
+    before :each do
+      @c1_1 = create(:clinic, state: 'NSW', unit_code: 501, unit_name: 'IVF Australia', site_code: 13, site_name: 'North Shore')
+      @c1_2 = create(:clinic, state: 'ACT', unit_code: 501, unit_name: 'IVF Australia', site_code: 27, site_name: 'Eastern Suburbs')
+      @c2_1 = create(:clinic, state: 'NSW', unit_code: 503, unit_name: 'Genea', site_code: 61, site_name: 'Liverpool')
+      @c2_2 = create(:clinic, state: 'NSW', unit_code: 503, unit_name: 'Genea', site_code: 43, site_name: 'RPAH')
+      @c3 = create(:clinic, state: 'QLD', unit_code: 512, unit_name: 'Cairns Fertility Centre', site_code: 20, site_name: 'Cairns')
+    end
+
+    it 'should return all clinics with the matching unit code ordered by site code' do
+      expect(Clinic.clinics_with_unit_code(501)).to eq([@c1_1, @c1_2])
+      expect(Clinic.clinics_with_unit_code(503)).to eq([@c2_2, @c2_1])
+      expect(Clinic.clinics_with_unit_code(512)).to eq([@c3])
       expect(Clinic.clinics_with_unit_code(456)).to eq([])
+    end
+
+    it 'should exclusively return active clinics only when specified' do
+      @c1_2.update!(active: false)
+      create(:clinic, state: 'NSW', unit_code: 501, unit_name: 'IVF Australia', site_code: 16, site_name: 'Hunter IVF', active: false)
+      expect(Clinic.clinics_with_unit_code(501, true)).to eq([@c1_1])
+      expect(Clinic.clinics_with_unit_code(503, true)).to eq([@c2_2, @c2_1])
+      expect(Clinic.clinics_with_unit_code(512, true)).to eq([@c3])
+      expect(Clinic.clinics_with_unit_code(456, true)).to eq([])
     end
   end
 

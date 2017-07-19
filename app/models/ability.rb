@@ -42,7 +42,7 @@ class Ability
       when Role::SUPER_USER
         can :read, User
         can :update, User
-        can :get_sites, User
+        can :get_active_sites, User
 
         can :read, Response
         can :stats, Response

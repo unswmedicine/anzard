@@ -9,7 +9,7 @@ class Clinic < ApplicationRecord
   validates_presence_of :unit_code
   validates_presence_of :site_name
   validates_presence_of :site_code
-  validates_presence_of :active
+  validates_inclusion_of :active, in: [true, false]
 
   validates_uniqueness_of :site_code, scope: :unit_code
 
@@ -28,8 +28,13 @@ class Clinic < ApplicationRecord
     "(#{unit_code}-#{site_code}) #{site_name}"
   end
 
-  def self.clinics_with_unit_code(unit_code)
-    where(unit_code: unit_code)
+  def self.clinics_with_unit_code(unit_code, only_active_clinics=false)
+    if only_active_clinics
+      clinics = where(unit_code: unit_code, active: true)
+    else
+      clinics = where(unit_code: unit_code)
+    end
+    clinics.order(:site_code)
   end
 
   # Returns all Clinics grouped by State in the format [[State], [Unit Name - Site Name', Clinic_id_1], [Unit Name - Site Name', Clinic_id_2], ...]

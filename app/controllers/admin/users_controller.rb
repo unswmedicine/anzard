@@ -101,8 +101,8 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
 
-  def get_sites
-    render json: Clinic.where(unit_code: params['unit_code'])
+  def get_active_sites
+    render json: Clinic.where(unit_code: params['unit_code'], active: true)
   end
 
   private

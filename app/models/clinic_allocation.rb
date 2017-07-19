@@ -9,13 +9,21 @@ class ClinicAllocation < ApplicationRecord
 
   validate :user_can_only_be_allocated_to_one_clinic_unit
 
+  validate :user_cannot_be_allocated_to_deactivated_clinic
+
   after_validation :allocate_clinic_unit_code_to_user
 
   def user_can_only_be_allocated_to_one_clinic_unit
     unless user.nil? # User is only nil during RSpec test setup (this should be fine since we validate presence)
       if !user.allocated_unit_code.nil? && user.allocated_unit_code != clinic.unit_code
-        errors.add(:clinic_id, "User is already allocated to clinic unit_code #{user.allocated_unit_code}")
+        errors.add(:id, "User is already allocated to clinic unit_code #{user.allocated_unit_code}")
       end
+    end
+  end
+
+  def user_cannot_be_allocated_to_deactivated_clinic
+    unless user.nil? # User is only nil during RSpec test setup (this should be fine since we validate presence)
+      errors.add(:id, 'User cannot be allocated to a deactivated clinic') unless clinic.active
     end
   end
 
