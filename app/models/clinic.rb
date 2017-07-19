@@ -16,6 +16,14 @@ class Clinic < ApplicationRecord
   GROUP_BY_STATE_WITH_CLINIC = 0
   GROUP_BY_STATE_WITH_UNIT = 1
 
+  def activate
+    self.update!(active: true)
+  end
+
+  def deactivate
+    self.update!(active: false)
+  end
+
   def unit_name_with_code
     "(#{unit_code}) #{unit_name}"
   end

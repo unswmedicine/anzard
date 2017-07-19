@@ -22,6 +22,16 @@ class ClinicsController < ApplicationController
     end
   end
 
+  def activate
+    @clinic.activate
+    redirect_to(clinics_path, notice: 'The clinic has been activated.')
+  end
+
+  def deactivate
+    @clinic.deactivate
+    redirect_to(clinics_path, notice: 'The clinic has been deactivated.')
+  end
+
   private
   def sort_column
     ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : DEFAULT_SORT_COLUMN

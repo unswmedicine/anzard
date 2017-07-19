@@ -108,4 +108,22 @@ describe Clinic do
     end
   end
 
+  describe 'Activate clinic' do
+    it 'should update the clinic active attribute to true' do
+      clinic = create(:clinic, active: false)
+      expect(clinic.active).to eq(false)
+      clinic.activate
+      expect(clinic.active).to eq(true)
+    end
+  end
+
+  describe 'Deactivate clinic' do
+    it 'should update the clinic active attribute to false' do
+      clinic = create(:clinic)
+      expect(clinic.active).to eq(true)
+      clinic.deactivate
+      expect(clinic.active).to eq(false)
+    end
+  end
+
 end
