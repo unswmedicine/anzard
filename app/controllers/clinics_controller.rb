@@ -29,8 +29,19 @@ class ClinicsController < ApplicationController
 
   def deactivate
     @clinic.deactivate
-    ClinicAllocation.destroy_all(clinic: @clinic)
-    redirect_to(clinics_path, notice: 'The clinic has been deactivated.')
+    allocations_for_clinic = ClinicAllocation.where(clinic: @clinic)
+    deactivated_clinic_users = User.where(id: allocations_for_clinic.pluck(:user_id).uniq)
+    allocations_for_clinic.destroy_all
+    users_deactivated = []
+    deactivated_clinic_users.each do |user|
+      if user.clinics.empty?
+        user.deactivate
+        users_deactivated.append user
+      end
+    end
+    notice = 'The clinic has been deactivated.'
+    notice += " #{users_deactivated.count} user account(s) have also been automatically deactivated." unless users_deactivated.empty?
+    redirect_to(clinics_path, notice: notice)
   end
 
   private

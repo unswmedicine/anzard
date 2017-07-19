@@ -34,8 +34,12 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
   def activate
-    @user.activate
-    redirect_to(admin_user_path(@user), notice: 'The user has been activated.')
+    if @user.clinics.empty?
+      redirect_to(admin_user_path(@user), alert: "You cannot activate this account as it is not associated with any sites. Edit this user's site allocation before activating.")
+    else
+      @user.activate
+      redirect_to(admin_user_path(@user), notice: 'The user has been activated.')
+    end
   end
 
   def reject

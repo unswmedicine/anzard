@@ -30,7 +30,7 @@
         %td= clinic.state
         - if clinic.active
           %td= 'Active'
-          %td= link_to 'Deactivate', deactivate_clinic_path(clinic), class: 'btn', method: :post, data: {confirm: 'Are you sure? Deactivating a clinic will deallocate all users from that clinic.'}
+          %td= link_to 'Deactivate', deactivate_clinic_path(clinic), class: 'btn', method: :post, data: {confirm: 'Are you sure? Deactivating a clinic will deallocate all users from that clinic. User accounts with no other clinics will also be deactivated.'}
         - else
           %td= 'Deactivated'
           %td= link_to 'Activate', activate_clinic_path(clinic), class: 'btn', method: :post
