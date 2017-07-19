@@ -14,6 +14,7 @@ describe Clinic do
     it { should validate_presence_of(:unit_code) }
     it { should validate_presence_of(:site_name) }
     it { should validate_presence_of(:site_code) }
+    it { should validate_presence_of(:active) }
 
     it { should validate_uniqueness_of(:site_code).scoped_to(:unit_code) }
   end

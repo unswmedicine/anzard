@@ -9,6 +9,7 @@ class Clinic < ApplicationRecord
   validates_presence_of :unit_code
   validates_presence_of :site_name
   validates_presence_of :site_code
+  validates_presence_of :active
 
   validates_uniqueness_of :site_code, scope: :unit_code
 

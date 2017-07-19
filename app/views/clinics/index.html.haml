@@ -18,6 +18,7 @@
       %th= sortable 'site_code'
       %th= sortable 'site_name'
       %th= sortable 'state'
+      %th= sortable 'active', 'Status'
   %tbody
     - @clinics.each do |clinic|
       %tr{class: cycle('field_bg', 'field_nobg')}
@@ -26,3 +27,7 @@
         %td= clinic.site_code
         %td= clinic.site_name
         %td= clinic.state
+        - if clinic.active
+          %td= 'Active'
+        - else
+          %td= 'Deactivated'
