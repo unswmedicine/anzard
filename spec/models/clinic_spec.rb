@@ -73,6 +73,10 @@ describe Clinic do
       expect(@clinic.unit_name_with_code).to eq('(101) IVF Australia')
     end
 
+    it 'should display unit_name_with_code_for_unit as unit code in brackets followed by the unit name' do
+      expect(Clinic.unit_name_with_code_for_unit(101)).to eq('(101) IVF Australia')
+    end
+
     it 'shuold display site_name_with_code as site code in brackets followed by the site name' do
       expect(@clinic.site_name_with_code).to eq('(1) North Shore')
     end

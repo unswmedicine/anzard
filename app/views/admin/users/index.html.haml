@@ -36,13 +36,15 @@
         %td= user.last_name
         %td= user.email
         %td= user.role.name if user.role
-        - if user.clinics.empty?
+        - if user.allocated_unit_code.nil?
           %td (None)
+        - else
+          %td= Clinic.unit_name_with_code_for_unit(user.allocated_unit_code)
+        - if user.clinics.empty?
           %td (None)
         - else
           - user_clinics = "#{user.clinics.first.site_name} (#{user.clinics.first.state})"
           - user_clinics += " & #{user.clinics.count - 1} other site#{'s' if user.clinics.count > 2}" if user.clinics.count > 1
-          %td= user.clinics.first.unit_name_with_code
           %td= user_clinics
         %td
           - if user.status == 'A'

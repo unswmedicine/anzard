@@ -36,6 +36,11 @@ class Clinic < ApplicationRecord
     "(#{unit_code}-#{site_code}) #{site_name}"
   end
 
+  def self.unit_name_with_code_for_unit(unit_code)
+    clinic = find_by(unit_code: unit_code)
+    clinic.unit_name_with_code
+  end
+
   def self.clinics_with_unit_code(unit_code, only_active_clinics=false)
     if only_active_clinics
       clinics = where(unit_code: unit_code, active: true)

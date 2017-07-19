@@ -29,6 +29,7 @@ class ClinicsController < ApplicationController
 
   def deactivate
     @clinic.deactivate
+    ClinicAllocation.destroy_all(clinic: @clinic)
     redirect_to(clinics_path, notice: 'The clinic has been deactivated.')
   end
 
