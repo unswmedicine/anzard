@@ -1,0 +1,36 @@
+- title 'New Clinic'
+
+= form_for @clinic do |f|
+  = render 'shared/error_messages', target: @clinic
+  .clearfix
+    = f.label :unit_selection, 'Unit Selection'
+    .input
+      = select_tag :unit_selection, clinics_unit_options_with_new, {class: 'large'}
+  .clearfix
+    = f.label :unit_code, 'Unit Code'
+    .input
+      = f.text_field :unit_code
+      = required
+  .clearfix
+    = f.label :unit_name, 'Unit Name'
+    .input
+      = f.text_field :unit_name
+      = required
+  .clearfix
+    = f.label :site_code, 'Site Code'
+    .input
+      = f.text_field :site_code
+      = required
+  .clearfix
+    = f.label :site_name, 'Site Name'
+    .input
+      = f.text_field :site_name
+      = required
+  .clearfix
+    = f.label :state, 'State'
+    .input
+      = f.select :state, Clinic::PERMITTED_STATES
+      = required
+  .actions
+    = f.submit 'Save', class: 'btn primary'
+    = link_to 'Back', clinics_path, class: 'btn'

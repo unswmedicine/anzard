@@ -24,7 +24,12 @@ Anznn::Application.routes.draw do
     end
   end
 
-  resources :clinics, :only => [:index]
+  resources :clinics, :only => [:index, :new, :create, :edit, :update] do
+    collection do
+      get :edit_unit
+      post :update_unit
+    end
+  end
 
   resources :configuration_items, :only => [] do
     collection do

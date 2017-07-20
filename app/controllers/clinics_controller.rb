@@ -20,6 +20,42 @@ class ClinicsController < ApplicationController
     end
   end
 
+  def new
+  end
+
+  def create
+    @clinic = Clinic.new(clinic_params)
+    if @clinic.save
+      redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully created."
+    else
+      redirect_to(new_clinic_path(@clinic), alert: @clinic.errors.full_messages.first)
+    end
+  end
+
+  def edit
+  end
+
+  def update
+    @clinic.site_name = params[:clinic][:site_name]
+    if @clinic.save
+      redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully updated."
+    else
+      redirect_to(edit_clinic_path(@clinic), alert: @clinic.errors.full_messages.first)
+    end
+  end
+
+  def edit_unit
+  end
+
+  def update_unit
+    if params[:updated_unit_name].blank?
+      redirect_to(edit_unit_clinics_path, alert: 'Unit Name cannot be blank')
+    else
+      Clinic.where(unit_code: params[:selected_unit_code]).update_all(unit_name: params[:updated_unit_name])
+      redirect_to clinics_path, notice: "Unit #{params[:selected_unit_code]} was successfully updated."
+    end
+  end
+
   private
   def sort_column
     ALLOWED_SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : DEFAULT_SORT_COLUMN
@@ -27,6 +63,10 @@ class ClinicsController < ApplicationController
 
   def sort_direction
     %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
+  end
+
+  def clinic_params
+    params.require(:clinic).permit(:unit_code, :unit_name, :site_code, :site_name, :state)
   end
 
 end

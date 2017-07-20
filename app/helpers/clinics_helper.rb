@@ -5,4 +5,13 @@ module ClinicsHelper
     ('<option value="">ANY</option>' + clinics).html_safe
   end
 
+  def clinics_unit_options
+    units = Clinic.distinct_unit_list
+    options = options_for_select(units.map{ |unit| ["(#{unit[:unit_code]}) #{unit[:unit_name]}", unit[:unit_code]] })
+    options.html_safe
+  end
+
+  def clinics_unit_options_with_new
+    ('<option value="">New Unit</option>' + clinics_unit_options).html_safe
+  end
 end
