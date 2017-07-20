@@ -22,6 +22,8 @@ class User < ApplicationRecord
   validates_length_of :last_name, maximum: 255
   validates_length_of :email, maximum: 255
 
+  validates_numericality_of :allocated_unit_code, greater_than_or_equal_to: 0, allow_nil: true
+
   with_options if: :password_required? do |v|
     v.validates :password, password_format: true
   end

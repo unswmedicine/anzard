@@ -179,6 +179,7 @@ describe User do
     it { should validate_presence_of :last_name }
     it { should validate_presence_of :email }
     it { should validate_presence_of :password }
+    it { should validate_numericality_of(:allocated_unit_code).is_greater_than_or_equal_to(0).allow_nil }
 
     it "should validate presence of a clinic UNLESS user has no role OR user is a super user" do
       #NB: this could also be if they are inactive instead of no role, however this works fine

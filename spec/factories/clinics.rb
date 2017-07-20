@@ -3,7 +3,7 @@
 FactoryGirl.define do
   factory :clinic do
       sequence(:state) do |n| #Pick a random, real state
-        states = %w(ACT NSW Qld SA NT Vic WA New\ Zealand)
+        states = %w(ACT NSW NT QLD SA TAS VIC WA NZ)
         states[n % states.length]
       end
       sequence(:unit_name) { |n| "Some Unit Name #{n}" }

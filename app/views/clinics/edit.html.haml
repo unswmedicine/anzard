@@ -1,0 +1,27 @@
+- title 'Edit Site'
+
+= form_for(@clinic, url: clinic_path(@clinic)) do |f|
+  = render 'shared/error_messages', target: @clinic
+  .clearfix
+    = f.label :unit_code, 'Unit Code'
+    .input
+      = f.text_field :unit_code, disabled: true
+  .clearfix
+    = f.label :unit_name, 'Unit Name'
+    .input
+      = f.text_field :unit_name, disabled: true
+  .clearfix
+    = f.label :site_code, 'Site Code'
+    .input
+      = f.text_field :site_code, disabled: true
+  .clearfix
+    = f.label :site_name, 'Site Name'
+    .input
+      = f.text_field :site_name
+  .clearfix
+    = f.label :state, 'State'
+    .input
+      = f.text_field :state, disabled: true
+  .actions
+    = f.submit 'Save', class: 'btn primary'
+    = link_to 'Back', clinics_path, class: 'btn'
