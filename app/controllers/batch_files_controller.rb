@@ -2,6 +2,7 @@ class BatchFilesController < ApplicationController
 
   UPLOAD_NOTICE = "Your upload has been received and is now being processed. This may take some time depending on the size of the file. The status of your uploads can be seen in the table below. Click the 'Refresh Status' button to see an updated status."
   FORCE_SUBMIT_NOTICE = "Your request is now being processed. This may take some time depending on the size of the file. The status of your uploads can be seen in the table below. Click the 'Refresh Status' button to see an updated status."
+  PAPERCLIP_SPOOFED_MEDIA_TYPE_MSG = 'has contents that are not what they are reported to be'
 
   before_action :authenticate_user!
   load_and_authorize_resource
@@ -32,6 +33,7 @@ class BatchFilesController < ApplicationController
     # ToDo: (ANZARD-16) Remove hot-fix association between batch file and user's first clinic (solved by adding clinic association to batch file corresponding to each clinic in CSV row)
     @batch_file.clinic = current_user.clinics.first
     if @batch_file.save
+      # ToDo: remove ANZNN lingering supplementary files
       supplementaries = params[:supplementary_files]
       if supplementaries
         supplementaries.each_pair { |key, supp_attrs| @batch_file.supplementary_files.create!(supp_attrs) if supp_attrs[:file] }
@@ -39,6 +41,7 @@ class BatchFilesController < ApplicationController
       @batch_file.delay.process
       redirect_to batch_files_path, notice: UPLOAD_NOTICE
     else
+      replace_paperclip_spoof_error_with_invalid_csv_msg
       render :new
     end
   end
@@ -57,6 +60,14 @@ class BatchFilesController < ApplicationController
 
   def create_params
     params.require(:batch_file).permit(:survey_id, :year_of_registration, :file, :supplementary_files)
+  end
+
+  def replace_paperclip_spoof_error_with_invalid_csv_msg
+    if @batch_file.errors.include? :file
+      @batch_file.errors[:file].collect! do |error|
+        (error == PAPERCLIP_SPOOFED_MEDIA_TYPE_MSG) ? BatchFile::MESSAGE_BAD_FORMAT : error
+      end
+    end
   end
 
 end

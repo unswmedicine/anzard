@@ -71,11 +71,8 @@ class Ability
         can :create, Response, clinic_id: user.clinic_ids
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
 
-        # ToDo: (ANZARD-16 / ANZARD-38) Update data provider ability so that they can read and create batch files for all of their clinics
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
-        # ToDo: add batch file restriction so provider can only create a batch file for their clinics.
-        # can :create, BatchFile, clinic_id: user.clinic_ids
         can :create, BatchFile
         can :submitted_cycle_ids, Response
 
@@ -86,11 +83,8 @@ class Ability
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :destroy, Response, clinic_id: user.clinic_ids
 
-        # ToDo: (ANZARD-16 / ANZARD-38) Update data supervisor ability so that they can read and create batch files for all of their clinics
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
-        # ToDo: add batch file restriction so supervisor can only create a batch file for their clinics.
-        # can :create, BatchFile, clinic_id: user.clinic_ids
         can :create, BatchFile
 
         can :submitted_cycle_ids, Response
