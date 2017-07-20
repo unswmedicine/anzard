@@ -9,7 +9,7 @@ describe BatchFile do
     create_survey("some_name", question_file, options_file, cross_question_validations_file)
   end
   let(:user) { create(:user) }
-  let(:clinic) { create(:clinic) }
+  let(:clinic) { create(:clinic, unit_code: 0, site_code: 0) }
 
   describe "Associations" do
     it { should belong_to(:user) }
@@ -147,6 +147,46 @@ describe BatchFile do
         batch_file = process_batch_file('headers_only.csv', survey, user)
         batch_file.status.should eq("Failed")
         batch_file.message.should eq("The file you uploaded did not contain any data.")
+        batch_file.record_count.should be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
+      end
+
+      it 'should reject files that have a row without a UNIT column' do
+        batch_file = process_batch_file('no_unit_code_column.csv', survey, user)
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
+        batch_file.record_count.should be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
+      end
+
+      it 'should reject files that have a row with an unknown Unit Code' do
+        batch_file = process_batch_file('unknown_unit_code.csv', survey, user)
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
+        batch_file.record_count.should be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
+      end
+
+      it 'should reject files that have a row without a SITE column' do
+        batch_file = process_batch_file('no_site_code_column.csv', survey, user)
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
+        batch_file.record_count.should be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
+      end
+
+      it 'should reject files that have a row withan Unknown Site Code' do
+        batch_file = process_batch_file('unknown_site_code.csv', survey, user)
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
         batch_file.record_count.should be_nil
         batch_file.problem_record_count.should be_nil
         batch_file.summary_report_path.should be_nil
