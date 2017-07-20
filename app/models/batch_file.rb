@@ -2,27 +2,25 @@ require 'csv'
 
 class BatchFile < ApplicationRecord
 
-  CYCLE_ID_COLUMN = "CYCLE_ID"
-  UNIT_COLUMN = "UNIT"
-  SITE_COLUMN = "SITE"
-  STATUS_FAILED = "Failed"
-  STATUS_SUCCESS = "Processed Successfully"
-  STATUS_REVIEW = "Needs Review"
-  STATUS_IN_PROGRESS = "In Progress"
+  CYCLE_ID_COLUMN = 'CYCLE_ID'
+  UNIT_CODE_COLUMN = 'UNIT'
+  SITE_CODE_COLUMN = 'SITE'
+  STATUS_FAILED = 'Failed'
+  STATUS_SUCCESS = 'Processed Successfully'
+  STATUS_REVIEW = 'Needs Review'
+  STATUS_IN_PROGRESS = 'In Progress'
 
-  MESSAGE_WARNINGS = "The file you uploaded has one or more warnings. Please review the reports for details."
-  MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a CYCLE_ID column."
-
-  MESSAGE_UNKNOWN_UNIT_OR_SITE_ID = "The file you uploaded contains a UNIT or SITE ID that is unknown to our database."
-
-  MESSAGE_MISSING_CYCLE_IDS = "The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID."
-  MESSAGE_EMPTY = "The file you uploaded did not contain any data."
-  MESSAGE_FAILED_VALIDATION = "The file you uploaded did not pass validation. Please review the reports for details."
-  MESSAGE_SUCCESS = "Your file has been processed successfully."
-  MESSAGE_BAD_FORMAT = "The file you uploaded was not a valid CSV file."
-  MESSAGE_DUPLICATE_CYCLE_IDS = "The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once."
-  MESSAGE_UNEXPECTED_ERROR = "Processing failed due to an unexpected error."
-  MESSAGE_CSV_STOP_LINE = " Processing stopped on CSV row "
+  MESSAGE_WARNINGS = 'The file you uploaded has one or more warnings. Please review the reports for details.'
+  MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{CYCLE_ID_COLUMN} column."
+  MESSAGE_UNKNOWN_UNIT_OR_SITE_CODE = "The file you uploaded contains a #{UNIT_CODE_COLUMN} or #{SITE_CODE_COLUMN} that is unknown to our database."
+  MESSAGE_MISSING_CYCLE_IDS = 'The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID.'
+  MESSAGE_EMPTY = 'The file you uploaded did not contain any data.'
+  MESSAGE_FAILED_VALIDATION = 'The file you uploaded did not pass validation. Please review the reports for details.'
+  MESSAGE_SUCCESS = 'Your file has been processed successfully.'
+  MESSAGE_BAD_FORMAT = 'The file you uploaded was not a valid CSV file.'
+  MESSAGE_DUPLICATE_CYCLE_IDS = 'The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once.'
+  MESSAGE_UNEXPECTED_ERROR = 'Processing failed due to an unexpected error.'
+  MESSAGE_CSV_STOP_LINE = ' Processing stopped on CSV row '
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
 
   belongs_to :user
@@ -44,7 +42,7 @@ class BatchFile < ApplicationRecord
   attr_accessor :responses
 
   scope :failed, -> {where(:status => STATUS_FAILED)}
-  scope :older_than, lambda { |date| where("updated_at < ?", date) }
+  scope :older_than, lambda { |date| where('updated_at < ?', date) }
 
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of surveys that are loaded once in an initializer
@@ -79,7 +77,7 @@ class BatchFile < ApplicationRecord
   end
 
   def process(force=false)
-    raise "Batch has already been processed, cannot reprocess" unless status == STATUS_IN_PROGRESS
+    raise 'Batch has already been processed, cannot reprocess' unless status == STATUS_IN_PROGRESS
 
     BatchFile.transaction do
       start = Time.now
@@ -89,7 +87,7 @@ class BatchFile < ApplicationRecord
           BatchReportGenerator.new(self).generate_reports
         end
       rescue ArgumentError
-        logger.info("Argument error while reading file")
+        logger.info('Argument error while reading file')
         logger.error("Message: #{$!.message}")
         logger.error $!.backtrace
         # Note: Catching ArgumentError seems a bit odd, but CSV throws it when the file is not UTF-8 which happens if you upload an xls file
@@ -99,7 +97,7 @@ class BatchFile < ApplicationRecord
           set_outcome(STATUS_FAILED, MESSAGE_BAD_FORMAT)
         end
       rescue CSV::MalformedCSVError
-        logger.info("Malformed CSV error while reading file")
+        logger.info('Malformed CSV error while reading file')
         if @csv_row_count.present?
           set_outcome(STATUS_FAILED, MESSAGE_BAD_FORMAT + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         else
@@ -134,10 +132,10 @@ class BatchFile < ApplicationRecord
         organiser.add_problems(answer.question.code, r.cycle_id, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
       end
       r.missing_mandatory_questions.each do |question|
-        organiser.add_problems(question.code, r.cycle_id, ["This question is mandatory"], [], "")
+        organiser.add_problems(question.code, r.cycle_id, ['This question is mandatory'], [], '')
       end
       r.valid? #we have to call this to trigger errors getting populated
-      organiser.add_problems("CYCLE_ID", r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
+      organiser.add_problems(CYCLE_ID_COLUMN, r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
     end
     organiser
   end
@@ -169,8 +167,7 @@ class BatchFile < ApplicationRecord
       @csv_row_count += 1
       cycle_id = row[CYCLE_ID_COLUMN]
       cycle_id.strip! unless cycle_id.nil?
-      # ToDo: (ANZARD-16) associate each response in the batch file with the clinic id corresponding to the unit and site code within that CSV row
-      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_COLUMN], site_code: row[SITE_COLUMN])
+      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
       response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
       add_answers_from_supplementary_files(response, cycle_id)
@@ -236,9 +233,9 @@ class BatchFile < ApplicationRecord
         end
       end
 
-      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_COLUMN], site_code: row[SITE_COLUMN)
+      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
       if clinic_in_row.nil?
-        set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_OR_SITE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_OR_SITE_CODE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
       end
     end
