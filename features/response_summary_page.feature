@@ -26,12 +26,12 @@ Feature: View a summary page for a survey response
       | Sect2 Q2        | Integer       | 1       | false     |            |
       | Sect3 Q1        | Text          | 2       | true      |            |
       | Sect3 Q2        | Integer       | 2       | false     |            |
-    And "data.provider@intersect.org.au" created a response to the "MySurvey" survey with babycode "babycode123" and year of registration "2005"
+    And "data.provider@intersect.org.au" created a response to the "MySurvey" survey with cycleid "cycleid123" and year of registration "2005"
 
   Scenario: Navigate from summary to section
     Given I am on the edit first response page
     When I follow "Summary"
-    Then I should see "MySurvey - Baby Code babycode123 - Year of Registration 2005"
+    Then I should see "MySurvey - Cycle Id cycleid123 - Year of Registration 2005"
     When I follow "Edit" for section "Sec2"
     Then I should see "Sec2"
 
@@ -113,7 +113,7 @@ Feature: View a summary page for a survey response
 
   Scenario: Superusers don't see edit button
     Given I am logged in as "super@intersect.org.au" and have role "Administrator"
-    When I am on the response summary page for babycode123
+    When I am on the response summary page for cycleid123
     Then I should not see link "Edit"
 
 

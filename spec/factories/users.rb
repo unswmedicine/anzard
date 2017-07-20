@@ -5,8 +5,16 @@ FactoryGirl.define do
     password "Pas$w0rd"
     sequence(:email) { |n| "#{n}@intersect.org.au" }
 
+    allocated_unit_code nil
+
     factory :user do
-      association :hospital
+      transient do
+        clinics_count 0
+      end
+
+      after(:create) do |user, evaluator|
+        create_list(:clinic, evaluator.clinics_count, users: [user])
+      end
     end
 
     factory :super_user do

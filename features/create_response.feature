@@ -16,9 +16,9 @@ Feature: Create Response
     And I am logged in as "data.provider@intersect.org.au"
 
   Scenario: Creating a response
-    When I create a response for "Survey A" with baby code "ABC123" and year of registration "2001"
+    When I create a response for "Survey A" with cycle id "ABC123" and year of registration "2001"
     Then I should see "Data entry form created"
-    And I should see "Survey A - Baby Code ABC123 - Year of Registration 2001"
+    And I should see "Survey A - Cycle Id ABC123 - Year of Registration 2001"
     And I should see "Question A"
     And I should not see "Question B"
 
@@ -46,32 +46,32 @@ Feature: Create Response
       | 2010          |
 
   Scenario: Try to create without selecting survey type
-    When I create a response for "Please select" with baby code "ABC123"
+    When I create a response for "Please select" with cycle id "ABC123"
     Then I should see "Registration type can't be blank" within the form errors
 
   Scenario: Try to create without selecting year of registration
-    When I create a response for "Survey A" with baby code "ABC123" and year of registration "Please select"
+    When I create a response for "Survey A" with cycle id "ABC123" and year of registration "Please select"
     Then I should see "Year of registration can't be blank" within the form errors
 
-  Scenario: Try to create with duplicate baby code
-    Given I create a response for "Survey A" with baby code "ABC123"
-    When I create a response for "Survey A" with baby code "ABC123"
-    Then I should see "Baby code ABC123 has already been used." within the form errors
+  Scenario: Try to create with duplicate cycle id
+    Given I create a response for "Survey A" with cycle id "ABC123"
+    When I create a response for "Survey A" with cycle id "ABC123"
+    Then I should see "Cycle ID ABC123 has already been used." within the form errors
 
-  Scenario: Try to create with duplicate baby code with surrounding spaces
-    Given I create a response for "Survey A" with baby code "ABC123"
-    When I create a response for "Survey A" with baby code " ABC123 "
-    Then I should see "Baby code ABC123 has already been used." within the form errors
+  Scenario: Try to create with duplicate cycle id with surrounding spaces
+    Given I create a response for "Survey A" with cycle id "ABC123"
+    When I create a response for "Survey A" with cycle id " ABC123 "
+    Then I should see "Cycle ID ABC123 has already been used." within the form errors
 
-  Scenario: Responses should be ordered by baby code on the home page
-    Given I create a response for "Survey A" with baby code "C"
-    Given I create a response for "Survey A" with baby code "D"
-    Given I create a response for "Survey A" with baby code "B"
-    Given I create a response for "Survey A" with baby code "A"
-    Given I create a response for "Survey A" with baby code "AB"
+  Scenario: Responses should be ordered by cycle id on the home page
+    Given I create a response for "Survey A" with cycle id "C"
+    Given I create a response for "Survey A" with cycle id "D"
+    Given I create a response for "Survey A" with cycle id "B"
+    Given I create a response for "Survey A" with cycle id "A"
+    Given I create a response for "Survey A" with cycle id "AB"
     When I am on the home page
     Then I should see "responses" table with
-      | Baby Code |
+      | Cycle Id |
       | A         |
       | AB        |
       | B         |

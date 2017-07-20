@@ -5,7 +5,7 @@ class ResponsesController < ApplicationController
 
   expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
   expose(:surveys) { SURVEYS.values }
-  expose(:hospitals) { Hospital.hospitals_by_state }
+  expose(:clinics) { Clinic.clinics_by_state_with_clinic_id }
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
   def new
@@ -18,12 +18,11 @@ class ResponsesController < ApplicationController
 
   def submit
     @response.submit!
-    redirect_to root_path, notice: "Data Entry Form for #{@response.baby_code} to #{@response.survey.name} was submitted successfully."
+    redirect_to root_path, notice: "Data Entry Form for #{@response.cycle_id} to #{@response.survey.name} was submitted successfully."
   end
 
   def create
     @response.user = current_user
-    @response.hospital_id = current_user.hospital_id
     @response.submitted_status = Response::STATUS_UNSUBMITTED
     if @response.save
       redirect_to edit_response_path(@response, section: @response.survey.first_section.id), notice: 'Data entry form created'
@@ -107,15 +106,15 @@ class ResponsesController < ApplicationController
   def download
     set_tab :download, :home
     @survey_id = params[:survey_id]
-    @hospital_id = params[:hospital_id]
+    @unit_code = params[:unit_code]
     @year_of_registration = params[:year_of_registration]
-    @site_id = params[:site_id]
+    @site_code = params[:site_code]
 
     if @survey_id.blank?
       @errors = ["Please select a registration type"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(@survey_id, @hospital_id, @year_of_registration, @site_id)
+      generator = CsvGenerator.new(@survey_id, @unit_code, @year_of_registration, @site_code)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
@@ -126,7 +125,7 @@ class ResponsesController < ApplicationController
   end
 
   def get_sites
-    render json: Hospital.where(unit: params["unit_id"])
+    render json: Clinic.where(unit_code: params['unit_code'])
   end
 
   def batch_delete
@@ -160,22 +159,22 @@ class ResponsesController < ApplicationController
     end
   end
 
-  def submitted_baby_codes
-    set_tab :submitted_baby_codes, :home
+  def submitted_cycle_ids
+    set_tab :submitted_cycle_ids, :home
 
-    @baby_codes_by_year_by_form = organised_baby_codes(current_user)
+    @cycle_ids_by_year_by_form = organised_cycle_ids(current_user)
   end
 
   private
 
-  def organised_baby_codes(user)
-    hospital = user.hospital
-    responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, hospital_id: hospital)
+  def organised_cycle_ids(user)
+    clinics = user.clinics
+    responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, clinic_id: clinics)
     responses_by_survey = responses.group_by {|response| response.survey }
     responses_by_survey_and_year = responses_by_survey.map do |survey, responses|
       responses_by_year = responses.group_by{|response| response.year_of_registration }
       ordered_stuff = responses_by_year.map do |year, responses|
-        [year, responses.map(&:baby_code).sort]
+        [year, responses.map(&:cycle_id).sort]
       end.sort_by {|year, _| -year}
 
       [survey.name, ordered_stuff]
@@ -233,7 +232,7 @@ class ResponsesController < ApplicationController
   end
 
   def create_params
-    params.require(:response).permit(:year_of_registration, :survey_id, :baby_code)
+    params.require(:response).permit(:year_of_registration, :survey_id, :cycle_id, :clinic_id)
   end
 
 end

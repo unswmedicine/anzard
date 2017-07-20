@@ -26,7 +26,7 @@ class BatchFile < ApplicationRecord
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
 
   belongs_to :user
-  belongs_to :hospital
+  belongs_to :clinic
   has_many :supplementary_files
 
   has_attached_file :file, :styles => {}, :path => :make_file_path
@@ -37,7 +37,7 @@ class BatchFile < ApplicationRecord
 
   validates_presence_of :survey_id
   validates_presence_of :user_id
-  validates_presence_of :hospital_id
+  validates_presence_of :clinic_id
   validates_presence_of :file_file_name
   validates_presence_of :year_of_registration
 
@@ -131,13 +131,13 @@ class BatchFile < ApplicationRecord
     # get all the problems from all the responses organised for reporting
     responses.each do |r|
       r.answers.each do |answer|
-        organiser.add_problems(answer.question.code, r.baby_code, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
+        organiser.add_problems(answer.question.code, r.cycle_id, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
       end
       r.missing_mandatory_questions.each do |question|
-        organiser.add_problems(question.code, r.baby_code, ["This question is mandatory"], [], "")
+        organiser.add_problems(question.code, r.cycle_id, ["This question is mandatory"], [], "")
       end
       r.valid? #we have to call this to trigger errors getting populated
-      organiser.add_problems("CYCLE_ID", r.baby_code, r.errors.full_messages, [], r.baby_code) unless r.errors.empty?
+      organiser.add_problems("CYCLE_ID", r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
     end
     organiser
   end
@@ -167,12 +167,13 @@ class BatchFile < ApplicationRecord
     responses = []
     CSV.foreach(file.path, {headers: true}) do |row|
       @csv_row_count += 1
-      baby_code = row[CYCLE_ID_COLUMN]
-      baby_code.strip! unless baby_code.nil?
-      row_hospital = Hospital.where('unit = ? AND site = ?', row[UNIT_COLUMN], row[SITE_COLUMN]).first
-      response = Response.new(survey: survey, baby_code: baby_code, user: user, hospital: row_hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      cycle_id = row[CYCLE_ID_COLUMN]
+      cycle_id.strip! unless cycle_id.nil?
+      # ToDo: (ANZARD-16) associate each response in the batch file with the clinic id corresponding to the unit and site code within that CSV row
+      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_COLUMN], site_code: row[SITE_COLUMN])
+      response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
-      add_answers_from_supplementary_files(response, baby_code)
+      add_answers_from_supplementary_files(response, cycle_id)
 
       failures = true if (response.fatal_warnings? || !response.valid?)
       warnings = true if response.warnings?
@@ -189,11 +190,8 @@ class BatchFile < ApplicationRecord
     else
       responses.each do |r|
         r.submitted_status = Response::STATUS_SUBMITTED
+        r.save!
       end
-
-      #Using the activerecord-import gem to improve performance as it does 1 SQL insert per model (i.e. response and then answers) rather then 1 for each reponse.
-      Response.import responses, :validate => true, recursive: true
-
       set_outcome(STATUS_SUCCESS, MESSAGE_SUCCESS)
     end
     save!
@@ -203,9 +201,9 @@ class BatchFile < ApplicationRecord
     true
   end
 
-  def add_answers_from_supplementary_files(response, baby_code)
+  def add_answers_from_supplementary_files(response, cycle_id)
     supplementary_files.each do |supp_file|
-      answers = supp_file.as_denormalised_hash[baby_code]
+      answers = supp_file.as_denormalised_hash[cycle_id]
       response.build_answers_from_hash(answers) if answers
     end
   end
@@ -213,7 +211,7 @@ class BatchFile < ApplicationRecord
   def pre_process_file
     # do basic checks that can result in the file failing completely and not being validated
     @csv_row_count = 0
-    baby_codes = []
+    cycle_ids = []
     CSV.foreach(file.path, {headers: true}) do |row|
       unless row.headers.include?(CYCLE_ID_COLUMN)
         set_outcome(STATUS_FAILED, MESSAGE_NO_CYCLE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
@@ -224,22 +222,22 @@ class BatchFile < ApplicationRecord
         return false
       end
       @csv_row_count += 1
-      baby_code = row[CYCLE_ID_COLUMN]
-      if baby_code.blank?
+      cycle_id = row[CYCLE_ID_COLUMN]
+      if cycle_id.blank?
         set_outcome(STATUS_FAILED, MESSAGE_MISSING_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
       else
-        baby_code.strip!
-        if baby_codes.include?(baby_code)
+        cycle_id.strip!
+        if cycle_ids.include?(cycle_id)
           set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         else
-          baby_codes << baby_code
+          cycle_ids << cycle_id
         end
       end
 
-      found_hospital = Hospital.where('unit = ? AND site = ?', row[UNIT_COLUMN], row[SITE_COLUMN]).first
-      if found_hospital.nil?
+      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_COLUMN], site_code: row[SITE_COLUMN)
+      if clinic_in_row.nil?
         set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_OR_SITE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
       end

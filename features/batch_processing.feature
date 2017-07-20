@@ -4,7 +4,7 @@ Feature: Processing batch files
   I want to the system to process my batch file
 
   Background:
-    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to hospital "RPA"
+    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to clinic "RPA"
     And I have the standard survey setup
 
   Scenario Outline: Invalid files that get rejected before validation
@@ -18,12 +18,12 @@ Feature: Processing batch files
     | file                    | message                                                                                                                     |
     | not_csv.xls             | The file you uploaded was not a valid CSV file. Processing stopped on CSV row 0                                             |
     | invalid_csv.csv         | The file you uploaded was not a valid CSV file. Processing stopped on CSV row 2                                             |
-    | no_baby_code_column.csv | The file you uploaded did not contain a CYCLE_ID column. Processing stopped on CSV row 0                                    |
-    | missing_baby_code.csv   | The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 2 |
+    | no_cycle_id_column.csv | The file you uploaded did not contain a CYCLE_ID column. Processing stopped on CSV row 0                                    |
+    | missing_cycle_id.csv   | The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 2 |
     | blank_rows.csv          | The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 1 |
     | empty.csv               | The file you uploaded did not contain any data.                                                                             |
     | headers_only.csv        | The file you uploaded did not contain any data.                                                                             |
-    | duplicate_baby_code.csv | The file you uploaded contained duplicate cycle IDs. Each baby code can only be used once. Processing stopped on CSV row 3 |
+    | duplicate_cycle_id.csv | The file you uploaded contained duplicate cycle IDs. Each cycle id can only be used once. Processing stopped on CSV row 3 |
     | duplicate_column.csv    | The file you uploaded contained duplicate columns. Each column heading must be unique.                                      |
 
   Scenario: Valid file with no errors or warnings
@@ -73,7 +73,7 @@ Feature: Processing batch files
     | number_out_of_range.csv  |
 
   Scenario: File that gets rejected because a cycle ID already exists in the system
-    Given "data.provider@intersect.org.au" created a response to the "MySurvey" survey with babycode "B2"
+    Given "data.provider@intersect.org.au" created a response to the "MySurvey" survey with cycleid "B2"
     And I upload batch file "no_errors_or_warnings.csv" for survey "MySurvey"
     And the system processes the latest upload
     When I am on the list of batch uploads page

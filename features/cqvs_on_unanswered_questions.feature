@@ -4,11 +4,11 @@ Feature: In order to see error messages in the right place
 
   Background:
     Given I have the usual roles
-    And I have hospitals
+    And I have clinics
       | state | name      | abbrev |
       | NSW   | Left Wing | Left   |
     And I have users
-      | email                         | first_name | last_name | role          | hospital  |
+      | email                         | first_name | last_name | role          | clinic  |
       | dataprovider@intersect.org.au | Data       | Provider  | Data Provider | Left Wing |
   # Setup questionnaire with two questions one must be present if other is something
     And I have a survey with name "MySurvey" and questions
@@ -52,7 +52,7 @@ Feature: In order to see error messages in the right place
     Then I should not see "QText must be present if QChoice == 1"
 
   Scenario: Warning shows up on response submission screen
-    Given "dataprovider@intersect.org.au" created a response to the "MySurvey" survey with babycode "abc"
+    Given "dataprovider@intersect.org.au" created a response to the "MySurvey" survey with cycleid "abc"
     And I am logged in as "dataprovider@intersect.org.au"
     And I am on the edit first response page
     And I store the following answers skipping assertion

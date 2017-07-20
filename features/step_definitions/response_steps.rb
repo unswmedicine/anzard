@@ -13,27 +13,27 @@ Given /^"([^"]*)" created a response to the "([^"]*)" survey$/ do |email, survey
   create_response(Survey.find_by_name(survey_name), email)
 end
 
-Given /^"([^"]*)" created a response to the "([^"]*)" survey with babycode "([^"]*)"( and submitted it)?$/ do |email, survey_name, babycode, submitted|
-  create_response(Survey.find_by_name(survey_name), email, babycode, "2005", submitted)
+Given /^"([^"]*)" created a response to the "([^"]*)" survey with cycleid "([^"]*)"( and submitted it)?$/ do |email, survey_name, cycleid, submitted|
+  create_response(Survey.find_by_name(survey_name), email, cycleid, "2005", submitted)
 end
 
-Given /^"([^"]*)" created a response to the "([^"]*)" survey with babycode "([^"]*)" and year of registration "([^"]*)"( and submitted it)?$/ do |email, survey_name, babycode, year_of_reg, submitted|
-  create_response(Survey.find_by_name(survey_name), email, babycode, year_of_reg, submitted)
+Given /^"([^"]*)" created a response to the "([^"]*)" survey with cycleid "([^"]*)" and year of registration "([^"]*)"( and submitted it)?$/ do |email, survey_name, cycleid, year_of_reg, submitted|
+  create_response(Survey.find_by_name(survey_name), email, cycleid, year_of_reg, submitted)
 end
 
-Given /^"([^"]*)" created a response to the "([^"]*)" survey with id "([^"]*)" and babycode "([^"]*)"$/ do |email, survey_name, id, babycode|
-  create_response(Survey.find_by_name(survey_name), email, babycode, "2005", false, id)
+Given /^"([^"]*)" created a response to the "([^"]*)" survey with id "([^"]*)" and cycleid "([^"]*)"$/ do |email, survey_name, id, cycleid|
+  create_response(Survey.find_by_name(survey_name), email, cycleid, "2005", false, id)
 end
 
-def create_response(survey, email, babycode = 'babycode123', year_of_reg = "2005", submitted = false, id=nil)
+def create_response(survey, email, cycleid = 'cycleid123', year_of_reg = "2005", submitted = false, id=nil)
   user = User.find_by_email(email)
   submitted_status = submitted ? Response::STATUS_SUBMITTED : Response::STATUS_UNSUBMITTED
   if id
-    Response.create!(survey: survey, baby_code: babycode, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status) do |r|
+    Response.create!(survey: survey, cycle_id: cycleid, year_of_registration: year_of_reg, user: user, clinic: user.clinic, submitted_status: submitted_status) do |r|
       r.id = id
     end 
   else
-    Response.create!(survey: survey, baby_code: babycode, year_of_registration: year_of_reg, user: user, hospital: user.hospital, submitted_status: submitted_status)
+    Response.create!(survey: survey, cycle_id: cycleid, year_of_registration: year_of_reg, user: user, clinic: user.clinic, submitted_status: submitted_status)
   end
 end
 
@@ -102,19 +102,19 @@ Then /^"([^"]*)" should have no warning$/ do |question_label|
   classes.include?("warning").should be_false
 end
 
-When /^I create a response for "([^"]*)" with baby code "([^"]*)"$/ do |survey, baby_code|
+When /^I create a response for "([^"]*)" with cycle id "([^"]*)"$/ do |survey, cycle_id|
   visit path_to("the home page")
   click_link "Start New Data Entry Form"
-  fill_in "Baby code", :with => baby_code
+  fill_in "Cycle id", :with => cycle_id
   select survey, :from => "Registration type"
   select "2001", :from => "Year of registration"
   click_button "Save"
 end
 
-When /^I create a response for "([^"]*)" with baby code "([^"]*)" and year of registration "([^"]*)"$/ do |survey, baby_code, year|
+When /^I create a response for "([^"]*)" with cycle id "([^"]*)" and year of registration "([^"]*)"$/ do |survey, cycle_id, year|
   visit path_to("the home page")
   click_link "Start New Data Entry Form"
-  fill_in "Baby code", :with => baby_code
+  fill_in "Cycle id", :with => cycle_id
   select survey, :from => "Registration type"
   select year, :from => "Year of registration"
   click_button "Save"
@@ -345,8 +345,8 @@ Then /^I should see answers for section "([^"]*)"$/ do |section_name, expected_t
   chatty_diff_table!(expected_table, actual)
 end
 
-Then /^I should( not)? see a submit button on the home page for survey "([^"]*)" and baby code "([^"]*)"( with( no)? warning( "(.*)")?)?$/ do |not_see, survey, baby_code, check_warning, no_warning, _, warning_text|
-  survey_link = submit_survey_link(baby_code)
+Then /^I should( not)? see a submit button on the home page for survey "([^"]*)" and cycle id "([^"]*)"( with( no)? warning( "(.*)")?)?$/ do |not_see, survey, cycle_id, check_warning, no_warning, _, warning_text|
+  survey_link = submit_survey_link(cycle_id)
   if not_see
     survey_link.should_not be
   else
@@ -354,7 +354,7 @@ Then /^I should( not)? see a submit button on the home page for survey "([^"]*)"
   end
 
   if check_warning
-    warning = submit_warning_homepage(baby_code)
+    warning = submit_warning_homepage(cycle_id)
     if no_warning
       warning.should_not be
     else
@@ -364,15 +364,15 @@ Then /^I should( not)? see a submit button on the home page for survey "([^"]*)"
   end
 end
 
-Then /^I should( not)? see a submit button on the response summary page for survey "([^"]*)" and baby code "([^"]*)"( with( no)? warning( "(.*)")?)?$/ do |not_see, survey, baby_code, with_warning, no_warning, _, warning_text|
+Then /^I should( not)? see a submit button on the response summary page for survey "([^"]*)" and cycle id "([^"]*)"( with( no)? warning( "(.*)")?)?$/ do |not_see, survey, cycle_id, with_warning, no_warning, _, warning_text|
   if not_see
-    submit_survey_link(baby_code).should_not be
+    submit_survey_link(cycle_id).should_not be
   else
-    submit_survey_link(baby_code).should be
+    submit_survey_link(cycle_id).should be
   end
 
   if with_warning
-    warning = submit_warning_summary_page(baby_code)
+    warning = submit_warning_summary_page(cycle_id)
     if no_warning
       warning.should_not be
     else
@@ -382,11 +382,11 @@ Then /^I should( not)? see a submit button on the response summary page for surv
   end
 end
 
-Then /^I should not see the response for survey "(.*)" and baby code "(.*)" on the home page$/ do |survey_name, baby_code|
+Then /^I should not see the response for survey "(.*)" and cycle id "(.*)" on the home page$/ do |survey_name, cycle_id|
   current_path = URI.parse(current_url).path
   current_path.should eq root_path
 
-  response = response_by_survey_name_and_baby_code!(survey_name, baby_code)
+  response = response_by_survey_name_and_cycle_id!(survey_name, cycle_id)
 
   selector = "#response_#{response.id}"
   elem = find_or_nil(selector)
@@ -394,46 +394,46 @@ Then /^I should not see the response for survey "(.*)" and baby code "(.*)" on t
   elem.should be_nil
 end
 
-When /^I submit the survey for survey "(.*)" and baby code "(.*)"$/ do |survey, baby_code|
-  submit_survey_link(baby_code).click
+When /^I submit the survey for survey "(.*)" and cycle id "(.*)"$/ do |survey, cycle_id|
+  submit_survey_link(cycle_id).click
 end
 
-Then /^I should see a confirmation message that "([^"]*)" for survey "([^"]*)" has been submitted$/ do |baby_code, survey|
-  find('div.alert-message.info').text.should eq "Data Entry Form for #{baby_code} to #{survey} was submitted successfully."
+Then /^I should see a confirmation message that "([^"]*)" for survey "([^"]*)" has been submitted$/ do |cycle_id, survey|
+  find('div.alert-message.info').text.should eq "Data Entry Form for #{cycle_id} to #{survey} was submitted successfully."
 end
 
-Then /^I can't view response for survey "([^"]*)" and baby code "([^"]*)"$/ do |survey, baby_code|
-  response = response_by_survey_name_and_baby_code!(survey, baby_code)
+Then /^I can't view response for survey "([^"]*)" and cycle id "([^"]*)"$/ do |survey, cycle_id|
+  response = response_by_survey_name_and_cycle_id!(survey, cycle_id)
   visit response_path(response)
   find("div.alert-message.error").should have_content "You tried to access a page you are not authorised to view."
 end
 
-Then /^I can't edit response for survey "([^"]*)" and baby code "([^"]*)"$/ do |survey, baby_code|
-  response = response_by_survey_name_and_baby_code!(survey, baby_code)
+Then /^I can't edit response for survey "([^"]*)" and cycle id "([^"]*)"$/ do |survey, cycle_id|
+  response = response_by_survey_name_and_cycle_id!(survey, cycle_id)
   visit edit_response_path(response)
   find("div.alert-message.error").should have_content "You tried to access a page you are not authorised to view."
 end
 
-Then /^I can't review response for survey "([^"]*)" and baby code "([^"]*)"$/ do |survey, baby_code|
-  response = response_by_survey_name_and_baby_code!(survey, baby_code)
+Then /^I can't review response for survey "([^"]*)" and cycle id "([^"]*)"$/ do |survey, cycle_id|
+  response = response_by_survey_name_and_cycle_id!(survey, cycle_id)
   visit review_answers_response_path(response)
   find("div.alert-message.error").should have_content "You tried to access a page you are not authorised to view."
 end
 
-def submit_survey_link(baby_code)
-  response = Response.find_by_baby_code!(baby_code)
+def submit_survey_link(cycle_id)
+  response = Response.find_by_cycle_id!(cycle_id)
   selector = %Q{form[action="#{submit_response_path response}"] > input.submit_response}
   find_or_nil(selector)
 end
 
-def submit_warning_homepage(baby_code)
-  response = Response.find_by_baby_code!(baby_code)
+def submit_warning_homepage(cycle_id)
+  response = Response.find_by_cycle_id!(cycle_id)
   selector = %Q{#response_#{response.id} > td:last-child span.warning-display.submit_warning}
   find_or_nil(selector)
 end
 
-def submit_warning_summary_page(baby_code)
-  response = Response.find_by_baby_code!(baby_code)
+def submit_warning_summary_page(cycle_id)
+  response = Response.find_by_cycle_id!(cycle_id)
   selector = %Q{span.warning-display.submit_warning}
   find_or_nil(selector)
 end
@@ -446,9 +446,9 @@ def find_or_nil(selector)
   end
 end
 
-def response_by_survey_name_and_baby_code!(survey_name, baby_code)
+def response_by_survey_name_and_cycle_id!(survey_name, cycle_id)
   survey = Survey.find_by_name!(survey_name)
-  Response.find_by_survey_id_and_baby_code!(survey, baby_code)
+  Response.find_by_survey_id_and_cycle_id!(survey, cycle_id)
 end
 
 When /^I am ready to enter responses as (.*)$/ do |email|
@@ -464,11 +464,11 @@ Given /^I fill in the year of registration range with "([^"]*)" and "([^"]*)"$/ 
 end
 
 When /^I have a range of responses$/ do
-  rpa = Hospital.find_by_name!("RPA")
-  rns = Hospital.find_by_name!("Royal North Shore")
-  mh = Hospital.find_by_name!("Mercy Hospital")
-  rc = Hospital.find_by_name!("The Royal Childrens Hospital")
-  sc = Hospital.find_by_name!("Sydney Childrens Hospital")
+  rpa = Clinic.find_by_unit_name!("RPA")
+  rns = Clinic.find_by_unit_name!("Royal North Shore")
+  mh = Clinic.find_by_unit_name!("Mercy Clinic")
+  rc = Clinic.find_by_unit_name!("The Royal Childrens Clinic")
+  sc = Clinic.find_by_unit_name!("Sydney Childrens Clinic")
 
   survey_a = Survey.find_by_name!("Survey A")
   survey_b = Survey.find_by_name!("Survey B")
@@ -490,12 +490,12 @@ When /^I have a range of responses$/ do
   create_responses({unsubmitted: [0, 0, 1], submitted: [0, 0, 0]}, sc, survey_b)
 end
 
-def create_responses(counts, hospital, survey)
-  user = Factory(:user, hospital: hospital)
+def create_responses(counts, clinic, survey)
+  user = Factory(:user, clinic: clinic)
   counts[:unsubmitted].each_with_index do |required_number, index|
     required_number.times do |i|
       Factory(:response,
-              hospital: hospital,
+              clinic: clinic,
               submitted_status: Response::STATUS_UNSUBMITTED,
               survey: survey,
               year_of_registration: (2009 + index),
@@ -506,7 +506,7 @@ def create_responses(counts, hospital, survey)
   counts[:submitted].each_with_index do |required_number, index|
     required_number.times do |i|
       Factory(:response,
-              hospital: hospital,
+              clinic: clinic,
               submitted_status: Response::STATUS_SUBMITTED,
               survey: survey,
               year_of_registration: (2009 + index),
@@ -524,15 +524,15 @@ Given /^I have responses$/ do |table|
   table.hashes.each do |attrs|
     survey_name = attrs.delete('survey')
     survey = survey_name.blank? ? Factory(:survey) : Survey.find_by_name!(survey_name)
-    hospital_name = attrs.delete('hospital')
-    hospital = hospital_name.blank? ? Factory(:hospital) : Hospital.find_by_name!(hospital_name)
-    user = Factory(:user, hospital: hospital)
-    Factory(:response, attrs.merge(survey: survey, user: user, hospital: hospital))
+    clinic_name = attrs.delete('clinic')
+    clinic = clinic_name.blank? ? Factory(:clinic) : Clinic.find_by_unit_name!(clinic_name)
+    user = Factory(:user, clinic: clinic)
+    Factory(:response, attrs.merge(survey: survey, user: user, clinic: clinic))
   end
 end
 
-When /^the response for baby "([^"]*)" should have (\d+) answers$/ do |babycode, expected_answers|
-  response = Response.find_by_baby_code!(babycode)
+When /^the response for cycle "([^"]*)" should have (\d+) answers$/ do |cycleid, expected_answers|
+  response = Response.find_by_cycle_id!(cycleid)
   response.answers.count.should eq(expected_answers.to_i)
 end
 

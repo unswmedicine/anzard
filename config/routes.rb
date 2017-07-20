@@ -18,11 +18,13 @@ Anznn::Application.routes.draw do
       get :download
       get :get_sites
       get :batch_delete
-      get :submitted_baby_codes
+      get :submitted_cycle_ids
       put :confirm_batch_delete
       put :perform_batch_delete
     end
   end
+
+  resources :clinics, :only => [:index]
 
   resources :configuration_items, :only => [] do
     collection do
@@ -59,6 +61,7 @@ Anznn::Application.routes.draw do
           patch :update_role
           get :edit_approval
           patch :approve
+          get :get_sites
 
         end
       end

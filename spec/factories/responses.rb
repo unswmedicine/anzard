@@ -4,8 +4,8 @@ FactoryGirl.define do
   factory :response do
     association :survey
     association :user
-    association :hospital
-    sequence(:baby_code) { |n| "SomeBaby#{n}" }
+    association :clinic
+    sequence(:cycle_id) { |n| "SomeCycle#{n}" }
     submitted_status Response::STATUS_UNSUBMITTED
     year_of_registration "2003"
   end

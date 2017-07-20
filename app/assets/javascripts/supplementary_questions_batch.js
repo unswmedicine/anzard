@@ -9,6 +9,7 @@ $(function() {
 function showHideSupplementary() {
   $('.supplementary_group').hide();
 
+  // ToDo: remove lingering ANZNN code
   // We always want these hidden for ANZARD as they are only used by ANZNN.
 
   /*var selected_survey_id = $('#batch_file_survey_id').val();

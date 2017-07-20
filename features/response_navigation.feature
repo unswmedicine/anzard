@@ -24,14 +24,14 @@ Feature: Navigating around the sections of a survey response
 
   Scenario: When I first start a new survey response, the first section is shown
     Given I am logged in as "data.provider@intersect.org.au"
-    When I create a response for "MySurvey" with baby code "ABC123"
+    When I create a response for "MySurvey" with cycle id "ABC123"
     Then I should see questions
       | Sect1 Q1 |
       | Sect1 Q2 |
 
   Scenario: When I click on a section, that section is shown
     Given I am logged in as "data.provider@intersect.org.au"
-    And I create a response for "MySurvey" with baby code "ABC123"
+    And I create a response for "MySurvey" with cycle id "ABC123"
     When I follow "Sec2"
     Then I should see questions
       | Sect2 Q1 |
@@ -47,7 +47,7 @@ Feature: Navigating around the sections of a survey response
 
   Scenario: When saving, same section is redisplayed
     Given I am logged in as "data.provider@intersect.org.au"
-    And I create a response for "MySurvey" with baby code "ABC123"
+    And I create a response for "MySurvey" with cycle id "ABC123"
     When I follow "Sec2"
     And I press "Save page"
     Then I should see questions
@@ -56,7 +56,7 @@ Feature: Navigating around the sections of a survey response
 
   Scenario: Answers on current page are saved when navigating to another section
     Given I am logged in as "data.provider@intersect.org.au"
-    And I create a response for "MySurvey" with baby code "ABC123"
+    And I create a response for "MySurvey" with cycle id "ABC123"
     And I answer "Sect1 Q2" with "5678"
     When I follow "Sec2"
     Then the answer to "Sect1 Q2" should be "5678"
@@ -66,7 +66,7 @@ Feature: Navigating around the sections of a survey response
 
   Scenario: Save and go to next section should save my answers and take me to the next section
     Given I am logged in as "data.provider@intersect.org.au"
-    And I create a response for "MySurvey" with baby code "ABC123"
+    And I create a response for "MySurvey" with cycle id "ABC123"
     And I answer "Sect1 Q2" with "5678"
     When I press "Save and go to next section"
     Then the answer to "Sect1 Q2" should be "5678"
@@ -86,7 +86,7 @@ Feature: Navigating around the sections of a survey response
       | Sect1 Q1 | Choice        | 0       |
       | Sect1 Q2 | Choice        | 0       |
       | Sect2 Q1 | Text          | 1       |
-    And I create a response for "MySurvey1" with baby code "ABC123"
+    And I create a response for "MySurvey1" with cycle id "ABC123"
     When I press "Save and go to next section"
     Then I should have no answers
     And I should see questions
@@ -94,7 +94,7 @@ Feature: Navigating around the sections of a survey response
 
   Scenario: Last section should replace save-and-go-next with save and return to summary page
     Given I am logged in as "data.provider@intersect.org.au"
-    And I create a response for "MySurvey" with baby code "ABC123"
+    And I create a response for "MySurvey" with cycle id "ABC123"
     And I follow "Sec3"
     And I answer "Sect3 Q2" with "5678"
     When I press "Save and return to summary page"
@@ -103,7 +103,7 @@ Feature: Navigating around the sections of a survey response
 
   Scenario: Cancel button should go to summary page
     Given I am logged in as "data.provider@intersect.org.au"
-    And I create a response for "MySurvey" with baby code "ABC123"
+    And I create a response for "MySurvey" with cycle id "ABC123"
     And I follow "Sec3"
     And I answer "Sect3 Q2" with "243"
     When I follow "Cancel"

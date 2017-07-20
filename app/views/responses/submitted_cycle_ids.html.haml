@@ -1,0 +1,18 @@
+- content_for :tabs do
+  = render 'pages/tabs'
+
+- title 'Submitted Cycle IDs'
+- if @cycle_ids_by_year_by_form.empty?
+  %p There are no submitted cycle IDs to show.
+- else
+  - @cycle_ids_by_year_by_form.each do |form_name_and_cycle_ids_by_year|
+    - form_name = form_name_and_cycle_ids_by_year.first
+    - cycle_ids_by_year = form_name_and_cycle_ids_by_year.last
+    .form
+      %h1.form= form_name
+      - cycle_ids_by_year.each do |year, cycle_ids|
+        .year
+          %h2.year= year.to_s + '   (' + cycle_ids.size.to_s + ' submitted)'
+          %ul
+            - cycle_ids.each do |cycle_id|
+              %li= cycle_id

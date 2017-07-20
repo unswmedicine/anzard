@@ -15,7 +15,7 @@ group: manual
 Once you are logged in, click on your email address in the top right of the page. From here you can change your password, or edit your personal details.
 
 ### Requesting your account be deactivated ###
-If you are no longer working at the hospital you signed up at, or wish to have your account deactivated for some other reason, please contact the ANZNN administrators.
+If you are no longer working at the clinic you signed up at, or wish to have your account deactivated for some other reason, please contact the ANZNN administrators.
 
 ### Other problems ###
 If you are having other difficulties with the system, please contact the ANZNN administrators. Providing as much information as possible will help us resolve your query as quickly as possible. For example:

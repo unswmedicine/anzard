@@ -154,7 +154,12 @@ class Answer < ApplicationRecord
       when TYPE_TIME
         self.time_answer + offset
       when TYPE_CHOICE
-        self.choice_answer.to_i + offset
+        # Valid choice option values are Text/Decimal/Integer
+        if self.choice_answer.is_number?
+          self.choice_answer.to_f + offset
+        else
+          self.choice_answer
+        end
       when TYPE_DECIMAL
         self.decimal_answer + offset
       when TYPE_INTEGER

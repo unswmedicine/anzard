@@ -7,19 +7,19 @@ Feature: Download survey data
     And I am logged in as "admin@intersect.org.au" and have role "Administrator"
     And I have a survey with name "Survey B"
     And I have a survey with name "Survey A"
-    And I have hospitals
+    And I have clinics
       | name                         | state | abbrev |
       | RPA                          | NSW   | RPA    |
       | Royal North Shore            | NSW   | RNS    |
-      | Mercy Hospital               | Vic   | MH     |
-      | The Royal Childrens Hospital | Vic   | RCH    |
-      | Sydney Childrens Hospital    | NSW   | SCH    |
+      | Mercy Clinic               | Vic   | MH     |
+      | The Royal Childrens Clinic | Vic   | RCH    |
+      | Sydney Childrens Clinic    | NSW   | SCH    |
       | Another One                  | NSW   | AO     |
     And I have responses
-      | survey   | year_of_registration | hospital          | baby_code | submitted_status |
+      | survey   | year_of_registration | clinic          | cycle_id | submitted_status |
       | Survey A | 2009                 | RPA               | A-2009-1  | Submitted        |
-      | Survey A | 2009                 | Mercy Hospital    | A-2009-2  | Submitted        |
-      | Survey A | 2011                 | Mercy Hospital    | A-2011-1  | Submitted        |
+      | Survey A | 2009                 | Mercy Clinic    | A-2009-2  | Submitted        |
+      | Survey A | 2011                 | Mercy Clinic    | A-2011-1  | Submitted        |
       | Survey B | 2007                 | Royal North Shore | B-2007-1  | Submitted        |
       | Survey A | 2009                 | RPA               | A-2009-1U | Unsubmitted      |
 
@@ -30,10 +30,10 @@ Feature: Download survey data
       | Please select |
       | Survey A      |
       | Survey B      |
-    And the "Hospital" nested select should contain
+    And the "Clinic" nested select should contain
       |     | ALL                                                            |
-      | NSW | Another One, Royal North Shore, RPA, Sydney Childrens Hospital |
-      | Vic | Mercy Hospital, The Royal Childrens Hospital                   |
+      | NSW | Another One, Royal North Shore, RPA, Sydney Childrens Clinic |
+      | Vic | Mercy Clinic, The Royal Childrens Clinic                   |
     And the "Year of registration" select should contain
       | ALL  |
       | 2007 |
@@ -61,10 +61,10 @@ Feature: Download survey data
     Then I should receive a file with name "survey_a.csv" and type "text/csv"
     And the file I received should match "survey_a.csv"
 
-  Scenario: Download by hospital for a survey
+  Scenario: Download by clinic for a survey
     Given I am on the download page
     When I select "Survey A" from "Registration type"
-    And I select "Mercy Hospital" from "Hospital"
+    And I select "Mercy Clinic" from "Clinic"
     And I press "Download"
     Then I should receive a file with name "survey_a_mh.csv" and type "text/csv"
     And the file I received should match "survey_a_mh.csv"
@@ -77,11 +77,11 @@ Feature: Download survey data
     Then I should receive a file with name "survey_a_2009.csv" and type "text/csv"
     And the file I received should match "survey_a_2009.csv"
 
-  Scenario: Download by hospital and year of registration for a survey
+  Scenario: Download by clinic and year of registration for a survey
     Given I am on the download page
     When I select "Survey A" from "Registration type"
     And I select "2009" from "Year of registration"
-    And I select "Mercy Hospital" from "Hospital"
+    And I select "Mercy Clinic" from "Clinic"
     And I press "Download"
     Then I should receive a file with name "survey_a_mh_2009.csv" and type "text/csv"
     And the file I received should match "survey_a_mh_2009.csv"
@@ -89,11 +89,11 @@ Feature: Download survey data
   Scenario: Dropdown selections should be retained on page reload
     Given I am on the download page
     When I select "Survey B" from "Registration type"
-    And I select "Mercy Hospital" from "Hospital"
+    And I select "Mercy Clinic" from "Clinic"
     And I select "2009" from "Year of registration"
     And I press "Download"
     Then "Survey B" should be selected in the "Registration type" select
-    Then "Mercy Hospital" should be selected in the "Hospital" select
+    Then "Mercy Clinic" should be selected in the "Clinic" select
     Then "2009" should be selected in the "Year of registration" select
 
   Scenario Outline: Data providers/Data provider supervisors can't download

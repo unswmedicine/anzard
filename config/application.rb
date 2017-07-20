@@ -57,6 +57,8 @@ module Anznn
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
+    # Autoload all core library extensions
+    config.autoload_paths += Dir[File.join(Rails.root, "lib", "core_ext", "*.rb")].each {|l| require l }
 
   end
 end
