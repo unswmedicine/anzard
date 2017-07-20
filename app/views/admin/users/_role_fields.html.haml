@@ -12,7 +12,7 @@
   = f.label :clinic_ids, 'Sites'
   .input#user_clinics
     -# Collection checkbox used for initial rendering and editing access level. The content of this input is replaced by JS when the user selects a different unit.
-    = f.collection_check_boxes :clinic_ids, Clinic.clinics_with_unit_code(@user.allocated_unit_code), :id, :site_name_with_full_code do |b|
+    = f.collection_check_boxes :clinic_ids, Clinic.clinics_with_unit_code(@user.allocated_unit_code, true), :id, :site_name_with_full_code do |b|
       = content_tag'div', class: 'clinic_site' do
         = b.label(:'data-value' => b.value, class: 'check_box_label') { b.check_box + b.text }
 

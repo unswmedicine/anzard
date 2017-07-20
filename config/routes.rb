@@ -29,6 +29,11 @@ Anznn::Application.routes.draw do
       get :edit_unit
       post :update_unit
     end
+
+    member do
+      post :deactivate
+      post :activate
+    end
   end
 
   resources :configuration_items, :only => [] do
@@ -66,7 +71,7 @@ Anznn::Application.routes.draw do
           patch :update_role
           get :edit_approval
           patch :approve
-          get :get_sites
+          get :get_active_sites
 
         end
       end

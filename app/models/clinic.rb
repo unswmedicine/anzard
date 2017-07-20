@@ -10,6 +10,8 @@ class Clinic < ApplicationRecord
   validates_presence_of :site_name
   validates_presence_of :state
 
+  validates_inclusion_of :active, in: [true, false]
+
   validates_uniqueness_of :site_code, scope: :unit_code
   validates_numericality_of :unit_code, greater_than_or_equal_to: 0
   validates_numericality_of :site_code, greater_than_or_equal_to: 0
@@ -29,6 +31,14 @@ class Clinic < ApplicationRecord
   GROUP_BY_STATE_WITH_CLINIC = 0
   GROUP_BY_STATE_WITH_UNIT = 1
 
+  def activate
+    self.update!(active: true)
+  end
+
+  def deactivate
+    self.update!(active: false)
+  end
+
   def unit_site_code
     "(#{unit_code}-#{site_code})"
   end
@@ -45,8 +55,18 @@ class Clinic < ApplicationRecord
     "(#{unit_code}-#{site_code}) #{site_name}"
   end
 
-  def self.clinics_with_unit_code(unit_code)
-    where(unit_code: unit_code)
+  def self.unit_name_with_code_for_unit(unit_code)
+    clinic = find_by(unit_code: unit_code)
+    clinic.unit_name_with_code
+  end
+
+  def self.clinics_with_unit_code(unit_code, only_active_clinics=false)
+    if only_active_clinics
+      clinics = where(unit_code: unit_code, active: true)
+    else
+      clinics = where(unit_code: unit_code)
+    end
+    clinics.order(:site_code)
   end
 
   # Returns all Clinics grouped by State in the format [[State], [Unit Name - Site Name', Clinic_id_1], [Unit Name - Site Name', Clinic_id_2], ...]

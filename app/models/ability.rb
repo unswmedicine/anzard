@@ -42,7 +42,7 @@ class Ability
       when Role::SUPER_USER
         can :read, User
         can :update, User
-        can :get_sites, User
+        can :get_active_sites, User
 
         can :read, Response
         can :stats, Response
@@ -62,6 +62,8 @@ class Ability
         can :create, Clinic
         can :edit_unit, Clinic
         can :update_unit, Clinic
+        can :activate, Clinic
+        can :deactivate, Clinic
 
       when Role::DATA_PROVIDER
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED

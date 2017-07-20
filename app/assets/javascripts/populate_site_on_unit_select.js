@@ -23,7 +23,7 @@ $(window).load(function () {
     $('#clinic_unit').change(function() {
         $.ajax({
             type: 'GET',
-            url: 'get_sites',
+            url: 'get_active_sites',
             dataType: 'json',
             async: true,
             data: {unit_code: $("#clinic_unit option:selected").val()},

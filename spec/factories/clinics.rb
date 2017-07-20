@@ -10,5 +10,6 @@ FactoryGirl.define do
       sequence(:unit_code) { |n| n }
       sequence(:site_name) { |n| "Some Site Name #{n}" }
       sequence(:site_code) { |n| n }
+      active true
     end
 end
