@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170712040648) do
+ActiveRecord::Schema.define(version: 20170719005230) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(version: 20170712040648) do
     t.integer  "unit_code"
     t.integer  "site_code"
     t.string   "site_name"
+    t.boolean  "active",     default: true, null: false
   end
 
   create_table "configuration_items", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

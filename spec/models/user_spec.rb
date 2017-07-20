@@ -39,6 +39,7 @@ describe User do
       end
     end
     describe "Approved Administrators Scope" do
+      # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: Clinic allocations is invalid"
       it "should return users that are approved ordered by email address" do
         #super_role = create(:role, :name => "Administrator")
         other_role = create(:role, :name => "Other")
@@ -122,12 +123,14 @@ describe User do
       result.should be false
       user.errors[:password].should eq ["can't be blank", "must be between 6 and 20 characters long and contain at least one uppercase letter, one lowercase letter, one digit and one symbol"]
     end
+    # ToDo: figure out why this test is failing with "expected: ["doesn't match confirmation"] got: []"
     it "should fail if confirmation blank" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => ""})
       result.should be false
       user.errors[:password].should eq ["doesn't match confirmation"]
     end
+    # ToDo: figure out why this test is failing with "expected: ["doesn't match confirmation"] got: []"
     it "should fail if confirmation doesn't match new password" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => "Pass.678"})
@@ -165,8 +168,9 @@ describe User do
       user_1 = create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
       user_1.check_number_of_superusers(1, 1).should eq(false)
     end
-    
-    it "should return true if the logged in user does not match the user record being modified" do  
+
+    # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: Clinic allocations is invalid"
+    it "should return true if the logged in user does not match the user record being modified" do
       research_role = create(:role, :name => 'Data Provider')
       user_1 = create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
       user_2 = create(:user, :role => research_role, :status => 'A', :email => 'user2@intersect.org.au', :clinics => [create(:clinic)])
@@ -181,6 +185,7 @@ describe User do
     it { should validate_presence_of :password }
     it { should validate_numericality_of(:allocated_unit_code).is_greater_than_or_equal_to(0).allow_nil }
 
+    # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: Clinic allocations is invalid"
     it "should validate presence of a clinic UNLESS user has no role OR user is a super user" do
       #NB: this could also be if they are inactive instead of no role, however this works fine
       research_role = create(:role, :name => 'Data Provider')
@@ -201,6 +206,7 @@ describe User do
 
     end
 
+    # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: Clinic allocations is invalid"
     it "should clear the clinic on before validation if a user becomes a super user" do
       super_role = create(:role, :name => Role::SUPER_USER)
       clinic = create(:clinic)
@@ -216,6 +222,7 @@ describe User do
 
     end
 
+    # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: Clinic allocations is invalid"
     it "should never clear the clinic for regular users" do
       clinic = create(:clinic)
       user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :clinics => [clinic])
@@ -280,6 +287,7 @@ describe User do
     it { should allow_value("AAAaaa000`").for(:password) }
   end
 
+  # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: Clinic allocations is invalid"
   describe "Get superuser emails" do
     it "should find all approved superusers and extract their email address" do
 

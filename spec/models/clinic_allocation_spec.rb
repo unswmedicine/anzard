@@ -40,7 +40,7 @@ describe ClinicAllocation do
         clinic2 = create(:clinic, unit_code: 200, site_code: 1, unit_name: 'unit 200', site_name: 'site 1')
         allocation2 = build(:clinic_allocation, user: user, clinic: clinic2)
         expect(allocation2).to_not be_valid
-        expect(allocation2.errors[:clinic_id]).to eq(['User is already allocated to clinic unit_code 100'])
+        expect(allocation2.errors[:id]).to eq(['User is already allocated to clinic unit_code 100'])
       end
     end
 
@@ -54,7 +54,7 @@ describe ClinicAllocation do
       clinic2 = create(:clinic, unit_code: 200, site_code: 1, unit_name: 'unit 200', site_name: 'site 1')
       allocation2 = build(:clinic_allocation, user: user, clinic: clinic2)
       expect(allocation2).to_not be_valid
-      expect(allocation2.errors[:clinic_id]).to eq(['User is already allocated to clinic unit_code 100'])
+      expect(allocation2.errors[:id]).to eq(['User is already allocated to clinic unit_code 100'])
     end
   end
 
@@ -75,9 +75,25 @@ describe ClinicAllocation do
       clinic2 = create(:clinic, unit_code: 200, site_code: 1, unit_name: 'unit 200', site_name: 'site 1')
       allocation2 = build(:clinic_allocation, user: user, clinic: clinic2)
       expect(allocation2).to_not be_valid
-      expect(allocation2.errors[:clinic_id]).to eq(['User is already allocated to clinic unit_code 100'])
+      expect(allocation2.errors[:id]).to eq(['User is already allocated to clinic unit_code 100'])
       expect(user.allocated_unit_code).to eq(100)
     end
   end
 
+  describe 'clinic activation status' do
+    it 'should be able to allocate a user to an active clinic' do
+      user = create :user
+      clinic = create :clinic
+      allocation = build :clinic_allocation, user: user, clinic: clinic
+      expect(allocation).to be_valid
+    end
+
+    it 'should not be possible to allocate a user to a deactivated clinic' do
+      user = create :user
+      clinic = create :clinic, active: false
+      allocation = build :clinic_allocation, user: user, clinic: clinic
+      expect(allocation).to_not be_valid
+      expect(allocation.errors[:id]).to eq(['User cannot be allocated to a deactivated clinic'])
+    end
+  end
 end

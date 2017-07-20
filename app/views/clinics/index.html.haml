@@ -22,6 +22,7 @@
       %th= sortable 'site_code'
       %th= sortable 'site_name'
       %th= sortable 'state'
+      %th= sortable 'active', 'Status'
       %th Actions
   %tbody
     - @clinics.each do |clinic|
@@ -31,6 +32,14 @@
         %td= clinic.site_code
         %td= clinic.site_name
         %td= clinic.state
+        - if clinic.active
+          %td= 'Active'
+        - else
+          %td= 'Deactivated'
         %td
+          - if clinic.active
+            = link_to 'Deactivate', deactivate_clinic_path(clinic), class: 'btn', method: :post, data: {confirm: 'Are you sure? Deactivating a clinic will deallocate all users from that clinic. User accounts with no other clinics will also be deactivated.'}
+          - else
+            = link_to 'Activate', activate_clinic_path(clinic), class: 'btn', method: :post
           - if can?(:edit, clinic)
             = link_to 'Edit Site', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn'

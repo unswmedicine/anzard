@@ -12,8 +12,8 @@ class Admin::UsersController < Admin::AdminBaseController
 
     @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
     @clinic_filter = { unit: params[:users_clinic_unit_filter], unit_and_site: params[:users_clinic_site_filter] }
-    filter_users @clinic_filter[:unit], Clinic.where(unit_code: @clinic_filter[:unit])
-    filter_users @clinic_filter[:unit_and_site], @clinic_filter[:unit_and_site]
+    filter_users_by_unit_code @clinic_filter[:unit], @clinic_filter[:unit]
+    filter_users_by_clinic_ids @clinic_filter[:unit_and_site], @clinic_filter[:unit_and_site]
   end
 
   def show
@@ -34,8 +34,12 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
   def activate
-    @user.activate
-    redirect_to(admin_user_path(@user), notice: 'The user has been activated.')
+    if @user.clinics.empty?
+      redirect_to(admin_user_path(@user), alert: "You cannot activate this account as it is not associated with any sites. Edit this user's site allocation before activating.")
+    else
+      @user.activate
+      redirect_to(admin_user_path(@user), notice: 'The user has been activated.')
+    end
   end
 
   def reject
@@ -101,8 +105,8 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
 
-  def get_sites
-    render json: Clinic.where(unit_code: params['unit_code'])
+  def get_active_sites
+    render json: Clinic.where(unit_code: params['unit_code'], active: true)
   end
 
   private
@@ -118,7 +122,15 @@ class Admin::UsersController < Admin::AdminBaseController
     params.require(:user).permit(:email, :password, :password_confirmation, :first_name, :last_name)
   end
 
-  def filter_users(selected_filter_option, clinic_ids)
+  def filter_users_by_unit_code(selected_filter_option, unit_code)
+    if selected_filter_option == 'None'
+      @users = @users.where(allocated_unit_code: nil)
+    elsif !selected_filter_option.blank?
+      @users = @users.where(allocated_unit_code: unit_code)
+    end
+  end
+
+  def filter_users_by_clinic_ids(selected_filter_option, clinic_ids)
     if selected_filter_option == 'None'
       @users = @users.where('users.id NOT IN (SELECT user_id FROM clinic_allocations)')
     elsif !selected_filter_option.blank?

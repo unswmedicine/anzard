@@ -81,6 +81,7 @@ describe Response do
       Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
     end
 
+    # ToDo: figure out why this test is failing with "expected: [337, 338, 339] got: []"
     it "should filter by clinic when provided" do
       Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.id, "", "").collect(&:id).should eq([@r1, @r2, @r3])
     end
@@ -89,6 +90,7 @@ describe Response do
       Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "2001", "").collect(&:id).should eq([@r1, @r2, @r4])
     end
 
+    # ToDo: figure out why this test is failing with "expected: [353, 354] got: []"
     it "should filter by clinic and year of reg when both provided" do
       Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.id, "2001", "").collect(&:id).should eq([@r1, @r2])
     end
