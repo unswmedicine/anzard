@@ -25,6 +25,7 @@ class BatchFile < ApplicationRecord
 
   belongs_to :user
   belongs_to :clinic
+  # ToDo: remove lingering ANZNN supplementary files
   has_many :supplementary_files
 
   has_attached_file :file, :styles => {}, :path => :make_file_path
