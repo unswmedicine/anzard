@@ -71,6 +71,7 @@ class Ability
         can :create, Response, clinic_id: user.clinic_ids
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
 
+        # ToDo: (ANZARD-38) only allow user to read batch file if batch file clinic ids are included in user clinic ids
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile
@@ -83,6 +84,7 @@ class Ability
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :destroy, Response, clinic_id: user.clinic_ids
 
+        # ToDo: (ANZARD-38) only allow user to read batch file if batch file clinic ids are included in user clinic ids
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile

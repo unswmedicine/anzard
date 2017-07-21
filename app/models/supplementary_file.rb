@@ -1,4 +1,6 @@
 class SupplementaryFile < ApplicationRecord
+  # ToDo: remove supplementary files from the app as it is ANZNN-specific and not relevant to ANZARD
+
   belongs_to :batch_file
   has_attached_file :file, :styles => {}, :path => :make_file_path
   validates_presence_of :multi_name

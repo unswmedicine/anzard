@@ -10,6 +10,7 @@ describe BatchFile do
   end
   let(:user) { create(:user) }
   let(:clinic) { create(:clinic, unit_code: 100, site_code: 100) }
+  let(:clinic_allocation) { create(:clinic_allocation, user: user, clinic: clinic) }
 
   describe "Associations" do
     it { should belong_to(:user) }
@@ -101,6 +102,9 @@ describe BatchFile do
 
   #These are integration tests that verify the file processing works correctly
   describe "File processing" do
+    before :each do
+      clinic_allocation
+    end
 
     describe "invalid files" do
       it "should reject binary files such as xls" do
@@ -133,7 +137,7 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: File has contents that are not what they are reported to be"
+      # ToDo: Fix this. This test fails with the message "File has contents that are not what they are reported to be" due to the Paperclip gem treating an empty CSV as a file type spoofing attempt.
       it "should reject files that are empty" do
         batch_file = process_batch_file('empty.csv', survey, user)
         batch_file.status.should eq("Failed")
@@ -184,10 +188,32 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      it 'should reject files that have a row withan Unknown Site Code' do
+      it 'should reject files that have a row with an Unknown Site Code' do
         batch_file = process_batch_file('unknown_site_code.csv', survey, user)
         batch_file.status.should eq('Failed')
         batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
+        batch_file.record_count.should be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
+      end
+
+      it 'should reject files that contain a row with a Site Code the user is not allocated to' do
+        create(:clinic, unit_code: 100, site_code: 999)
+        batch_file = process_batch_file('unauthorised_site_code.csv', survey, user)
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
+        batch_file.record_count.should be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
+      end
+
+      it 'should reject files that contain a row with a Unit Code the user is not allocated to' do
+        create(:clinic, unit_code: 999, site_code: 100)
+        batch_file = process_batch_file('unauthorised_unit_code.csv', survey, user)
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
         batch_file.record_count.should be_nil
         batch_file.problem_record_count.should be_nil
         batch_file.summary_report_path.should be_nil
@@ -681,6 +707,7 @@ describe BatchFile do
 
   describe "Destroy" do
     it "should remove the associated data file and any reports" do
+      clinic_allocation
       batch_file = process_batch_file('a_range_of_problems.csv', survey, user)
       path = batch_file.file.path
       summary_path = batch_file.summary_report_path

@@ -6,10 +6,10 @@ FactoryGirl.define do
         states = %w(ACT NSW NT QLD SA TAS VIC WA NZ)
         states[n % states.length]
       end
-      sequence(:unit_name) { |n| "Some Unit Name #{n}" }
       sequence(:unit_code, 100) { |n| n }
-      sequence(:site_name) { |n| "Some Site Name #{n}" }
+      unit_name { "Some Unit Name #{unit_code}" }
       sequence(:site_code, 100) { |n| n }
+      site_name { "Some Site Name #{site_code}" }
       active true
     end
 end
