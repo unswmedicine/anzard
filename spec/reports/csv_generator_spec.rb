@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe CsvGenerator do
   let(:survey) { create(:survey, name: "Survey One") }
-  let(:clinic) { create(:clinic, unit_name: "Royal North Shore", unit_code: 100, site_name: 'Kent Street', site_code: 2) }
+  let(:clinic) { create(:clinic, unit_name: "Royal North Shore", unit_code: 100, site_name: 'Kent Street', site_code: 102) }
 
   describe "Generating the filename" do
 
@@ -55,7 +55,7 @@ describe CsvGenerator do
       q_text = create(:question, section: section1, question_order: 2, question_type: Question::TYPE_TEXT, code: 'TextQ')
       q_time = create(:question, section: section1, question_order: 4, question_type: Question::TYPE_TIME, code: 'TimeQ')
 
-      response1 = create(:response, clinic: create(:clinic, unit_name: 'RNS IVF', unit_code: 112, site_code: 4, site_name: 'site one'), survey: survey, year_of_registration: 2009, cycle_id: 'ABC-123')
+      response1 = create(:response, clinic: create(:clinic, unit_name: 'RNS IVF', unit_code: 112, site_code: 104, site_name: 'site one'), survey: survey, year_of_registration: 2009, cycle_id: 'ABC-123')
       create(:answer, response: response1, question: q_choice, answer_value: '1')
       create(:answer, response: response1, question: q_date, answer_value: '25/02/2001')
       create(:answer, response: response1, question: q_decimal, answer_value: '15.5673')
@@ -65,7 +65,7 @@ describe CsvGenerator do
       response1.reload
       response1.save!
 
-      response2 = create(:response, clinic: create(:clinic, unit_name: 'RNS IVF', unit_code: 112, site_code: 6, site_name: 'site two'), survey: survey, year_of_registration: 2011, cycle_id: 'DEF-567')
+      response2 = create(:response, clinic: create(:clinic, unit_name: 'RNS IVF', unit_code: 112, site_code: 106, site_name: 'site two'), survey: survey, year_of_registration: 2011, cycle_id: 'DEF-567')
       create(:answer, response: response2, question: q_integer, answer_value: '99')
       create(:answer, response: response2, question: q_text, answer_value: 'ABCdefg Ijkl')
       response2.reload
@@ -75,8 +75,8 @@ describe CsvGenerator do
       csv = CsvGenerator.new(survey.id, '', '', '').csv
       expected = []
       expected << %w(TreatmentData YearOfTreatment UnitName SiteName UnitID SiteID CYCLE_ID ChoiceQ TextQ DateQ TimeQ IntegerQ DecimalQ)
-      expected << ['Survey One', '2009', 'RNS IVF', 'site one', '112', '4', 'ABC-123', '1', 'ABc', '2001-02-25', '14:56', '877', '15.5673']
-      expected << ['Survey One', '2011', 'RNS IVF', 'site two', '112', '6', 'DEF-567', '', 'ABCdefg Ijkl', '', '', '99', '']
+      expected << ['Survey One', '2009', 'RNS IVF', 'site one', '112', '104', 'ABC-123', '1', 'ABc', '2001-02-25', '14:56', '877', '15.5673']
+      expected << ['Survey One', '2011', 'RNS IVF', 'site two', '112', '106', 'DEF-567', '', 'ABCdefg Ijkl', '', '', '99', '']
       expect(CSV.parse(csv)).to eq(expected)
     end
   end

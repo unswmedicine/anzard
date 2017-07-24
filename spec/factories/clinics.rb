@@ -7,9 +7,9 @@ FactoryGirl.define do
         states[n % states.length]
       end
       sequence(:unit_name) { |n| "Some Unit Name #{n}" }
-      sequence(:unit_code) { |n| n }
+      sequence(:unit_code, 100) { |n| n }
       sequence(:site_name) { |n| "Some Site Name #{n}" }
-      sequence(:site_code) { |n| n }
+      sequence(:site_code, 100) { |n| n }
       active true
     end
 end

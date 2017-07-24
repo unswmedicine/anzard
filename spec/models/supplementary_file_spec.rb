@@ -64,17 +64,17 @@ describe SupplementaryFile do
 
       denormalised = supp_file.as_denormalised_hash
       #File contents:
-      #CycleID,Date,Time
-      #B1,2012-12-01,11:45
-      #B1,2011-11-01,
-      #B2,2011-08-30,01:05
-      #B2,2010-03-04,13:23
-      #B2,,11:53
+      #UNIT, SITE, CycleID,Date,Time
+      #100,100,B1,2012-12-01,11:45
+      #100,100,B1,2011-11-01,
+      #100,100,B2,2011-08-30,01:05
+      #100,100,B2,2010-03-04,13:23
+      #100,100,B2,,11:53
       denormalised.size.should eq(2)
       cycle1 = denormalised['B1']
-      cycle1.should eq({'Date1' => '2012-12-01', 'Date2' => '2011-11-01', 'Time1' => '11:45'})
+      cycle1.should eq({'UNIT1'=>'100', 'SITE1'=>'100', 'UNIT2'=>'100', 'SITE2'=>'100', 'Date1' => '2012-12-01', 'Date2' => '2011-11-01', 'Time1' => '11:45'})
       cycle2 = denormalised['B2']
-      cycle2.should eq({'Date1' => '2011-08-30', 'Date2' => '2010-03-04', 'Time1' => '01:05', 'Time2' => '13:23', 'Time3' => '11:53'})
+      cycle2.should eq({'UNIT1'=>'100', 'SITE1'=>'100', 'UNIT2'=>'100', 'SITE2'=>'100', 'UNIT3'=>'100', 'SITE3'=>'100', 'Date1' => '2011-08-30', 'Date2' => '2010-03-04', 'Time1' => '01:05', 'Time2' => '13:23', 'Time3' => '11:53'})
     end
   end
   

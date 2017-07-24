@@ -9,7 +9,7 @@ describe BatchFile do
     create_survey("some_name", question_file, options_file, cross_question_validations_file)
   end
   let(:user) { create(:user) }
-  let(:clinic) { create(:clinic, unit_code: 0, site_code: 0) }
+  let(:clinic) { create(:clinic, unit_code: 100, site_code: 100) }
 
   describe "Associations" do
     it { should belong_to(:user) }

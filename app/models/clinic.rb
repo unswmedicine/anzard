@@ -13,8 +13,8 @@ class Clinic < ApplicationRecord
   validates_inclusion_of :active, in: [true, false]
 
   validates_uniqueness_of :site_code, scope: :unit_code
-  validates_numericality_of :unit_code, greater_than_or_equal_to: 0
-  validates_numericality_of :site_code, greater_than_or_equal_to: 0
+  validates_numericality_of :unit_code, greater_than_or_equal_to: 100, less_than_or_equal_to: 999
+  validates_numericality_of :site_code, greater_than_or_equal_to: 100, less_than_or_equal_to: 999
 
   PERMITTED_STATES = %w(ACT NSW NT QLD SA TAS VIC WA NZ)
   validates_inclusion_of :state, in: PERMITTED_STATES, message: "must be one of #{PERMITTED_STATES.to_s}"
