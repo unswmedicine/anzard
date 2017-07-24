@@ -169,7 +169,6 @@ class BatchFile < ApplicationRecord
       cycle_id = row[CYCLE_ID_COLUMN]
       cycle_id.strip! unless cycle_id.nil?
       clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
-      # ToDo: associate batch file with each clinic listed in the CSV
       response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
       add_answers_from_supplementary_files(response, cycle_id)
