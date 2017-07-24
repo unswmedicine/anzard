@@ -32,20 +32,20 @@ PGD,0,n,No,No- No PGD undertaken
 PGD,1,y,Yes,Yes - Fresh and thaw cycles where preimplantation genetic diagnosis in any form (including aneuploidy screening or sex selection) has been performed on any of the embryos (transferred or not)
 ASS_HATC,0,n,No,No- No assisted hatching 
 ASS_HATC,1,y,Yes,Yes- Fresh and Thaw cycles where assisted hatching in any form has been performed on any of the embryos (transferred or not)
-THAW_DON,0,o,o - donated oocyte,"If thawed/warmed embryos were originally from donated oocytes, record this field as ìoî."
-THAW_DON,1,e,e - donated embryo,"If thawed/warmed embryos were donated embryos, record this field as ìeî."
+THAW_DON,0,o,o - donated oocyte,"If thawed/warmed embryos were originally from donated oocytes, record this field as o."
+THAW_DON,1,e,e - donated embryo,"If thawed/warmed embryos were donated embryos, record this field as e."
 EMB_ICSI,0,n,No,ICSI not used
 EMB_ICSI,1,y,Yes,Answer YES if any of the transferred embryos fertilised by ICSI.
 PR_CLIN,0,n,No,No clinical pregnancy recorded
 PR_CLIN,1,y,Yes,Clinical pregnancy recorded
-PR_ECTOP,0,n,n - No,Not ectopi or heterotopic
+PR_ECTOP,0,n,n - No,Not ectopic or heterotopic
 PR_ECTOP,1,e,e - ectopic,If this pregnancy is an ectopic pregnancy
 PR_ECTOP,2,h,h - heterotopic,If pregnancy is combined ectopic and uterine pregnancy (heterotopic).
 PR_TOP,0,n,No,No termination of pregnancy
 PR_TOP,1,y,Yes,Elective termination of pregnancy
 PR_REDUC,0,n,No,No selective reduction of pregnancy
-PR_REDUC,1,y,Yes,selective reduction was performed due to fetal abnormality/other reasons
-CS,0,n,No,Not caesarean delivery 
+PR_REDUC,1,y,Yes,Selective reduction was performed due to fetal abnormality/other reasons
+CS,0,n,No,Not caesarean delivery
 CS,1,y,Yes,Caesarean delivery
 BAB1_OUT,0,s,s - Stillbirth,
 BAB1_OUT,1,l,l - Livebirth / survived,
@@ -76,6 +76,6 @@ BAB4_SEX,0,m,m- Male,
 BAB4_SEX,1,f,f - Female,
 BAB4_SEX,2,u,u - Unknown sex,
 MORB_ADM,0,n,No,No hospital admission due to fertility treatment
-MORB_ADM,1,y,Yes,"yes where the female partner is admitted to hospital with any condition (excluding any pregnancy-related issues, such as ectopic pregnancy) that could be in any way related to fertility treatment"
+MORB_ADM,1,y,Yes,"Yes - where the female partner is admitted to hospital with any condition (excluding any pregnancy-related issues, such as ectopic pregnancy) that could be in any way related to fertility treatment"
 MRB_OHSS,0,n,No,No OHSS
 MRB_OHSS,1,y,Yes,Yes if OHSS occurred

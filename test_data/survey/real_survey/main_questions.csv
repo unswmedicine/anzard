@@ -1,19 +1,19 @@
 section,question_order,code,question,question_type,mandatory,multiple,multi_name,group_number,order_within_group,number_min,number_max,number_unknown,string_min,string_max,guide_for_use,description
 Patient demographics,1,UNIT,Unit identifier,Integer,TRUE,,,,,100,999,,,,This number will be supplied by NPESU,3-digit ART unit code provided by NPESU
-Patient demographics,2,SITE,Site of Unit,Integer,TRUE,,,,,0,99,,,,This number will be supplied by NPESU,1/2-digit code for each clinic
-Patient demographics,3,PAT_ID,Patients ID/Medical record number,Text,TRUE,,,,,,,,1,20,Unique ID for patient. This can take whatever form the Unit wishes but RTAC must be able to identify the case file from this ID for vaidation of data collection,Unique ID for patient
-Patient demographics,4,NAM_FST2,First two letters of female patient first name,Text,TRUE,,,,,,,,2,2,First two letters of female patients first name. This field will be used to generate the statistical linkage key,First two letters of female patient first name
-Patient demographics,5,NAM_SUR2,First two letters of female patient surname,Text,TRUE,,,,,,,,2,2,First two letters of female patients surname. This field will be used to generate the statistical linkage key,First two letters of female patient surname
-Patient demographics,6,FDOB,Female patients date of birth ,Date,TRUE,,,,,,,,,,This field must be completed for all female patients including oocyte/embryo donors. This field will be used to generate the statistical linkage key.,Female patient date of birth 
-Patient demographics,7,PDOB,Husband/male partners date of birth ,Date,FALSE,,,,,,,,,,Leave blank if the female patient does not have husband or male partner,Husband/male partners date of birth 
-Donor,8,DON_AGE,Age of oocyte/embryo donor,Integer,FALSE,,,,,18,50,99,,,"Completed years at time of OPU. This item must be completed for oocyte donation, oocyte recipient, embryo donation and embryo recipient, and surrogagcy cycles. Otherwise must be left blank",Age of oocyte/embryo donor in completed years at time of OPU
+Patient demographics,2,SITE,Site of Unit,Integer,TRUE,,,,,100,999,,,,This number is the RTAC accredited unit number,3 digit code for each clinic
+Patient demographics,3,PAT_ID,Patient's ID/Medical record number,Text,TRUE,,,,,,,,1,20,Unique ID for patient. This can take whatever form the Unit wishes but RTAC must be able to identify the case file from this ID for validation of data collection,Unique ID for patient
+Patient demographics,4,NAM_FST2,First two letters of female patient's first name,Text,TRUE,,,,,,,,2,2,First two letters of female patient's first name. This field will be used to generate the statistical linkage key,First two letters of female patient's first name
+Patient demographics,5,NAM_SUR2,First two letters of female patient's surname,Text,TRUE,,,,,,,,2,2,First two letters of female patient's surname. This field will be used to generate the statistical linkage key,First two letters of female patient's surname
+Patient demographics,6,FDOB,Female patient's date of birth ,Date,TRUE,,,,,,,,,,This field must be completed for all female patient's including oocyte/embryo donors. This field will be used to generate the statistical linkage key.,Female patient's date of birth
+Patient demographics,7,PDOB,Husband/male partner's date of birth ,Date,FALSE,,,,,,,,,,Leave blank if the female patient does not have husband or male partner,Husband/male partner's date of birth
+Donor,8,DON_AGE,Age of oocyte/embryo donor,Integer,FALSE,,,,,18,50,99,,,"Completed years at time of OPU. This item must be completed for oocyte donation, oocyte recipient, embryo donation and embryo recipient, and surrogacy cycles. Otherwise must be left blank",Age of oocyte/embryo donor in completed years at time of OPU
 Infertility,9,CI_TUBE,Cause of Infertility: tubal disease,Choice,FALSE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to tubal disease. Otherwise answer no,"n=No, y=Yes"
 Infertility,10,CI_ENDO,Cause of Infertility: endometriosis,Choice,FALSE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to endometriosis. Otherwise answer no,"n=No, y=Yes"
 Infertility,11,CI_OTH,Cause of Infertility: other female factors,Choice,FALSE,,,,,,,,,,"Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to other female factors apart from endometriosis an dtubal disease. Possible examples could include fibroids, ovulation disorders or premature ovarian failure. If there is no clinical female factor subfertility, answer no. ","n=No, y=Yes"
 Infertility,12,CI_MALE,Cause of Infertility:male factor,Choice,FALSE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to male factor problem . Otherwise answer no,"n=No, y=Yes"
 Infertility,13,CI_UNEX,Cause of Infertility: unexplained,Choice,FALSE,,,,,,,,,,"Answer yes if in the opinion of the treating clinician or clinic there is subfertility without any apparent explaination. If answered yes to any of the previous four fields CI_TUBE, CI_ENDO, CI_OTH and CI_MALE, answer no to CI_UNEX.","n=No, y=Yes"
 Infertility,14,PREG_20W,Any pregnancies of 20 weeks or more. ,Choice,FALSE,,,,,,,,,,Whether the female patient had a pregnancy of 20 complete weeks or more. Include any pregnancies or 20 weeks or more regardless of whether by ART or by a different partner. ,"n=No, y=Yes, u=unknown"
-Cycle info,15,CYCLE_ID,Unique identification of each cycle ,Text,TRUE,,,,,,,,1,20,This field must be completed for all cycles - no exceptions. This field must be unique to each cycle and will be used to facilitate queries about the data,Unique ID for cycle
+Cycle info,15,CYCLE_ID,Unique identification of each cycle ,Text,TRUE,,,,,,,,1,20,This field must be completed for all cycles - no exceptions. This field must be unique to each cycle and will be used to facilitate queries about the data,Unique ID for cycle - This code MUST be unique to identify this cycle across the whole ANZARD.
 Cycle info,16,CYC_DATE,The date the cycle started ,Date,TRUE,,,,,,,,,,"THIS FIELD MUST BE COMPLETED FOR ALL CYCLES NO EXCEPTIONS! Coding CYC_DATE by the following rules:
 1. the first date where FSH/stimulation drug is administrated,
 2. the date of LMP for unstimulated cycles (including natural fresh cycles and thaw cycles),
@@ -22,12 +22,12 @@ Cycle info,16,CYC_DATE,The date the cycle started ,Date,TRUE,,,,,,,,,,"THIS FIEL
 5. the date of embryos donated for frozen embryos donation cycles, or
 6. the date of embryos received for non-transfer embryo recipient cycles.",The date the cycle started. This date defines the year in which a cycle is reported by NPESU
 Donor,17,SURR,Surrogacy arrangement,Choice,FALSE,,,,,,,,,,"Whether surrogacy arrangement is involved in this cycle.
-Recode for all parties of the arrangement including commission patients (with or without OPU), surrogacy carrier, and oocyte donor if donated oocytes were used.","n=No, y=Yes"
+Recode for all parties of the arrangement including commission patients (with or without OPU), surrogacy carrier, and oocyte donor if donated oocytes were used.","n=No, y=Yes - a surrogacy arrangement "
 Fresh,18,OV_STIM,Whether FSH stimulation was given,Choice,FALSE,,,,,,,,,,Does not include clomiphene or hCG alone unless FSH was also given.,"n=No, y=Yes"
 Fresh,19,STIM_1ST,First ever FSH stimulation was given,Choice,FALSE,,,,,,,,,,"Whether the current fresh cycle is the first ever FSH stimulated cycle with the intension of OPU (include all treatments she had in other unit or country). This field must be completed for all fresh cycles (include cancelled fresh cycles before OPU). FSH stimulated artificial insemination cycle is not counted. If known the female patient had FSH stimulated cycle for OPU before, answer ìnî to this field; if the current fresh cycle is her first FSH stimulated cycle for OPU, answer ìyî to this field. If unknown whether she had FSH stimulated cycle for OPU before, answer ìuî to this field.","n=No, y=Yes, u=unknown"
 Donor,20,IUI_DATE,Date of intra-uterine insemination,Date,FALSE,,,,,,,,,,"Date of intra-uterine insemination using donated sperm.
-Only included cycles with intra-uterine insemination using donated sperm. Exclude cycles such as intra-virginal insemination using donated sperm.",
-Fresh,21,CAN_DATE,Date of cancellation for cancelled cycle before OPU,Date,FALSE,,,,,,,,,,Date of last day FSH is administrated in a cancelled cycle. Leave it blank if not a cancelled cycle.,
+Only include cycles with intra-uterine insemination using donated sperm. Exclude cycles such as intra-virginal insemination using donated sperm.",
+Fresh,21,CAN_DATE,Date of cancellation for cancelled cycle before OPU,Date,FALSE,,,,,,,,,,Date of the last day FSH is administered in a cancelled cycle. Leave it blank if not a cancelled cycle.,
 Fresh,22,OPU_DATE,OPU date,Date,FALSE,,,,,,,,,,The date of oocyte pick up,
 Fresh,23,N_EGGS,Number of eggs retrieved,Integer,FALSE,,,,,0,50,,,,Number of eggs retrieved at OPU. Include any immature oocytes that are identified.,
 Donor,24,N_DONATE,Number of eggs donated,Integer,FALSE,,,,,0,50,,,,"Number of eggs donated to someone else (oocyte donation cycle, DON_AGE field must be coded).",
@@ -62,7 +62,7 @@ FROZEN/THAW,44,N_V_CLTH,Number of vitrified cleavage embryos warmed,Integer,FALS
 FROZEN/THAW,45,N_S_BLTH,Number of slow frozen blastocysts thawed,Integer,FALSE,,,,,0,15,,,,"Number of slow frozen blastocysts thawed with intention of performing an embryo transfer. For the ANZARD collection, blastocyst is simply defined as an embryo five or six days after fertilization.",
 FROZEN/THAW,46,N_V_BLTH,Number of vitrified blastocysts warmed,Integer,FALSE,,,,,0,15,,,,Number of vitrified blastocysts warmed with intention of performing an embryo transfer.,
 FROZEN/THAW,47,FDAT_EMB,Freezing date of thawed/warmed embryos,Date,FALSE,,,,,,,,,,"If two batches of thawed/warmed embryos with different freezing date, record the earlier freezing date.",
-Donor,48,THAW_DON,Thawed/warmed embryo originally from oocyte donor or embryo donor,Choice,FALSE,,,,,,,,,,"If thawed/warmed embryos were originally from donated oocytes, record this field as o. If thawed/warmed embryos were donated embryos, record this field as e. (DON_AGE field must be coded).",o = donated oocyte e = donated embryo
+Donor,48,THAW_DON,Thawed/warmed embryo originally from oocyte donor or embryo donor,Choice,FALSE,,,,,,,,,,"If thawed/warmed embryos were originally from donated oocytes, record this field as o. If thawed/warmed embryos were donated embryos, record this field as e. (DON_AGE field must be coded).","o = donated oocyte, e = donated embryo "
 ET,49,ET_DATE,Embryo transfer date,Date,FALSE,,,,,,,,,,"If it is known that an embryo transfer has taken place but the exact date is unknown, make comments in COMMENT field.",
 ET,50,N_CL_ET,Number of cleavage embryos transferred,Integer,FALSE,,,,,0,3,,,,Number of cleavage stage embryos transferred.,
 ET,51,N_BL_ET,Number of blastocysts transferred,Integer,FALSE,,,,,0,3,,,,Number of blastocyst stage embryos transferred.,
@@ -84,8 +84,8 @@ Outcomes,62,N_FH,Number of fetal hearts,Integer,FALSE,,,,,0,3,9,,,"Number of fet
 This field must be completed if PR_CLIN field is y.","0 = No fetal hearts detected / 1 to 8 = Number of fetal hearts detected
 9 = unknown of number of FH"
 Outcomes,63,PR_ECTOP,Ectopic pregnancy,Choice,FALSE,,,,,,,,,,"If this pregnancy is an ectopic pregnancy, or a combined ectopic and uterine pregnancy (heterotopic).
-This field must be completed if PR_CLIN field is y","n = No 
-e = ectopic 
+This field must be completed if PR_CLIN field is y","n = No
+e = ectopic
 h = heterotopic"
 Outcomes,64,PR_TOP,Elective termination of pregnancy,Choice,FALSE,,,,,,,,,,"Do NOT include pregnancies where a planned fetal reduction of a multiple pregnancy results in a subsequent unintended miscarriage, or a pregnancy where there has been an IUFD requiring induced delivery. Give reasons for TOP in ABN_LESS field.
 This field must be completed if PR_CLIN field is y","n=No, y=Yes"
@@ -147,8 +147,8 @@ Outcomes,90,MORB_ADM,Hospital admission with ART related morbidity,Choice,FALSE,
 Outcomes,91,MRB_OHSS,OHSS,Choice,FALSE,,,,,,,,,,Answer yes if OHSS occurred.,"n=No, y=Yes"
 Outcomes,92,MORB_INF,Morbidity detail,Text,FALSE,,,,,,,,0,255,Put in as much detail as known about cause of morbidity. This field must Not be blank if MORB_ADM field and/or MRB_OHSS field is yes. ,"Leave this field blank if no morbidity
 Do not insert nil or none"
-Patient demographics,93,POSTCODE,Postcode of patient residential area,Text,TRUE,,,,,,,,0,50,"Postcode of patient current residential area
-New Zealand units put ìNZî.","I.E. 2000
+Patient demographics,93,POSTCODE,Postcode of patient residential area,Text,TRUE,,,,,,,,0,50,"Postcode of patient's current residential area
+New Zealand units put NZ","I.E. 2000
 NZ = New Zealand
 Put country name for overseas patient"
 COMMENT,94,COMMENT,Any comments of this cycle,Text,FALSE,,,,,,,,0,255,Explanations/comments where  any fields cannot be coded properly according to the data dictionary.,"Leave this field blank if not applicable.
