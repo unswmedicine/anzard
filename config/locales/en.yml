@@ -7,6 +7,7 @@ en:
     attributes:
       response:
         survey_id: 'Registration type'
+        cycle_id: 'Cycle ID'
       batch_file:
         file_file_name: 'File'
         survey_id: 'Registration type'
@@ -15,7 +16,7 @@ en:
         response:
           attributes:
             cycle_id:
-              taken: 'ID %{value} has already been used.'
+              taken: '%{value} has already been used.'
 
   unauthorized:
     default: 'You tried to access a page you are not authorised to view.'
