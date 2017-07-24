@@ -30,10 +30,10 @@ class BatchFilesController < ApplicationController
 
   def create
     @batch_file.user = current_user
-    # ToDo: (ANZARD-38) Remove hot-fix association between batch file and user's first clinic (solved by adding clinic association to batch file corresponding to each clinic in CSV row)
+    # ToDo: Remove hot-fix association between batch file and user's first clinic (solved by adding clinic association to batch file corresponding to each clinic in CSV row)
     @batch_file.clinic = current_user.clinics.first
     if @batch_file.save
-      # ToDo: (ANZARD-38) remove ANZNN lingering supplementary files
+      # ToDo: Remove ANZNN lingering supplementary files
       supplementaries = params[:supplementary_files]
       if supplementaries
         supplementaries.each_pair { |key, supp_attrs| @batch_file.supplementary_files.create!(supp_attrs) if supp_attrs[:file] }
