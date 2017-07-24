@@ -30,8 +30,6 @@ class BatchFilesController < ApplicationController
 
   def create
     @batch_file.user = current_user
-    # ToDo: (ANZARD-16) Remove hot-fix association between batch file and user's first clinic (solved by adding clinic association to batch file corresponding to each clinic in CSV row)
-    @batch_file.clinic = current_user.clinics.first
     if @batch_file.save
       # ToDo: remove ANZNN lingering supplementary files
       supplementaries = params[:supplementary_files]
@@ -59,7 +57,7 @@ class BatchFilesController < ApplicationController
   private
 
   def create_params
-    params.require(:batch_file).permit(:survey_id, :year_of_registration, :file, :supplementary_files)
+    params.require(:batch_file).permit(:survey_id, :year_of_registration, :file, :supplementary_files, :clinic_id)
   end
 
   def replace_paperclip_spoof_error_with_invalid_csv_msg
