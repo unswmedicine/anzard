@@ -15,6 +15,7 @@ class Response < ApplicationRecord
   has_many :answers, dependent: :destroy
 
   validates_presence_of :cycle_id
+  validates_length_of :cycle_id, :minimum => 1, :maximum => 20
   validates_presence_of :user
   validates_presence_of :survey_id
   validates_presence_of :clinic_id
