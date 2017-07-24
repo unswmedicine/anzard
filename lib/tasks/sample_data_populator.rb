@@ -2,6 +2,8 @@ require 'csv'
 require 'csv_survey_operations.rb'
 
 include CsvSurveyOperations
+
+SURVEY_NAME = 'ANZARD 2.0'
 ALL_MANDATORY = 1
 ALL = 2
 FEW = 3
@@ -25,7 +27,7 @@ end
 
 def create_responses(big)
   Response.delete_all
-  main = Survey.where(:name => 'ANZARD data form').first
+  main = Survey.where(:name => SURVEY_NAME).first
 
   # remove the one dataprovider is linked to as we'll create those separately
   dp_clinics = User.find_by_email!('dataprovider@intersect.org.au').clinics
@@ -61,7 +63,7 @@ def create_surveys
   CrossQuestionValidation.delete_all
   SupplementaryFile.delete_all
 
-  create_survey_from_lib_tasks("ANZARD data form", "main_questions.csv", "main_question_options.csv", "main_cross_question_validations.csv", 'test_data/survey/real_survey')
+  create_survey_from_lib_tasks(SURVEY_NAME, 'main_questions.csv', 'main_question_options.csv', 'main_cross_question_validations.csv', 'test_data/survey/real_survey')
 end
 
 def create_survey_from_lib_tasks(name, question_file, options_file, cross_question_validations_file, dir='lib/tasks')
