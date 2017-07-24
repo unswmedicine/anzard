@@ -20,9 +20,12 @@ class CsvGenerator
     name_parts = [survey.name.parameterize(separator: '_')]
 
     unless unit_code.blank?
-      clinic = Clinic.find_by_unit_code(unit_code)
-      name_parts << clinic.unit_name.parameterize(separator: '_')
-      unless clinic.site_name.blank?
+      if site_code.blank?
+        clinic = Clinic.find_by(unit_code: unit_code)
+        name_parts << clinic.unit_name.parameterize(separator: '_')
+      else
+        clinic = Clinic.find_by(unit_code: unit_code, site_code: site_code)
+        name_parts << clinic.unit_name.parameterize(separator: '_')
         name_parts << clinic.site_name.parameterize(separator: '_')
       end
     end

@@ -3,6 +3,7 @@ require 'rails_helper'
 describe CsvGenerator do
   let(:survey) { create(:survey, name: "Survey One") }
   let(:clinic) { create(:clinic, unit_name: "Royal North Shore", unit_code: 100, site_name: 'Kent Street', site_code: 102) }
+  let(:clinic2) { create(:clinic, unit_name: "Royal North Shore", unit_code: 100, site_name: 'George Street', site_code: 103) }
 
   describe "Generating the filename" do
 
@@ -10,19 +11,20 @@ describe CsvGenerator do
       expect(CsvGenerator.new(survey.id, "", "", "").csv_filename).to eq("survey_one.csv")
     end
 
-    it "includes survey name and clinic when clinic set" do
-      expect(CsvGenerator.new(survey.id, clinic.unit_code, "", "").csv_filename).to eq("survey_one_royal_north_shore_kent_street.csv")
+    it "includes survey name and clinic unit name when clinic unit set" do
+      expect(CsvGenerator.new(survey.id, clinic.unit_code, "", "").csv_filename).to eq("survey_one_royal_north_shore.csv")
+    end
 
+    it "includes survey name and clinic unit and site name when clinic unit and site set" do
+      expect(CsvGenerator.new(survey.id, clinic.unit_code, clinic.site_code, "").csv_filename).to eq("survey_one_royal_north_shore_kent_street.csv")
     end
 
     it "includes survey name and year of registration when year of registration set" do
       expect(CsvGenerator.new(survey.id, "", "", "2009").csv_filename).to eq("survey_one_2009.csv")
-
     end
 
     it "includes survey name, clinic and year of registration when all are set" do
-      expect(CsvGenerator.new(survey.id, clinic.unit_code, "", "2009").csv_filename).to eq("survey_one_royal_north_shore_kent_street_2009.csv")
-
+      expect(CsvGenerator.new(survey.id, clinic2.unit_code, clinic2.site_code, "2009").csv_filename).to eq("survey_one_royal_north_shore_george_street_2009.csv")
     end
 
     it "makes the survey name safe for use in a filename" do
