@@ -66,8 +66,9 @@ describe Response do
     before(:each) do
       @survey_a = create(:survey)
       @survey_b = create(:survey)
-      @clinic_a = create(:clinic)
-      @clinic_b = create(:clinic)
+      @clinic_a = create(:clinic, unit_code: 100, unit_name: 'Unit 100', site_code: 100)
+      @clinic_b = create(:clinic, unit_code: 200, unit_name: 'Unit 200', site_code: 200)
+      @clinic_c = create(:clinic, unit_code: 100, unit_name: 'Unit 100', site_code: 101)
       @r1 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "1").id
       @r2 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "2").id
       @r3 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "3").id
@@ -75,25 +76,32 @@ describe Response do
       @r5 = create(:response, survey: @survey_a, clinic: @clinic_b, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "5").id
       @r6 = create(:response, survey: @survey_a, clinic: @clinic_b, year_of_registration: 2003, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "6").id
       @r7 = create(:response, survey: @survey_b, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "7").id
-      @r8 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
+      @r8 = create(:response, survey: @survey_a, clinic: @clinic_c, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "8").id
+      @r9 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_UNSUBMITTED).id
     end
 
     it "should return all submitted responses for survey when clinic and year of reg not provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6])
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6, @r8])
     end
 
-    # ToDo: figure out why this test is failing with "expected: [337, 338, 339] got: []"
-    it "should filter by clinic when provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.id, "", "").collect(&:id).should eq([@r1, @r2, @r3])
+    it "should filter by unit when provided" do
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, "", "").collect(&:id).should eq([@r1, @r2, @r3, @r8])
+    end
+
+    it "should filter by unit and site when provided" do
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, @clinic_a.site_code, "").collect(&:id).should eq([@r1, @r2, @r3])
     end
 
     it "should filter by year of reg when provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "2001", "").collect(&:id).should eq([@r1, @r2, @r4])
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "2001").collect(&:id).should eq([@r1, @r2, @r4, @r8])
     end
 
-    # ToDo: figure out why this test is failing with "expected: [353, 354] got: []"
-    it "should filter by clinic and year of reg when both provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.id, "2001", "").collect(&:id).should eq([@r1, @r2])
+    it "should filter by clinic unit and year of reg when both provided" do
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, "", "2001").collect(&:id).should eq([@r1, @r2, @r8])
+    end
+
+    it "should filter by clinic unit and site and year of reg when all provided" do
+      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, @clinic_a.site_code, "2001").collect(&:id).should eq([@r1, @r2])
     end
   end
 

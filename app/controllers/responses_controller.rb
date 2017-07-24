@@ -107,14 +107,14 @@ class ResponsesController < ApplicationController
     set_tab :download, :home
     @survey_id = params[:survey_id]
     @unit_code = params[:unit_code]
-    @year_of_registration = params[:year_of_registration]
     @site_code = params[:site_code]
+    @year_of_registration = params[:year_of_registration]
 
     if @survey_id.blank?
       @errors = ["Please select a registration type"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(@survey_id, @unit_code, @year_of_registration, @site_code)
+      generator = CsvGenerator.new(@survey_id, @unit_code, @site_code, @year_of_registration)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download

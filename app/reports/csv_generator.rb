@@ -4,7 +4,7 @@ class CsvGenerator
   BASIC_HEADERS = %w(TreatmentData YearOfTreatment UnitName SiteName UnitID SiteID CYCLE_ID)
   attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code
 
-  def initialize(survey_id, unit_code, year_of_registration, site_code)
+  def initialize(survey_id, unit_code, site_code, year_of_registration)
     self.survey_id = survey_id
     self.unit_code = unit_code
     self.site_code = site_code
@@ -13,7 +13,7 @@ class CsvGenerator
     self.survey = SURVEYS[survey_id.to_i]
     self.question_codes = survey.ordered_questions.collect(&:code)
 
-    self.records = Response.for_survey_clinic_and_year_of_registration(survey, unit_code, year_of_registration, site_code)
+    self.records = Response.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
   end
 
   def csv_filename

@@ -16,12 +16,12 @@ describe CsvGenerator do
     end
 
     it "includes survey name and year of registration when year of registration set" do
-      expect(CsvGenerator.new(survey.id, "", "2009", "").csv_filename).to eq("survey_one_2009.csv")
+      expect(CsvGenerator.new(survey.id, "", "", "2009").csv_filename).to eq("survey_one_2009.csv")
 
     end
 
     it "includes survey name, clinic and year of registration when all are set" do
-      expect(CsvGenerator.new(survey.id, clinic.unit_code, "2009", "").csv_filename).to eq("survey_one_royal_north_shore_kent_street_2009.csv")
+      expect(CsvGenerator.new(survey.id, clinic.unit_code, "", "2009").csv_filename).to eq("survey_one_royal_north_shore_kent_street_2009.csv")
 
     end
 
@@ -34,8 +34,8 @@ describe CsvGenerator do
   describe "Checking for emptiness" do
     # ToDo: figure out why this test is failing with "RSpec::Mocks::MockExpectationError: #<Response(id: integer, survey_id: integer, user_id: integer, cycle_id: string, created_at: datetime, updated_at: datetime, clinic_id: integer, submitted_status: string, batch_file_id: integer, year_of_registration: integer, validation_status: string) (class)> received :for_survey_clinic_and_year_of_registration with unexpected arguments"
     it "returns true if there's no matching records" do
-      expect(Response).to receive(:for_survey_clinic_and_year_of_registration).with(survey, clinic.id, "2009", "").and_return([])
-      expect(CsvGenerator.new(survey.id, clinic.unit_code, "2009", "")).to be_empty
+      expect(Response).to receive(:for_survey_clinic_and_year_of_registration).with(survey, clinic.id, "", "2009").and_return([])
+      expect(CsvGenerator.new(survey.id, clinic.unit_code, "", "2009")).to be_empty
     end
 
     it "returns false if there's matching records" do
