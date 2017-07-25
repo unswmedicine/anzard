@@ -47,10 +47,15 @@ class Response < ApplicationRecord
     self.survey_id = survey.id
   end
 
-  def self.for_survey_clinic_and_year_of_registration(survey, unit_code, year_of_registration, site_code)
+  def self.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
     results = submitted.for_survey(survey).order(:cycle_id)
-    results = results.joins(:clinic).where(:clinics => {:unit_code => unit_code}) unless unit_code.blank?
-    results = results.joins(:clinic).where(:clinics => {:site_code => site_code}) unless site_code.blank?
+    unless unit_code.blank?
+      if site_code.blank?
+        results = results.joins(:clinic).where(:clinics => {unit_code: unit_code})
+      else
+        results = results.joins(:clinic).where(:clinics => {unit_code: unit_code, site_code: site_code})
+      end
+    end
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
     results.includes([:clinic])
   end
