@@ -15,11 +15,6 @@
         = f.select :year_of_registration, year_of_registration_range.reverse, {:include_blank => "Please select"}, {:class => "medium"}
         = required
     .clearfix
-      = f.label :cycle_id, 'Cycle ID'
-      .input
-        = f.text_field :cycle_id, placeholder: 'Code uniquely identifying this cycle'
-        = required
-    .clearfix
       = label_tag 'unit', 'Unit'
       .input
         = text_field_tag 'unit', current_user.clinics.first.unit_name_with_code, disabled: true # All user clinics are from the same unit
@@ -27,6 +22,11 @@
       = f.label :clinic_id, 'Site'
       .input
         = f.collection_select :clinic_id, current_user.clinics, :id, :site_name_with_full_code, {},  {:class => "large"}
+        = required
+    .clearfix
+      = f.label :cycle_id, 'Cycle ID'
+      .input
+        = f.text_field :cycle_id, placeholder: 'Code uniquely identifying this cycle', size: Response::CYCLE_ID_MAX_SIZE, maxlength: Response::CYCLE_ID_MAX_SIZE
         = required
     .actions
       = f.submit "Save", class: "btn primary"

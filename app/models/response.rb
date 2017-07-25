@@ -7,6 +7,9 @@ class Response < ApplicationRecord
   INCOMPLETE = 'Incomplete'
   COMPLETE_WITH_WARNINGS = 'Complete with warnings'
 
+  CYCLE_ID_MIN_SIZE = 1
+  CYCLE_ID_MAX_SIZE = 20
+
   belongs_to :user
   belongs_to :clinic
   belongs_to :batch_file
@@ -15,7 +18,7 @@ class Response < ApplicationRecord
   has_many :answers, dependent: :destroy
 
   validates_presence_of :cycle_id
-  validates_length_of :cycle_id, :minimum => 1, :maximum => 20
+  validates_length_of :cycle_id, :minimum => CYCLE_ID_MIN_SIZE, :maximum => CYCLE_ID_MAX_SIZE
   validates_presence_of :user
   validates_presence_of :survey_id
   validates_presence_of :clinic_id
