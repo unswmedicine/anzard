@@ -15,9 +15,9 @@
         = f.select :year_of_registration, year_of_registration_range.reverse, {:include_blank => "Please select"}, {:class => "medium"}
         = required
     .clearfix
-      = f.label :cycle_id, "Cycle ID"
+      = f.label :cycle_id, 'Cycle ID'
       .input
-        = f.text_field :cycle_id
+        = f.text_field :cycle_id, placeholder: 'Code uniquely identifying this cycle'
         = required
     .clearfix
       = label_tag 'unit', 'Unit'

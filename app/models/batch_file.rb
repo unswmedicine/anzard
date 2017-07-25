@@ -12,7 +12,8 @@ class BatchFile < ApplicationRecord
 
   MESSAGE_WARNINGS = 'The file you uploaded has one or more warnings. Please review the reports for details.'
   MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{CYCLE_ID_COLUMN} column."
-  MESSAGE_UNKNOWN_UNIT_OR_SITE_CODE = "The file you uploaded contains a #{UNIT_CODE_COLUMN} or #{SITE_CODE_COLUMN} that is unknown to our database."
+  MESSAGE_UNKNOWN_UNIT_SITE = "The file you uploaded contains a #{UNIT_CODE_COLUMN} or #{SITE_CODE_COLUMN} that is unknown to our database."
+  MESSAGE_UNAUTHORISED_UNIT_SITE = 'The file you uploaded contains a Unit_Site that you are not allocated to.'
   MESSAGE_MISSING_CYCLE_IDS = 'The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID.'
   MESSAGE_EMPTY = 'The file you uploaded did not contain any data.'
   MESSAGE_FAILED_VALIDATION = 'The file you uploaded did not pass validation. Please review the reports for details.'
@@ -236,8 +237,13 @@ class BatchFile < ApplicationRecord
 
       clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
       if clinic_in_row.nil?
-        set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_OR_SITE_CODE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
+      else
+        unless user.clinics.exists? clinic_in_row.id
+          set_outcome(STATUS_FAILED, MESSAGE_UNAUTHORISED_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+          return false
+        end
       end
     end
 

@@ -1,7 +1,7 @@
 require 'csv'
 class CsvGenerator
 
-  BASIC_HEADERS = %w(TreatmentData YearOfTreatment UnitName SiteName UnitID SiteID CYCLE_ID)
+  BASIC_HEADERS = %w(TREATMENT_DATA YEAR_OF_TREATMENT UNIT_NAME SITE_NAME UNIT SITE CYCLE_ID)
   attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code
 
   def initialize(survey_id, unit_code, site_code, year_of_registration)

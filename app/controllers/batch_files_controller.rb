@@ -31,7 +31,7 @@ class BatchFilesController < ApplicationController
   def create
     @batch_file.user = current_user
     if @batch_file.save
-      # ToDo: remove ANZNN lingering supplementary files
+      # ToDo: Remove ANZNN lingering supplementary files
       supplementaries = params[:supplementary_files]
       if supplementaries
         supplementaries.each_pair { |key, supp_attrs| @batch_file.supplementary_files.create!(supp_attrs) if supp_attrs[:file] }
