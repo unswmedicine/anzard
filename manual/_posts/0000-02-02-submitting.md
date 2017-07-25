@@ -16,7 +16,7 @@ Once you have done this, you will see  a 'Submit' button at the top. If you are 
 ## Submitting with warnings
 If your data entry form has warnings, please check your answers carefully to ensure there are no mistakes. If you have checked and wish to submit with the warnings, this can be done by a user with 'Supervisor' level access.
 
-If you do not have 'Supervisor' access, you will need to ask a supervisor to submit for you. If you are a 'Supervisor', you can submit the data entry form by clicking the '' button for the data entry form you wish to submit.
+If you do not have 'Supervisor' access, you will need to ask a supervisor to submit for you. If you are a 'Supervisor', you can submit the data entry form by clicking the 'Submit' button for the data entry form you wish to submit.
 
 ![Submitting](/user_manual/assets/images/data_entry/cant_submit.png)
 *Fig 2. Message shown when data entry form can't be submitted due to warnings*

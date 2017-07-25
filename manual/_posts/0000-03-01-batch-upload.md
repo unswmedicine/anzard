@@ -12,7 +12,9 @@ Batch uploads must be provided as a CSV file. The CSV file should contain a head
 ## Starting a new batch upload
 Click on the 'Batch Uploads' tab from the home page. 
 
-Select the treatment data and year of treatment, then browse for the file you wish to upload.
+Select the primary clinic site to associate the batch upload with. Any user that has access to the selected site will be able to review the status of the uploaded file. 
+
+Next select the treatment data and year of treatment, then browse for the file you wish to upload.
 
 Once you have selected your file, click the 'Upload' button. You will be returned to the batch uploads list screen and will see your file in the list. Initially it will have a status of 'In Progress'. 
 

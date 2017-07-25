@@ -29,6 +29,6 @@ After you request an account, your request will be reviewed by ANZARD administra
 Go to the ANZARD home page and enter your email address and the password you chose when requesting an account.
 
 ## What to do if you can't log in
-If you're having trouble logging in, you can use the 'Forgot your password?' link on the home page to create a new password. A password reset link will be sent to the email address you registered with. If you are still having difficulties, please contact ANZARD.
+If you're having trouble logging in, you can use the 'Forgot your password?' link on the home page to create a new password. A password reset link will be sent to the email address you registered with. If you are still having difficulties, please contact [ANZARD](mailto:anzard@unsw.edu.au).
 
   
