@@ -16,10 +16,23 @@ Anznn::Application.routes.draw do
       get :stats
       get :prepare_download
       get :download
+      get :get_sites
       get :batch_delete
-      get :submitted_baby_codes
+      get :submitted_cycle_ids
       put :confirm_batch_delete
       put :perform_batch_delete
+    end
+  end
+
+  resources :clinics, :only => [:index, :new, :create, :edit, :update] do
+    collection do
+      get :edit_unit
+      post :update_unit
+    end
+
+    member do
+      post :deactivate
+      post :activate
     end
   end
 
@@ -58,6 +71,7 @@ Anznn::Application.routes.draw do
           patch :update_role
           get :edit_approval
           patch :approve
+          get :get_active_sites
 
         end
       end

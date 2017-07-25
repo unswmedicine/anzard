@@ -12,11 +12,16 @@ def create_config_items
   ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2012")
 end
 
-def create_hospitals
-  Hospital.delete_all
+def create_clinics
+  Clinic.delete_all
 
-  hospitals = read_hashes_from_csv(Rails.root.join("db/seed_files", "hospitals.csv"))
-  hospitals.each do |hash|
-    Hospital.create!(hash)
+  clinics = read_hashes_from_csv(Rails.root.join("db/seed_files", "clinics.csv"))
+  clinics.each do |hash|
+    clinic = Clinic.new(state:hash['State'].strip,
+                        unit_name: hash['Unit_Name'].strip,
+                        unit_code: hash['Unit_Code'].strip,
+                        site_name: hash['Site_Name'].strip,
+                        site_code: hash['Site_Code'].strip)
+    clinic.save!
   end
 end

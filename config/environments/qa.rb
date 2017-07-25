@@ -1,6 +1,6 @@
 Anznn::Application.configure do
 
-  config.action_mailer.default_url_options = { :host => 'gsw1-anznn-qa.intersect.org.au' }
+  config.action_mailer.default_url_options = { :host => 'anznn-qa.intersect.org.au' }
 
   # Settings specified here will take precedence over those in config/application.rb
 
@@ -61,5 +61,6 @@ Anznn::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
-  config.eager_load = false
+  config.eager_load = true
+  config.eager_load_paths += %W(#{config.root}/lib)
 end

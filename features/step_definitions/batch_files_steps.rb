@@ -1,7 +1,7 @@
 require 'tempfile'
 
-Then /^I should have a batch file stored for survey "([^"]*)" with uploader "([^"]*)" and hospital "([^"]*)"$/ do |survey_name, email, hospital_name|
-  check_batch_file(survey_name, email, hospital_name)
+Then /^I should have a batch file stored for survey "([^"]*)" with uploader "([^"]*)" and clinic "([^"]*)"$/ do |survey_name, email, clinic_name|
+  check_batch_file(survey_name, email, clinic_name)
 end
 
 Then /^the batch uploads table should look like$/ do |expected_table|
@@ -44,7 +44,7 @@ Given /^I upload batch file( as "(.*)")? "([^"]*)" for survey "([^"]*)"$/ do |as
   else
     user = User.first
   end
-  check_batch_file(survey_name, user.email, user.hospital.name)
+  check_batch_file(survey_name, user.email, user.clinic.unit_name)
 end
 
 Then /^I should have two batch files stored with name "([^"]*)"$/ do |name|
@@ -61,13 +61,13 @@ Given /^I have batch uploads$/ do |table|
   table.hashes.each do |attrs|
     survey = Survey.find_by_name!(attrs.delete("survey"))
     uploader = User.find_by_email!(attrs.delete("created_by"))
-    hospital_name = attrs.delete("hospital")
-    hospital = Hospital.find_by_name(hospital_name)
-    hospital ||= Factory(:hospital, name: hospital_name)
+    clinic_name = attrs.delete("clinic")
+    clinic = Clinic.find_by_unit_name(clinic_name)
+    clinic ||= Factory(:clinic, name: clinic_name)
     summary = attrs.delete("summary report") == "true"
     detail = attrs.delete("detail report") == "true"
 
-    bf = Factory(:batch_file, attrs.merge(survey: survey, user: uploader, hospital: hospital))
+    bf = Factory(:batch_file, attrs.merge(survey: survey, user: uploader, clinic: clinic))
 
     #create fake reports so we can test downloading them
     if summary
@@ -81,7 +81,7 @@ Given /^I have batch uploads$/ do |table|
     if detail
       file_path = File.join(APP_CONFIG['batch_reports_path'], "#{bf.id}-details.csv")
       CSV.open(file_path, "wb") do |csv|
-        csv.add_row ['BabyCode', 'Column Name', 'Type', 'Value', 'Message']
+        csv.add_row ['CYCLE_ID', 'Column Name', 'Type', 'Value', 'Message']
         csv.add_row ['1', 'MoAge', 'Error', '6', 'A bad value']
       end
       bf.detail_report_path = file_path
@@ -113,11 +113,11 @@ Then /^I should see file select "([^"]*)"$/ do |label|
 end
 
 
-def check_batch_file(survey_name, email, hospital_name)
+def check_batch_file(survey_name, email, clinic_name)
   file = BatchFile.last
   file.survey.should eq(Survey.find_by_name!(survey_name))
   file.user.should eq(User.find_by_email!(email))
-  file.hospital.should eq(Hospital.find_by_name!(hospital_name))
+  file.clinic.should eq(Clinic.find_by_unit_name!(clinic_name))
   # since the test env is configured to store files in tmp, we look for them there
   ext = File.extname(file.file_file_name)
   expected_path = Rails.root.join("tmp/#{file.id}#{ext}").to_s

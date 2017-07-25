@@ -47,15 +47,15 @@ module NavigationHelpers
       edit_response_path Response.first
 
     when /the response page for (.*)$/
-      response = Response.find_by_baby_code($1)
+      response = Response.find_by_cycle_id($1)
       edit_response_path response
 
     when /the response summary page for (.*)$/
-      response = Response.find_by_baby_code($1)
+      response = Response.find_by_cycle_id($1)
       response_path response
 
     when /the review answers page for (.*)$/
-      response = Response.find_by_baby_code($1)
+      response = Response.find_by_cycle_id($1)
       review_answers_response_path response
 
     when /the edit section (.*) page$/
@@ -80,10 +80,10 @@ module NavigationHelpers
       prepare_download_responses_path
 
     when /the download link for the first survey/
-      download_responses_path(survey_id: Survey.first.id, hospital_id: "", year_of_registration: "")
+      download_responses_path(survey_id: Survey.first.id, clinic_id: "", year_of_registration: "")
 
-    when /the submitted baby codes page/
-        submitted_baby_codes_responses_path
+    when /the submitted cycle ids page/
+        submitted_cycle_ids_responses_path
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

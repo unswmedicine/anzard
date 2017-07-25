@@ -4,7 +4,7 @@ Feature: Upload survey responses in a batch file
   I want to upload a batch file
 
   Background:
-    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to hospital "RPA"
+    Given I am logged in as "data.provider@intersect.org.au" and have role "Data Provider" and I'm linked to clinic "RPA"
     And I have year of registration range configured as "2005" to "2009"
     And I have a survey with name "MySurvey"
     And I have a survey with name "MySurvey2"
@@ -34,7 +34,7 @@ Feature: Upload survey responses in a batch file
     Then I should be on the list of batch uploads page
     And I should see "Your upload has been received and is now being processed. This may take some time depending on the size of the file."
     And I should see "The status of your uploads can be seen in the table below. Click the 'Refresh Status' button to see an updated status."
-    And I should have a batch file stored for survey "MySurvey" with uploader "data.provider@intersect.org.au" and hospital "RPA"
+    And I should have a batch file stored for survey "MySurvey" with uploader "data.provider@intersect.org.au" and clinic "RPA"
 
   Scenario: Accepts duplicates
     When I upload batch file "batch_sample.csv" for survey "MySurvey"
@@ -67,13 +67,13 @@ Feature: Upload survey responses in a batch file
     | administrator | Administrator |
 
   Scenario: Supervisors see an extra column
-    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to hospital "RPA"
+    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to clinic "RPA"
     And I upload batch file as "supervisor@intersect.org.au" "batch_sample.csv" for survey "MySurvey"
     When I am on the list of batch uploads page
     Then the "batch_uploads" table should have 10 columns
 
   Scenario: Supervisors see an extra column
-    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to hospital "RPA"
+    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to clinic "RPA"
     And I upload batch file as "supervisor@intersect.org.au" "number_out_of_range.csv" for survey "Test Survey"
     And I sleep for 1
     And I upload batch file as "supervisor@intersect.org.au" "no_errors_or_warnings.csv" for survey "Test Survey"
@@ -104,7 +104,7 @@ Feature: Upload survey responses in a batch file
       | Registration Type | Status       |
       | Test Survey       | Needs Review |
 
-    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to hospital "RPA"
+    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to clinic "RPA"
     When I am on the list of batch uploads page
     And the "batch_uploads" table should have 10 columns
     Then the batch uploads table should look like
@@ -139,7 +139,7 @@ Feature: Upload survey responses in a batch file
       | Registration Type | Status       |
       | MySurvey          | Needs Review |
 
-    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to hospital "RPA"
+    Given I am logged in as "supervisor@intersect.org.au" and have role "Data Provider Supervisor" and I'm linked to clinic "RPA"
     When I am on the list of batch uploads page
     And the "batch_uploads" table should have 10 columns
     Then the batch uploads table should look like

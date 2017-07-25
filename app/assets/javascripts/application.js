@@ -16,7 +16,8 @@
 //= require supplementary_questions_batch
 //= require deselect_option
 //= require cancel_delete
-
+//= require populate_site_on_unit_select
+//= require new_clinic
 
 $(window).load(function () {
   $('.row div[class^="span"]:last-child').addClass('last-child');

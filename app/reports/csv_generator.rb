@@ -1,27 +1,35 @@
 require 'csv'
 class CsvGenerator
 
-  BASIC_HEADERS = %w(RegistrationType YearOfRegistration Hospital BabyCODE)
-  attr_accessor :survey_id, :hospital_id, :year_of_registration, :records, :survey, :question_codes
+  BASIC_HEADERS = %w(TREATMENT_DATA YEAR_OF_TREATMENT UNIT_NAME SITE_NAME UNIT SITE CYCLE_ID)
+  attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code
 
-  def initialize(survey_id, hospital_id, year_of_registration)
+  def initialize(survey_id, unit_code, site_code, year_of_registration)
     self.survey_id = survey_id
-    self.hospital_id = hospital_id
+    self.unit_code = unit_code
+    self.site_code = site_code
     self.year_of_registration = year_of_registration
 
     self.survey = SURVEYS[survey_id.to_i]
     self.question_codes = survey.ordered_questions.collect(&:code)
 
-    self.records = Response.for_survey_hospital_and_year_of_registration(survey, hospital_id, year_of_registration)
+    self.records = Response.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
   end
 
   def csv_filename
-    name_parts = [survey.name.parameterize(separator: "_")]
+    name_parts = [survey.name.parameterize(separator: '_')]
 
-    unless hospital_id.blank?
-      hospital = Hospital.find(hospital_id)
-      name_parts << hospital.abbrev.parameterize(separator: "_")
+    unless unit_code.blank?
+      if site_code.blank?
+        clinic = Clinic.find_by(unit_code: unit_code)
+        name_parts << clinic.unit_name.parameterize(separator: '_')
+      else
+        clinic = Clinic.find_by(unit_code: unit_code, site_code: site_code)
+        name_parts << clinic.unit_name.parameterize(separator: '_')
+        name_parts << clinic.site_name.parameterize(separator: '_')
+      end
     end
+    
     unless year_of_registration.blank?
       name_parts << year_of_registration
     end
@@ -36,7 +44,7 @@ class CsvGenerator
     CSV.generate(:col_sep => ",") do |csv|
       csv.add_row BASIC_HEADERS + question_codes
       records.each do |response|
-        basic_row_data = [response.survey.name, response.year_of_registration, response.hospital.abbrev, response.baby_code]
+        basic_row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.clinic.unit_code, response.clinic.site_code, response.cycle_id]
         csv.add_row basic_row_data + answers(response)
       end
     end

@@ -1,27 +1,37 @@
 .clearfix
-  = f.label :role_id, "Role"
+  = f.label :role_id, 'Role'
   .input
     = f.collection_select :role_id, @roles, :id, :name, {include_blank: ""}, {class: 'large'}
-.clearfix#hospital_fields
-  = f.label :hospital_id, "Hospital"
-  .input
-    = f.select :hospital_id, grouped_options_for_select(Hospital.hospitals_by_state, @user.hospital_id), {include_blank: ""}
 
+.clearfix#clinic_units
+  = label_tag :clinic_unit, 'Unit'
+  .input
+    = select_tag :clinic_unit, grouped_options_for_select(Clinic.units_by_state_with_unit_code, @user.allocated_unit_code), include_blank: true, disabled: disable_unit_select, class: 'large'
+
+.clearfix#clinic_sites
+  = f.label :clinic_ids, 'Sites'
+  .input#user_clinics
+    -# Collection checkbox used for initial rendering and editing access level. The content of this input is replaced by JS when the user selects a different unit.
+    = f.collection_check_boxes :clinic_ids, Clinic.clinics_with_unit_code(@user.allocated_unit_code, true), :id, :site_name_with_full_code do |b|
+      = content_tag'div', class: 'clinic_site' do
+        = b.label(:'data-value' => b.value, class: 'check_box_label') { b.check_box + b.text }
 
 :javascript
   $(window).load(function() {
-    hide_hospital_if_required();
+    hide_clinic_if_required();
   });
 
   $('#user_role_id').change(function() {
-    hide_hospital_if_required();
+    hide_clinic_if_required();
   });
 
-  function hide_hospital_if_required() {
+  function hide_clinic_if_required() {
     if ($('#user_role_id :selected').text() == "#{Role.super_user_role}") {
-      $('#hospital_fields').hide();
+      $('#clinic_units').hide();
+      $('#clinic_sites').hide();
     } else {
-      $('#hospital_fields').show();
+      $('#clinic_units').show();
+      $('#clinic_sites').show();
     }
   }
 

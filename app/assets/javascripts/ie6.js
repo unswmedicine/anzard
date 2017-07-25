@@ -10,7 +10,7 @@ $(function() {
         $('.btn-ie6').each(
             function() {
                 $(this).click(function() {
-                    msg = "You are about to delete this form in progress for BabyCODE " + $(this).attr('id')
+                    msg = "You are about to delete this form in progress for CYCLE_ID " + $(this).attr('id')
                         + ". This action cannot be undone. Are you sure you want to delete this form?" 
                     return window.confirm(msg);
                 });

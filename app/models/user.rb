@@ -10,23 +10,26 @@ class User < ApplicationRecord
 
   belongs_to :role
   has_many :responses
-  belongs_to :hospital, optional: true
+  has_many :clinic_allocations
+  has_many :clinics, through: :clinic_allocations
 
   validates_presence_of :first_name
   validates_presence_of :last_name
   validates_presence_of :status
-  validates_presence_of :hospital_id, unless: Proc.new { |user|  user.role.blank? || user.super_user? }
+  validates_presence_of :clinics, unless: Proc.new { |user|  user.role.blank? || user.super_user? }
 
   validates_length_of :first_name, maximum: 255
   validates_length_of :last_name, maximum: 255
   validates_length_of :email, maximum: 255
+
+  validates_numericality_of :allocated_unit_code, greater_than_or_equal_to: 0, allow_nil: true
 
   with_options if: :password_required? do |v|
     v.validates :password, password_format: true
   end
 
   before_validation :initialize_status
-  before_validation :clear_super_user_hospital
+  before_validation :clear_super_user_clinic
 
   scope :pending_approval, -> {where(status: STATUS_UNAPPROVED).order(:email)}
   scope :approved, -> {where(status: STATUS_ACTIVE).order(:email)}
@@ -158,8 +161,11 @@ class User < ApplicationRecord
 
   private
 
-  def clear_super_user_hospital
-    self.hospital = nil if self.super_user?
+  def clear_super_user_clinic
+    if self.super_user?
+      self.clinics.clear
+      self.allocated_unit_code = nil
+    end
   end
 
   def initialize_status

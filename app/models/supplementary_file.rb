@@ -1,4 +1,6 @@
 class SupplementaryFile < ApplicationRecord
+  # ToDo: remove supplementary files from the app as it is ANZNN-specific and not relevant to ANZARD
+
   belongs_to :batch_file
   has_attached_file :file, :styles => {}, :path => :make_file_path
   validates_presence_of :multi_name
@@ -20,17 +22,17 @@ class SupplementaryFile < ApplicationRecord
     begin
 
       CSV.foreach(file.path, {headers: true}) do |row|
-        unless row.headers.include?(BatchFile::BABY_CODE_COLUMN)
-          self.message = "The supplementary file you uploaded for '#{multi_name}' did not contain a BabyCODE column."
+        unless row.headers.include?(BatchFile::CYCLE_ID_COLUMN)
+          self.message = "The supplementary file you uploaded for '#{multi_name}' did not contain a CYCLE_ID column."
           return false
         end
-        baby_code = row[BatchFile::BABY_CODE_COLUMN]
-        if baby_code.blank?
-          self.message = "The supplementary file you uploaded for '#{multi_name}' is missing one or more baby codes. Each record must have a baby code."
+        cycle_id = row[BatchFile::CYCLE_ID_COLUMN]
+        if cycle_id.blank?
+          self.message = "The supplementary file you uploaded for '#{multi_name}' is missing one or more cycle IDs. Each record must have a cycle ID."
           return false
         else
-          self.supplementary_data[baby_code] ||= []
-          self.supplementary_data[baby_code] << row
+          self.supplementary_data[cycle_id] ||= []
+          self.supplementary_data[cycle_id] << row
         end
       end
 
@@ -62,17 +64,17 @@ class SupplementaryFile < ApplicationRecord
     return self.denormalised if self.denormalised
     self.denormalised = {}
 
-    supplementary_data.each_pair do |baby_code, rows_for_baby|
-      if rows_for_baby
+    supplementary_data.each_pair do |cycle_id, rows_for_cycle|
+      if rows_for_cycle
         answer_hash = {}
-        rows_for_baby.each_with_index do |row, index|
+        rows_for_cycle.each_with_index do |row, index|
           answers = row.to_hash
-          answers.delete('BabyCODE')
+          answers.delete('CYCLE_ID')
           answers.each_pair do |key, value|
             answer_hash["#{key}#{index+1}"] = value unless value.blank?
           end
         end
-        self.denormalised[baby_code] = answer_hash
+        self.denormalised[cycle_id] = answer_hash
       end
     end
 

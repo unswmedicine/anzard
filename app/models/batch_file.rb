@@ -2,26 +2,31 @@ require 'csv'
 
 class BatchFile < ApplicationRecord
 
-  BABY_CODE_COLUMN = "BabyCODE"
-  STATUS_FAILED = "Failed"
-  STATUS_SUCCESS = "Processed Successfully"
-  STATUS_REVIEW = "Needs Review"
-  STATUS_IN_PROGRESS = "In Progress"
+  CYCLE_ID_COLUMN = 'CYCLE_ID'
+  UNIT_CODE_COLUMN = 'UNIT'
+  SITE_CODE_COLUMN = 'SITE'
+  STATUS_FAILED = 'Failed'
+  STATUS_SUCCESS = 'Processed Successfully'
+  STATUS_REVIEW = 'Needs Review'
+  STATUS_IN_PROGRESS = 'In Progress'
 
-  MESSAGE_WARNINGS = "The file you uploaded has one or more warnings. Please review the reports for details."
-  MESSAGE_NO_BABY_CODE = "The file you uploaded did not contain a BabyCODE column."
-  MESSAGE_MISSING_BABY_CODES = "The file you uploaded is missing one or more baby codes. Each record must have a baby code."
-  MESSAGE_EMPTY = "The file you uploaded did not contain any data."
-  MESSAGE_FAILED_VALIDATION = "The file you uploaded did not pass validation. Please review the reports for details."
-  MESSAGE_SUCCESS = "Your file has been processed successfully."
-  MESSAGE_BAD_FORMAT = "The file you uploaded was not a valid CSV file."
-  MESSAGE_DUPLICATE_BABY_CODES = "The file you uploaded contained duplicate baby codes. Each baby code can only be used once."
-  MESSAGE_UNEXPECTED_ERROR = "Processing failed due to an unexpected error."
-  MESSAGE_CSV_STOP_LINE = " Processing stopped on CSV row "
+  MESSAGE_WARNINGS = 'The file you uploaded has one or more warnings. Please review the reports for details.'
+  MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{CYCLE_ID_COLUMN} column."
+  MESSAGE_UNKNOWN_UNIT_SITE = "The file you uploaded contains a #{UNIT_CODE_COLUMN} or #{SITE_CODE_COLUMN} that is unknown to our database."
+  MESSAGE_UNAUTHORISED_UNIT_SITE = 'The file you uploaded contains a Unit_Site that you are not allocated to.'
+  MESSAGE_MISSING_CYCLE_IDS = 'The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID.'
+  MESSAGE_EMPTY = 'The file you uploaded did not contain any data.'
+  MESSAGE_FAILED_VALIDATION = 'The file you uploaded did not pass validation. Please review the reports for details.'
+  MESSAGE_SUCCESS = 'Your file has been processed successfully.'
+  MESSAGE_BAD_FORMAT = 'The file you uploaded was not a valid CSV file.'
+  MESSAGE_DUPLICATE_CYCLE_IDS = 'The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once.'
+  MESSAGE_UNEXPECTED_ERROR = 'Processing failed due to an unexpected error.'
+  MESSAGE_CSV_STOP_LINE = ' Processing stopped on CSV row '
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
 
   belongs_to :user
-  belongs_to :hospital
+  belongs_to :clinic
+  # ToDo: remove lingering ANZNN supplementary files
   has_many :supplementary_files
 
   has_attached_file :file, :styles => {}, :path => :make_file_path
@@ -32,14 +37,14 @@ class BatchFile < ApplicationRecord
 
   validates_presence_of :survey_id
   validates_presence_of :user_id
-  validates_presence_of :hospital_id
+  validates_presence_of :clinic_id
   validates_presence_of :file_file_name
   validates_presence_of :year_of_registration
 
   attr_accessor :responses
 
   scope :failed, -> {where(:status => STATUS_FAILED)}
-  scope :older_than, lambda { |date| where("updated_at < ?", date) }
+  scope :older_than, lambda { |date| where('updated_at < ?', date) }
 
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of surveys that are loaded once in an initializer
@@ -74,7 +79,7 @@ class BatchFile < ApplicationRecord
   end
 
   def process(force=false)
-    raise "Batch has already been processed, cannot reprocess" unless status == STATUS_IN_PROGRESS
+    raise 'Batch has already been processed, cannot reprocess' unless status == STATUS_IN_PROGRESS
 
     BatchFile.transaction do
       start = Time.now
@@ -84,7 +89,7 @@ class BatchFile < ApplicationRecord
           BatchReportGenerator.new(self).generate_reports
         end
       rescue ArgumentError
-        logger.info("Argument error while reading file")
+        logger.info('Argument error while reading file')
         logger.error("Message: #{$!.message}")
         logger.error $!.backtrace
         # Note: Catching ArgumentError seems a bit odd, but CSV throws it when the file is not UTF-8 which happens if you upload an xls file
@@ -94,7 +99,7 @@ class BatchFile < ApplicationRecord
           set_outcome(STATUS_FAILED, MESSAGE_BAD_FORMAT)
         end
       rescue CSV::MalformedCSVError
-        logger.info("Malformed CSV error while reading file")
+        logger.info('Malformed CSV error while reading file')
         if @csv_row_count.present?
           set_outcome(STATUS_FAILED, MESSAGE_BAD_FORMAT + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         else
@@ -126,13 +131,13 @@ class BatchFile < ApplicationRecord
     # get all the problems from all the responses organised for reporting
     responses.each do |r|
       r.answers.each do |answer|
-        organiser.add_problems(answer.question.code, r.baby_code, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
+        organiser.add_problems(answer.question.code, r.cycle_id, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
       end
       r.missing_mandatory_questions.each do |question|
-        organiser.add_problems(question.code, r.baby_code, ["This question is mandatory"], [], "")
+        organiser.add_problems(question.code, r.cycle_id, ['This question is mandatory'], [], '')
       end
       r.valid? #we have to call this to trigger errors getting populated
-      organiser.add_problems("BabyCODE", r.baby_code, r.errors.full_messages, [], r.baby_code) unless r.errors.empty?
+      organiser.add_problems(CYCLE_ID_COLUMN, r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
     end
     organiser
   end
@@ -162,11 +167,12 @@ class BatchFile < ApplicationRecord
     responses = []
     CSV.foreach(file.path, {headers: true}) do |row|
       @csv_row_count += 1
-      baby_code = row[BABY_CODE_COLUMN]
-      baby_code.strip! unless baby_code.nil?
-      response = Response.new(survey: survey, baby_code: baby_code, user: user, hospital: hospital, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      cycle_id = row[CYCLE_ID_COLUMN]
+      cycle_id.strip! unless cycle_id.nil?
+      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
+      response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
-      add_answers_from_supplementary_files(response, baby_code)
+      add_answers_from_supplementary_files(response, cycle_id)
 
       failures = true if (response.fatal_warnings? || !response.valid?)
       warnings = true if response.warnings?
@@ -188,15 +194,15 @@ class BatchFile < ApplicationRecord
       set_outcome(STATUS_SUCCESS, MESSAGE_SUCCESS)
     end
     save!
-    self.responses = responses #this is only ever kept in memory for the sake of reporting, its not an AR association
+    self.responses = responses #this is only ever kept in memory for the sake of reporting, its not an AR association.
     logger.info("After rest took #{Time.now - start}")
 
     true
   end
 
-  def add_answers_from_supplementary_files(response, baby_code)
+  def add_answers_from_supplementary_files(response, cycle_id)
     supplementary_files.each do |supp_file|
-      answers = supp_file.as_denormalised_hash[baby_code]
+      answers = supp_file.as_denormalised_hash[cycle_id]
       response.build_answers_from_hash(answers) if answers
     end
   end
@@ -204,10 +210,10 @@ class BatchFile < ApplicationRecord
   def pre_process_file
     # do basic checks that can result in the file failing completely and not being validated
     @csv_row_count = 0
-    baby_codes = []
+    cycle_ids = []
     CSV.foreach(file.path, {headers: true}) do |row|
-      unless row.headers.include?(BABY_CODE_COLUMN)
-        set_outcome(STATUS_FAILED, MESSAGE_NO_BABY_CODE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+      unless row.headers.include?(CYCLE_ID_COLUMN)
+        set_outcome(STATUS_FAILED, MESSAGE_NO_CYCLE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
       end
       unless headers_unique?(row.headers)
@@ -215,17 +221,28 @@ class BatchFile < ApplicationRecord
         return false
       end
       @csv_row_count += 1
-      baby_code = row[BABY_CODE_COLUMN]
-      if baby_code.blank?
-        set_outcome(STATUS_FAILED, MESSAGE_MISSING_BABY_CODES + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+      cycle_id = row[CYCLE_ID_COLUMN]
+      if cycle_id.blank?
+        set_outcome(STATUS_FAILED, MESSAGE_MISSING_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
       else
-        baby_code.strip!
-        if baby_codes.include?(baby_code)
-          set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_BABY_CODES + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        cycle_id.strip!
+        if cycle_ids.include?(cycle_id)
+          set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         else
-          baby_codes << baby_code
+          cycle_ids << cycle_id
+        end
+      end
+
+      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
+      if clinic_in_row.nil?
+        set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        return false
+      else
+        unless user.clinics.exists? clinic_in_row.id
+          set_outcome(STATUS_FAILED, MESSAGE_UNAUTHORISED_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+          return false
         end
       end
     end

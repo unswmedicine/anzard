@@ -4,7 +4,7 @@ FactoryGirl.define do
   factory :batch_file do
     association :survey
     association :user
-    association :hospital
+    association :clinic
     file_file_name "Blah"
     year_of_registration 2012
   end

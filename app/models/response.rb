@@ -7,24 +7,21 @@ class Response < ApplicationRecord
   INCOMPLETE = 'Incomplete'
   COMPLETE_WITH_WARNINGS = 'Complete with warnings'
 
-  BABY_CODE_REGEX = /\A[a-z0-9\-_]+\Z/i
-
   belongs_to :user
-  belongs_to :hospital
+  belongs_to :clinic
   belongs_to :batch_file
   belongs_to :survey
 
   has_many :answers, dependent: :destroy
 
-  validates_presence_of :baby_code
+  validates_presence_of :cycle_id
+  validates_length_of :cycle_id, :minimum => 1, :maximum => 20
   validates_presence_of :user
   validates_presence_of :survey_id
-  validates_presence_of :hospital_id
+  validates_presence_of :clinic_id
   validates_presence_of :year_of_registration
   validates_inclusion_of :submitted_status, in: [STATUS_UNSUBMITTED, STATUS_SUBMITTED]
-  validates_uniqueness_of :baby_code, scope: :survey_id
-  validates_format_of :baby_code, with: BABY_CODE_REGEX
-  validates_length_of :baby_code, maximum: 30
+  validates_uniqueness_of :cycle_id, scope: :survey_id
 
   before_validation :strip_whitespace
   before_validation :clear_dummy_answers
@@ -50,11 +47,17 @@ class Response < ApplicationRecord
     self.survey_id = survey.id
   end
 
-  def self.for_survey_hospital_and_year_of_registration(survey, hospital_id, year_of_registration)
-    results = submitted.for_survey(survey).order(:baby_code)
-    results = results.where(hospital_id: hospital_id) unless hospital_id.blank?
+  def self.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
+    results = submitted.for_survey(survey).order(:cycle_id)
+    unless unit_code.blank?
+      if site_code.blank?
+        results = results.joins(:clinic).where(:clinics => {unit_code: unit_code})
+      else
+        results = results.joins(:clinic).where(:clinics => {unit_code: unit_code, site_code: site_code})
+      end
+    end
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
-    results.includes([:hospital])
+    results.includes([:clinic])
   end
 
   def self.count_per_survey_and_year_of_registration(survey_id, year)
@@ -202,11 +205,11 @@ class Response < ApplicationRecord
   end
 
   def strip_whitespace
-    self.baby_code = self.baby_code.strip unless self.baby_code.nil?
+    self.cycle_id = self.cycle_id.strip unless self.cycle_id.nil?
   end
 
   def clear_dummy_answers
-    self.answers.delete_all{|elem| @dummy_answers.map(&:object_id).include? elem.object_id }
+    self.answers.delete(self.answers.select{|elem| @dummy_answers.map(&:object_id).include? elem.object_id})
     @dummy_answers.clear
   end
 

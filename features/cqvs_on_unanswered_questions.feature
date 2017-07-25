@@ -4,11 +4,11 @@ Feature: In order to see error messages in the right place
 
   Background:
     Given I have the usual roles
-    And I have hospitals
+    And I have clinics
       | state | name      | abbrev |
       | NSW   | Left Wing | Left   |
     And I have users
-      | email                         | first_name | last_name | role          | hospital  |
+      | email                         | first_name | last_name | role          | clinic  |
       | dataprovider@intersect.org.au | Data       | Provider  | Data Provider | Left Wing |
   # Setup questionnaire with two questions one must be present if other is something
     And I have a survey with name "MySurvey" and questions
@@ -52,7 +52,7 @@ Feature: In order to see error messages in the right place
     Then I should not see "QText must be present if QChoice == 1"
 
   Scenario: Warning shows up on response submission screen
-    Given "dataprovider@intersect.org.au" created a response to the "MySurvey" survey with babycode "abc"
+    Given "dataprovider@intersect.org.au" created a response to the "MySurvey" survey with cycleid "abc"
     And I am logged in as "dataprovider@intersect.org.au"
     And I am on the edit first response page
     And I store the following answers skipping assertion
@@ -76,7 +76,7 @@ Feature: In order to see error messages in the right place
   Scenario: Warning shows up on batch submission
     Given I am logged in as "dataprovider@intersect.org.au"
     And I uploaded the following batch file to the "MySurvey" survey in year "2005"
-      | BabyCODE | QChoice | QText |
+      | CYCLE_ID | QChoice | QText |
       | bad      | 1       |       |
     And the system processes the latest upload
     When I am on the list of batch uploads page
@@ -84,13 +84,13 @@ Feature: In order to see error messages in the right place
       | Registration Type | Num records | Status       | Details                                                                                | Reports                       |
       | MySurvey          | 1           | Needs Review | The file you uploaded has one or more warnings. Please review the reports for details. | Summary Report\nDetail Report |
     And the last detail report should look like
-      | BabyCODE | Column Name | Type    | Value | Message                               |
+      | CYCLE_ID | Column Name | Type    | Value | Message                               |
       | bad      | QText       | Warning |       | QText must be present if QChoice == 1 |
 
   Scenario: Warning is ok for valid batch submission
     Given I am logged in as "dataprovider@intersect.org.au"
     And I uploaded the following batch file to the "MySurvey" survey in year "2005"
-      | BabyCODE | QChoice | QText   |
+      | CYCLE_ID | QChoice | QText   |
       | good     | 1       | present |
     And the system processes the latest upload
     When I am on the list of batch uploads page

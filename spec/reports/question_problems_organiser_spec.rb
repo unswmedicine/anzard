@@ -44,7 +44,7 @@ describe QuestionProblemsOrganiser do
     aggregated[22].should eq(['', '', 'b2', ''])
   end
 
-  it "For detailed report it takes errors and warnings orders them by baby code, question and error message" do
+  it "For detailed report it takes errors and warnings orders them by cycle id, question and error message" do
     details = qpo.detailed_problems
     details.should be_a(Array)
     details.size.should == 15

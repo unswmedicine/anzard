@@ -1,4 +1,4 @@
-MoAge,Prevprem,BabyCODE
-20,A,A
-20,B,B
-20  1   1   "1
+UNIT,SITE,MoAge,Prevprem,CYCLE_ID
+100,100,20,A,A
+100,100,20,B,B
+100,100,20  1   1   "1

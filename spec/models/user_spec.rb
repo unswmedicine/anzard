@@ -4,7 +4,8 @@ describe User do
   describe "Associations" do
     it { should belong_to(:role) }
     it { should have_many(:responses) }
-    it { should belong_to(:hospital) }
+    it { should have_many(:clinic_allocations) }
+    it { should have_many(:clinics).through(:clinic_allocations) }
   end
 
   describe "Named Scopes" do
@@ -42,7 +43,7 @@ describe User do
         #super_role = create(:role, :name => "Administrator")
         other_role = create(:role, :name => "Other")
         u1 = create(:super_user, :status => 'A', :email => "fasdf1@intersect.org.au")
-        u2 = create(:user, :status => 'A', :role => other_role)
+        u2 = create(:user, :status => 'A', :role => other_role, :clinics => [create(:clinic)])
         u3 = create(:super_user, :status => 'U')
         u4 = create(:super_user, :status => 'R')
         u5 = create(:super_user, :status => 'D')
@@ -121,17 +122,19 @@ describe User do
       result.should be false
       user.errors[:password].should eq ["can't be blank", "must be between 6 and 20 characters long and contain at least one uppercase letter, one lowercase letter, one digit and one symbol"]
     end
+
     it "should fail if confirmation blank" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => ""})
       result.should be false
-      user.errors[:password].should eq ["doesn't match confirmation"]
+      user.errors[:password_confirmation].should eq ["doesn't match Password"]
     end
+
     it "should fail if confirmation doesn't match new password" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => "Pass.678"})
       result.should be false
-      user.errors[:password].should eq ["doesn't match confirmation"]
+      user.errors[:password_confirmation].should eq ["doesn't match Password"]
     end
     it "should fail if password doesn't meet rules" do
       user = create(:user, :password => "Pass.123")
@@ -164,11 +167,11 @@ describe User do
       user_1 = create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
       user_1.check_number_of_superusers(1, 1).should eq(false)
     end
-    
-    it "should return true if the logged in user does not match the user record being modified" do  
+
+    it "should return true if the logged in user does not match the user record being modified" do
       research_role = create(:role, :name => 'Data Provider')
       user_1 = create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
-      user_2 = create(:user, :role => research_role, :status => 'A', :email => 'user2@intersect.org.au')
+      user_2 = create(:user, :role => research_role, :status => 'A', :email => 'user2@intersect.org.au', :clinics => [create(:clinic)])
       user_1.check_number_of_superusers(1, 2).should eq(true)
     end
   end
@@ -178,8 +181,9 @@ describe User do
     it { should validate_presence_of :last_name }
     it { should validate_presence_of :email }
     it { should validate_presence_of :password }
+    it { should validate_numericality_of(:allocated_unit_code).is_greater_than_or_equal_to(0).allow_nil }
 
-    it "should validate presence of a hospital UNLESS user has no role OR user is a super user" do
+    it "should validate presence of a clinic UNLESS user has no role OR user is a super user" do
       #NB: this could also be if they are inactive instead of no role, however this works fine
       research_role = create(:role, :name => 'Data Provider')
 
@@ -187,10 +191,10 @@ describe User do
 
       users << create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
       users << create(:user, :role => nil, :status => 'A', :email => 'user2@intersect.org.au')
-      users << create(:user, :role => research_role, :status => 'A', :email => 'user3@intersect.org.au')
+      users << create(:user, :role => research_role, :status => 'A', :email => 'user3@intersect.org.au', :clinics => [create(:clinic)])
 
       users.each do |u|
-        u.hospital = nil
+        u.clinics.clear
       end
 
       users[0].should be_valid
@@ -199,27 +203,31 @@ describe User do
 
     end
 
-    it "should clear the hospital on before validation if a user becomes a super user" do
+    it "should clear the clinic on before validation if a user becomes a super user" do
       super_role = create(:role, :name => Role::SUPER_USER)
-      hospital = create(:hospital)
-      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :hospital => hospital)
-      user1.hospital.should eq(hospital)
+      clinic = create(:clinic)
+
+      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :clinics  => [clinic])
+      user1.clinics.count.should eq(1)
+      user1.clinics.should include(clinic)
 
       user1.role = super_role
       user1.should be_valid
-      user1.hospital.should eq(nil)
+      user1.clinics.count.should eq(0)
+      expect(user1.allocated_unit_code).to eq(nil)
 
     end
 
-    it "should never clear the hospital for regular users" do
-      hospital = create(:hospital)
-      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :hospital => hospital)
+    it "should never clear the clinic for regular users" do
+      clinic = create(:clinic)
+      user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :clinics => [clinic])
 
       user1.should be_valid
       user1.save
       user1a = User.find_by_email('user1@intersect.org.au')
-      user1a.hospital.should eq(hospital)
-
+      user1a.clinics.count.should eq(1)
+      user1a.clinics.should include(clinic)
+      expect(user1.allocated_unit_code).to eq(clinic.unit_code)
 
     end
 
@@ -283,7 +291,7 @@ describe User do
       super_3 = create(:super_user, :status => "A", :email => "c@intersect.org.au")
       super_4 = create(:super_user, :status => "D", :email => "d@intersect.org.au")
       super_5 = create(:super_user, :status => "R", :email => "e@intersect.org.au")
-      admin = create(:user, :role => admin_role, :status => "A", :email => "f@intersect.org.au")
+      admin = create(:user, :role => admin_role, :status => "A", :email => "f@intersect.org.au", :clinics => [create(:clinic)])
 
       supers = User.get_superuser_emails
       supers.should eq(["a@intersect.org.au", "c@intersect.org.au"])

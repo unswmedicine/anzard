@@ -1,7 +1,8 @@
 - title "Select Role For #{@user.email}"
+
 = form_for(@user, url: approve_admin_user_path(@user)) do |f|
   = render "shared/error_messages", target: @user
-  = render partial: "role_fields", locals: {f: f}
+  = render partial: "role_fields", locals: {f: f, disable_unit_select: false}
   .actions
     = f.submit "Approve", class: 'btn primary'
     = link_to 'Back', access_requests_admin_users_path, class: 'btn'
