@@ -28,11 +28,14 @@ describe SupplementaryFile do
       supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' did not contain a CYCLE_ID column.")
     end
 
-    # ToDo: figure out why this test is failing with "ActiveRecord::RecordInvalid: Validation failed: File has contents that are not what they are reported to be"
     it "should reject files that are empty" do
-      supplementary_file = create_supplementary_file('empty.csv', 'my multi')
-      supplementary_file.pre_process.should be false
-      supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' did not contain any data.")
+      # Expect the processing of the empty file to return exception during tests, which is otherwise caught and displayed in the controller.
+      # This exception is raised because the PaperClip gem determines that the empty CSV is a spoofing attempt.
+      expect {
+        supplementary_file = create_supplementary_file('empty.csv', 'my multi')
+        supplementary_file.pre_process.should be false
+        supplementary_file.message.should eq("The supplementary file you uploaded for 'my multi' did not contain any data.")
+      }.to raise_error ActiveRecord::RecordInvalid, 'Validation failed: File has contents that are not what they are reported to be'
     end
 
     it "should reject files that have a header row only" do

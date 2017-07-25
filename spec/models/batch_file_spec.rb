@@ -137,15 +137,18 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      # ToDo: Fix this. This test fails with the message "File has contents that are not what they are reported to be" due to the Paperclip gem treating an empty CSV as a file type spoofing attempt.
       it "should reject files that are empty" do
-        batch_file = process_batch_file('empty.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not contain any data.")
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        # Expect the processing of the empty file to return exception during tests, which is otherwise caught and displayed in the controller.
+        # This exception is raised because the PaperClip gem determines that the empty CSV is a spoofing attempt.
+        expect {
+          batch_file = process_batch_file('empty.csv', survey, user)
+          batch_file.status.should eq("Failed")
+          batch_file.message.should eq("The file you uploaded did not contain any data.")
+          batch_file.record_count.should be_nil
+          batch_file.problem_record_count.should be_nil
+          batch_file.summary_report_path.should be_nil
+          batch_file.detail_report_path.should be_nil
+        }.to raise_error ActiveRecord::RecordInvalid, 'Validation failed: File has contents that are not what they are reported to be'
       end
 
       it "should reject files that have a header row only" do
