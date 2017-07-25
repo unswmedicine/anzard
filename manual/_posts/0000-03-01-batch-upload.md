@@ -5,17 +5,18 @@ title: Batch Upload
 group: manual
 ---
 ## Batch upload file format
-Batch uploads must be provided as a CSV file. The CSV file should contain a header row and one row for each cycle records. You must include a column "CycleID" which contains a unique code for each record. The other column headers should match the data item codes from the ANZNN data dictionary.
+Batch uploads must be provided as a CSV file. The CSV file should contain a header row and one row for each cycle. You must include a column "CYCLE_ID" which contains a unique code for each record. The other column headers should match the data item codes from the ANZARD data dictionary.
 
-* Dates should be provided in yyyy-mm-dd or dd/mm/yyyy format.
-* Times should be provided in hh:mm format (24 hour time). 00:00 is the start of the day.
+* Dates should be provided in dd/mm/yyyy format.
 
 ## Starting a new batch upload
 Click on the 'Batch Uploads' tab from the home page. 
 
-Select the registration type and year of registration, then browse for the file you wish to upload. Depending on which registration type you chose, you may also be given the option to upload supplementary files. These are optional and can be selected if you wish to supply some of the data in separate tables. If you wish to supply all your data in a single file you can ignore these additional file selection options.
+Select the primary clinic site to associate the batch upload with. Any user that has access to the selected site will be able to review the status of the uploaded file. 
 
-Once you have selected your file(s), click the 'Upload' button. You will be returned to the batch uploads list screen and will see your file in the list. Initially it will have a status of 'In Progress'. 
+Next select the treatment data and year of treatment, then browse for the file you wish to upload.
+
+Once you have selected your file, click the 'Upload' button. You will be returned to the batch uploads list screen and will see your file in the list. Initially it will have a status of 'In Progress'. 
 
 ![New batch upload](/user_manual/assets/images/batch/upload.png)
 *Fig 1. New batch upload*
