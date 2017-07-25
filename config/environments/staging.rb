@@ -1,6 +1,6 @@
 Anznn::Application.configure do
 
-  config.action_mailer.default_url_options = { :host => 'anznn-staging.intersect.org.au' }
+  config.action_mailer.default_url_options = { :host => 'anzard-staging.intersect.org.au' }
 
   # Settings specified here will take precedence over those in config/application.rb
 
