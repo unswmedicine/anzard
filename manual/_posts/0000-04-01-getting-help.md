@@ -9,7 +9,7 @@ group: manual
 ### If you can't log in ###
 * After requesting an account you should have received an email confirming that your account has been approved. If you haven't received this yet, your account may not yet be active.
 * Try using the 'Forgot your password?' link on the home page to reset your password. 
-* If you are still having difficulty, please contact the [[ANZARD](mailto:anzard@unsw.edu.au) administrators.
+* If you are still having difficulty, please contact the [ANZARD](mailto:anzard@unsw.edu.au) administrators.
 
 ### Changing your password or details ###
 Once you are logged in, click on your email address in the top right of the page. From here you can change your password, or edit your personal details.
