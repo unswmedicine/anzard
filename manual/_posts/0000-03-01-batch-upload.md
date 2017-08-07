@@ -42,5 +42,5 @@ Depending on the outcome of your upload, a summary and/or detail report may be g
 If your file has a status of 'Needs Review', and you have checked to confirm that the data is correct, it can be submitted by a user with 'Supervisor' level access. If you do not have 'Supervisor' access, you will need to ask a supervisor to submit for you. If you are a 'Supervisor', you can submit the file by clicking the 'Force Submit' button for the file you wish to submit. It will then take a few minutes to be processed.
 
 ![Submitting](/user_manual/assets/images/batch/force.png)
-*Fig 3. Submitting a file with warnings*
+*Fig 4. Submitting a file with warnings*
 
