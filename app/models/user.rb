@@ -64,10 +64,13 @@ class User < ApplicationRecord
   end
 
   # Overrride Devise method so we can check if account is active before allowing them to get a password reset email
+  # https://github.com/plataformatec/devise/blob/v4.2.0/lib/devise/models/recoverable.rb#L44
   def send_reset_password_instructions
     if approved?
-      generate_reset_password_token!
-      ::Devise.mailer.reset_password_instructions(self).deliver
+      token = set_reset_password_token
+      send_reset_password_instructions_notification(token)
+
+      token
     else
       if pending_approval? or deactivated?
         Notifier.notify_user_that_they_cant_reset_their_password(self).deliver
