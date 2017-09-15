@@ -9,73 +9,73 @@ CI_MALE,0,n,No,No - Subfertility is not due to male factors
 CI_MALE,1,y,Yes,Yes - Subfertility is due to male factors 
 CI_UNEX,0,n,No,"No - If answered yes to CI_TUBE, CI_ENDO, CI_OTH, CI_MALE"
 CI_UNEX,1,y,Yes,"Yes - if answered no to CI_TUBE, CI_ENDO, CI_OTH, CI_MALE"
-PREG_20W,0,n,No,No- The female patient has not had a pregnancy of 20 or more weeks
+PREG_20W,0,n,No,No - The female patient has not had a pregnancy of 20 or more weeks
 PREG_20W,1,y,Yes,Yes - The female patient has had a pregnancy of 20 or more weeks
-PREG_20W,2,u,Unknown,Unknown
+PREG_20W,2,u,Unknown,Unknown previous pregnancy
 SURR,0,n,No,No - a surrogacy arrangement is not involved in this cycle
 SURR,1,y,Yes,Yes - a surrogagcy arrangment is involved in this cycle
 OV_STIM,0,n,No,No - FSH stimulation was not given
 OV_STIM,1,y,Yes,Yes - FSH stimulation was given
-STIM_1ST,0,n,No,No - The current fresh cycle is not the patients first FSH stimulated cycle for OPU
+STIM_1ST,0,n,No,No - the current fresh cycle is not the patients first FSH stimulated cycle for OPU
 STIM_1ST,1,y,Yes,Yes - the current fresh cycle is the patients first FSH stimulated cycle for OPU
-STIM_1ST,2,u,Unknown,Unknown - unknown whether the patient had FSH stimulated cycle for OPU before
-SP_SITE,0,e,e - Ejaculate,Site of sperm extraction: ejaculated
-SP_SITE,1,t,t - Testicular,Site of sperm extraction: testicular
-SP_SITE,2,p,p - Epidydimal,Site of sperm extraction: epididymal (whether by open biopsy or by PESA)
-SP_SITE,3,o,o - Other,Site of sperm extraction: other
-SP_SITE,4,u,u - Unknown,Site of sperm extraction:unknown
-SP_PERSN,0,h,h - Husband/Partner,Sperm provided by husband/partner
-SP_PERSN,1,k,k - Known donor,Sperm provided by known donor
-SP_PERSN,2,a,a - Anonymous donor,Sperm provided by anonymous donor
-SP_PERSN,3,u,u - Unknown,Unknown sperm provider 
-PGD,0,n,No,No- No PGD undertaken
+STIM_1ST,2,u,Unknown,Unknown whether the patient had FSH stimulated cycle for OPU before
+SP_SITE,0,e,Ejaculate,Site of sperm extraction: ejaculated
+SP_SITE,1,t,Testicular,Site of sperm extraction: testicular
+SP_SITE,2,p,Epidydimal,Site of sperm extraction: epididymal (whether by open biopsy or by PESA)
+SP_SITE,3,o,Other,Site of sperm extraction: other
+SP_SITE,4,u,Unknown,Site of sperm extraction:unknown
+SP_PERSN,0,h,Husband/Partner,Sperm provided by husband/partner
+SP_PERSN,1,k,Known donor,Sperm provided by known donor
+SP_PERSN,2,a,Anonymous donor,Sperm provided by anonymous donor
+SP_PERSN,3,u,Unknown,Unknown sperm provider 
+PGD,0,n,No,No PGD undertaken
 PGD,1,y,Yes,Yes - Fresh and thaw cycles where preimplantation genetic diagnosis in any form (including aneuploidy screening or sex selection) has been performed on any of the embryos (transferred or not)
-ASS_HATC,0,n,No,No- No assisted hatching 
-ASS_HATC,1,y,Yes,Yes- Fresh and Thaw cycles where assisted hatching in any form has been performed on any of the embryos (transferred or not)
-THAW_DON,0,o,o - donated oocyte,"If thawed/warmed embryos were originally from donated oocytes, record this field as o."
-THAW_DON,1,e,e - donated embryo,"If thawed/warmed embryos were donated embryos, record this field as e."
-EMB_ICSI,0,n,No,ICSI not used
+ASS_HATC,0,n,No,No assisted hatching 
+ASS_HATC,1,y,Yes,Yes - Fresh and Thaw cycles where assisted hatching in any form has been performed on any of the embryos (transferred or not)
+THAW_DON,0,o,Donated oocyte,"If thawed/warmed embryos were originally from donated oocytes, record this field as o."
+THAW_DON,1,e,Donated embryo,"If thawed/warmed embryos were donated embryos, record this field as e."
+EMB_ICSI,0,n,No,No transferred embryos fertilised by ICSI
 EMB_ICSI,1,y,Yes,Answer YES if any of the transferred embryos fertilised by ICSI.
 PR_CLIN,0,n,No,No clinical pregnancy recorded
 PR_CLIN,1,y,Yes,Clinical pregnancy recorded
-PR_ECTOP,0,n,n - No,Not ectopic or heterotopic
-PR_ECTOP,1,e,e - ectopic,If this pregnancy is an ectopic pregnancy
-PR_ECTOP,2,h,h - heterotopic,If pregnancy is combined ectopic and uterine pregnancy (heterotopic).
+PR_ECTOP,0,n,No,Not ectopic or heterotopic
+PR_ECTOP,1,e,ectopic,If this pregnancy is an ectopic pregnancy
+PR_ECTOP,2,h,heterotopic,If pregnancy is combined ectopic and uterine pregnancy (heterotopic).
 PR_TOP,0,n,No,No termination of pregnancy
 PR_TOP,1,y,Yes,Elective termination of pregnancy
 PR_REDUC,0,n,No,No selective reduction of pregnancy
 PR_REDUC,1,y,Yes,Selective reduction was performed due to fetal abnormality/other reasons
-CS,0,n,No,Not caesarean delivery
+CS,0,n,No,No caesarean delivery 
 CS,1,y,Yes,Caesarean delivery
-BAB1_OUT,0,s,s - Stillbirth,
-BAB1_OUT,1,l,l - Livebirth / survived,
-BAB1_OUT,2,n,n - Livebirth / died - Neonatal death ,
-BAB1_OUT,3,u,u - baby born but outcome unknown ,
-BAB1_SEX,0,m,m- Male,
-BAB1_SEX,1,f,f - Female,
-BAB1_SEX,2,u,u - Unknown sex,
-BAB2_OUT,0,s,s - Stillbirth,
-BAB2_OUT,1,l,l - Livebirth / survived,
-BAB2_OUT,2,n,n - Livebirth / died - Neonatal death ,
-BAB2_OUT,3,u,u - baby born but outcome unknown ,
-BAB2_SEX,0,m,m- Male,
-BAB2_SEX,1,f,f - Female,
-BAB2_SEX,2,u,u - Unknown sex,
-BAB3_OUT,0,s,s - Stillbirth,
-BAB3_OUT,1,l,l - Livebirth / survived,
-BAB3_OUT,2,n,n - Livebirth / died - Neonatal death ,
-BAB3_OUT,3,u,u - baby born but outcome unknown ,
-BAB3_SEX,0,m,m- Male,
-BAB3_SEX,1,f,f - Female,
-BAB3_SEX,2,u,u - Unknown sex,
-BAB4_OUT,0,s,s - Stillbirth,
-BAB4_OUT,1,l,l - Livebirth / survived,
-BAB4_OUT,2,n,n - Livebirth / died - Neonatal death ,
-BAB4_OUT,3,u,u - baby born but outcome unknown ,
-BAB4_SEX,0,m,m- Male,
-BAB4_SEX,1,f,f - Female,
-BAB4_SEX,2,u,u - Unknown sex,
+BAB1_OUT,0,s,Stillbirth,
+BAB1_OUT,1,l,Livebirth / survived,
+BAB1_OUT,2,n,Livebirth / died - Neonatal death ,
+BAB1_OUT,3,u,Baby born but outcome unknown ,
+BAB1_SEX,0,m,Male,
+BAB1_SEX,1,f,Female,
+BAB1_SEX,2,u,Unknown sex,
+BAB2_OUT,0,s,Stillbirth,
+BAB2_OUT,1,l,Livebirth / survived,
+BAB2_OUT,2,n,Livebirth / died - Neonatal death ,
+BAB2_OUT,3,u,Baby born but outcome unknown ,
+BAB2_SEX,0,m,Male,
+BAB2_SEX,1,f,Female,
+BAB2_SEX,2,u,Unknown sex,
+BAB3_OUT,0,s,Stillbirth,
+BAB3_OUT,1,l,Livebirth / survived,
+BAB3_OUT,2,n,Livebirth / died - Neonatal death ,
+BAB3_OUT,3,u,Baby born but outcome unknown ,
+BAB3_SEX,0,m,Male,
+BAB3_SEX,1,f,Female,
+BAB3_SEX,2,u,Unknown sex,
+BAB4_OUT,0,s,Stillbirth,
+BAB4_OUT,1,l,Livebirth / survived,
+BAB4_OUT,2,n,Livebirth / died - Neonatal death ,
+BAB4_OUT,3,u,Baby born but outcome unknown ,
+BAB4_SEX,0,m,Male,
+BAB4_SEX,1,f,Female,
+BAB4_SEX,2,u,Unknown sex,
 MORB_ADM,0,n,No,No hospital admission due to fertility treatment
 MORB_ADM,1,y,Yes,"Yes - where the female partner is admitted to hospital with any condition (excluding any pregnancy-related issues, such as ectopic pregnancy) that could be in any way related to fertility treatment"
-MRB_OHSS,0,n,No,No OHSS
+MRB_OHSS,0,n,No,No OHSS 
 MRB_OHSS,1,y,Yes,Yes if OHSS occurred
