@@ -37,12 +37,12 @@ class SupplementaryFile < ApplicationRecord
 
     begin
 
-      CSV.foreach(file.path, {headers: true}) do |row|
-        unless row.headers.include?(BatchFile::CYCLE_ID_COLUMN)
+      CSV.foreach(file.path, {headers: true, header_converters: :downcase}) do |row|
+        unless row.headers.include?(BatchFile::COLUMN_CYCLE_ID.downcase)
           self.message = "The supplementary file you uploaded for '#{multi_name}' did not contain a CYCLE_ID column."
           return false
         end
-        cycle_id = row[BatchFile::CYCLE_ID_COLUMN]
+        cycle_id = row[BatchFile::COLUMN_CYCLE_ID.downcase]
         if cycle_id.blank?
           self.message = "The supplementary file you uploaded for '#{multi_name}' is missing one or more cycle IDs. Each record must have a cycle ID."
           return false
@@ -85,7 +85,7 @@ class SupplementaryFile < ApplicationRecord
         answer_hash = {}
         rows_for_cycle.each_with_index do |row, index|
           answers = row.to_hash
-          answers.delete('CYCLE_ID')
+          answers.delete(BatchFile::COLUMN_CYCLE_ID.downcase)
           answers.each_pair do |key, value|
             answer_hash["#{key}#{index+1}"] = value unless value.blank?
           end
