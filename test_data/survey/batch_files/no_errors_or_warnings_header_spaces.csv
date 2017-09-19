@@ -1,2 +1,2 @@
 unit , site, cycle_id , textmandatory,textoptional , date1 ,date2,time,choice,decimal,integer
-100,100,12345,Val1,,2011-12-25,,14:30,0,56.77,10
+100 , 100, 12345,Val1 ,,2011-12-25,,14:30,0,56.77, 10
