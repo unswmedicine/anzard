@@ -241,23 +241,45 @@ describe BatchFile do
     end
 
     describe 'well formatted files' do
-      describe 'CSV header case-insensitivity' do
-        it 'file with no errors or warnings - should accept files with headers in upper-case' do
+
+      describe 'CSV header formatting' do
+        def check_batch_file_ok(batch_file, survey, user, clinic)
+          batch_file.status.should eq('Processed Successfully')
+          batch_file.message.should eq('Your file has been processed successfully.')
+          response = Response.find_by_cycle_id!('12345')
+          response.survey.should eq(survey)
+          response.user.should eq(user)
+          response.clinic.should eq(clinic)
+          response.submitted_status.should eq(Response::STATUS_SUBMITTED)
+          response.batch_file.id.should eq(batch_file.id)
+          answer_hash = response.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+          answer_hash['TextMandatory'].text_answer.should == 'Val1'
+          answer_hash['TextOptional'].should be_nil #not answered
+          answer_hash['Date1'].date_answer.should == Date.parse('2011-12-25')
+          answer_hash['Time'].time_answer.should == Time.utc(2000, 1, 1, 14, 30)
+          answer_hash['Choice'].choice_answer.should == '0'
+          answer_hash['Decimal'].decimal_answer.should == 56.77
+          answer_hash['Integer'].integer_answer.should == 10
+        end
+
+        it 'should accept files with headers in upper-case' do
           batch_file = process_batch_file('no_errors_or_warnings_headers_upper_case.csv', survey, user)
-          batch_file.status.should eq('Processed Successfully')
-          batch_file.message.should eq('Your file has been processed successfully.')
+          check_batch_file_ok(batch_file, survey, user, clinic)
         end
 
-        it 'file with no errors or warnings - should accept files with headers in lower-case' do
+        it 'should accept files with headers in lower-case' do
           batch_file = process_batch_file('no_errors_or_warnings_headers_lower_case.csv', survey, user)
-          batch_file.status.should eq('Processed Successfully')
-          batch_file.message.should eq('Your file has been processed successfully.')
+          check_batch_file_ok(batch_file, survey, user, clinic)
         end
 
-        it 'file with no errors or warnings - should accept files with headers in mixed-case' do
+        it 'should accept files with headers in mixed-case' do
           batch_file = process_batch_file('no_errors_or_warnings_headers_mixed_case.csv', survey, user)
-          batch_file.status.should eq('Processed Successfully')
-          batch_file.message.should eq('Your file has been processed successfully.')
+          check_batch_file_ok(batch_file, survey, user, clinic)
+        end
+
+        it 'should accept files with headers containing leading or trailing spaces' do
+          batch_file = process_batch_file('no_errors_or_warnings_header_spaces.csv', survey, user)
+          check_batch_file_ok(batch_file, survey, user, clinic)
         end
       end
 
