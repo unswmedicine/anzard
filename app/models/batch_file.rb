@@ -225,51 +225,50 @@ class BatchFile < ApplicationRecord
 
   def pre_process_file
     # do basic checks that can result in the file failing completely and not being validated
-    @csv_row_count = 0
-
     # ToDo: update so that headers and survey question codes are downcased and stripped of trailing whitespace
-    headers = CSV.read(file.path, {headers: true}).headers
     survey_question_codes = survey.questions.pluck(:code)
-    unless headers.sort == survey_question_codes.sort
-      # ToDo: figure out which question headers are missing and display that to the user
-      set_outcome(STATUS_FAILED, 'The file you uploaded is missing some question headers.' + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
-      return false
-    end
-
-
     cycle_ids = []
-    CSV.foreach(file.path, {headers: true}) do |row|
-      unless row.headers.include?(CYCLE_ID_COLUMN)
-        set_outcome(STATUS_FAILED, MESSAGE_NO_CYCLE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
-        return false
-      end
-      unless headers_unique?(row.headers)
-        set_outcome(STATUS_FAILED, MESSAGE_NOT_UNIQUE)
-        return false
-      end
-      @csv_row_count += 1
-      cycle_id = row[CYCLE_ID_COLUMN]
-      if cycle_id.blank?
-        set_outcome(STATUS_FAILED, MESSAGE_MISSING_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
-        return false
+    @csv_row_count = 0
+    CSV.foreach(file.path, {headers: true, return_headers: true}) do |row|
+      if row.header_row?
+        unless row.headers.sort == survey_question_codes.sort
+          # ToDo: figure out which question headers are missing and display that to the user
+          set_outcome(STATUS_FAILED, 'The file you uploaded is missing some question headers.')
+          return false
+        end
+        unless headers_unique?(row.headers)
+          set_outcome(STATUS_FAILED, MESSAGE_NOT_UNIQUE)
+          return false
+        end
       else
-        cycle_id.strip!
-        if cycle_ids.include?(cycle_id)
-          set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        unless row.headers.include?(CYCLE_ID_COLUMN)
+          set_outcome(STATUS_FAILED, MESSAGE_NO_CYCLE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+          return false
+        end
+        @csv_row_count += 1
+        cycle_id = row[CYCLE_ID_COLUMN]
+        if cycle_id.blank?
+          set_outcome(STATUS_FAILED, MESSAGE_MISSING_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         else
-          cycle_ids << cycle_id
+          cycle_id.strip!
+          if cycle_ids.include?(cycle_id)
+            set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+            return false
+          else
+            cycle_ids << cycle_id
+          end
         end
-      end
 
-      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
-      if clinic_in_row.nil?
-        set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
-        return false
-      else
-        unless user.clinics.exists? clinic_in_row.id
-          set_outcome(STATUS_FAILED, MESSAGE_UNAUTHORISED_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+        clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
+        if clinic_in_row.nil?
+          set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
+        else
+          unless user.clinics.exists? clinic_in_row.id
+            set_outcome(STATUS_FAILED, MESSAGE_UNAUTHORISED_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+            return false
+          end
         end
       end
     end

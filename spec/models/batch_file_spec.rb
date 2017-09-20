@@ -92,6 +92,7 @@ describe BatchFile do
       end
     end
   end
+
   describe "can't process based on status" do
     let(:batch_file) { BatchFile.new }
     it "should die trying to force successful" do
@@ -146,7 +147,8 @@ describe BatchFile do
       it "should reject file without a cycle id column" do
         batch_file = process_batch_file('no_cycle_id_column.csv', survey, user)
         batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not contain a CYCLE_ID column. Processing stopped on CSV row 0")
+        # ToDo: update test to reference which columns are missing
+        batch_file.message.should eq('The file you uploaded is missing some question headers.')
         batch_file.record_count.should be_nil
         batch_file.problem_record_count.should be_nil
         batch_file.summary_report_path.should be_nil
@@ -388,15 +390,16 @@ describe BatchFile do
         batch_file.detail_report_path.should_not be_nil
       end
 
-      it "should reject records with missing mandatory fields - where the column is missing entirely" do
+      it 'should reject records with missing mandatory fields - where the column is missing entirely - and no reports generated' do
         batch_file = process_batch_file('missing_mandatory_column.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        batch_file.status.should eq('Failed')
+        # ToDo: update test to reference which columns are missing
+        batch_file.message.should eq('The file you uploaded is missing some question headers.')
         Response.count.should == 0
         Answer.count.should == 0
-        batch_file.record_count.should == 3
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
       end
 
       it "should reject records with choice answers that are not one of the allowed values for the question" do
