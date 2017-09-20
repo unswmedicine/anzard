@@ -80,7 +80,7 @@ Rule                       | Question Code | Description
 special_dob                |               | DOB must be in the same year as the year of registration
 special_rule_comp1         | N_V_EGTH      | (n_v_egth + n_s_egth + n_eggs + n_recvd) must be >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
 special_rule_comp2         | N_FERT        | n_fert must be <= (n_ivf + n_icsi)
-special_rule_comp3         | N_S_CLTH      | (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
+special_rule_comp3         | N_S_CLTH      | (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v)
 special_rule_mtage         | N_EMBDISP     | If n_embdisp == 0 then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 55 years)
 special_rule_mtagedisp     | N_EMBDISP     | If n_embdisp > 0  then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 70 years)
 special_rule_pr_clin       | PR_CLIN       | If pr_clin equals 'y' or 'u' then n_bl_et > 0 or n_cl_et > 0 or iui_date must be present

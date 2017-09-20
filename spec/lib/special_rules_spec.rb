@@ -221,7 +221,7 @@ describe 'Special Rules' do
   end
 
   describe 'Rule: special_rule_comp3' do
-    # special_rule_comp3: (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp)
+    # special_rule_comp3: (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v)
     before(:each) do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
@@ -230,14 +230,12 @@ describe 'Special Rules' do
       @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @n_fert = create(:question, code: 'N_FERT', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_embrec = create(:question, code: 'N_EMBREC', section: @section, question_type: Question::TYPE_INTEGER)
       @n_bl_et = create(:question, code: 'N_BL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @n_cl_et = create(:question, code: 'N_CL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @n_clfz_s = create(:question, code: 'N_CLFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
       @n_clfz_v = create(:question, code: 'N_CLFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
       @n_blfz_s = create(:question, code: 'N_BLFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
       @n_blfz_v = create(:question, code: 'N_BLFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
       @cqv = create(:cross_question_validation, rule: 'special_rule_comp3', question: @n_s_clth, error_message: 'My error message', related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
@@ -296,12 +294,6 @@ describe 'Special Rules' do
           expect(@cqv.check(@answer)).to be_nil
         end
 
-        it 'should pass when only N_EMBREC is answered' do
-          create(:answer, question: @n_embrec, answer_value: 0, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
         it 'should pass when only N_BL_ET answered' do
           create(:answer, question: @n_bl_et, answer_value: 0, response: @response)
           @answer.reload
@@ -337,12 +329,6 @@ describe 'Special Rules' do
           @answer.reload
           expect(@cqv.check(@answer)).to be_nil
         end
-
-        it 'should pass when only N_EMBDISP is answered' do
-          create(:answer, question: @n_embdisp, answer_value: 0, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
       end
     end
 
@@ -354,7 +340,6 @@ describe 'Special Rules' do
         create(:answer, question: @n_s_blth, answer_value: 0, response: @response)
         create(:answer, question: @n_v_blth, answer_value: 0, response: @response)
         create(:answer, question: @n_fert, answer_value: 0, response: @response)
-        create(:answer, question: @n_embrec, answer_value: 0, response: @response)
         # Sum right-side
         create(:answer, question: @n_bl_et, answer_value: 0, response: @response)
         create(:answer, question: @n_cl_et, answer_value: 0, response: @response)
@@ -362,7 +347,6 @@ describe 'Special Rules' do
         create(:answer, question: @n_clfz_v, answer_value: 0, response: @response)
         create(:answer, question: @n_blfz_s, answer_value: 0, response: @response)
         create(:answer, question: @n_blfz_v, answer_value: 0, response: @response)
-        create(:answer, question: @n_embdisp, answer_value: 0, response: @response)
         answer.reload
         expect(@cqv.check(answer)).to be_nil
       end
@@ -373,7 +357,6 @@ describe 'Special Rules' do
         create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
         create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
         create(:answer, question: @n_fert, answer_value: 1, response: @response)
-        create(:answer, question: @n_embrec, answer_value: 1, response: @response)
         # Sum right-side
         create(:answer, question: @n_bl_et, answer_value: 0, response: @response)
         create(:answer, question: @n_cl_et, answer_value: 0, response: @response)
@@ -381,7 +364,6 @@ describe 'Special Rules' do
         create(:answer, question: @n_clfz_v, answer_value: 0, response: @response)
         create(:answer, question: @n_blfz_s, answer_value: 0, response: @response)
         create(:answer, question: @n_blfz_v, answer_value: 0, response: @response)
-        create(:answer, question: @n_embdisp, answer_value: 0, response: @response)
         answer.reload
         expect(@cqv.check(answer)).to be_nil
       end
@@ -392,7 +374,6 @@ describe 'Special Rules' do
         create(:answer, question: @n_s_blth, answer_value: 0, response: @response)
         create(:answer, question: @n_v_blth, answer_value: 0, response: @response)
         create(:answer, question: @n_fert, answer_value: 0, response: @response)
-        create(:answer, question: @n_embrec, answer_value: 0, response: @response)
         # Sum right-side
         create(:answer, question: @n_bl_et, answer_value: 1, response: @response)
         create(:answer, question: @n_cl_et, answer_value: 1, response: @response)
@@ -400,7 +381,6 @@ describe 'Special Rules' do
         create(:answer, question: @n_clfz_v, answer_value: 1, response: @response)
         create(:answer, question: @n_blfz_s, answer_value: 1, response: @response)
         create(:answer, question: @n_blfz_v, answer_value: 1, response: @response)
-        create(:answer, question: @n_embdisp, answer_value: 1, response: @response)
         answer.reload
         expect(@cqv.check(answer)).to eq('My error message')
       end

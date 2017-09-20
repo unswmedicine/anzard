@@ -103,7 +103,7 @@ rulenew8,,emb_icsi,et_date,,present_implies_present,"if emb_icsi is complete, et
 rulenew9,,pr_end_dt,n_deliv,,present_implies_present,"if pr_end_dt is complete, n_deliv must be complete",,,,,,,,
 rule22d,,n_v_egth,,,special_rule_comp1,(n_v_egth + n_s_egth + n_eggs + n_recvd) must be >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v),,,,,,,,
 rule24,,n_fert,,,special_rule_comp2,n_fert must be <= (n_ivf + n_icsi),,,,,,,,
-rule26e,,n_s_clth,,,special_rule_comp3,(n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert + n_embrec) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdisp),,,,,,,,
+rule26e,,n_s_clth,,,special_rule_comp3,(n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v),,,,,,,,
 rule1mt,,n_embdisp,,,special_rule_mtage,if n_embdisp == 0 then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 55 years),,,,,,,,
 rule1mtdisp,,n_embdisp,,,special_rule_mtagedisp,if n_embdisp > 0 then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 70 years),,,,,,,,
 rule17a,,pr_clin,,,special_rule_pr_clin,if pr_clin equals 'y' or 'u' then n_bl_et > 0 or n_cl_et > 0 or iui_date must be present,,,,,,,,
