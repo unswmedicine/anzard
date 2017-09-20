@@ -146,9 +146,8 @@ describe BatchFile do
 
       it "should reject file without a cycle id column" do
         batch_file = process_batch_file('no_cycle_id_column.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        # ToDo: update test to reference which columns are missing
-        batch_file.message.should eq('The file you uploaded is missing some question headers.')
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded is missing the following question headers: CYCLE_ID')
         batch_file.record_count.should be_nil
         batch_file.problem_record_count.should be_nil
         batch_file.summary_report_path.should be_nil
@@ -182,9 +181,11 @@ describe BatchFile do
       it 'should reject files that do not have all survey questions included in the header row' do
         batch_file = process_batch_file('missing_some_headers.csv', survey, user)
         batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded is missing some question headers.')
-        #   ToDo: determine how to return list of missing headers within the error message
-
+        batch_file.message.should eq('The file you uploaded is missing the following question headers: TextOptional, Date2, Time2')
+        batch_file.record_count.should be_nil
+        batch_file.problem_record_count.should be_nil
+        batch_file.summary_report_path.should be_nil
+        batch_file.detail_report_path.should be_nil
       end
 
       it 'should reject files that have a row without a UNIT field' do
@@ -393,8 +394,7 @@ describe BatchFile do
       it 'should reject records with missing mandatory fields - where the column is missing entirely - and no reports generated' do
         batch_file = process_batch_file('missing_mandatory_column.csv', survey, user)
         batch_file.status.should eq('Failed')
-        # ToDo: update test to reference which columns are missing
-        batch_file.message.should eq('The file you uploaded is missing some question headers.')
+        batch_file.message.should eq('The file you uploaded is missing the following question headers: TextMandatory')
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.problem_record_count.should be_nil

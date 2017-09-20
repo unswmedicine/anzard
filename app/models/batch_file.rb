@@ -39,6 +39,7 @@ class BatchFile < ApplicationRecord
   MESSAGE_UNEXPECTED_ERROR = 'Processing failed due to an unexpected error.'
   MESSAGE_CSV_STOP_LINE = ' Processing stopped on CSV row '
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
+  MESSAGE_MISSING_HEADER_COLUMNS = 'The file you uploaded is missing the following question headers: '
 
   belongs_to :user
   belongs_to :clinic
@@ -232,8 +233,8 @@ class BatchFile < ApplicationRecord
     CSV.foreach(file.path, {headers: true, return_headers: true}) do |row|
       if row.header_row?
         unless row.headers.sort == survey_question_codes.sort
-          # ToDo: figure out which question headers are missing and display that to the user
-          set_outcome(STATUS_FAILED, 'The file you uploaded is missing some question headers.')
+          missing_headers = survey_question_codes - row.headers
+          set_outcome(STATUS_FAILED, MESSAGE_MISSING_HEADER_COLUMNS + missing_headers.join(', '))
           return false
         end
         unless headers_unique?(row.headers)
