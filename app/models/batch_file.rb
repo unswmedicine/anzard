@@ -225,6 +225,14 @@ class BatchFile < ApplicationRecord
 
   def pre_process_file
     # do basic checks that can result in the file failing completely and not being validated
+    headers = CSV.read(file.path, {headers: true}).headers
+    survey_question_codes = survey.questions.pluck(:code)
+    unless headers == survey_question_codes
+      # ToDo: figure out which question headers are missing and display that to the user
+      set_outcome(STATUS_FAILED, 'The file you uploaded is missing some question headers.')
+      return false
+    end
+
     @csv_row_count = 0
     cycle_ids = []
     CSV.foreach(file.path, {headers: true}) do |row|

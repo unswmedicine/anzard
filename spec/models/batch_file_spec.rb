@@ -177,6 +177,14 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
+      it 'should reject files that do not have all survey questions included in the header row' do
+        batch_file = process_batch_file('missing_some_headers.csv', survey, user)
+        batch_file.status.should eq('Failed')
+        batch_file.message.should eq('The file you uploaded is missing some question headers.')
+        #   ToDo: determine how to return list of missing headers within the error message
+
+      end
+
       it 'should reject files that have a row without a UNIT column' do
         batch_file = process_batch_file('no_unit_code_column.csv', survey, user)
         batch_file.status.should eq('Failed')

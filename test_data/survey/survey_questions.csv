@@ -8,3 +8,6 @@
 1,0,"Choice","Choice?","Choice",,,,,,,"Choice guide","Choice desc"
 1,1,"Decimal","Decimal?","Decimal",,,,,,,"Decimal guide","Decimal desc"
 1,2,"Integer","Integer?","Integer",5,,,,,,"Integer guide","Integer desc"
+2,0,"CYCLE_ID","Cycle_ID?","Text",,,,1,true,20,"Cycle ID guide","Cycle ID desc"
+2,1,"UNIT","Unit?","Integer",100,999,,,true,,"Unit guide","Unit desc"
+2,2,"SITE","Site?","Integer",100,999,,,true,,"Site guide","Site desc"
