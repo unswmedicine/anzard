@@ -185,8 +185,8 @@ describe BatchFile do
 
       end
 
-      it 'should reject files that have a row without a UNIT column' do
-        batch_file = process_batch_file('no_unit_code_column.csv', survey, user)
+      it 'should reject files that have a row without a UNIT field' do
+        batch_file = process_batch_file('no_unit_code_field.csv', survey, user)
         batch_file.status.should eq('Failed')
         batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
         batch_file.record_count.should be_nil
@@ -205,8 +205,8 @@ describe BatchFile do
         batch_file.detail_report_path.should be_nil
       end
 
-      it 'should reject files that have a row without a SITE column' do
-        batch_file = process_batch_file('no_site_code_column.csv', survey, user)
+      it 'should reject files that have a row without a SITE field' do
+        batch_file = process_batch_file('no_site_code_field.csv', survey, user)
         batch_file.status.should eq('Failed')
         batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
         batch_file.record_count.should be_nil
@@ -255,7 +255,7 @@ describe BatchFile do
         batch_file.status.should eq("Processed Successfully")
         batch_file.message.should eq("Your file has been processed successfully.")
         Response.count.should == 3
-        Answer.count.should eq(21) #3x8 questions = 24, 3 not answered
+        Answer.count.should eq(30) #3x12 questions = 36, 6 not answered
         batch_file.problem_record_count.should == 0
         batch_file.record_count.should == 3
 
@@ -294,7 +294,7 @@ describe BatchFile do
         batch_file.status.should eq("Processed Successfully")
         batch_file.message.should eq("Your file has been processed successfully.")
         Response.count.should == 3
-        Answer.count.should eq(21) #3x8 questions = 24, 3 not answered
+        Answer.count.should eq(30) #3x12 questions = 36, 6 not answered
         batch_file.problem_record_count.should == 0
         batch_file.record_count.should == 3
 
@@ -548,7 +548,7 @@ describe BatchFile do
         batch_file.status.should eq("Processed Successfully")
         batch_file.message.should eq("Your file has been processed successfully.")
         Response.count.should == 3
-        Answer.count.should == 20
+        Answer.count.should == 29
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
         batch_file.summary_report_path.should_not be_nil
@@ -592,7 +592,7 @@ describe BatchFile do
         batch_file.status.should eq("Processed Successfully")
         batch_file.message.should eq("Your file has been processed successfully.")
         Response.count.should == 3
-        Answer.count.should == 21
+        Answer.count.should == 30
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
         batch_file.summary_report_path.should_not be_nil

@@ -1,1 +1,1 @@
-UNIT,SITE,CYCLE_ID,Clinic
+UNIT,SITE,CYCLE_ID,TextMandatory,TextOptional,Date1,Date2,Time,Time2,Choice,Decimal,Integer
