@@ -225,18 +225,34 @@ class BatchFile < ApplicationRecord
     end
   end
 
+  def sanitise_question_code(question_code)
+    question_code.downcase.strip
+  end
+
+  def missing_batch_file_headers(batch_file_headers, survey_question_codes)
+    missing_headers = []
+    sanitised_batch_headers = batch_file_headers.map{|header| sanitise_question_code(header)}
+    sanitised_question_codes = survey_question_codes.map{|code| sanitise_question_code(code)}
+    unless sanitised_batch_headers.sort == sanitised_question_codes.sort
+      survey_question_codes.each do |question_code|
+        unless sanitised_batch_headers.include? sanitise_question_code(question_code)
+          missing_headers.append(question_code)
+        end
+      end
+    end
+    missing_headers
+  end
+
   def pre_process_file
     # do basic checks that can result in the file failing completely and not being validated
-    # ToDo: update so that headers and survey question codes are downcased and stripped of trailing whitespace
-    survey_question_codes = survey.questions.pluck(:code)
     cycle_ids = []
     @csv_row_count = 0
     CSV.foreach(file.path, {headers: true, return_headers: true,
                             header_converters: lambda {|header| header.downcase.strip}}) do |row|
       if row.header_row?
-        unless row.headers.sort == survey_question_codes.sort
-          missing_headers = survey_question_codes - row.headers
-          set_outcome(STATUS_FAILED, MESSAGE_MISSING_HEADER_COLUMNS + missing_headers.join(', '))
+        missing_batch_headers = missing_batch_file_headers(row.headers, survey.questions.pluck(:code))
+        unless missing_batch_headers.empty?
+          set_outcome(STATUS_FAILED, MESSAGE_MISSING_HEADER_COLUMNS + missing_batch_headers.join(', '))
           return false
         end
         unless headers_unique?(row.headers)
