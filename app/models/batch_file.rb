@@ -182,7 +182,7 @@ class BatchFile < ApplicationRecord
     failures = false
     warnings = false
     responses = []
-    CSV.foreach(file.path, {headers: true, header_converters: :downcase}) do |row|
+    CSV.foreach(file.path, {headers: true, header_converters: lambda {|header| header.downcase.strip}}) do |row|
       @csv_row_count += 1
       cycle_id = row[COLUMN_CYCLE_ID.downcase]
       cycle_id.strip! unless cycle_id.nil?
@@ -228,7 +228,7 @@ class BatchFile < ApplicationRecord
     # do basic checks that can result in the file failing completely and not being validated
     @csv_row_count = 0
     cycle_ids = []
-    CSV.foreach(file.path, {headers: true, header_converters: :downcase}) do |row|
+    CSV.foreach(file.path, {headers: true, header_converters: lambda {|header| header.downcase.strip}}) do |row|
       unless row.headers.include?(COLUMN_CYCLE_ID.downcase)
         set_outcome(STATUS_FAILED, MESSAGE_NO_CYCLE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
         return false
