@@ -2,3 +2,7 @@
 "Choice",0,"No","No hint",0
 "Choice",1,"Yes","Yes hint",1
 "Choice",99,"Dunno","Dunno hint",2
+"Choice2","y","Yes","Yes hint",0
+"Choice2","n","No","No hint",1
+"Choice3","yes","Yes","Yes hint",0
+"Choice3","no","No","No hint",1

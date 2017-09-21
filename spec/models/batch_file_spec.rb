@@ -374,6 +374,53 @@ describe BatchFile do
         File.exist?(batch_file.summary_report_path).should be true
         batch_file.detail_report_path.should be_nil
       end
+
+      it 'file with no errors or warnings - should create the survey responses and answers and should treat textual question choice answers as case insensitive' do
+        batch_file = process_batch_file('no_errors_or_warnings_case_insensitive_choices.csv', survey, user)
+        batch_file.status.should eq('Processed Successfully')
+        batch_file.message.should eq('Your file has been processed successfully.')
+        Response.count.should == 3
+        Answer.count.should eq(33) #3x14 questions = 42, 9 not answered
+        batch_file.problem_record_count.should == 0
+        batch_file.record_count.should == 3
+
+        r1 = Response.find_by_cycle_id!('B1')
+        r2 = Response.find_by_cycle_id!('B2')
+        r3 = Response.find_by_cycle_id!('B3')
+
+        [r1, r2, r3].each do |r|
+          r.survey.should eq(survey)
+          r.user.should eq(user)
+          r.clinic.should eq(clinic)
+          r.submitted_status.should eq(Response::STATUS_SUBMITTED)
+          r.batch_file.id.should eq(batch_file.id)
+        end
+
+        # Check that each question options are mapped case-insensitively from batch file answer to choice options
+        answer1_hash = r1.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+        answer1_hash['Choice'].choice_answer.should == '0'
+        answer1_hash['Choice2'].choice_answer.should == 'y'
+        answer1_hash['Choice3'].choice_answer.should == 'yes'
+
+        answer2_hash = r2.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+        answer2_hash['Choice'].choice_answer.should == '1'
+        answer2_hash['Choice2'].choice_answer.should == 'y'
+        answer1_hash['Choice3'].choice_answer.should == 'yes'
+
+        answer2_hash = r3.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+        answer2_hash['Choice'].choice_answer.should == '99'
+        answer2_hash['Choice2'].choice_answer.should == 'y'
+        answer1_hash['Choice3'].choice_answer.should == 'yes'
+
+
+        Answer.all.each { |a| a.has_fatal_warning?.should be false }
+        Answer.all.each { |a| a.has_warning?.should be false }
+        batch_file.record_count.should == 3
+        # summary report should exist but not detail report
+        batch_file.summary_report_path.should_not be_nil
+        File.exist?(batch_file.summary_report_path).should be true
+        batch_file.detail_report_path.should be_nil
+      end
     end
 
     describe "with validation errors" do
