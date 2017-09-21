@@ -18,17 +18,18 @@ require 'csv'
 
 class BatchFile < ApplicationRecord
 
-  CYCLE_ID_COLUMN = 'CYCLE_ID'
-  UNIT_CODE_COLUMN = 'UNIT'
-  SITE_CODE_COLUMN = 'SITE'
   STATUS_FAILED = 'Failed'
   STATUS_SUCCESS = 'Processed Successfully'
   STATUS_REVIEW = 'Needs Review'
   STATUS_IN_PROGRESS = 'In Progress'
 
+  COLUMN_CYCLE_ID = 'CYCLE_ID'
+  COLUMN_UNIT_CODE = 'UNIT'
+  COLUMN_SITE_CODE = 'SITE'
+
   MESSAGE_WARNINGS = 'The file you uploaded has one or more warnings. Please review the reports for details.'
-  MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{CYCLE_ID_COLUMN} column."
-  MESSAGE_UNKNOWN_UNIT_SITE = "The file you uploaded contains a #{UNIT_CODE_COLUMN} or #{SITE_CODE_COLUMN} that is unknown to our database."
+  MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{COLUMN_CYCLE_ID} column."
+  MESSAGE_UNKNOWN_UNIT_SITE = "The file you uploaded contains a #{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE} that is unknown to our database."
   MESSAGE_UNAUTHORISED_UNIT_SITE = 'The file you uploaded contains a Unit_Site that you are not allocated to.'
   MESSAGE_MISSING_CYCLE_IDS = 'The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID.'
   MESSAGE_EMPTY = 'The file you uploaded did not contain any data.'
@@ -154,7 +155,7 @@ class BatchFile < ApplicationRecord
         organiser.add_problems(question.code, r.cycle_id, ['This question is mandatory'], [], '')
       end
       r.valid? #we have to call this to trigger errors getting populated
-      organiser.add_problems(CYCLE_ID_COLUMN, r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
+      organiser.add_problems(COLUMN_CYCLE_ID, r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
     end
     organiser
   end
@@ -182,11 +183,11 @@ class BatchFile < ApplicationRecord
     failures = false
     warnings = false
     responses = []
-    CSV.foreach(file.path, {headers: true}) do |row|
+    CSV.foreach(file.path, {headers: true, header_converters: lambda {|header| header.downcase.strip}}) do |row|
       @csv_row_count += 1
-      cycle_id = row[CYCLE_ID_COLUMN]
+      cycle_id = row[COLUMN_CYCLE_ID.downcase]
       cycle_id.strip! unless cycle_id.nil?
-      clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
+      clinic_in_row = Clinic.find_by(unit_code: row[COLUMN_UNIT_CODE.downcase], site_code: row[COLUMN_SITE_CODE.downcase])
       response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
       add_answers_from_supplementary_files(response, cycle_id)
@@ -230,7 +231,8 @@ class BatchFile < ApplicationRecord
     survey_question_codes = survey.questions.pluck(:code)
     cycle_ids = []
     @csv_row_count = 0
-    CSV.foreach(file.path, {headers: true, return_headers: true}) do |row|
+    CSV.foreach(file.path, {headers: true, return_headers: true,
+                            header_converters: lambda {|header| header.downcase.strip}}) do |row|
       if row.header_row?
         unless row.headers.sort == survey_question_codes.sort
           missing_headers = survey_question_codes - row.headers
@@ -242,12 +244,12 @@ class BatchFile < ApplicationRecord
           return false
         end
       else
-        unless row.headers.include?(CYCLE_ID_COLUMN)
+        unless row.headers.include?(COLUMN_CYCLE_ID.downcase)
           set_outcome(STATUS_FAILED, MESSAGE_NO_CYCLE_ID + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         end
         @csv_row_count += 1
-        cycle_id = row[CYCLE_ID_COLUMN]
+        cycle_id = row[COLUMN_CYCLE_ID.downcase]
         if cycle_id.blank?
           set_outcome(STATUS_FAILED, MESSAGE_MISSING_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
@@ -261,7 +263,7 @@ class BatchFile < ApplicationRecord
           end
         end
 
-        clinic_in_row = Clinic.find_by(unit_code: row[UNIT_CODE_COLUMN], site_code: row[SITE_CODE_COLUMN])
+        clinic_in_row = Clinic.find_by(unit_code: row[COLUMN_UNIT_CODE.downcase], site_code: row[COLUMN_SITE_CODE.downcase])
         if clinic_in_row.nil?
           set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
