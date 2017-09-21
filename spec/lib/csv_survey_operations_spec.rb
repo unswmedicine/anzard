@@ -43,7 +43,8 @@ describe CsvSurveyOperations do
       s = create_survey('some_name', good_question_file, good_options_file, good_cqv_file)
       s.sections.count.should eq 3
       s.sections.first.questions.count.should eq 6
-      s.sections.second.questions.count.should eq 3
+      s.sections.second.questions.count.should eq 5
+      s.sections.third.questions.count.should eq 3
 
       Section.find_by_name!('0').section_order.should eq 0
       Section.find_by_name!('1').section_order.should eq 1
