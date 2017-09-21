@@ -91,9 +91,9 @@ describe SupplementaryFile do
       #100,100,B2,,11:53
       denormalised.size.should eq(2)
       cycle1 = denormalised['B1']
-      cycle1.should eq({'UNIT1'=>'100', 'SITE1'=>'100', 'UNIT2'=>'100', 'SITE2'=>'100', 'Date1' => '2012-12-01', 'Date2' => '2011-11-01', 'Time1' => '11:45'})
+      cycle1.should eq({'unit1'=>'100', 'site1'=>'100', 'unit2'=>'100', 'site2'=>'100', 'date1' => '2012-12-01', 'date2' => '2011-11-01', 'time1' => '11:45'})
       cycle2 = denormalised['B2']
-      cycle2.should eq({'UNIT1'=>'100', 'SITE1'=>'100', 'UNIT2'=>'100', 'SITE2'=>'100', 'UNIT3'=>'100', 'SITE3'=>'100', 'Date1' => '2011-08-30', 'Date2' => '2010-03-04', 'Time1' => '01:05', 'Time2' => '13:23', 'Time3' => '11:53'})
+      cycle2.should eq({'unit1'=>'100', 'site1'=>'100', 'unit2'=>'100', 'site2'=>'100', 'unit3'=>'100', 'site3'=>'100', 'date1' => '2011-08-30', 'date2' => '2010-03-04', 'time1' => '01:05', 'time2' => '13:23', 'time3' => '11:53'})
     end
   end
   

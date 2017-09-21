@@ -117,7 +117,7 @@ describe BatchFile do
   end
 
   #These are integration tests that verify the file processing works correctly
-  describe "File processing" do
+  describe 'File processing' do
     before :each do
       clinic_allocation
     end
@@ -240,7 +240,27 @@ describe BatchFile do
       end
     end
 
-    describe "well formatted files" do
+    describe 'well formatted files' do
+      describe 'CSV header case-insensitivity' do
+        it 'file with no errors or warnings - should accept files with headers in upper-case' do
+          batch_file = process_batch_file('no_errors_or_warnings_headers_upper_case.csv', survey, user)
+          batch_file.status.should eq('Processed Successfully')
+          batch_file.message.should eq('Your file has been processed successfully.')
+        end
+
+        it 'file with no errors or warnings - should accept files with headers in lower-case' do
+          batch_file = process_batch_file('no_errors_or_warnings_headers_lower_case.csv', survey, user)
+          batch_file.status.should eq('Processed Successfully')
+          batch_file.message.should eq('Your file has been processed successfully.')
+        end
+
+        it 'file with no errors or warnings - should accept files with headers in mixed-case' do
+          batch_file = process_batch_file('no_errors_or_warnings_headers_mixed_case.csv', survey, user)
+          batch_file.status.should eq('Processed Successfully')
+          batch_file.message.should eq('Your file has been processed successfully.')
+        end
+      end
+
       it "file with no errors or warnings - should create the survey responses and answers" do
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user, 2008)
         batch_file.organised_problems.detailed_problems.should eq []
