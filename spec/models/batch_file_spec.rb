@@ -406,7 +406,7 @@ describe BatchFile do
         answer2_hash = r2.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
         answer2_hash['Choice'].choice_answer.should == '1'
         answer2_hash['Choice2'].choice_answer.should == 'y'
-        answer1_hash['Choice3'].choice_answer.should == 'yes'
+        answer2_hash['Choice3'].choice_answer.should == 'yes'
 
         answer3_hash = r3.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
         answer3_hash['Choice'].choice_answer.should == '99'

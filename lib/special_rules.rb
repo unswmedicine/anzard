@@ -16,6 +16,10 @@
 
 class SpecialRules
 
+  # NOTE: Special rules involving choice question options should use a lowercase comparison, as the choice answer is
+  #        downcast on batch file ingest and on survey question option save. Failing to do so may cause rules not to
+  #        trigger as expected.
+
   RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL = %w(
     special_rule_comp1
     special_rule_comp3

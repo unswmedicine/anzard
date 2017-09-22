@@ -47,6 +47,8 @@ class CrossQuestionValidation < ApplicationRecord
     end
   end
 
+  before_save :downcase_constants_and_sets
+
   serialize :related_question_ids, Array
   serialize :set, Array
   serialize :conditional_set, Array
@@ -103,6 +105,15 @@ class CrossQuestionValidation < ApplicationRecord
   end
 
   private
+
+  def downcase_constants_and_sets
+    # Constants and sets are nil unless a value was supplied in the CQV
+    # Constants sometimes come in as ints/floats rather than strings, so need to check if string first
+    constant.downcase! if constant.is_a?(String) && !constant.nil?
+    conditional_constant.downcase! if conditional_constant.is_a?(String) && !conditional_constant.nil?
+    set.downcase! unless set.nil?
+    conditional_set.downcase! unless conditional_set.nil?
+  end
 
   def skip_when_related_unanswered?(rule)
     !RULES_THAT_APPLY_EVEN_WHEN_RELATED_ANSWER_NIL.include?(rule)

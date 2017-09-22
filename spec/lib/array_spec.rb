@@ -40,4 +40,35 @@ describe Array do
       expect([0, 0.0, 1, 1.5, -1.5].contains_non_numerical_string?).to eq false
     end
   end
+
+  describe 'downcase!' do
+    it 'should downcast all string elements' do
+      arr = ['Hello', 'WORLD!', 'test', 1, 0.0, nil]
+      arr.downcase!
+      expect(arr).to eq(['hello', 'world!', 'test', 1, 0.0, nil])
+    end
+  end
+
+  describe 'downcase' do
+    it 'should return an array of downcast string elements' do
+      arr = ['Hello', 'WORLD!', 'test', 1, 0.0, nil]
+      downcast_arr = arr.downcase
+      expect(arr).to eq(['Hello', 'WORLD!', 'test', 1, 0.0, nil])
+      expect(downcast_arr).to eq(['hello', 'world!', 'test', 1, 0.0, nil])
+    end
+
+    it 'should return original if no string elements' do
+      arr = [1, 0.0, nil]
+      downcast_arr = arr.downcase
+      expect(arr).to eq([1, 0.0, nil])
+      expect(downcast_arr).to eq([1, 0.0, nil])
+    end
+
+    it 'should return empty if original empty' do
+      arr = []
+      downcast_arr = arr.downcase
+      expect(arr).to eq([])
+      expect(downcast_arr).to eq([])
+    end
+  end
 end

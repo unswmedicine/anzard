@@ -25,4 +25,20 @@ class Array
     end
     false
   end
+
+  # Downcast all string elements in the array
+  def downcase!
+    self.replace(self.downcase)
+  end
+
+  # Returns a copy with all string elements downcast
+  def downcase
+    self.map do |elem|
+      if elem.is_a?(String)
+        elem.downcase
+      else
+        elem
+      end
+    end
+  end
 end
