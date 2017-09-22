@@ -379,16 +379,17 @@ describe BatchFile do
         batch_file = process_batch_file('no_errors_or_warnings_case_insensitive_choices.csv', survey, user)
         batch_file.status.should eq('Processed Successfully')
         batch_file.message.should eq('Your file has been processed successfully.')
-        Response.count.should == 3
-        Answer.count.should eq(33) #3x14 questions = 42, 9 not answered
+        Response.count.should == 4
+        Answer.count.should eq(44) #4x14 questions = 56, 12 not answered
         batch_file.problem_record_count.should == 0
-        batch_file.record_count.should == 3
+        batch_file.record_count.should == 4
 
         r1 = Response.find_by_cycle_id!('B1')
         r2 = Response.find_by_cycle_id!('B2')
         r3 = Response.find_by_cycle_id!('B3')
+        r4 = Response.find_by_cycle_id!('B4')
 
-        [r1, r2, r3].each do |r|
+        [r1, r2, r3, r4].each do |r|
           r.survey.should eq(survey)
           r.user.should eq(user)
           r.clinic.should eq(clinic)
@@ -407,15 +408,20 @@ describe BatchFile do
         answer2_hash['Choice2'].choice_answer.should == 'y'
         answer1_hash['Choice3'].choice_answer.should == 'yes'
 
-        answer2_hash = r3.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
-        answer2_hash['Choice'].choice_answer.should == '99'
-        answer2_hash['Choice2'].choice_answer.should == 'y'
-        answer1_hash['Choice3'].choice_answer.should == 'yes'
+        answer3_hash = r3.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+        answer3_hash['Choice'].choice_answer.should == '99'
+        answer3_hash['Choice2'].choice_answer.should == 'y'
+        answer3_hash['Choice3'].choice_answer.should == 'yes'
+
+        answer4_hash = r4.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+        answer4_hash['Choice'].choice_answer.should == '99'
+        answer4_hash['Choice2'].choice_answer.should == 'y'
+        answer4_hash['Choice3'].choice_answer.should == 'unknown'
 
 
         Answer.all.each { |a| a.has_fatal_warning?.should be false }
         Answer.all.each { |a| a.has_warning?.should be false }
-        batch_file.record_count.should == 3
+        batch_file.record_count.should == 4
         # summary report should exist but not detail report
         batch_file.summary_report_path.should_not be_nil
         File.exist?(batch_file.summary_report_path).should be true

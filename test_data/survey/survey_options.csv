@@ -6,3 +6,4 @@
 "Choice2","n","No","No hint",1
 "Choice3","yes","Yes","Yes hint",0
 "Choice3","no","No","No hint",1
+"Choice3","UNKNOWN","Unknown","Unknown hint",2

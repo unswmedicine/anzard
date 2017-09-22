@@ -2,3 +2,4 @@ UNIT,SITE,CYCLE_ID,TextMandatory,TextOptional,Date1,Date2,Time,Time2,Choice,Deci
 100,100,B1,B1Val1,,2011-12-25,,14:30,,0,51.0,10,y,yes
 100,100,B2,B2Val1,,2012-01-01,,23:59,,1,44.1,9,y,Yes
 100,100,B3,B3Val1,,2010-05-30,,1:00,,99,11.3,255,Y,YES
+100,100,B4,B4Val1,,2010-05-30,,1:00,,99,11.3,255,Y,Unknown
