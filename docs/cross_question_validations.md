@@ -47,7 +47,7 @@ operator | == <= >= < > \!= | Only == and != are permitted for textual constants
 constant | any decimal, integer or text 
 set_operator | included, excluded, range, between | Only "included" and "excluded" are permitted for textual sets
 set | list of numbers or text separated by commas and in square brackets where text is quoted | e.g. [1,3,5,7] or ["y","n","true","false"]
-conditional_operator | == <= >= < > \!= (| Only == and != are permitted for textual conditional constants and conditional sets
+conditional_operator | == <= >= < > \!= | Only == and != are permitted for textual conditional constants and conditional sets
 conditional_constant | any decimal, integer or text 
 conditional_set_operator | included, excluded, range, between | Only "included" and "excluded" are permitted for textual sets
 conditional_set | list of numbers or text separated by commas and in square brackets where text is quoted | e.g. [1,3,5,7] or ["y","n","true","false"]
