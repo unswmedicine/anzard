@@ -126,32 +126,23 @@ describe BatchFile do
     describe "invalid files" do
       it "should reject binary files such as xls" do
         batch_file = process_batch_file('not_csv.xls', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded was not a valid CSV file. Processing stopped on CSV row 0")
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded was not a valid CSV file. Processing stopped on CSV row 0')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "should reject files that are text but have malformed csv" do
         batch_file = process_batch_file('invalid_csv.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded was not a valid CSV file. Processing stopped on CSV row 2")
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded was not a valid CSV file. Processing stopped on CSV row 2')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "should reject file without a cycle id column" do
         batch_file = process_batch_file('no_cycle_id_column.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded is missing the following column(s): CYCLE_ID')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded is missing the following column(s): CYCLE_ID')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "should reject files that are empty" do
@@ -159,95 +150,68 @@ describe BatchFile do
         # This exception is raised because the PaperClip gem determines that the empty CSV is a spoofing attempt.
         expect {
           batch_file = process_batch_file('empty.csv', survey, user)
-          batch_file.status.should eq("Failed")
-          batch_file.message.should eq("The file you uploaded did not contain any data.")
-          batch_file.record_count.should be_nil
-          batch_file.problem_record_count.should be_nil
-          batch_file.summary_report_path.should be_nil
-          batch_file.detail_report_path.should be_nil
+          expect_fail_status_with_message(batch_file, 'The file you uploaded did not contain any data.')
+          expect_no_records_and_no_problem_records(batch_file)
+          expect_no_summary_report_and_no_detail_report(batch_file)
         }.to raise_error ActiveRecord::RecordInvalid, 'Validation failed: File has contents that are not what they are reported to be'
       end
 
       it "should reject files that have a header row only" do
         batch_file = process_batch_file('headers_only.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not contain any data.")
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded did not contain any data.')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that do not have all survey questions included in the header row' do
         batch_file = process_batch_file('missing_some_headers.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded is missing the following column(s): TextOptional, Date2, Time2')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded is missing the following column(s): TextOptional, Date2, Time2')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that have a row without a UNIT field' do
         batch_file = process_batch_file('no_unit_code_field.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that have a row with an unknown Unit Code' do
         batch_file = process_batch_file('unknown_unit_code.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that have a row without a SITE field' do
         batch_file = process_batch_file('no_site_code_field.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that have a row with an Unknown Site Code' do
         batch_file = process_batch_file('unknown_site_code.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that contain a row with a Site Code the user is not allocated to' do
         create(:clinic, unit_code: 100, site_code: 999)
         batch_file = process_batch_file('unauthorised_site_code.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that contain a row with a Unit Code the user is not allocated to' do
         create(:clinic, unit_code: 999, site_code: 100)
         batch_file = process_batch_file('unauthorised_unit_code.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
     end
 
@@ -255,8 +219,7 @@ describe BatchFile do
 
       describe 'CSV header formatting' do
         def check_batch_file_ok(batch_file, survey, user, clinic)
-          batch_file.status.should eq('Processed Successfully')
-          batch_file.message.should eq('Your file has been processed successfully.')
+          expect_successful_status_with_message(batch_file, 'Your file has been processed successfully.')
           response = Response.find_by_cycle_id!('12345')
           response.survey.should eq(survey)
           response.user.should eq(user)
@@ -297,8 +260,7 @@ describe BatchFile do
       it "file with no errors or warnings - should create the survey responses and answers" do
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user, 2008)
         batch_file.organised_problems.detailed_problems.should eq []
-        batch_file.status.should eq("Processed Successfully")
-        batch_file.message.should eq("Your file has been processed successfully.")
+        expect_successful_status_with_message(batch_file, "Your file has been processed successfully.")
         Response.count.should == 3
         Answer.count.should eq(30) #3x12 questions = 36, 6 not answered
         batch_file.problem_record_count.should == 0
@@ -336,8 +298,7 @@ describe BatchFile do
 
       it "file with no errors or warnings - should create the survey responses and answers and should strip leading/trailing whitespace" do
         batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user)
-        batch_file.status.should eq("Processed Successfully")
-        batch_file.message.should eq("Your file has been processed successfully.")
+        expect_successful_status_with_message(batch_file, "Your file has been processed successfully.")
         Response.count.should == 3
         Answer.count.should eq(30) #3x12 questions = 36, 6 not answered
         batch_file.problem_record_count.should == 0
@@ -374,8 +335,7 @@ describe BatchFile do
 
       it 'file with no errors or warnings - should create the survey responses and answers and should treat textual question choice answers as case insensitive' do
         batch_file = process_batch_file('no_errors_or_warnings_case_insensitive_choices.csv', survey, user)
-        batch_file.status.should eq('Processed Successfully')
-        batch_file.message.should eq('Your file has been processed successfully.')
+        expect_successful_status_with_message(batch_file, 'Your file has been processed successfully.')
         Response.count.should == 4
         Answer.count.should eq(44) #4x14 questions = 56, 12 not answered
         batch_file.problem_record_count.should == 0
@@ -429,139 +389,112 @@ describe BatchFile do
     describe "with validation errors" do
       it "file that just has blank rows fails on cycle id since cycle ids are missing" do
         batch_file = process_batch_file('blank_rows.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 1")
+        expect_fail_status_with_message(batch_file, "The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 1")
         Response.count.should == 0
         Answer.count.should == 0
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "file with missing cycle ids should be rejected completely and no reports generated" do
         batch_file = process_batch_file('missing_cycle_id.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 2")
+        expect_fail_status_with_message(batch_file, "The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID. Processing stopped on CSV row 2")
         Response.count.should == 0
         Answer.count.should == 0
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "file with duplicate cycle ids within the file should be rejected completely and no reports generated" do
         batch_file = process_batch_file('duplicate_cycle_id.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
+        expect_fail_status_with_message(batch_file, "The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
         Response.count.should == 0
         Answer.count.should == 0
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "file with duplicate cycle ids within the file (with whitespace padding) should be rejected completely and no reports generated" do
         batch_file = process_batch_file('duplicate_cycle_id_whitespace.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
+        expect_fail_status_with_message(batch_file, "The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
         Response.count.should == 0
         Answer.count.should == 0
-        batch_file.record_count.should be_nil
-        batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "should reject records with missing mandatory fields" do
         batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it 'should reject records with missing mandatory fields - where the column is missing entirely - and no reports generated' do
         batch_file = process_batch_file('missing_mandatory_column.csv', survey, user)
-        batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded is missing the following column(s): TextMandatory')
+        expect_fail_status_with_message(batch_file, 'The file you uploaded is missing the following column(s): TextMandatory')
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.problem_record_count.should be_nil
-        batch_file.summary_report_path.should be_nil
-        batch_file.detail_report_path.should be_nil
+        expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it "should reject records with choice answers that are not one of the allowed values for the question" do
         batch_file = process_batch_file('incorrect_choice_answer_value.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it "should reject records with integer answers that are badly formed" do
         batch_file = process_batch_file('bad_integer.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it "should reject records with decimal answers that are badly formed" do
         batch_file = process_batch_file('bad_decimal.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it "should reject records with time answers that are badly formed" do
         batch_file = process_batch_file('bad_time.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it "should reject records with date answers that are badly formed" do
         batch_file = process_batch_file('bad_date.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it "should reject records where the cycle id is already in the system" do
         create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
         File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
@@ -574,13 +507,12 @@ describe BatchFile do
       it "should reject records where the cycle id is already in the system even with whitespace padding" do
         create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
         File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
@@ -593,13 +525,12 @@ describe BatchFile do
       it "can detect both duplicate cycle id and other errors on the same record" do
         create(:response, survey: survey, cycle_id: "B2")
         batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user)
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
         File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
@@ -614,14 +545,12 @@ describe BatchFile do
     describe "with warnings" do
       it "warns on number range issues" do
         batch_file = process_batch_file('number_out_of_range.csv', survey, user)
-        batch_file.status.should eq("Needs Review")
-        batch_file.message.should eq("The file you uploaded has one or more warnings. Please review the reports for details.")
+        expect_review_status_with_message(batch_file, "The file you uploaded has one or more warnings. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it "accepts number range issues if forced to" do
@@ -630,40 +559,34 @@ describe BatchFile do
         batch_file.process
         batch_file.reload
 
-        batch_file.status.should eq("Needs Review")
-        batch_file.message.should eq("The file you uploaded has one or more warnings. Please review the reports for details.")
+        expect_review_status_with_message(batch_file, "The file you uploaded has one or more warnings. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
 
         batch_file.status = BatchFile::STATUS_IN_PROGRESS # the controller sets it to in progress before forcing processing
         batch_file.process(:force)
         batch_file.reload
 
-        batch_file.status.should eq("Processed Successfully")
-        batch_file.message.should eq("Your file has been processed successfully.")
+        expect_successful_status_with_message(batch_file, "Your file has been processed successfully.")
         Response.count.should == 3
         Answer.count.should == 29
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
 
       end
 
       it "should warn on records which fail cross-question validations" do
         batch_file = process_batch_file('cross_question_error.csv', survey, user)
-        batch_file.status.should eq("Needs Review")
-        batch_file.message.should eq("The file you uploaded has one or more warnings. Please review the reports for details.")
+        expect_review_status_with_message(batch_file, "The file you uploaded has one or more warnings. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
 
         csv_file = batch_file.detail_report_path
         rows = CSV.read(csv_file)
@@ -674,39 +597,33 @@ describe BatchFile do
 
       it "should accepts cross-question validation failures if forced to" do
         batch_file = process_batch_file('cross_question_error.csv', survey, user)
-        batch_file.status.should eq("Needs Review")
-        batch_file.message.should eq("The file you uploaded has one or more warnings. Please review the reports for details.")
+        expect_review_status_with_message(batch_file, "The file you uploaded has one or more warnings. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
 
         batch_file.status = BatchFile::STATUS_IN_PROGRESS # the controller sets it to in progress before forcing processing
         batch_file.process(:force)
         batch_file.reload
 
-        batch_file.status.should eq("Processed Successfully")
-        batch_file.message.should eq("Your file has been processed successfully.")
+        expect_successful_status_with_message(batch_file, "Your file has been processed successfully.")
         Response.count.should == 3
         Answer.count.should == 30
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
       end
 
       it "should warn on records which fail cross-question validations - date time quad failure" do
         batch_file = process_batch_file('cross_question_error_datetime_comparison.csv', survey, user)
-        batch_file.status.should eq("Needs Review")
-        batch_file.message.should eq("The file you uploaded has one or more warnings. Please review the reports for details.")
+        expect_review_status_with_message(batch_file, "The file you uploaded has one or more warnings. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
         batch_file.problem_record_count.should == 1
-        batch_file.summary_report_path.should_not be_nil
-        batch_file.detail_report_path.should_not be_nil
+        expect_summary_report_and_detail_report(batch_file)
         File.exist?(batch_file.summary_report_path).should be true
 
         csv_file = batch_file.detail_report_path
@@ -722,9 +639,7 @@ describe BatchFile do
     describe "with a range of errors and warnings" do
       it "should produce a CSV detail report file with correct error and warning details" do
         batch_file = process_batch_file('a_range_of_problems.csv', survey, user)
-
-        batch_file.status.should eq("Failed")
-        batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.record_count.should == 3
@@ -871,5 +786,39 @@ describe BatchFile do
     batch_file.reload
     batch_file
   end
+
+  def expect_successful_status_with_message(batch_file, message)
+    expect_status_and_message(batch_file, 'Processed Successfully', message)
+  end
+
+  def expect_review_status_with_message(batch_file, message)
+    expect_status_and_message(batch_file, 'Needs Review', message)
+  end
+
+  def expect_fail_status_with_message(batch_file, message)
+    expect_status_and_message(batch_file, 'Failed', message)
+  end
+
+  def expect_status_and_message(batch_file, status, message)
+    expect(batch_file.status).to eq(status)
+    expect(batch_file.message).to eq(message)
+  end
+
+  def expect_summary_report_and_detail_report(batch_file)
+    expect(batch_file.summary_report_path).to_not be_nil
+    expect(batch_file.detail_report_path).to_not be_nil
+  end
+
+  def expect_no_summary_report_and_no_detail_report(batch_file)
+    expect(batch_file.summary_report_path).to be_nil
+    expect(batch_file.detail_report_path).to be_nil
+  end
+
+  def expect_no_records_and_no_problem_records(batch_file)
+    expect(batch_file.record_count).to be_nil
+    expect(batch_file.problem_record_count).to be_nil
+  end
+
+
 end
 
