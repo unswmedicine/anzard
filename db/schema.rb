@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170719005230) do
+ActiveRecord::Schema.define(version: 20170925025512) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 20170719005230) do
     t.integer  "file_file_size"
     t.datetime "file_updated_at"
     t.string   "status"
-    t.string   "message"
+    t.text     "message",              limit: 65535
     t.integer  "record_count"
     t.string   "summary_report_path"
     t.string   "detail_report_path"

@@ -102,11 +102,8 @@ describe BatchFile do
         if status == BatchFile::STATUS_IN_PROGRESS
           # Batch process explicitly raises error unless status is in progress. When in progress, this will raise
           #  type error due to no file being attached to the batch file object
-          # expect { batch_file.process }.to raise_error('no implicit conversion of nil into String')
-          # expect { batch_file.process(:force) }.to raise_error('no implicit conversion of nil into String')
-          # ToDo: figure out how to fix the above failing lines. Currently fails with different exception as survey is nil when comparing CSV headers to survey questions
-          expect { batch_file.process }.to raise_error
-          expect { batch_file.process(:force) }.to raise_error
+          expect { batch_file.process }.to raise_error('no implicit conversion of nil into String')
+          expect { batch_file.process(:force) }.to raise_error('no implicit conversion of nil into String')
         else
           expect { batch_file.process }.to raise_error("Batch has already been processed, cannot reprocess")
           expect { batch_file.process(:force) }.to raise_error("Batch has already been processed, cannot reprocess")
@@ -150,7 +147,7 @@ describe BatchFile do
       it "should reject file without a cycle id column" do
         batch_file = process_batch_file('no_cycle_id_column.csv', survey, user)
         batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded is missing the following question headers: CYCLE_ID')
+        batch_file.message.should eq('The file you uploaded is missing the following column(s): CYCLE_ID')
         batch_file.record_count.should be_nil
         batch_file.problem_record_count.should be_nil
         batch_file.summary_report_path.should be_nil
@@ -184,7 +181,7 @@ describe BatchFile do
       it 'should reject files that do not have all survey questions included in the header row' do
         batch_file = process_batch_file('missing_some_headers.csv', survey, user)
         batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded is missing the following question headers: TextOptional, Date2, Time2')
+        batch_file.message.should eq('The file you uploaded is missing the following column(s): TextOptional, Date2, Time2')
         batch_file.record_count.should be_nil
         batch_file.problem_record_count.should be_nil
         batch_file.summary_report_path.should be_nil
@@ -492,7 +489,7 @@ describe BatchFile do
       it 'should reject records with missing mandatory fields - where the column is missing entirely - and no reports generated' do
         batch_file = process_batch_file('missing_mandatory_column.csv', survey, user)
         batch_file.status.should eq('Failed')
-        batch_file.message.should eq('The file you uploaded is missing the following question headers: TextMandatory')
+        batch_file.message.should eq('The file you uploaded is missing the following column(s): TextMandatory')
         Response.count.should == 0
         Answer.count.should == 0
         batch_file.problem_record_count.should be_nil

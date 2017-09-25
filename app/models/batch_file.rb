@@ -40,7 +40,7 @@ class BatchFile < ApplicationRecord
   MESSAGE_UNEXPECTED_ERROR = 'Processing failed due to an unexpected error.'
   MESSAGE_CSV_STOP_LINE = ' Processing stopped on CSV row '
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
-  MESSAGE_MISSING_HEADER_COLUMNS = 'The file you uploaded is missing the following question headers: '
+  MESSAGE_MISSING_HEADER_COLUMNS = 'The file you uploaded is missing the following column(s): '
 
   belongs_to :user
   belongs_to :clinic
