@@ -77,7 +77,6 @@ def create_surveys
   Question.delete_all
   QuestionOption.delete_all
   CrossQuestionValidation.delete_all
-  SupplementaryFile.delete_all
 
   create_survey_from_lib_tasks(SURVEY_NAME, 'main_questions.csv', 'main_question_options.csv', 'main_cross_question_validations.csv', 'test_data/survey/real_survey')
 end

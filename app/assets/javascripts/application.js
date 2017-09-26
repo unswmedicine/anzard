@@ -29,7 +29,6 @@
 //= require help_text
 //= require section_navigation
 //= require show_hide_multi_questions
-//= require supplementary_questions_batch
 //= require deselect_option
 //= require cancel_delete
 //= require populate_site_on_unit_select

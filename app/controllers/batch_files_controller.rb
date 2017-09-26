@@ -47,11 +47,6 @@ class BatchFilesController < ApplicationController
   def create
     @batch_file.user = current_user
     if @batch_file.save
-      # ToDo: Remove ANZNN lingering supplementary files
-      supplementaries = params[:supplementary_files]
-      if supplementaries
-        supplementaries.each_pair { |key, supp_attrs| @batch_file.supplementary_files.create!(supp_attrs) if supp_attrs[:file] }
-      end
       @batch_file.delay.process
       redirect_to batch_files_path, notice: UPLOAD_NOTICE
     else
@@ -73,7 +68,7 @@ class BatchFilesController < ApplicationController
   private
 
   def create_params
-    params.require(:batch_file).permit(:survey_id, :year_of_registration, :file, :supplementary_files, :clinic_id)
+    params.require(:batch_file).permit(:survey_id, :year_of_registration, :file, :clinic_id)
   end
 
   def replace_paperclip_spoof_error_with_invalid_csv_msg

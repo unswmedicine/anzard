@@ -31,7 +31,6 @@ describe BatchFile do
   describe "Associations" do
     it { should belong_to(:user) }
     it { should belong_to(:clinic) }
-    it { should have_many(:supplementary_files) }
   end
 
   describe "Validations" do
@@ -659,91 +658,6 @@ describe BatchFile do
         File.exist?(batch_file.summary_report_path).should be true
       end
     end
-
-    # Todo: remove supplementary files & test as is unused
-    # describe "processing supplementary files" do
-    #   let(:survey_with_multis) do
-    #     question_file = Rails.root.join 'test_data/survey', 'survey_questions_with_multi.csv'
-    #     options_file = Rails.root.join 'test_data/survey', 'survey_options.csv'
-    #     cross_question_validations_file = Rails.root.join 'test_data/survey', 'cross_question_validations_with_multi.csv'
-    #     create_survey("with multi", question_file, options_file, cross_question_validations_file)
-    #   end
-    #
-    #   describe "valid file" do
-    #     it "should add the data from the supplementary files to the dataset" do
-    #       batch_file = process_batch_file_with_supplementaries('no_errors_or_warnings_multi.csv', user, {'Multi1' => 'batch_sample_multi1.csv', 'Multi2' => 'batch_sample_multi2.csv'})
-    #       batch_file.status.should eq("Processed Successfully")
-    #
-    #       Response.count.should == 3
-    #       #Answer.count.should eq(30) #14 regular + 16 from supplementary files = 31
-    #       batch_file.problem_record_count.should == 0
-    #       batch_file.record_count.should == 3
-    #
-    #       b1_answer_hash = Response.find_by_cycle_id!("B1").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
-    #       b2_answer_hash = Response.find_by_cycle_id!("B2").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
-    #       b3_answer_hash = Response.find_by_cycle_id!("B3").answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
-    #
-    #       b1_answer_hash.size.should eq(7) #3 from multi-1, 0 from multi-2, 4 from main
-    #       b1_answer_hash["Date1"].date_answer.should == Date.parse("2012-12-01")
-    #       b1_answer_hash["Date2"].date_answer.should == Date.parse("2011-11-01")
-    #       b1_answer_hash["Time1"].time_answer.should == Time.utc(2000, 1, 1, 11, 45)
-    #       b1_answer_hash["TextMandatory"].text_answer.should == "B1Val1"
-    #       b1_answer_hash["Choice"].choice_answer.should == "0"
-    #       b1_answer_hash["Decimal"].decimal_answer.should == 56.77
-    #       b1_answer_hash["Integer"].integer_answer.should == 10
-    #
-    #       b2_answer_hash.size.should eq(16) #5 from multi-1, 6 from multi-2, 5 from main
-    #       b2_answer_hash["MultiText1"].text_answer.should == "text-answer-1-b2"
-    #       b2_answer_hash["MultiText2"].text_answer.should == "text-answer-2-b2"
-    #       b2_answer_hash["MultiText3"].text_answer.should == "text-answer-3-b2"
-    #       b2_answer_hash["MultiNumber1"].integer_answer.should == 1
-    #       b2_answer_hash["MultiNumber2"].integer_answer.should == 2
-    #       b2_answer_hash["MultiNumber3"].integer_answer.should == 3
-    #
-    #       b3_answer_hash.size.should eq(7) #0 from multi-1, 2 from multi-2, 5 from main
-    #
-    #       batch_file.record_count.should == 3
-    #     end
-    #   end
-    #
-    #   describe "invalid files" do
-    #     # the various possible invalid file cases are tested in supplementary_file_spec, so here we're just testing that batch_file processing
-    #     # fails if one of the supplementaries is invalid
-    #     it "should stop on the first bad file" do
-    #       batch_file = process_batch_file_with_supplementaries('no_errors_or_warnings_multi.csv', user, {'Multi1' => 'batch_sample_multi1.csv', 'Multi2' => 'not_csv.xls'})
-    #       batch_file.status.should eq("Failed")
-    #       batch_file.message.should eq("The supplementary file you uploaded for 'Multi2' was not a valid CSV file.")
-    #     end
-    #   end
-    #
-    #   describe "with validation errors from the supplementary files" do
-    #     # there's not really any special behaviour here, the answers are validated just like anything else, so we just test one example
-    #     it "should reject records with integer answers that are badly formed" do
-    #       batch_file = process_batch_file_with_supplementaries('no_errors_or_warnings_multi.csv', user, {'Multi1' => 'batch_sample_multi1_errors.csv', 'Multi2' => 'batch_sample_multi2.csv'})
-    #       batch_file.status.should eq("Failed")
-    #       batch_file.message.should eq("The file you uploaded did not pass validation. Please review the reports for details.")
-    #       Response.count.should == 0
-    #       Answer.count.should == 0
-    #       batch_file.record_count.should == 3
-    #       batch_file.summary_report_path.should_not be_nil
-    #       batch_file.detail_report_path.should_not be_nil
-    #     end
-    #
-    #   end
-    #
-    #   describe "where the number of possible answers is exceeded" do
-    #     pending
-    #   end
-    #
-    #   describe "where the supplementary file contains cycle ids not in the main file" do
-    #     pending
-    #   end
-    #
-    #   describe "where the supplementary file contains extra unwanted info" do
-    #     pending
-    #   end
-    # end
-
   end
 
   describe "Destroy" do
@@ -771,17 +685,6 @@ describe BatchFile do
 
   def process_batch_file(file_name, survey, user, year_of_registration=2009)
     batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + file_name, 'text/csv'), survey: survey, user: user, clinic: clinic, year_of_registration: year_of_registration)
-    batch_file.process
-    batch_file.reload
-    batch_file
-  end
-
-  def process_batch_file_with_supplementaries(file_name, user, supp_files)
-    batch_file = BatchFile.create!(file: Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + file_name, 'text/csv'), survey: survey_with_multis, user: user, clinic: clinic, year_of_registration: 2009)
-    supp_files.each_pair do |multi_name, supp_file_name|
-      file = Rack::Test::UploadedFile.new('test_data/survey/batch_files/' + supp_file_name, 'text/csv')
-      batch_file.supplementary_files.create!(multi_name: multi_name, file: file)
-    end
     batch_file.process
     batch_file.reload
     batch_file

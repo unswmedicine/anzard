@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170925025512) do
+ActiveRecord::Schema.define(version: 20170925071323) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -157,18 +157,6 @@ ActiveRecord::Schema.define(version: 20170925025512) do
     t.integer "survey_id"
     t.integer "section_order"
     t.string  "name"
-  end
-
-  create_table "supplementary_files", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "multi_name"
-    t.integer  "batch_file_id"
-    t.string   "file_file_name"
-    t.string   "file_content_type"
-    t.integer  "file_file_size"
-    t.datetime "file_updated_at"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["batch_file_id"], name: "index_supplementary_files_on_batch_file_id", using: :btree
   end
 
   create_table "surveys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
