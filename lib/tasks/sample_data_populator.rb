@@ -46,7 +46,7 @@ def create_responses(big)
   main = Survey.where(:name => SURVEY_NAME).first
 
   # remove the one dataprovider is linked to as we'll create those separately
-  dp_clinics = User.find_by_email!('dataprovider@intersect.org.au').clinics
+  dp_clinics = User.find_by_email!('dataprovider@anzard.intersect.org.au').clinics
   clinics = Clinic.where.not(id: dp_clinics.pluck(:id))
 
   count1 = big ? 100 : 20
@@ -87,26 +87,26 @@ def create_survey_from_lib_tasks(name, question_file, options_file, cross_questi
 end
 
 def create_test_users
-  create_user(email: "admin@intersect.org.au", first_name: "Administrator", last_name: "Intersect")
-  create_user(email: "georgina@intersect.org.au", first_name: "Georgina", last_name: "Edwards")
-  create_user(email: "alexb@intersect.org.au", first_name: "Alex", last_name: "Bradner")
-  create_user(email: "kali@intersect.org.au", first_name: "Kali", last_name: "Waterford")
-  create_user(email: "ryan@intersect.org.au", first_name: "Ryan", last_name: "Braganza")
-  create_user(email: "dataprovider@intersect.org.au", first_name: "Data", last_name: "Provider")
-  create_user(email: "supervisor@intersect.org.au", first_name: "Data", last_name: "Supervisor")
-  create_user(email: "dataprovider2@intersect.org.au", first_name: "Data", last_name: "Provider2")
-  create_user(email: "supervisor2@intersect.org.au", first_name: "Data", last_name: "Supervisor2")
-  create_unapproved_user(email: "unapproved1@intersect.org.au", first_name: "Unapproved", last_name: "One")
-  create_unapproved_user(email: "unapproved2@intersect.org.au", first_name: "Unapproved", last_name: "Two")
-  set_role("admin@intersect.org.au", "Administrator")
-  set_role("georgina@intersect.org.au", "Administrator")
-  set_role("alexb@intersect.org.au", "Administrator")
-  set_role("kali@intersect.org.au", "Administrator")
-  set_role("ryan@intersect.org.au", "Administrator")
-  set_role("dataprovider@intersect.org.au", "Data Provider", Clinic.first.id)
-  set_role("supervisor@intersect.org.au", "Data Provider Supervisor", Clinic.first.id)
-  set_role("dataprovider2@intersect.org.au", "Data Provider", Clinic.last.id)
-  set_role("supervisor2@intersect.org.au", "Data Provider Supervisor", Clinic.last.id)
+  create_user(email: 'kali@intersect.org.au', first_name: 'Kali', last_name: 'Waterford')
+  set_role('kali@intersect.org.au', 'Administrator')
+
+  create_user(email: 'admin@anzard.intersect.org.au', first_name: 'Administrator', last_name: 'Anzard')
+  set_role('admin@anzard.intersect.org.au', 'Administrator')
+
+  create_user(email: 'dataprovider@anzard.intersect.org.au', first_name: 'Data', last_name: 'Provider')
+  set_role('dataprovider@anzard.intersect.org.au', 'Data Provider', Clinic.first.id)
+
+  create_user(email: 'supervisor@anzard.intersect.org.au', first_name: 'Data', last_name: 'Supervisor')
+  set_role('supervisor@anzard.intersect.org.au', 'Data Provider Supervisor', Clinic.first.id)
+
+  create_user(email: 'dataprovider2@anzard.intersect.org.au', first_name: 'Data', last_name: 'Provider2')
+  set_role('dataprovider2@anzard.intersect.org.au', 'Data Provider', Clinic.last.id)
+  
+  create_user(email: 'supervisor2@anzard.intersect.org.au', first_name: 'Data', last_name: 'Supervisor2')
+  set_role('supervisor2@anzard.intersect.org.au', 'Data Provider Supervisor', Clinic.last.id)
+
+  create_unapproved_user(email: 'unapproved1@anzard.intersect.org.au', first_name: 'Unapproved', last_name: 'One')
+  create_unapproved_user(email: 'unapproved2@anzard.intersect.org.au', first_name: 'Unapproved', last_name: 'Two')
 end
 
 def set_role(email, role, clinic_id=nil)
