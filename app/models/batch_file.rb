@@ -40,12 +40,10 @@ class BatchFile < ApplicationRecord
   MESSAGE_UNEXPECTED_ERROR = 'Processing failed due to an unexpected error.'
   MESSAGE_CSV_STOP_LINE = ' Processing stopped on CSV row '
   MESSAGE_NOT_UNIQUE = 'The file you uploaded contained duplicate columns. Each column heading must be unique.'
-  MESSAGE_MISSING_HEADER_COLUMNS = 'The file you uploaded is missing the following question headers: '
+  MESSAGE_MISSING_HEADER_COLUMNS = 'The file you uploaded is missing the following column(s): '
 
   belongs_to :user
   belongs_to :clinic
-  # ToDo: remove lingering ANZNN supplementary files
-  has_many :supplementary_files
 
   has_attached_file :file, :styles => {}, :path => :make_file_path
   do_not_validate_attachment_file_type :file
@@ -190,7 +188,6 @@ class BatchFile < ApplicationRecord
       clinic_in_row = Clinic.find_by(unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
       response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
-      add_answers_from_supplementary_files(response, cycle_id)
 
       failures = true if (response.fatal_warnings? || !response.valid?)
       warnings = true if response.warnings?
@@ -216,13 +213,6 @@ class BatchFile < ApplicationRecord
     logger.info("After rest took #{Time.now - start}")
 
     true
-  end
-
-  def add_answers_from_supplementary_files(response, cycle_id)
-    supplementary_files.each do |supp_file|
-      answers = supp_file.as_denormalised_hash[cycle_id]
-      response.build_answers_from_hash(answers) if answers
-    end
   end
 
   def sanitise_question_code(question_code)
@@ -294,13 +284,6 @@ class BatchFile < ApplicationRecord
     end
 
     @csv_row_count = nil
-
-    supplementary_files.each do |supplementary_file|
-      unless supplementary_file.pre_process
-        set_outcome(STATUS_FAILED, supplementary_file.message)
-        return false
-      end
-    end
 
     true
   end

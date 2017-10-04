@@ -80,6 +80,28 @@ describe CrossQuestionValidation do
     end
   end
 
+  describe 'before_save' do
+    it 'should downcast a supplied constant' do
+      cqv = create(:cross_question_validation, rule: 'present_implies_constant', constant: 'Y', question: create(:question))
+      expect(cqv.constant).to eq('y')
+    end
+
+    it 'should downcast each element of a supplied set' do
+      cqv = create(:cross_question_validation, rule: 'const_implies_set', set: %w(lower Mixed UPPER), question: create(:question))
+      expect(cqv.set).to eq(%w(lower mixed upper))
+    end
+
+    it 'should downcast a supplied conditional constant' do
+      cqv = create(:cross_question_validation, rule: 'const_implies_set', conditional_constant: 'Y', question: create(:question))
+      expect(cqv.conditional_constant).to eq('y')
+    end
+
+    it 'should downcast each element of a supplied conditional set' do
+      cqv = create(:cross_question_validation, rule: 'set_implies_set', conditional_set: %w(lower Mixed UPPER), question: create(:question))
+      expect(cqv.conditional_set).to eq(%w(lower mixed upper))
+    end
+  end
+
   describe "helpers" do
     ALL_OPERATORS = %w(* / + - % ** == != > < >= <= <=> === eql? equal? = += -+ *= /+ %= **= & | ^ ~ << >> and or && || ! not ?: .. ...)
     UNSAFE_OPERATORS = ALL_OPERATORS - CrossQuestionValidation::SAFE_OPERATORS

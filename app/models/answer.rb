@@ -279,7 +279,11 @@ class Answer < ApplicationRecord
             self.raw_answer = input_handler.to_raw
           end
         when TYPE_CHOICE
-          self.choice_answer = input
+          if input.is_a? String
+            self.choice_answer = input.downcase
+          else
+            self.choice_answer = input
+          end
         when TYPE_DECIMAL
           if input.blank?
             self.decimal_answer = nil

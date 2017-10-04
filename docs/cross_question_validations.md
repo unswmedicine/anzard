@@ -52,6 +52,8 @@ conditional_constant | any decimal, integer or text
 conditional_set_operator | included, excluded, range, between | Only "included" and "excluded" are permitted for textual sets
 conditional_set | list of numbers or text separated by commas and in square brackets where text is quoted | e.g. [1,3,5,7] or ["y","n","true","false"]
 
+Note: Text data within constants, sets, conditional constants and conditional sets are automatically converted to lower case upon rule ingestion. 
+
 ## Cross Question Validation Rules
 ### Generic Rules
 Rule                        | Description                                                                                                                                                             

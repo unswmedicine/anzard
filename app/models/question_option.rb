@@ -23,7 +23,15 @@ class QuestionOption < ApplicationRecord
   validates_presence_of :option_order
   validates_uniqueness_of :option_order, scope: :question_id
 
+  before_save :downcase_option_value
+
   def display_value
     "(#{option_value}) #{label}"
+  end
+
+  private
+
+  def downcase_option_value
+    option_value.downcase!
   end
 end
