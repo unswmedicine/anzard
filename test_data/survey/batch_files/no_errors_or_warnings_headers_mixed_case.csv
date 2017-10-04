@@ -1,2 +1,2 @@
-Unit,Site,Cycle_ID,TextMandatory,TextOptional,Date1,Date2,Time,Choice,Decimal,Integer
-100,100,12345,Val1,,2011-12-25,,14:30,0,56.77,10
+Unit,Site,Cycle_ID,TextMandatory,TextOptional,Date1,Date2,Time,Time2,Choice,Decimal,Integer
+100,100,12345,Val1,,2011-12-25,,14:30,,0,56.77,10
