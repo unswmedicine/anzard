@@ -32,8 +32,8 @@ Fresh,22,OPU_DATE,OPU date,Date,FALSE,,,,,,,,,,The date of oocyte pick up,
 Fresh,23,N_EGGS,Number of eggs retrieved (at OPU),Integer,TRUE,,,,,0,50,,,,Number of eggs retrieved at OPU. Include any immature oocytes that are identified.,
 Donor,24,N_DONATE,Number of eggs donated,Integer,TRUE,,,,,0,50,,,,"Number of eggs donated to someone else (oocyte donation cycle, DON_AGE field must be coded).",
 Donor,25,N_RECVD,Number of eggs received,Integer,TRUE,,,,,0,50,,,,"Number of eggs received from someone else (oocyte recipient cycle, DON_AGE field must be coded).",
-IMP/EXP,26,N_EGGIMP,Number of eggs imported,Integer,TRUE,,,,,0,30,,,,Records number of oocytes imported into the current unit from another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required.,
-IMP/EXP,27,N_EGGEXP,Number of eggs exported,Integer,TRUE,,,,,0,30,,,,Records number of oocytes exported from the current unit to another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required,
+IMP/EXP,26,N_EGGIMP,Number of eggs imported,Integer,FALSE,,,,,0,30,,,,Records number of oocytes imported into the current unit from another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required.,
+IMP/EXP,27,N_EGGEXP,Number of eggs exported,Integer,FALSE,,,,,0,30,,,,Records number of oocytes exported from the current unit to another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required,
 FROZEN/THAW,28,N_EGFZ_S,Number of oocytes slow frozen,Integer,TRUE,,,,,0,40,,,,Number of oocytes frozen by slow freezing method in this cycle.,
 FROZEN/THAW,29,N_EGFZ_V,Number of oocytes vitrified,Integer,TRUE,,,,,0,40,,,,Number of oocytes frozen by vitrification in this cycle.,
 FROZEN/THAW,30,N_S_EGTH,Number of slow frozen oocytes thawed,Integer,TRUE,,,,,0,30,,,,Number of slow frozen oocytes thawed in this cycle.,
@@ -52,10 +52,10 @@ k = Known donor
 a = Anonymous donor
 u = unknown"
 Fresh,38,N_FERT,Number of eggs fertilised normally,Integer,TRUE,,,,,0,40,,,,"Number of eggs fertilised normally. The critical issue is the opinion of the treating embryologist. Thus even if two pronuclei are not seen but cleavage occurs, provided the embryologist considers this to be normal fertilisation then it should be included.",
-Specialist treatment,39,PGD,Preimplantation genetic diagnosis,Choice,TRUE,,,,,,,,,,"Answer yes where preimplantation genetic diagnosis in any form (including aneuploidy screening or sex selection) has been performed on any of the embryos (transferred or not). Otherwise answer no.
+Specialist treatment,39,PGD,Preimplantation genetic diagnosis,Choice,FALSE,,,,,,,,,,"Answer yes where preimplantation genetic diagnosis in any form (including aneuploidy screening or sex selection) has been performed on any of the embryos (transferred or not). Otherwise answer no.
 This field needs to be coded for both fresh and thaw cycles.","n=No, y=Yes"
 Specialist treatment,40,ASS_HATC,Assisted hatching,Choice,TRUE,,,,,,,,,,Answer yes where assisted hatching in any form has been performed on any of the embryos (transferred or not). Otherwise answer no. This filed needs to be coded for both fresh and thaw cycles.,"n=No, y=Yes"
-IMP/EXP,41,N_EMBIMP,Number of embryos imported from another clinic,Integer,TRUE,,,,,0,20,,,,Records number of embryos imported into the current unit from another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required.,
+IMP/EXP,41,N_EMBIMP,Number of embryos imported from another clinic,Integer,FALSE,,,,,0,20,,,,Records number of embryos imported into the current unit from another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required.,
 Donor,42,N_EMBREC,Number of embryos received from another patient/couple,Integer,TRUE,,,,,0,20,,,,"Records the number of embryos that a patient/couple received from another patient/couple (embryo recipient cycle, DON_AGE field must be coded).",
 FROZEN/THAW,43,N_S_CLTH,Number of slow frozen cleavage embryos thawed,Integer,TRUE,,,,,0,30,,,,"Number of slow frozen cleavage embryos thawed with intention of performing an embryo transfer. For the ANZARD collection, cleavage embryo is simply defined as an embryo one to four days after fertilization.",
 FROZEN/THAW,44,N_V_CLTH,Number of vitrified cleavage embryos warmed,Integer,TRUE,,,,,0,20,,,,Number of vitrified cleavage embryos warmed with intention of performing an embryo transfer.,
@@ -71,7 +71,7 @@ FROZEN/THAW,53,N_CLFZ_S,Number of cleavage embryos slow frozen,Integer,TRUE,,,,,
 FROZEN/THAW,54,N_CLFZ_V,Number of cleavage embryos vitrified,Integer,TRUE,,,,,0,20,,,,Number of cleavage embryos frozen by vitrification in this cycle.,
 FROZEN/THAW,55,N_BLFZ_S,Number of blastocysts slow frozen,Integer,TRUE,,,,,0,20,,,,Number of blastocysts frozen by slow freezing method in this cycle.,
 FROZEN/THAW,56,N_BLFZ_V,Number of blastocysts vitrified,Integer,TRUE,,,,,0,25,,,,Number of blastocysts frozen by vitrification in this cycle.,
-IMP/EXP,57,N_EMBEXP,Number of and embryos exported to another clinic,Integer,TRUE,,,,,0,30,,,,Records the number of embryos exported from the current unit to another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required.,
+IMP/EXP,57,N_EMBEXP,Number of and embryos exported to another clinic,Integer,FALSE,,,,,0,30,,,,Records the number of embryos exported from the current unit to another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required.,
 Donor,58,N_EMBDON,Number of embryos donated to another patient,Integer,TRUE,,,,,0,30,,,,Records the number of embryos donated to someone else (embryo donation cycle) (DON_AGE field must be coded).,
 IMP/EXP,59,N_EMBDISP,Number of potentially usable frozen embryos discarded,Integer,TRUE,,,,,0,30,,,,Frozen embryos disposed in accordance with patients request or Govt. regulation.,
 Outcomes,60,PR_CLIN,Clinical pregnancy,Choice,FALSE,,,,,,,,,,"A clinical pregnancy must fulfil one of the following criteria:
