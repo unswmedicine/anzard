@@ -137,6 +137,18 @@ describe BatchFile do
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
+      it 'should reject files with one or more blank columns' do
+        batch_file = process_batch_file('blank_column.csv', survey, user)
+        expect_fail_status_with_message(batch_file, 'The file you uploaded was not a valid CSV file. Processing stopped on CSV row 0')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
+
+        batch_file = process_batch_file('blank_columns.csv', survey, user)
+        expect_fail_status_with_message(batch_file, 'The file you uploaded was not a valid CSV file. Processing stopped on CSV row 0')
+        expect_no_records_and_no_problem_records(batch_file)
+        expect_no_summary_report_and_no_detail_report(batch_file)
+      end
+
       it "should reject file without a cycle id column" do
         batch_file = process_batch_file('no_cycle_id_column.csv', survey, user)
         expect_fail_status_with_message(batch_file, 'The file you uploaded is missing the following column(s): CYCLE_ID')

@@ -216,7 +216,7 @@ class BatchFile < ApplicationRecord
   end
 
   def sanitise_question_code(question_code)
-    question_code.downcase.strip
+    question_code.downcase.strip unless question_code.nil?
   end
 
   def missing_batch_file_headers(batch_file_headers, survey_question_codes)
