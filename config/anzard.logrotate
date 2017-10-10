@@ -1,21 +1,21 @@
-/home/anznn/anznn/shared/log/*.log {
+/home/anzard/anzard/shared/log/*.log {
     rotate 520
     weekly
     copytruncate
     missingok
     notifempty
-    olddir /home/anznn/anznn/shared/log_archive
+    olddir /home/anzard/anzard/shared/log_archive
     compress
     dateext
 }
 
-/home/devel/anznn/shared/log/*.log {
+/home/devel/anzard/shared/log/*.log {
     rotate 520
     weekly
     copytruncate
     missingok
     notifempty
-    olddir /home/devel/anznn/shared/log_archive
+    olddir /home/devel/anzard/shared/log_archive
     compress
     dateext
 }

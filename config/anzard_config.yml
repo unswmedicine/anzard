@@ -1,4 +1,4 @@
-# any structural changes here should also be mirrored in deploy_templates/config/anznn_config.yml
+# any structural changes here should also be mirrored in deploy_templates/config/anzard_config.yml
 
 defaults: &defaults
   password_reset_email_sender: pwd-reset@intersect.org.au

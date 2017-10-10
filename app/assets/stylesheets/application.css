@@ -23,5 +23,5 @@
  * Note: original_rails3_styling is used for legacy styling, as the upgrade to Rails 5 messed up styling.
  *       Additional stylesheets are applied after original_rails3_styling to preserve some modularisation.
  *= require original_rails3_styling
- *= require anznn
+ *= require anzard
 */

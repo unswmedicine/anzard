@@ -1,11 +1,11 @@
 # Your HTTP server, Apache/etc
-set :web_server, 'anznn.med.unsw.edu.au'
+set :web_server, 'anzard.med.unsw.edu.au'
 # This may be the same as your Web server
-set :app_server, 'anznn.med.unsw.edu.au'
+set :app_server, 'anzard.med.unsw.edu.au'
 # This is where Rails migrations will run
-set :db_server, 'anznn.med.unsw.edu.au'
+set :db_server, 'anzard.med.unsw.edu.au'
 # The user configured to run the rails app
-set :user, 'anznn'
+set :user, 'anzard'
 
 role :web, web_server
 role :app, app_server

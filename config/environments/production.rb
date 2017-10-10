@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Anznn::Application.configure do
+Anzard::Application.configure do
 
   config.action_mailer.default_url_options = { :host => 'anzard.med.unsw.edu.au' }
   config.action_mailer.smtp_settings = {

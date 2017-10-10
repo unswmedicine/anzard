@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-Anznn::Application.load_tasks
+Anzard::Application.load_tasks

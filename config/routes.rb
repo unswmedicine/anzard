@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Anznn::Application.routes.draw do
+Anzard::Application.routes.draw do
   devise_for :users, :controllers => {:registrations => "user_registers", :passwords => "user_passwords"}
 
   as :user do

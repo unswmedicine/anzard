@@ -9,7 +9,7 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
-module Anznn
+module Anzard
   class Application < Rails::Application
     config.autoload_paths += %W( #{config.root}/lib )
     config.generators do |g|  

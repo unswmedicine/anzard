@@ -14,4 +14,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-APP_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/anznn_config.yml")[Rails.env]
+APP_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/anzard_config.yml")[Rails.env]

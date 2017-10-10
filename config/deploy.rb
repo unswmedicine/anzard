@@ -11,7 +11,7 @@ set :whenever_environment, defer { stage }
 set :whenever_command, "bundle exec whenever"
 require 'whenever/capistrano'
 
-set :application, 'anznn'
+set :application, 'anzard'
 set :stages, %w(qa staging production)
 set :default_stage, "qa"
 
@@ -23,11 +23,11 @@ set :project_rpms, %w(openssl openssl-devel curl-devel httpd-devel apr-devel apr
 set :shared_children, shared_children + %w(log_archive)
 set :bash, '/bin/bash'
 set :shell, bash # This is done in two lines to allow rpm_install to refer to bash (as shell just launches cap shell)
-set :rvm_ruby_string, 'ruby-2.0.0-p643@anznn'
+set :rvm_ruby_string, 'ruby-2.0.0-p643@anzard'
 
 # Deploy using copy for now
 set :scm, 'git'
-set :repository, 'https://github.com/IntersectAustralia/anznn.git'
+set :repository, 'https://github.com/IntersectAustralia/anzard.git'
 set :deploy_via, :copy
 set :copy_exclude, [".git/*"]
 

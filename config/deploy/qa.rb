@@ -1,9 +1,9 @@
 # Your HTTP server, Apache/etc
-set :web_server, 'anznn-qa.intersect.org.au'
+set :web_server, 'anzard-qa.intersect.org.au'
 # This may be the same as your Web server
-set :app_server, 'anznn-qa.intersect.org.au'
+set :app_server, 'anzard-qa.intersect.org.au'
 # This is where Rails migrations will run
-set :db_server,  'anznn-qa.intersect.org.au'
+set :db_server,  'anzard-qa.intersect.org.au'
 # The user configured to run the rails app
 
 
