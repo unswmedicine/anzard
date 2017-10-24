@@ -84,7 +84,7 @@ Anzard::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
-  GA.tracker = "UA-16667092-14"
+  GA.tracker = 'UA-108624567-1'
 
   config.eager_load = true
 end
