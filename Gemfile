@@ -78,10 +78,6 @@ gem "tabs_on_rails"
 gem "devise" , "4.2.0"
 gem "email_spec", :group => :test
 gem "cancancan"
-gem "capistrano-ext"
-gem "capistrano", '~> 3.7.2'
-gem 'rvm-capistrano', require: false
-gem "colorize"
 gem "simplecov", :require => false, :group => :test
 gem "simplecov-rcov", :require => false, :group => :test
 gem "bootstrap-sass", '~> 3.3.7'

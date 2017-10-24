@@ -1,5 +1,3 @@
-# any structural changes here should also be mirrored in deploy_templates/config/anzard_config.yml
-
 defaults: &defaults
   password_reset_email_sender: pwd-reset@intersect.org.au
   account_request_user_status_email_sender: account-status@intersect.org.au
@@ -18,11 +16,14 @@ test:
   batch_files_root: ":rails_root/tmp"
   batch_reports_path: "tmp"
 
-production:
+production: &production
   <<: *defaults
+  password_reset_email_sender: no-reply@unsw.edu.au
+  account_request_user_status_email_sender: no-reply@unsw.edu.au
+  account_request_admin_notification_sender: no-reply@unsw.edu.au
 
 staging:
-  <<: *defaults
+  <<: *production
 
 qa:
   <<: *defaults
