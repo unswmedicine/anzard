@@ -4,16 +4,16 @@ Patient demographics,2,SITE,Site of Unit,Integer,TRUE,,,,,100,999,,,,This number
 Patient demographics,3,PAT_ID,Patient's ID/Medical record number,Text,TRUE,,,,,,,,1,20,Unique ID for patient. This can take whatever form the Unit wishes but RTAC must be able to identify the case file from this ID for validation of data collection,Unique ID for patient
 Patient demographics,4,NAM_FST2,First two letters of female patient's first name,Text,TRUE,,,,,,,,2,2,First two letters of female patient's first name. This field will be used to generate the statistical linkage key,First two letters of female patient's first name
 Patient demographics,5,NAM_SUR2,First two letters of female patient's surname,Text,TRUE,,,,,,,,2,2,First two letters of female patient's surname. This field will be used to generate the statistical linkage key,First two letters of female patient's surname
-Patient demographics,6,FDOB,Female patient's date of birth ,Date,TRUE,,,,,,,,,,This field must be completed for all female patient's including oocyte/embryo donors. This field will be used to generate the statistical linkage key.,Female patient's date of birth 
-Patient demographics,7,PDOB,Husband/male partner's date of birth ,Date,FALSE,,,,,,,,,,Leave blank if the female patient does not have husband or male partner,Husband/male partner's date of birth 
+Patient demographics,6,FDOB,Female patient's date of birth ,Date,TRUE,,,,,,,,,,This field must be completed for all female patient's including oocyte/embryo donors. This field will be used to generate the statistical linkage key.,Female patient's date of birth
+Patient demographics,7,PDOB,Husband/male partner's date of birth ,Date,FALSE,,,,,,,,,,Leave blank if the female patient does not have husband or male partner,Husband/male partner's date of birth
 Donor,8,DON_AGE,Age of oocyte/embryo donor,Integer,FALSE,,,,,18,55,99,,,"Completed years at time of OPU. This item must be completed for oocyte donation, oocyte recipient, embryo donation and embryo recipient, and surrogacy cycles. Otherwise must be left blank",Age of oocyte/embryo donor in completed years at time of OPU
-Infertility,9,CI_TUBE,Cause of Infertility: tubal disease,Choice,TRUE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to tubal disease. Otherwise answer no,"n=No, y=Yes"
-Infertility,10,CI_ENDO,Cause of Infertility: endometriosis,Choice,TRUE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to endometriosis. Otherwise answer no,"n=No, y=Yes"
-Infertility,11,CI_OTH,Cause of Infertility: other female factors,Choice,TRUE,,,,,,,,,,"Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to other female factors apart from endometriosis an dtubal disease. Possible examples could include fibroids, ovulation disorders or premature ovarian failure. If there is no clinical female factor subfertility, answer no. ","n=No, y=Yes"
-Infertility,12,CI_MALE,Cause of Infertility: male factor,Choice,TRUE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to male factor problem. Otherwise answer no,"n=No, y=Yes"
-Infertility,13,CI_UNEX,Cause of Infertility: unexplained,Choice,TRUE,,,,,,,,,,"Answer yes if in the opinion of the treating clinician or clinic there is subfertility without any apparent explaination. If answered yes to any of the previous four fields CI_TUBE, CI_ENDO, CI_OTH and CI_MALE, answer no to CI_UNEX.","n=No, y=Yes"
-Infertility,14,PREG_20W,Any pregnancies of 20 weeks or more,Choice,TRUE,,,,,,,,,,Whether the female patient had a pregnancy of 20 complete weeks or more. Include any pregnancies or 20 weeks or more regardless of whether by ART or by a different partner. ,"n=No, y=Yes, u=unknown"
-Cycle info,15,CYCLE_ID,Unique identification of each cycle ,Text,TRUE,,,,,,,,1,20,This field must be completed for all cycles - no exceptions. This field must be unique to each cycle and will be used to facilitate queries about the data,Unique ID for cycle - This code MUST be unique to identify this cycle across the whole ANZARD. 
+Infertility,9,CI_TUBE,Cause of Infertility: tubal disease,Choice,FALSE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to tubal disease. Otherwise answer no,"n=No, y=Yes, u=unknown"
+Infertility,10,CI_ENDO,Cause of Infertility: endometriosis,Choice,FALSE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to endometriosis. Otherwise answer no,"n=No, y=Yes, u=unknown"
+Infertility,11,CI_OTH,Cause of Infertility: other female factors,Choice,FALSE,,,,,,,,,,"Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to other female factors apart from endometriosis an dtubal disease. Possible examples could include fibroids, ovulation disorders or premature ovarian failure. If there is no clinical female factor subfertility, answer no. ","n=No, y=Yes, u=unknown"
+Infertility,12,CI_MALE,Cause of Infertility: male factor,Choice,FALSE,,,,,,,,,,Answer yes if in the opinion of the treating clinician or clinic there is subfertility due to male factor problem. Otherwise answer no,"n=No, y=Yes, u=unknown"
+Infertility,13,CI_UNEX,Cause of Infertility: unexplained,Choice,FALSE,,,,,,,,,,"Answer yes if in the opinion of the treating clinician or clinic there is subfertility without any apparent explaination. If answered yes to any of the previous four fields CI_TUBE, CI_ENDO, CI_OTH and CI_MALE, answer no to CI_UNEX.","n=No, y=Yes, u=unknown"
+Infertility,14,PREG_20W,Any pregnancies of 20 weeks or more,Choice,FALSE,,,,,,,,,,Whether the female patient had a pregnancy of 20 complete weeks or more. Include any pregnancies or 20 weeks or more regardless of whether by ART or by a different partner. ,"n=No, y=Yes, u=unknown"
+Cycle info,15,CYCLE_ID,Unique identification of each cycle ,Text,TRUE,,,,,,,,1,20,This field must be completed for all cycles - no exceptions. This field must be unique to each cycle and will be used to facilitate queries about the data,Unique ID for cycle - This code MUST be unique to identify this cycle across the whole ANZARD.
 Cycle info,16,CYC_DATE,The date the cycle started ,Date,TRUE,,,,,,,,,,"THIS FIELD MUST BE COMPLETED FOR ALL CYCLES NO EXCEPTIONS! Coding CYC_DATE by the following rules:
 1. the first date where FSH/stimulation drug is administrated,
 2. the date of LMP for unstimulated cycles (including natural fresh cycles and thaw cycles),
@@ -24,7 +24,7 @@ Cycle info,16,CYC_DATE,The date the cycle started ,Date,TRUE,,,,,,,,,,"THIS FIEL
 Donor,17,SURR,Surrogacy arrangement,Choice,TRUE,,,,,,,,,,"Whether surrogacy arrangement is involved in this cycle.
 Recode for all parties of the arrangement including commission patients (with or without OPU), surrogacy carrier, and oocyte donor if donated oocytes were used.","n=No, y=Yes - a surrogacy arrangement "
 Fresh,18,OV_STIM,Whether FSH stimulation was given,Choice,TRUE,,,,,,,,,,Does not include clomiphene or hCG alone unless FSH was also given.,"n=No, y=Yes"
-Fresh,19,STIM_1ST,First ever FSH stimulation was given,Choice,TRUE,,,,,,,,,,"Whether the current fresh cycle is the first ever FSH stimulated cycle with the intension of OPU (include all treatments she had in other unit or country). This field must be completed for all fresh cycles (include cancelled fresh cycles before OPU). FSH stimulated artificial insemination cycle is not counted. If known the female patient had FSH stimulated cycle for OPU before, answer n to this field; if the current fresh cycle is her first FSH stimulated cycle for OPU, answer y to this field. If unknown whether she had FSH stimulated cycle for OPU before, answer u to this field.","n=No, y=Yes, u=unknown"
+Fresh,19,STIM_1ST,First ever FSH stimulation was given,Choice,FALSE,,,,,,,,,,"Whether the current fresh cycle is the first ever FSH stimulated cycle with the intension of OPU (include all treatments she had in other unit or country). This field must be completed for all fresh cycles (include cancelled fresh cycles before OPU). FSH stimulated artificial insemination cycle is not counted. If known the female patient had FSH stimulated cycle for OPU before, answer n to this field; if the current fresh cycle is her first FSH stimulated cycle for OPU, answer y to this field. If unknown whether she had FSH stimulated cycle for OPU before, answer u to this field.","n=No, y=Yes, u=unknown"
 Donor,20,IUI_DATE,Date of intra-uterine insemination,Date,FALSE,,,,,,,,,,"Date of intra-uterine insemination using donated sperm.
 Only include cycles with intra-uterine insemination using donated sperm. Exclude cycles such as intra-virginal insemination using donated sperm.",
 Fresh,21,CAN_DATE,Date of cancellation for cancelled cycle before OPU,Date,FALSE,,,,,,,,,,Date of the last day FSH is administered in a cancelled cycle. Leave it blank if not a cancelled cycle.,
@@ -39,22 +39,22 @@ FROZEN/THAW,29,N_EGFZ_V,Number of oocytes vitrified,Integer,TRUE,,,,,0,40,,,,Num
 FROZEN/THAW,30,N_S_EGTH,Number of slow frozen oocytes thawed,Integer,TRUE,,,,,0,30,,,,Number of slow frozen oocytes thawed in this cycle.,
 FROZEN/THAW,31,N_V_EGTH,Number of vitrified oocytes warmed,Integer,TRUE,,,,,0,30,,,,Number of vitrified oocytes warmed in this cycle.,
 FROZEN/THAW,32,FDAT_EGG,Freezing date of thawed/warmed oocytes,Date,FALSE,,,,,,,,,,"If two batches of thawed/warmed oocytes with different freezing date, record the earlier freezing date.",
-Fresh,33,N_GIFT,Number of eggs GIFT,Integer,TRUE,,,,,0,3,,,,Number of eggs replaced in a GIFT procedure.,
+Fresh,33,N_GIFT,Number of eggs GIFT,Integer,FALSE,,,,,0,3,,,,Number of eggs replaced in a GIFT procedure.,
 Fresh,34,N_IVF,Number of eggs IVF,Integer,TRUE,,,,,0,50,,,,Number of eggs treated (inseminated) with IVF.,
 Fresh,35,N_ICSI,Number of eggs ICSI,Integer,TRUE,,,,,0,50,,,,Number of eggs treated with ICSI.,
-Infertility,36,SP_SITE,Site of sperm used,Choice,TRUE,,,,,,,,,,"Site of sperm extraction: ejaculated, epididymal (whether by open biopsy or by PESA), testicular, other or unknown.","e = Ejaculate
+Infertility,36,SP_SITE,Site of sperm used,Choice,FALSE,,,,,,,,,,"Site of sperm extraction: ejaculated, epididymal (whether by open biopsy or by PESA), testicular, other or unknown.","e = Ejaculate
 t = Testicular
 p = Epidydimal
-o = Other 
+o = Other
 u = Unknown"
-Infertility,37,SP_PERSN,The person who provided sperm,Choice,TRUE,,,,,,,,,,"Sperm provided by husband/partner, known donor, anonymous donor or unknown of the sperm provider.","h = Husband/partner
+Infertility,37,SP_PERSN,The person who provided sperm,Choice,FALSE,,,,,,,,,,"Sperm provided by husband/partner, known donor, anonymous donor or unknown of the sperm provider.","h = Husband/partner
 k = Known donor
 a = Anonymous donor
 u = unknown"
 Fresh,38,N_FERT,Number of eggs fertilised normally,Integer,TRUE,,,,,0,40,,,,"Number of eggs fertilised normally. The critical issue is the opinion of the treating embryologist. Thus even if two pronuclei are not seen but cleavage occurs, provided the embryologist considers this to be normal fertilisation then it should be included.",
 Specialist treatment,39,PGD,Preimplantation genetic diagnosis,Choice,FALSE,,,,,,,,,,"Answer yes where preimplantation genetic diagnosis in any form (including aneuploidy screening or sex selection) has been performed on any of the embryos (transferred or not). Otherwise answer no.
 This field needs to be coded for both fresh and thaw cycles.","n=No, y=Yes"
-Specialist treatment,40,ASS_HATC,Assisted hatching,Choice,TRUE,,,,,,,,,,Answer yes where assisted hatching in any form has been performed on any of the embryos (transferred or not). Otherwise answer no. This filed needs to be coded for both fresh and thaw cycles.,"n=No, y=Yes"
+Specialist treatment,40,ASS_HATC,Assisted hatching,Choice,FALSE,,,,,,,,,,Answer yes where assisted hatching in any form has been performed on any of the embryos (transferred or not). Otherwise answer no. This filed needs to be coded for both fresh and thaw cycles.,"n=No, y=Yes"
 IMP/EXP,41,N_EMBIMP,Number of embryos imported from another clinic,Integer,FALSE,,,,,0,20,,,,Records number of embryos imported into the current unit from another unit. Movement between different sites of the same unit (three ANZARD Unit code) is not required.,
 Donor,42,N_EMBREC,Number of embryos received from another patient/couple,Integer,TRUE,,,,,0,20,,,,"Records the number of embryos that a patient/couple received from another patient/couple (embryo recipient cycle, DON_AGE field must be coded).",
 FROZEN/THAW,43,N_S_CLTH,Number of slow frozen cleavage embryos thawed,Integer,TRUE,,,,,0,30,,,,"Number of slow frozen cleavage embryos thawed with intention of performing an embryo transfer. For the ANZARD collection, cleavage embryo is simply defined as an embryo one to four days after fertilization.",
@@ -84,8 +84,8 @@ Outcomes,62,N_FH,Number of fetal hearts,Integer,FALSE,,,,,0,3,9,,,"Number of fet
 This field must be completed if PR_CLIN field is y.","0 = No fetal hearts detected / 1 to 8 = Number of fetal hearts detected
 9 = unknown of number of FH"
 Outcomes,63,PR_ECTOP,Ectopic pregnancy,Choice,FALSE,,,,,,,,,,"If this pregnancy is an ectopic pregnancy, or a combined ectopic and uterine pregnancy (heterotopic).
-This field must be completed if PR_CLIN field is y","n = No 
-e = ectopic 
+This field must be completed if PR_CLIN field is y","n = No
+e = ectopic
 h = heterotopic"
 Outcomes,64,PR_TOP,Elective termination of pregnancy,Choice,FALSE,,,,,,,,,,"Do NOT include pregnancies where a planned fetal reduction of a multiple pregnancy results in a subsequent unintended miscarriage, or a pregnancy where there has been an IUFD requiring induced delivery. Give reasons for TOP in ABN_LESS field.
 This field must be completed if PR_CLIN field is y","n=No, y=Yes"
@@ -98,7 +98,7 @@ Do not insert ""nil"" or ""none""."
 Outcomes,68,N_DELIV,Number of babies delivered.,Integer,FALSE,,,,,0,4,,,,"Include all liveborn and stillborn babies after 20 weeks gestation or at least with birthweight at least 400 grams.
 This field must be completed if PR_CLIN field is y","0 = No babies born, all fetuses aborted
 1 = one baby born"
-Outcomes,69,CS,Caesarean delivery,Choice,FALSE,,,,,,,,,,"Doesn't matter whether the CS was planned or emergency. If any of a multiple birth is a caesarean section delivery, answer yes.","n=No, y=Yes"
+Outcomes,69,CS,Caesarean delivery,Choice,FALSE,,,,,,,,,,"Doesn't matter whether the CS was planned or emergency. If any of a multiple birth is a caesarean section delivery, answer yes.","n=No, y=Yes, u=unknown"
 Outcomes,70,BAB1_OUT,Baby 1 Outcome,Choice,FALSE,TRUE,Baby outcomes,1,1,,,,,,Outcome of the first born baby.,"s =Stillbirth
 l = Livebirth/Survived
 n = Livebirth/Died < 28 days (neonatal death)

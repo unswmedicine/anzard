@@ -1,14 +1,19 @@
 code,option_order,option_value,label,hint_text
 CI_TUBE,0,n,No,No - Subfertility is not due to tubal disease
 CI_TUBE,1,y,Yes,Yes - Subfertility is due to tubal disease
-CI_ENDO,0,n,No,No - Subfertility is not due to endometriosis 
-CI_ENDO,1,y,Yes,Yes - Subfertility is due to endometriosis 
+CI_TUBE,2,u,Unknown,Unknown if subfertility is due to tubal disease
+CI_ENDO,0,n,No,No - Subfertility is not due to endometriosis
+CI_ENDO,1,y,Yes,Yes - Subfertility is due to endometriosis
+CI_ENDO,2,u,Unknown,Unknown if subfertility is due to endometriosis
 CI_OTH,0,n,No,No - Subfertility is not due to other female factors
-CI_OTH,1,y,Yes,Yes - Subfertility is due to other female factors 
+CI_OTH,1,y,Yes,Yes - Subfertility is due to other female factors
+CI_OTH,2,u,Unknown,Unknown if subfertility is due to other female factors
 CI_MALE,0,n,No,No - Subfertility is not due to male factors
-CI_MALE,1,y,Yes,Yes - Subfertility is due to male factors 
+CI_MALE,1,y,Yes,Yes - Subfertility is due to male factors
+CI_MALE,2,u,Unknown,Unknown if subfertility is due to male factors
 CI_UNEX,0,n,No,"No - If answered yes to CI_TUBE, CI_ENDO, CI_OTH, CI_MALE"
 CI_UNEX,1,y,Yes,"Yes - if answered no to CI_TUBE, CI_ENDO, CI_OTH, CI_MALE"
+CI_UNEX,2,u,Unknown,Unknown if subfertility is unexplained
 PREG_20W,0,n,No,No - The female patient has not had a pregnancy of 20 or more weeks
 PREG_20W,1,y,Yes,Yes - The female patient has had a pregnancy of 20 or more weeks
 PREG_20W,2,u,Unknown,Unknown previous pregnancy
@@ -27,10 +32,10 @@ SP_SITE,4,u,Unknown,Site of sperm extraction:unknown
 SP_PERSN,0,h,Husband/Partner,Sperm provided by husband/partner
 SP_PERSN,1,k,Known donor,Sperm provided by known donor
 SP_PERSN,2,a,Anonymous donor,Sperm provided by anonymous donor
-SP_PERSN,3,u,Unknown,Unknown sperm provider 
+SP_PERSN,3,u,Unknown,Unknown sperm provider
 PGD,0,n,No,No PGD undertaken
 PGD,1,y,Yes,Yes - Fresh and thaw cycles where preimplantation genetic diagnosis in any form (including aneuploidy screening or sex selection) has been performed on any of the embryos (transferred or not)
-ASS_HATC,0,n,No,No assisted hatching 
+ASS_HATC,0,n,No,No assisted hatching
 ASS_HATC,1,y,Yes,Yes - Fresh and Thaw cycles where assisted hatching in any form has been performed on any of the embryos (transferred or not)
 THAW_DON,0,o,Donated oocyte,"If thawed/warmed embryos were originally from donated oocytes, record this field as o."
 THAW_DON,1,e,Donated embryo,"If thawed/warmed embryos were donated embryos, record this field as e."
@@ -45,8 +50,9 @@ PR_TOP,0,n,No,No termination of pregnancy
 PR_TOP,1,y,Yes,Elective termination of pregnancy
 PR_REDUC,0,n,No,No selective reduction of pregnancy
 PR_REDUC,1,y,Yes,Selective reduction was performed due to fetal abnormality/other reasons
-CS,0,n,No,No caesarean delivery 
+CS,0,n,No,No caesarean delivery
 CS,1,y,Yes,Caesarean delivery
+CS,2,u,Unknown,Unknown if caesarean delivery
 BAB1_OUT,0,s,Stillbirth,
 BAB1_OUT,1,l,Livebirth / survived,
 BAB1_OUT,2,n,Livebirth / died - Neonatal death ,
