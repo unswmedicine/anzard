@@ -162,8 +162,8 @@ class BatchFile < ApplicationRecord
 
   def delete_data_file_and_reports
     file.destroy
-    File.delete(self.summary_report_path)
-    File.delete(self.detail_report_path)
+    File.delete(self.summary_report_path) if has_summary_report?
+    File.delete(self.detail_report_path) if has_detail_report?
   end
 
   def process_batch(force)
