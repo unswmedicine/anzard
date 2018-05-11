@@ -5,7 +5,7 @@ class DeviseCreateUsers < ActiveRecord::Migration
       t.recoverable
       t.rememberable
       t.trackable
-t.lockable :lock_strategy => :failed_attempts, :unlock_strategy => :time
+      t.lockable :lock_strategy => :failed_attempts, :unlock_strategy => :both
 
       # t.encryptable
       # t.confirmable
@@ -22,6 +22,7 @@ t.lockable :lock_strategy => :failed_attempts, :unlock_strategy => :time
 
     add_index :users, :email,                :unique => true
     add_index :users, :reset_password_token, :unique => true
+    add_index :users, :unlock_token,         :unique => true
     # add_index :users, :confirmation_token,   :unique => true
     # add_index :users, :unlock_token,         :unique => true
     # add_index :users, :authentication_token, :unique => true

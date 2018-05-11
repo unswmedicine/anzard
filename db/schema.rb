@@ -178,6 +178,7 @@ ActiveRecord::Schema.define(version: 20170925071323) do
     t.string   "last_sign_in_ip"
     t.integer  "failed_attempts",                    default: 0
     t.datetime "locked_at"
+    t.string   "unlock_token"
     t.string   "first_name"
     t.string   "last_name"
     t.string   "status"
