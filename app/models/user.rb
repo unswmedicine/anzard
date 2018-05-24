@@ -107,6 +107,14 @@ class User < ApplicationRecord
     save
   end
 
+  # Overriding Send unlock instructions by email
+  def send_unlock_instructions
+    raw, enc = Devise.token_generator.generate(self.class, :unlock_token)
+    self.unlock_token = enc
+    save(validate: false)
+    #send_devise_notification(:unlock_instructions, raw, {})
+    raw
+  end
 
   def approved?
     self.status == STATUS_ACTIVE

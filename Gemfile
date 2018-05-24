@@ -8,7 +8,7 @@ gem 'rails', '5.0.2'
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
 #gem 'pg'
-gem 'mysql2'
+gem 'mysql2', '~> 0.4.4'
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -75,13 +75,13 @@ gem "iconv"
 gem "haml"
 gem "haml-rails"
 gem "tabs_on_rails"
-gem "devise" , "4.2.0"
+gem 'devise', '~> 4.2'
 gem "email_spec", :group => :test
 gem "cancancan"
 gem "simplecov", :require => false, :group => :test
 gem "simplecov-rcov", :require => false, :group => :test
 gem "bootstrap-sass", '~> 3.3.7'
-gem "paperclip", "~> 5.1.0"
+gem "paperclip", "~> 5.2.0"
 gem 'delayed_job', '~> 4.1.2'
 gem 'delayed_job_active_record'
 gem 'daemons'
@@ -96,3 +96,5 @@ gem 'jekyll', :require => false
 
 gem 'highline' # This has (up until now) been implicitly included by capistrano
 gem 'passenger', '~> 5.1.2', :require => false
+
+
