@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 gem 'whoops_rails_logger', :git=> 'https://github.com/IntersectAustralia/whoops_rails_logger.git'
 
-gem 'rails', '5.0.2'
+gem 'rails', '5.0.7.2'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
@@ -75,12 +75,12 @@ gem "iconv"
 gem "haml"
 gem "haml-rails"
 gem "tabs_on_rails"
-gem 'devise', '~> 4.2'
+gem 'devise', '~> 4.6.0'
 gem "email_spec", :group => :test
 gem "cancancan"
 gem "simplecov", :require => false, :group => :test
 gem "simplecov-rcov", :require => false, :group => :test
-gem "bootstrap-sass", '~> 3.3.7'
+gem "bootstrap-sass", '~> 3.4.1'
 gem "paperclip", "~> 5.2.0"
 gem 'delayed_job', '~> 4.1.2'
 gem 'delayed_job_active_record'
