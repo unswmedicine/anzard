@@ -7,6 +7,7 @@ There are two documented methods for setting up a development environment:
 
 ## Local Installation
 This section describes how to install the ANZARD application within a local development environment.
+Note: within the database configuration file `config/database.yml` the host of the development environment database needs to be changed from `db` to `localhost` for a local installation. The value `db` is only applicable for a Docker installation.
 
 ### Set up for Rails development
 If you haven't already, you will need to set up your computer for Rails development. We highly recommend Mac or Linux over Windows as a development environment.
