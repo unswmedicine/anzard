@@ -1,0 +1,25 @@
+version: '3.6'
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  db:
+    image: "mysql:5.7"
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      # Not working for unknown reason
+#      MYSQL_DATABASE: anzard-dev
+#      MYSQL_USER: anzard
+#      MYSQL_PASSWORD: anzard
+    volumes:
+      - "./tmp/db:/var/lib/mysql"
+    ports:
+      - "3306:3306"

@@ -20,13 +20,13 @@
 #   Ensure the SQLite 3 gem is defined in your Gemfile
 #   gem 'sqlite3'
 
-
-development:
+# This is for developer docker container use only due to security around "root/root"
+development: &default
   adapter: mysql2
-  host: localhost
+  host: db
   database: anzard-dev
-  username: anzard
-  password: anzard
+  username: root
+  password: root
   pool: 5
   timeout: 5000
 
@@ -34,13 +34,8 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test: &test
-  adapter: mysql2
-  host: localhost
+  <<: *default
   database: anzard-test
-  username: anzard
-  password: anzard
-  pool: 5
-  timeout: 5000
 
 production: &production
   adapter: mysql2
