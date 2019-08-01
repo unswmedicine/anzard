@@ -1,7 +1,15 @@
 This document gives an overview of the system for future developers including those who may wish to reuse the application and/or contribute changes.
 
-# Setting Up Your Local Environment
-## Set up for Rails development
+# Setting Up Your Development Environment
+There are two documented methods for setting up a development environment:
+- Local installation (Mac/CentOS)
+- Docker installation
+
+## Local Installation
+This section describes how to install the ANZARD application within a local development environment.
+Note: within the database configuration file `config/database.yml` the host of the development environment database needs to be changed from `db` to `localhost` for a local installation. The value `db` is only applicable for a Docker installation.
+
+### Set up for Rails development
 If you haven't already, you will need to set up your computer for Rails development. We highly recommend Mac or Linux over Windows as a development environment.
 
 Install RVM (see https://rvm.io/rvm/install/ for the latest - steps below may change over time)
@@ -36,7 +44,7 @@ To start up the MySQL server you may have to execute in a terminal
 mysql.server start
 ```
 
-## Set up ANZARD
+### Set up ANZARD
 Clone the repository
 ```
 git clone git@github.com:IntersectAustralia/anzard.git
@@ -138,6 +146,25 @@ cflags="-I$pkgincludedir  -Wall -Os -g -fno-strict-aliasing -DDBUG_OFF " #note: 
 cxxflags="-I$pkgincludedir  -Wall -Os -g -fno-strict-aliasing -DDBUG_OFF " #note: end space!
 ```
 Running `bundle install` should now work.
+
+## Docker Installation
+- Clone the repository
+- Change directory into the repo and run the command `docker-compose build` to build the containers
+- Install RubyMine on your local environment
+- Configure RubyMine Ruby SDK and Gems
+   - Open the menu chain: RubyMine > Preferences > Language & Frameworks > Ruby SDK and Gems > New Remote Interpreter Path
+   - Configure a Docker Compose Remote Ruby Interpreter using the service 'web'
+- Create two run configurations for the project
+   - Create a Docker Compose run configuration and give the config the path to the compose file
+   - Create a Rails run configuration ensuring to use the environment 'development'
+- Start the Docker Compose run configuration and then exec command `bash` on it to be able to execute project setup commands
+   - Create the db & seed it: `SKIP_PRELOAD_MODELS=skip rake db:setup db:populate`
+   - Generate the user manual : `bundle exec jekyll build --source manual/ --destination public/user_manual/`
+- Stop the Docker Compose run configuration
+- Start the Rails run configuration either in run mode or debug mode
+   - If the debug mode does not start due to missing debug gem, try recreating the Ruby SDK and Gem configuration
+- Visit the web application at localhost:3000
+
 
 # Key Components
 * Ruby on Rails application (the application has been tested on Apache with Passenger (mod_rails), but can be run on your preferred deployment stack).

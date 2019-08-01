@@ -60,7 +60,8 @@ group :development do
   gem "rails3-generators"
   gem 'thin'
   gem 'cheat'
-
+  gem 'debase'
+  gem 'ruby-debug-ide'
 end
 
 group :test do
