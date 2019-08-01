@@ -54,14 +54,16 @@ group :development, :test do
   gem "launchy"    # So you can do Then show me the page
   gem "minitest"  # currently breaks without this
   gem "minitest-reporters"
+
+  # Gems to allow RubyMine debugging
+  gem 'debase'
+  gem 'ruby-debug-ide'
 end
 
 group :development do
   gem "rails3-generators"
   gem 'thin'
   gem 'cheat'
-  gem 'debase'
-  gem 'ruby-debug-ide'
 end
 
 group :test do
