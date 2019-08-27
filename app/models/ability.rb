@@ -61,7 +61,7 @@ class Ability
         can :get_active_sites, User
 
         can :read, Response
-        can :stats, Response
+        can :submission_summary, Response
         can :download, Response
         can :get_sites, Response
         can :batch_delete, Response

@@ -111,8 +111,8 @@ class ResponsesController < ApplicationController
     @sections_to_answers = @response.sections_to_answers_with_blanks_created
   end
 
-  def stats
-    set_tab :stats, :home
+  def submission_summary
+    set_tab :submission_summary, :home
   end
 
   def prepare_download

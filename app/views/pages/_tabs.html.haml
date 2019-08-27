@@ -18,8 +18,8 @@
   %ul.tabs
     = tab.responses 'Data Entry Forms', root_path
     = tab.batches 'Batch Uploads', batch_files_path
-    - if can?(:stats, Response)
-      = tab.stats 'Stats', stats_responses_path
+    - if can?(:submission_summary, Response)
+      = tab.submission_summary 'Submission Summary', submission_summary_responses_path
     - if can?(:download, Response)
       = tab.download 'Download Data', prepare_download_responses_path
     - if can?(:submitted_cycle_ids, Response)
