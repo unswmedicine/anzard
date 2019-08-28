@@ -164,6 +164,7 @@ Running `bundle install` should now work.
 - Start the Rails run configuration either in run mode or debug mode
    - If the debug mode does not start due to missing debug gem, try recreating the Ruby SDK and Gem configuration
 - Visit the web application at localhost:3000
+- Note: docker-compose exec needs to be used to start the rake task `rake jobs:work` in order to process any pending batch files.
 
 
 # Key Components

@@ -45,12 +45,12 @@ class Ability
     #All users can see all available surveys
     can :read, Survey
 
-    if user.role.name == Role::DATA_PROVIDER_SUPERVISOR
+    if user.role.name == Role::SUPER_USER
       can :force_submit, BatchFile do |batch_file|
         batch_file.force_submittable?
       end
-      can :submit, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: [Response::COMPLETE, Response::COMPLETE_WITH_WARNINGS]
-    elsif user.role.name == Role::DATA_PROVIDER
+      can :submit, Response, clinic_id: Clinic.all.ids, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: [Response::COMPLETE_WITH_WARNINGS]
+    elsif user.role.name == Role::DATA_PROVIDER || user.role.name == Role::DATA_PROVIDER_SUPERVISOR
       can :submit, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED, validation_status: Response::COMPLETE
     end
 

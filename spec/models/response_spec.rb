@@ -174,7 +174,7 @@ describe Response do
     end
     it "shows a warning for complete with warnings" do
       response.stub(:validation_status) { Response::COMPLETE_WITH_WARNINGS }
-      response.submit_warning.should eq "This data entry form has warnings. Double check them. If you believe them to be correct, contact a supervisor."
+      response.submit_warning.should eq "This data entry form has warnings. Double check them. If you believe them to be correct, contact an administrator."
     end
   end
 
