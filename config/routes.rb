@@ -34,7 +34,6 @@ Anzard::Application.routes.draw do
       get :download
       get :get_sites
       get :batch_delete
-      get :submitted_cycle_ids
       put :confirm_batch_delete
       put :perform_batch_delete
     end
