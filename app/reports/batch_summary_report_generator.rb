@@ -36,9 +36,9 @@ class BatchSummaryReportGenerator
       text "Number of records with problems: #{batch_file.problem_record_count}"
 
       move_down 10
-      problems_table = organiser.aggregated_by_question_and_message
+      problems_table = organiser.summary_problems_as_table
       if problems_table.size > 1
-        table(problems_table, header: true, row_colors: ["FFFFFF", "F0F0F0"], column_widths: {0 => 95, 1 => 50, 3 => 50}) do
+        table(problems_table, header: true, row_colors: ["FFFFFF", "F0F0F0"], column_widths: {0 => 95, 1 => 65, 2 => 95}) do
           row(0).font_style = :bold
         end
       end
