@@ -32,15 +32,15 @@ class QuestionProblemsOrganiser
 
 
   # organise the aggregated problems for display in the summary report - for each problem there's two rows
-  # the first row is the question, problem type, message and count of problem records
+  # the first row is the question, problem type, and message
   # the second row is a comma separated list of cycle ids that have the problem
   def aggregated_by_question_and_message
     problem_records = aggregated_problems.values.collect(&:values).flatten.sort_by { |prob| [ prob.question_code, prob.message ] }
     table = []
-    table << ['Column', 'Type', 'Message', 'Number of records']
+    table << ['Column', 'Type', 'Message']
     problem_records.each do |problem|
-      table << [problem.question_code, problem.type, problem.message, problem.cycle_ids.size.to_s]
-      table << ["", "", problem.cycle_ids.join(", "), ""]
+      table << [problem.question_code, problem.type, problem.message]
+      table << ["", "", problem.cycle_ids.join(", ")]
     end
     table
   end
