@@ -56,7 +56,7 @@ group :development, :test do
   gem "minitest-reporters"
 
   # Gems to allow RubyMine debugging
-  gem 'debase'
+  gem 'debase', '>=0.2.4'
   gem 'ruby-debug-ide'
 end
 
