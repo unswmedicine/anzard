@@ -14,11 +14,10 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-= tabs_tag(builder: MenuTabBuilder, namespace: :home) do |tab|
-  %ul.tabs
-    = tab.responses 'Data Entry Forms', root_path
-    = tab.batches 'Batch Uploads', batch_files_path
-    - if can?(:submission_summary, Response)
-      = tab.submission_summary 'Submission Summary', submission_summary_responses_path
-    - if can?(:download, Response)
-      = tab.download 'Download Data', prepare_download_responses_path
+-# ToDo: change links to icons with label
+=link_to 'Data Entry Forms', responses_path
+=link_to 'Batch Uploads', batch_files_path
+- if can?(:submission_summary, Response)
+  =link_to 'Submission Summary', submission_summary_responses_path
+- if can?(:download, Response)
+  =link_to 'Download Data', prepare_download_responses_path

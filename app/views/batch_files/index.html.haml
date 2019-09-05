@@ -14,9 +14,7 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-- content_for :tabs do
-  = render 'pages/tabs'
-
+= render 'pages/nav'
 - title 'Batch Uploads'
 
 - if can?(:create, BatchFile)
