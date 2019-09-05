@@ -151,11 +151,16 @@ class ResponsesController < ApplicationController
   def confirm_batch_delete
     @year = params[:year_of_registration] || ""
     @registration_type_id = params[:registration_type] || ""
+    @clinic_id = params[:clinic_id] || ""
 
     @errors = validate_batch_delete_form(@year, @registration_type_id)
     if @errors.empty?
       @registration_type = SURVEYS[@registration_type_id.to_i]
-      @count = Response.count_per_survey_and_year_of_registration(@registration_type_id, @year)
+      @clinic_site_code_name = ""
+      unless @clinic_id.blank?
+        @clinic_site_code_name = Clinic.find(@clinic_id).site_name_with_code
+      end
+      @count = Response.count_per_survey_and_year_of_registration_and_clinic(@registration_type_id, @year, @clinic_id)
     else
       batch_delete
       render :batch_delete
@@ -165,10 +170,11 @@ class ResponsesController < ApplicationController
   def perform_batch_delete
     @year = params[:year_of_registration] || ""
     @registration_type_id = params[:registration_type] || ""
+    @clinic_id = params[:clinic_id] || ""
 
     @errors = validate_batch_delete_form(@year, @registration_type_id)
     if @errors.empty?
-      Response.delete_by_survey_and_year_of_registration(@registration_type_id, @year)
+      Response.delete_by_survey_and_year_of_registration_and_clinic(@registration_type_id, @year, @clinic_id)
       redirect_to batch_delete_responses_path, :notice => 'The records were deleted'
     else
       redirect_to batch_delete_responses_path

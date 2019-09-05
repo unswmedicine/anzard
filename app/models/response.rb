@@ -79,12 +79,17 @@ class Response < ApplicationRecord
     results.includes([:clinic])
   end
 
-  def self.count_per_survey_and_year_of_registration(survey_id, year)
-    Response.where(year_of_registration: year, survey_id: survey_id).count
+  def self.count_per_survey_and_year_of_registration_and_clinic(survey_id, year, clinic_id)
+    if clinic_id.blank?
+      responses = Response.where(year_of_registration: year, survey_id: survey_id)
+    else
+      responses = Response.where(year_of_registration: year, survey_id: survey_id, clinic_id: clinic_id)
+    end
+    responses.count
   end
 
-  def self.delete_by_survey_and_year_of_registration(survey_id, year)
-    Response.destroy_all(["year_of_registration = ? AND survey_id = ?", year, survey_id])
+  def self.delete_by_survey_and_year_of_registration_and_clinic(survey_id, year, clinic_id)
+    Response.destroy_all(["year_of_registration = ? AND survey_id = ? AND clinic_id = ?", year, survey_id, clinic_id])
   end
 
   def self.existing_years_of_registration
