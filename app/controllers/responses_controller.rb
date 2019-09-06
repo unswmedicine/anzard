@@ -146,6 +146,7 @@ class ResponsesController < ApplicationController
 
   def batch_delete
     set_tab :delete_responses, :admin_navigation
+    @sorted_clinics = Clinic.order(:site_code)
   end
 
   def confirm_batch_delete
