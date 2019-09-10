@@ -416,7 +416,7 @@ describe BatchFile do
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
-      # ToDo: Determine whether this is affected - can't have duplicate id in same year but may be possible if site is appended? (unless entire batch is for one site)
+      # ToDo: Determine whether this is affected - can't have duplicate id in same year but may be possible if site is appended
       it "file with duplicate cycle ids within the file should be rejected completely and no reports generated" do
         batch_file = process_batch_file('duplicate_cycle_id.csv', survey, user)
         expect_fail_status_with_message(batch_file, "The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
@@ -498,7 +498,6 @@ describe BatchFile do
         expect_summary_report_and_detail_report(batch_file)
       end
 
-      # ToDo:
       it "should accept records where the cycle id is already in the system in the same survey and a different year" do
         create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user, 2010)

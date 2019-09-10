@@ -38,11 +38,9 @@ class Response < ApplicationRecord
   validates_presence_of :user
   validates_presence_of :survey_id
   validates_presence_of :clinic_id
+  # ToDo: refactor year_of_registration to year_of_treatment to keep code consistent with intent
   validates_presence_of :year_of_registration
   validates_inclusion_of :submitted_status, in: [STATUS_UNSUBMITTED, STATUS_SUBMITTED]
-  # ToDo: change uniqueness constraint so that cycle_id is unique scoped within survey and year of registration
-  # validates_uniqueness_of :cycle_id, scope: :survey_id
-  # ToDo: refactor year_of_registration to year_of_treatment to keep code consistent with intent
   validates_uniqueness_of :cycle_id, scope: [:survey_id, :year_of_registration]
 
   before_validation :strip_whitespace
