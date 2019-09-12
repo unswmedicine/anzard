@@ -16,6 +16,8 @@
 
 class Clinic < ApplicationRecord
 
+  SITE_CODE_MAX_SIZE = 3
+
   has_many :clinic_allocations
   has_many :users, through: :clinic_allocations
   has_many :responses
