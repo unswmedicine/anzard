@@ -17,7 +17,7 @@
 - content_for :tabs do
   = render 'pages/tabs'
 
-- title 'Data Collection Stats'
+- title 'Submission Summary'
 
 - surveys.each do |survey|
   - stats = StatsReport.new(survey)
