@@ -106,7 +106,7 @@ class Response < ApplicationRecord
       when INCOMPLETE
         "This data entry form is incomplete and can't be submitted."
       when COMPLETE_WITH_WARNINGS
-        "This data entry form has warnings. Double check them. If you believe them to be correct, contact a supervisor."
+        "This data entry form has warnings. Double check them. If you believe them to be correct, contact an administrator."
       else
         nil
     end
