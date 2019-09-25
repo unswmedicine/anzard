@@ -17,7 +17,7 @@
 - content_for :title do
   = 'New Batch Upload'
 
-%p Please select the treatment data and the file you want to upload. You will also need to select a primary site to associate the batch upload with.
+%p Please select the treatment data and the file you want to upload. You will also need to select a site to associate the batch upload with.
 %p Note: Any user that has access to the selected site will be able to review the status of the uploaded file.
 
 = form_for @batch_file do |f|
@@ -28,19 +28,19 @@
       .input
         = text_field_tag 'unit', current_user.clinics.first.unit_name_with_code, disabled: true # All user clinics are from the same unit
     .clearfix
-      = f.label :clinic_id, 'Primary Site'
+      = f.label :clinic_id, 'Site'
       .input
         = f.collection_select :clinic_id, current_user.clinics, :id, :site_name_with_full_code, {},  {:class => 'large'}
-        = required
-    .clearfix
-      = f.label :survey_id, 'Treatment data'
-      .input
-        = f.collection_select :survey_id, surveys, :id, :name, {:include_blank => 'Please select'}, {:class => 'large'}
         = required
     .clearfix
       = f.label :year_of_registration, 'Year of treatment'
       .input
         = f.select :year_of_registration, year_of_registration_range.reverse, {:include_blank => 'Please select'}, {:class => 'medium'}
+        = required
+    .clearfix
+      = f.label :survey_id, 'Treatment data'
+      .input
+        = f.collection_select :survey_id, surveys, :id, :name, {:include_blank => 'Please select'}, {:class => 'large'}
         = required
     .clearfix
       = f.label :file, 'File'

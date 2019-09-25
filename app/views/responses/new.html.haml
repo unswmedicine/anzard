@@ -21,14 +21,14 @@
   %fieldset
     = render "shared/error_messages", target: @response
     .clearfix
-      = f.label :survey_id, "Treatment Data"
-      .input
-        = f.collection_select :survey_id, surveys, :id, :name, {:include_blank => "Please select"}, {:class => "large"}
-        = required
-    .clearfix
       = f.label :year_of_registration, "Year of Treatment"
       .input
         = f.select :year_of_registration, year_of_registration_range.reverse, {:include_blank => "Please select"}, {:class => "medium"}
+        = required
+    .clearfix
+      = f.label :survey_id, "Treatment Data"
+      .input
+        = f.collection_select :survey_id, surveys, :id, :name, {:include_blank => "Please select"}, {:class => "large"}
         = required
     .clearfix
       = label_tag 'unit', 'Unit'
