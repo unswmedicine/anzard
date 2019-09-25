@@ -34,12 +34,13 @@
       %tr
         %th Treatment Data
         %th Year of Treatment
+        %th Unit Name
+        %th Site #
         %th Filename
+        %th Records
         %th Created By
         %th Date Uploaded
-        %th Num records
         %th Status
-        %th Details
         %th Reports
         - if can? :force_submit, BatchFile
           %th
@@ -48,12 +49,13 @@
 
         %td= batch_file.survey.name
         %td= batch_file.year_of_registration
+        %td= batch_file.clinic.unit_name
+        %td= batch_file.clinic.site_code
         %td= batch_file.file_file_name
+        %td= batch_file.record_count
         %td= batch_file.user.full_name
         %td= time_tag batch_file.created_at
-        %td= batch_file.record_count
-        %td= batch_file.status
-        %td= batch_file.message
+        %td= ('<b>' + batch_file.status + '</b> <br>' + batch_file.message).html_safe
         %td
           - if batch_file.has_summary_report?
             = link_to "Summary Report", summary_report_batch_file_path(batch_file), class: 'btn'
