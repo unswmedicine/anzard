@@ -19,35 +19,29 @@
 
 - title 'Submission Summary'
 
-- surveys.each do |survey|
-  - stats = StatsReport.new(survey)
-  - unless stats.empty?
-
-    %h2= survey.name
-
-    %table{id: "stats_#{survey.id}", class: 'bordered-table'}
-      %thead
-        %tr
-          %th
+%table#submission_summary.bordered-table
+  %thead
+    %tr
+      %th Treatment Data
+      %th Year of Treatment
+      %th Unit Name
+      %th Site #
+      %th Status
+      %th Records
+    %tbody
+      - surveys.each do |survey|
+        - stats = StatsReport.new(survey)
+        - unless stats.empty?
           - stats.years.each do |year|
-            %th
-              = year
-              %br/
-              In Progress
-            %th
-              = year
-              %br/
-              Submitted
-      %tbody
-        - data_columns = stats.years.size * 2
-        - clinics.each do |state|
-          %tr
-            %th{colspan: (data_columns + 1)}= state[0]
-
-          - state[1].each do |clinic|
-            - clinic_unit_name, clinic_id = clinic
-            %tr
-              %td= clinic_unit_name
-              - stats.years.each do |year|
-                %td= stats.response_count(year, Response::STATUS_UNSUBMITTED, clinic_id)
-                %td= stats.response_count(year, Response::STATUS_SUBMITTED, clinic_id)
+            - Clinic.order(:unit_code, :site_code).each do |clinic|
+              - [{name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
+                 {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}].each do |status|
+                - num_status = stats.response_count(year, status[:name], clinic.id)
+                - unless num_status == 'none'
+                  %tr
+                    %td= survey.name
+                    %td= year
+                    %td= clinic.unit_name
+                    %td= clinic.site_code
+                    %td= status[:str]
+                    %td= num_status
