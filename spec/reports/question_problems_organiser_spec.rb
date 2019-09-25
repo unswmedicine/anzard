@@ -30,34 +30,27 @@ describe QuestionProblemsOrganiser do
   end
 
   it "for aggregated report, takes errors and warnings and aggregates them by question and error message" do
-    aggregated = qpo.aggregated_by_question_and_message
-    aggregated.should be_a(Array)
-    aggregated.size.should == 23
-    aggregated[0].should eq(['Column', 'Type', 'Message', 'Number of records'])
-    aggregated[1].should eq(['q1', 'Error', 'fwa', '2'])
-    aggregated[2].should eq(['', '', 'b1, b2', ''])
-    aggregated[3].should eq(['q1', 'Error', 'fwb', '1'])
-    aggregated[4].should eq(['', '', 'b1', ''])
-    aggregated[5].should eq(['q1', 'Warning', 'wa', '2'])
-    aggregated[6].should eq(['', '', 'b1, b2', ''])
-    aggregated[7].should eq(['q1', 'Warning', 'wb', '1'])
-    aggregated[8].should eq(['', '', 'b1', ''])
+    summary = qpo.summary_problems_as_table
+    summary.should be_a(Array)
+    summary.size.should == 16
 
-    aggregated[9].should eq(['q2', 'Error', 'fwc', '2'])
-    aggregated[10].should eq(['', '', 'b1, b2', ''])
-    aggregated[11].should eq(['q2', 'Error', 'fwd', '1'])
-    aggregated[12].should eq(['', '', 'b2', ''])
-    aggregated[13].should eq(['q2', 'Warning', 'wc', '1'])
-    aggregated[14].should eq(['', '', 'b1', ''])
-    aggregated[15].should eq(['q2', 'Warning', 'wd', '2'])
-    aggregated[16].should eq(['', '', 'b1, b2', ''])
+    summary[0].should eq(['Cycle IDs with problems', 'Type of Problem', 'Data Items', 'Query'])
+    summary[1].should eq(['b1', 'Error',   'q1', 'fwa'])
+    summary[2].should eq(['',   'Error',   'q1', 'fwb'])
+    summary[3].should eq(['',   'Error',   'q2', 'fwc'])
+    summary[4].should eq(['',   'Error',   'q3', 'fwe'])
+    summary[5].should eq(['',   'Error',   'q3', 'fwf'])
+    summary[6].should eq(['',   'Warning', 'q1', 'wa'])
+    summary[7].should eq(['',   'Warning', 'q1', 'wb'])
+    summary[8].should eq(['',   'Warning', 'q2', 'wc'])
+    summary[9].should eq(['',   'Warning', 'q2', 'wd'])
 
-    aggregated[17].should eq(['q3', 'Error', 'fwe', '1'])
-    aggregated[18].should eq(['', '', 'b1', ''])
-    aggregated[19].should eq(['q3', 'Error', 'fwf', '1'])
-    aggregated[20].should eq(['', '', 'b1', ''])
-    aggregated[21].should eq(['q3', 'Warning', 'we', '1'])
-    aggregated[22].should eq(['', '', 'b2', ''])
+    summary[10].should eq(['b2', 'Error',   'q1', 'fwa'])
+    summary[11].should eq(['',   'Error',   'q2', 'fwc'])
+    summary[12].should eq(['',   'Error',   'q2', 'fwd'])
+    summary[13].should eq(['',   'Warning', 'q1', 'wa'])
+    summary[14].should eq(['',   'Warning', 'q2', 'wd'])
+    summary[15].should eq(['',   'Warning', 'q3', 'we'])
   end
 
   it "For detailed report it takes errors and warnings orders them by cycle id, question and error message" do
