@@ -37,5 +37,9 @@
         .input
           = select_tag :year_of_registration, options_for_select(existing_years_of_registration, @year), {prompt: "Please select", class: 'large'}
           = required
+      .clearfix
+        = label_tag :clinic_id, "Site"
+        .input
+          = select_tag :clinic_id, options_from_collection_for_select(@sorted_clinics, :id, :site_name_with_code, @clinic_id),  {prompt: "Please select", :class => 'large'}
       .actions
         = submit_tag "Next", class: "btn primary"
