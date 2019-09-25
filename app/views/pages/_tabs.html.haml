@@ -22,5 +22,3 @@
       = tab.submission_summary 'Submission Summary', submission_summary_responses_path
     - if can?(:download, Response)
       = tab.download 'Download Data', prepare_download_responses_path
-    - if can?(:submitted_cycle_ids, Response)
-      = tab.submitted_cycle_ids 'Submitted Cycle IDs', submitted_cycle_ids_responses_path

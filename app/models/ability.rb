@@ -90,7 +90,6 @@ class Ability
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile
-        can :submitted_cycle_ids, Response
 
       when Role::DATA_PROVIDER_SUPERVISOR
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
@@ -102,8 +101,6 @@ class Ability
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile
-
-        can :submitted_cycle_ids, Response
       else
         raise "Unknown role #{user.role.name}"
     end

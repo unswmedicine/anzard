@@ -175,12 +175,6 @@ class ResponsesController < ApplicationController
     end
   end
 
-  def submitted_cycle_ids
-    set_tab :submitted_cycle_ids, :home
-
-    @cycle_ids_by_year_by_form = organised_cycle_ids(current_user)
-  end
-
   private
 
   def organised_cycle_ids(user)
