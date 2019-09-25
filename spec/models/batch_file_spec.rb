@@ -416,6 +416,7 @@ describe BatchFile do
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
+      # ToDo: Determine whether this is affected - can't have duplicate id in same year but may be possible if site is appended
       it "file with duplicate cycle ids within the file should be rejected completely and no reports generated" do
         batch_file = process_batch_file('duplicate_cycle_id.csv', survey, user)
         expect_fail_status_with_message(batch_file, "The file you uploaded contained duplicate cycle IDs. Each cycle ID can only be used once. Processing stopped on CSV row 3")
@@ -497,27 +498,28 @@ describe BatchFile do
         expect_summary_report_and_detail_report(batch_file)
       end
 
-      it "should reject records where the cycle id is already in the system" do
-        create(:response, survey: survey, cycle_id: "B2")
-        batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user)
-        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
-        Response.count.should == 1 #the one we created earlier
-        Answer.count.should == 0
-        batch_file.record_count.should == 3
-        batch_file.problem_record_count.should == 1
-        expect_summary_report_and_detail_report(batch_file)
-        File.exist?(batch_file.summary_report_path).should be true
-
-        csv_file = batch_file.detail_report_path
-        rows = CSV.read(csv_file)
-        rows.size.should eq(2)
-        rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used.'])
+      it "should accept records where the cycle id is already in the system in the same survey and a different year" do
+        create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
+        batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user, 2010)
+        expect_successful_status_with_message(batch_file, 'Your file has been processed successfully.')
+        response = Response.find_by!(cycle_id: 'B2', year_of_registration: 2010)
+        response.survey.should eq(survey)
+        response.user.should eq(user)
+        response.clinic.should eq(clinic)
+        response.submitted_status.should eq(Response::STATUS_SUBMITTED)
+        response.batch_file.id.should eq(batch_file.id)
+        answer_hash = response.answers.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+        answer_hash['TextMandatory'].text_answer.should == 'B2Val1'
+        answer_hash['Date1'].date_answer.should == Date.parse('2012-01-01')
+        answer_hash['Time'].time_answer.should == Time.utc(2000, 1, 1, 23, 59)
+        answer_hash['Choice'].choice_answer.should == '1'
+        answer_hash['Decimal'].decimal_answer.should == 44
+        answer_hash['Integer'].integer_answer.should == 9
       end
 
-      it "should reject records where the cycle id is already in the system even with whitespace padding" do
-        create(:response, survey: survey, cycle_id: "B2")
-        batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user)
+      it "should reject records where the cycle id is already in the system within the survey and year of treatment" do
+        create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
+        batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user, 2005)
         expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier
         Answer.count.should == 0
@@ -530,12 +532,30 @@ describe BatchFile do
         rows = CSV.read(csv_file)
         rows.size.should eq(2)
         rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used.'])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used within the year of treatment.'])
+      end
+
+      it "should reject records where the cycle id is already in the system within the survey and year of treatment even with whitespace padding" do
+        create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
+        batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user, 2005)
+        expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
+        Response.count.should == 1 #the one we created earlier
+        Answer.count.should == 0
+        batch_file.record_count.should == 3
+        batch_file.problem_record_count.should == 1
+        expect_summary_report_and_detail_report(batch_file)
+        File.exist?(batch_file.summary_report_path).should be true
+
+        csv_file = batch_file.detail_report_path
+        rows = CSV.read(csv_file)
+        rows.size.should eq(2)
+        rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used within the year of treatment.'])
       end
 
       it "can detect both duplicate cycle id and other errors on the same record" do
-        create(:response, survey: survey, cycle_id: "B2")
-        batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user)
+        create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
+        batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user, 2005)
         expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier
         Answer.count.should == 0
@@ -548,7 +568,7 @@ describe BatchFile do
         rows = CSV.read(csv_file)
         rows.size.should eq(3)
         rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
-        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used.'])
+        rows[1].should eq(['B2', 'CYCLE_ID', 'Error', 'B2', 'Cycle ID B2 has already been used within the year of treatment.'])
         rows[2].should eq(['B2', 'TextMandatory', 'Error', '', 'This question is mandatory'])
       end
     end

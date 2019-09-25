@@ -39,13 +39,15 @@ describe Response do
       build(:response, submitted_status: "Blah").should_not be_valid
     end
 
-    it "should validate that cycle id is unique within survey" do
-      first = create(:response, cycle_id: "abcd")
-      second = build(:response, survey: first.survey, cycle_id: first.cycle_id)
+    it "should validate that cycle id is unique within survey and year of registration" do
+      first = create(:response, cycle_id: "abcd", year_of_registration: "2000")
+      second = build(:response, survey: first.survey, cycle_id: first.cycle_id, year_of_registration: first.year_of_registration)
       second.should_not be_valid
-      second.errors.full_messages.should eq(["Cycle ID abcd has already been used."])
-      diff_survey = build(:response, survey: create(:survey), cycle_id: first.cycle_id)
+      second.errors.full_messages.should eq(["Cycle ID abcd has already been used within the year of treatment."])
+      diff_survey = build(:response, survey: create(:survey), cycle_id: first.cycle_id, year_of_registration: first.year_of_registration)
       diff_survey.should be_valid
+      diff_year = build(:response, survey: first.survey, cycle_id: first.cycle_id, year_of_registration: (first.year_of_registration.to_i + 1).to_s)
+      diff_year.should be_valid
     end
 
     it "should strip leading/trailing spaces from cycle ids before validating" do
@@ -54,7 +56,7 @@ describe Response do
 
       second = build(:response, survey: first.survey, cycle_id: " abcd")
       second.should_not be_valid
-      second.errors.full_messages.should eq(["Cycle ID abcd has already been used."])
+      second.errors.full_messages.should eq(["Cycle ID abcd has already been used within the year of treatment."])
     end
   end
 

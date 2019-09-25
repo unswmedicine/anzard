@@ -32,7 +32,7 @@ en:
         response:
           attributes:
             cycle_id:
-              taken: '%{value} has already been used.'
+              taken: '%{value} has already been used within the year of treatment.'
 
   unauthorized:
     default: 'You tried to access a page you are not authorised to view.'
