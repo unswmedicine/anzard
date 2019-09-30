@@ -14,16 +14,20 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-= render 'pages/nav'
+- content_for :nav do
+  = render 'pages/nav'
+
 - title 'Batch Uploads'
 
-- if can?(:create, BatchFile)
-  = link_to "Upload Batch File", new_batch_file_path, class: 'btn'
+%div{class: "centered_wrapper"}
+  - if can?(:create, BatchFile)
+    = link_to "Upload Batch File", new_batch_file_path, class: 'btn'
+  - if !@batch_files.blank?
+    = link_to "Refresh Status", batch_files_path, class: 'btn'
 
 - if @batch_files.blank?
   %p There are no batch files to show.
 - else
-  = link_to "Refresh Status", batch_files_path, class: 'btn'
   %br/
   %br/
   = will_paginate @batch_files, :renderer => BootstrapPagination::Rails

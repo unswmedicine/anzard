@@ -17,8 +17,8 @@
 -# ToDo: change links to icons with label
 %div{class: "centered_wrapper"}
   %div{class: "nav_links"}
-    %div{class: "nav_link"}
-      - if can?(:download, Response)
+    - if can?(:download, Response)
+      %div{class: "nav_link"}
         =link_to prepare_download_responses_path do
           %img{src: "/images/icon_download.png", class: "nav_icon center"}
           Download Data
@@ -30,8 +30,8 @@
       =link_to batch_files_path do
         %img{src: "/images/icon_upload.png", class: "nav_icon center"}
         Batch Uploads
-    %div{class: "nav_link"}
-      - if can?(:submission_summary, Response)
+    - if can?(:submission_summary, Response)
+      %div{class: "nav_link"}
         =link_to submission_summary_responses_path do
           %img{src: "/images/icon_information.png", class: "nav_icon center"}
           Submission Summary

@@ -14,9 +14,13 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-= render 'pages/nav'
+- content_for :nav do
+  = render 'pages/nav'
+
 - title 'Data Entry Forms'
-= link_to "Start New Data Entry Form", new_response_path, class: 'btn' if can?(:create, Response)
+
+%div{class: "centered_wrapper"}
+  = link_to "Start New Data Entry Form", new_response_path, class: 'btn' if can?(:create, Response)
 
 %h2 Data Entry Forms In Progress
 - if @responses.blank?
