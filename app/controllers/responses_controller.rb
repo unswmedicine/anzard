@@ -24,6 +24,10 @@ class ResponsesController < ApplicationController
   expose(:clinics) { Clinic.clinics_by_state_with_clinic_id }
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
+  def index
+    @responses = Response.accessible_by(current_ability).unsubmitted.order("cycle_id")
+  end
+
   def new
   end
 

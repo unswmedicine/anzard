@@ -23,7 +23,7 @@ Anzard::Application.routes.draw do
     put "/users/update_password", :to => "user_registers#update_password" #allow users to edit their own password
   end
 
-  resources :responses, :only => [:new, :create, :edit, :update, :show, :destroy] do
+  resources :responses, :only => [:index, :new, :create, :edit, :update, :show, :destroy] do
     member do
       get :review_answers
       post :submit

@@ -14,10 +14,10 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-- title 'Download Data'
+- content_for :nav do
+  = render 'pages/nav'
 
-- content_for :tabs do
-  = render 'pages/tabs'
+- title 'Download Data', false, true
 
 = form_tag download_responses_path, method: :get do
   %fieldset

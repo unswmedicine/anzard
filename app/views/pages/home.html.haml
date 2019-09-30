@@ -15,14 +15,11 @@
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 - if user_signed_in?
-  - title 'Data Entry Forms'
+  - title 'Welcome to the Australia and New Zealand Assisted Reproduction Database', false, true
+  %div{class: "centered_wrapper"}
+    %h3 Please select the appropriate icon below to begin your submission.
 
-  - content_for :tabs do
-    = render 'tabs'
-
-  = link_to "Start New Data Entry Form", new_response_path, class: 'btn' if can?(:create, Response)
-
-  = render 'responses/survey_response_list'
+  = render(partial: 'pages/nav')
 
 - else
   - title 'Home'
