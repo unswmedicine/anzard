@@ -18,6 +18,11 @@
 %div{class: "centered_wrapper"}
   %div{class: "nav_links"}
     %div{class: "nav_link"}
+      - if can?(:download, Response)
+        =link_to prepare_download_responses_path do
+          %img{src: "/images/icon_download.png", class: "nav_icon center"}
+          Download Data
+    %div{class: "nav_link"}
       =link_to responses_path  do
         %img{src: "/images/icon_data_entry.png", class: "nav_icon center"}
         Data Entry Forms
@@ -30,8 +35,3 @@
         =link_to submission_summary_responses_path do
           %img{src: "/images/icon_information.png", class: "nav_icon center"}
           Submission Summary
-    %div{class: "nav_link"}
-      - if can?(:download, Response)
-        =link_to prepare_download_responses_path do
-          %img{src: "/images/icon_download.png", class: "nav_icon center"}
-          Download Data
