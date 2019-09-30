@@ -55,7 +55,10 @@
         %td= batch_file.record_count
         %td= batch_file.user.full_name
         %td= time_tag batch_file.created_at
-        %td= ('<b>' + batch_file.status + '</b> <br>' + batch_file.message).html_safe
+        - if batch_file.message.blank?
+          %td= ('<b>' + batch_file.status + '</b>').html_safe
+        - else
+          %td= ('<b>' + batch_file.status + '</b> <br>' + batch_file.message).html_safe
         %td
           - if batch_file.has_summary_report?
             = link_to "Summary Report", summary_report_batch_file_path(batch_file), class: 'btn'
