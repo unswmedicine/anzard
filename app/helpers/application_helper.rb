@@ -17,9 +17,11 @@
 module ApplicationHelper
 
   # set the page title to be used as browser title and h1 at the top of the page
-  def title(page_title, span12=false)
+  def title(page_title, span12=false, centered=false)
     content_for(:title) { page_title }
-    @title_span12=span12
+    content_for(:heading) { page_title }
+    @heading_span12=span12
+    @heading_centered=centered
   end
 
   # shorthand for the required asterisk

@@ -17,7 +17,7 @@
 - content_for :nav do
   = render 'pages/nav'
 
-- title 'Data Entry Forms'
+- title 'Data Entry Forms', false, true
 
 %div{class: "centered_wrapper"}
   = link_to "Start New Data Entry Form", new_response_path, class: 'btn' if can?(:create, Response)

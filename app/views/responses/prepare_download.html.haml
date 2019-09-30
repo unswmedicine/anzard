@@ -17,7 +17,7 @@
 - content_for :nav do
   = render 'pages/nav'
 
-- title 'Download Data'
+- title 'Download Data', false, true
 
 = form_tag download_responses_path, method: :get do
   %fieldset

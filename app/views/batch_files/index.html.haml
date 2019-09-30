@@ -17,7 +17,7 @@
 - content_for :nav do
   = render 'pages/nav'
 
-- title 'Batch Uploads'
+- title 'Batch Uploads', false, true
 
 %div{class: "centered_wrapper"}
   - if can?(:create, BatchFile)

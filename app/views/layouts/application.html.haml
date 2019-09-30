@@ -26,10 +26,18 @@
 
           = yield :nav
 
-          - if @title_span12
-            %h1.span12= yield :title
+          - if @heading_span12
+            - if @heading_centered
+              %div{class: "centered_wrapper"}
+                %h1.span12= yield :heading
+            - else
+              %h1.span12= yield :heading
           - else
-            %h1= yield :title
+            - if @heading_centered
+              %div{class: "centered_wrapper"}
+                %h1= yield :heading
+            - else
+              %h1= yield :heading
 
           = yield :tabs
 
