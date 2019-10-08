@@ -23,7 +23,6 @@ class Response < ApplicationRecord
   INCOMPLETE = 'Incomplete'
   COMPLETE_WITH_WARNINGS = 'Complete with warnings'
 
-  CYCLE_ID_MIN_SIZE = 1
   CYCLE_ID_MAX_SIZE = 20
 
   belongs_to :user
@@ -34,8 +33,8 @@ class Response < ApplicationRecord
   has_many :answers, dependent: :destroy
 
   validates_presence_of :cycle_id
-  # Cycle ID max size to allow length of CycleID_SiteCode (including underscore character)
-  validates_length_of :cycle_id, :minimum => CYCLE_ID_MIN_SIZE, :maximum => CYCLE_ID_MAX_SIZE + Clinic::SITE_CODE_MAX_SIZE + 1
+  # Cycle ID max size to allow length of concatenated CycleID_SiteCode (including underscore character)
+  validates_length_of :cycle_id, :minimum => 1, :maximum => CYCLE_ID_MAX_SIZE + Clinic::SITE_CODE_MAX_SIZE + 1
   validates_presence_of :user
   validates_presence_of :survey_id
   validates_presence_of :clinic_id
