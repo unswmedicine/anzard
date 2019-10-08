@@ -146,14 +146,29 @@ class BatchFile < ApplicationRecord
 
     # get all the problems from all the responses organised for reporting
     responses.each do |r|
+      # Get original cycle ID (cycle ID without site code) for display in reports to user
+      cycle_id_without_site_code = r.cycle_id
+      concatenated_site_code = '_' + r.clinic.site_code.to_s
+      if r.cycle_id.end_with?(concatenated_site_code)
+        cycle_id_without_site_code = r.cycle_id.slice(0, r.cycle_id.length - concatenated_site_code.length)
+      end
+
       r.answers.each do |answer|
-        organiser.add_problems(answer.question.code, r.cycle_id, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
+        organiser.add_problems(answer.question.code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
       end
       r.missing_mandatory_questions.each do |question|
-        organiser.add_problems(question.code, r.cycle_id, ['This question is mandatory'], [], '')
+        organiser.add_problems(question.code, cycle_id_without_site_code, ['This question is mandatory'], [], '')
       end
-      r.valid? #we have to call this to trigger errors getting populated
-      organiser.add_problems(COLUMN_CYCLE_ID, r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
+
+      r.valid? # we have to call this to trigger errors getting populated
+      unless r.errors.empty?
+        # Replace auto-concatenated cycle ID with original cycle ID for display of record validation errors
+        response_error_msgs = r.errors.full_messages
+        response_error_msgs.each do |msg|
+          msg.gsub!(r.cycle_id, cycle_id_without_site_code)
+        end
+        organiser.add_problems(COLUMN_CYCLE_ID, cycle_id_without_site_code, response_error_msgs, [], cycle_id_without_site_code)
+      end
     end
     organiser
   end
@@ -186,7 +201,9 @@ class BatchFile < ApplicationRecord
       cycle_id = row[sanitise_question_code(COLUMN_CYCLE_ID)]
       cycle_id.strip! unless cycle_id.nil?
       clinic_in_row = Clinic.find_by(unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
-      response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+
+      concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
+      response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
 
       failures = true if (response.fatal_warnings? || !response.valid?)
