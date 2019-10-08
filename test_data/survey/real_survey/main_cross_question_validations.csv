@@ -103,5 +103,5 @@ rule_xx,,n_deliv,,,special_rule_gest_iui_date,if gestational age (pr_end_dt - iu
 rule_xx,,n_deliv,,,special_rule_gest_et_date,if gestational age (pr_end_dt - et_date) is greater than 20 weeks then n_deliv must be present,,,,,,,,
 ruleDonor1,,thaw_don,,,special_rule_thaw_don,if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete then thaw_don must be complete,,,,,,,,
 ruleDonor3,,don_age,,,special_rule_surr,if surr equals 'y' and (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 then don_age must be present,,,,,,,,
-rule26h,,et_date,,,special_rule_et_date,if et_date is a date then n_cl_et must be >= 0 or n_bl_et must be >= 0,,,,,,,,
+rule26h,,et_date,,,special_rule_et_date,if et_date is a date then at least one of n_cl_et or n_bl_et must be > 0,,,,,,,,
 rule_xx,,stim_1st,,,special_rule_stim_1st,if stim_1st equals 'y' then opu_date must be complete or can_date must be complete,,,,,,,,
