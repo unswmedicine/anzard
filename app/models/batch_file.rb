@@ -186,7 +186,9 @@ class BatchFile < ApplicationRecord
       cycle_id = row[sanitise_question_code(COLUMN_CYCLE_ID)]
       cycle_id.strip! unless cycle_id.nil?
       clinic_in_row = Clinic.find_by(unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
-      response = Response.new(survey: survey, cycle_id: cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+
+      concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
+      response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       response.build_answers_from_hash(row.to_hash)
 
       failures = true if (response.fatal_warnings? || !response.valid?)
