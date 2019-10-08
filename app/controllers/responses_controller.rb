@@ -44,9 +44,14 @@ class ResponsesController < ApplicationController
   def create
     @response.user = current_user
     @response.submitted_status = Response::STATUS_UNSUBMITTED
+    original_cycle_id = params[:response][:cycle_id]
+    unless original_cycle_id.blank?
+      @response.cycle_id = original_cycle_id + '_' + Clinic.find(params[:response][:clinic_id]).site_code.to_s
+    end
     if @response.save
       redirect_to edit_response_path(@response, section: @response.survey.first_section.id), notice: 'Data entry form created'
     else
+      @response.cycle_id = original_cycle_id
       render :new
     end
   end

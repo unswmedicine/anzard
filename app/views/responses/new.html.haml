@@ -43,6 +43,9 @@
       .input
         = f.text_field :cycle_id, placeholder: 'Code uniquely identifying this cycle', size: Response::CYCLE_ID_MAX_SIZE, maxlength: Response::CYCLE_ID_MAX_SIZE
         = required
+
+    %em Note: The Site Number will be automatically appended to the Cycle ID upon creation to ensure uniqueness.
+
     .actions
       = f.submit "Save", class: "btn primary"
       = link_to 'Cancel', root_path, class: "btn"
