@@ -90,7 +90,7 @@ special_rule_gest_iui_date | N_DELIV       | If gestational age (pr_end_dt - iui
 special_rule_gest_et_date  | N_DELIV       | If gestational age (pr_end_dt - et_date) is greater than 20 weeks then n_deliv must be present
 special_rule_thaw_don      | THAW_DON      | If (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete then thaw_don must be complete
 special_rule_surr          | DON_AGE       | If surr equals 'y' and (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 then don_age must be present
-special_rule_et_date       | ET_DATE       | If et_date is a date then n_cl_et must be >= 0 or n_bl_et must be >= 0
+special_rule_et_date       | ET_DATE       | If et_date is a date then at least one of n_cl_et or n_bl_et must be > 0
 special_rule_stim_1st      | STIM_1ST      | If stim_1st equals 'y' then opu_date must be complete or can_date must be complete
 
 ### Operators
