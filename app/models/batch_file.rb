@@ -146,14 +146,29 @@ class BatchFile < ApplicationRecord
 
     # get all the problems from all the responses organised for reporting
     responses.each do |r|
+      # Get original cycle ID (cycle ID without site code) for display in reports to user
+      cycle_id_without_site_code = r.cycle_id
+      concatenated_site_code = '_' + r.clinic.site_code.to_s
+      if r.cycle_id.end_with?(concatenated_site_code)
+        cycle_id_without_site_code = r.cycle_id.slice(0, r.cycle_id.length - concatenated_site_code.length)
+      end
+
       r.answers.each do |answer|
-        organiser.add_problems(answer.question.code, r.cycle_id, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
+        organiser.add_problems(answer.question.code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
       end
       r.missing_mandatory_questions.each do |question|
-        organiser.add_problems(question.code, r.cycle_id, ['This question is mandatory'], [], '')
+        organiser.add_problems(question.code, cycle_id_without_site_code, ['This question is mandatory'], [], '')
       end
-      r.valid? #we have to call this to trigger errors getting populated
-      organiser.add_problems(COLUMN_CYCLE_ID, r.cycle_id, r.errors.full_messages, [], r.cycle_id) unless r.errors.empty?
+
+      r.valid? # we have to call this to trigger errors getting populated
+      unless r.errors.empty?
+        # Replace auto-concatenated cycle ID with original cycle ID for display of record validation errors
+        response_error_msgs = r.errors.full_messages
+        response_error_msgs.each do |msg|
+          msg.gsub!(r.cycle_id, cycle_id_without_site_code)
+        end
+        organiser.add_problems(COLUMN_CYCLE_ID, cycle_id_without_site_code, response_error_msgs, [], cycle_id_without_site_code)
+      end
     end
     organiser
   end
