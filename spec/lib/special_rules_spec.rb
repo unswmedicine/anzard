@@ -18,6 +18,8 @@ require 'rails_helper'
 
 describe 'Special Rules' do
 
+  GENERIC_ERROR_MSG = 'My error message'
+
   describe 'RULE: special_rule_comp1' do
     # special_rule_comp1: n_v_egth + n_s_egth + n_eggs + n_recvd >= n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v
     before(:each) do
@@ -32,7 +34,7 @@ describe 'Special Rules' do
       @n_icsi = create(:question, code: 'N_ICSI', section: @section, question_type: Question::TYPE_INTEGER)
       @n_egfz_s = create(:question, code: 'N_EGFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
       @n_egfz_v = create(:question, code: 'N_EGFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_comp1', question: @n_v_egth, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_comp1', question: @n_v_egth, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -156,7 +158,7 @@ describe 'Special Rules' do
         create(:answer, question: @n_egfz_s, answer_value: 1, response: @response)
         create(:answer, question: @n_egfz_v, answer_value: 1, response: @response)
         answer.reload
-        expect(@cqv.check(answer)).to eq('My error message')
+        expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
       end
     end
   end
@@ -170,7 +172,7 @@ describe 'Special Rules' do
       @n_fert = create(:question, code: 'N_FERT', section: @section, question_type: Question::TYPE_INTEGER)
       @n_ivf = create(:question, code: 'N_IVF', section: @section, question_type: Question::TYPE_INTEGER)
       @n_icsi = create(:question, code: 'N_ICSI', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_comp2', question: @n_fert, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_comp2', question: @n_fert, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -216,7 +218,7 @@ describe 'Special Rules' do
       create(:answer, question: @n_ivf, answer_value: 1, response: @response)
       create(:answer, question: @n_icsi, answer_value: 1, response: @response)
       answer.reload
-      expect(@cqv.check(answer)).to eq('My error message')
+      expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
     end
   end
 
@@ -236,7 +238,7 @@ describe 'Special Rules' do
       @n_clfz_v = create(:question, code: 'N_CLFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
       @n_blfz_s = create(:question, code: 'N_BLFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
       @n_blfz_v = create(:question, code: 'N_BLFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_comp3', question: @n_s_clth, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_comp3', question: @n_s_clth, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -382,7 +384,7 @@ describe 'Special Rules' do
         create(:answer, question: @n_blfz_s, answer_value: 1, response: @response)
         create(:answer, question: @n_blfz_v, answer_value: 1, response: @response)
         answer.reload
-        expect(@cqv.check(answer)).to eq('My error message')
+        expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
       end
     end
   end
@@ -396,7 +398,7 @@ describe 'Special Rules' do
       @n_bl_et = create(:question, code: 'N_BL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @n_cl_et = create(:question, code: 'N_CL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @iui_date = create(:question, code: 'IUI_DATE', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_pr_clin', question: @pr_clin, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_pr_clin', question: @pr_clin, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -421,14 +423,14 @@ describe 'Special Rules' do
         end
 
         it 'should fail when neither n_bl_et, n_cl_et or iui_date is answered' do
-          expect(@cqv.check(@answer)).to eq('My error message')
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
 
         it 'should fail when neither n_bl_et or n_cl_et is greater than 0 and iui_date is unanswered' do
           create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
           create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
           @answer.reload
-          expect(@cqv.check(@answer)).to eq('My error message')
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
 
         it 'should pass when n_bl_et > 0' do
@@ -460,7 +462,7 @@ describe 'Special Rules' do
       @pr_end_dt = create(:question, code: 'PR_END_DT', section: @section, question_type: Question::TYPE_DATE)
       @iui_date = create(:question, code: 'IUI_DATE', section: @section, question_type: Question::TYPE_DATE)
       @n_deliv = create(:question, code: 'N_DELIV', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_iui_date', question: @n_deliv, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_iui_date', question: @n_deliv, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -503,7 +505,7 @@ describe 'Special Rules' do
         create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
         create(:answer, question: @iui_date, answer_value: '2013-01-01', response: @response)
         answer.reload
-        expect(@cqv.check(answer)).to eq('My error message')
+        expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       it 'should pass if n_deliv is present' do
@@ -524,7 +526,7 @@ describe 'Special Rules' do
       @pr_end_dt = create(:question, code: 'PR_END_DT', section: @section, question_type: Question::TYPE_DATE)
       @et_date = create(:question, code: 'ET_DATE', section: @section, question_type: Question::TYPE_DATE)
       @n_deliv = create(:question, code: 'N_DELIV', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_et_date', question: @n_deliv, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_gest_et_date', question: @n_deliv, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -567,7 +569,7 @@ describe 'Special Rules' do
         create(:answer, question: @pr_end_dt, answer_value: '2013-05-22', response: @response) # 20 week + 1 day difference
         create(:answer, question: @et_date, answer_value: '2013-01-01', response: @response)
         answer.reload
-        expect(@cqv.check(answer)).to eq('My error message')
+        expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       it 'should pass if n_deliv is present' do
@@ -591,7 +593,7 @@ describe 'Special Rules' do
       @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @don_age = create(:question, code: 'DON_AGE', section: @section, question_type: Question::TYPE_INTEGER)
       @thaw_don = create(:question, code: 'THAW_DON', section: @section, question_type: Question::TYPE_CHOICE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_thaw_don', question: @thaw_don, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_thaw_don', question: @thaw_don, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -671,7 +673,7 @@ describe 'Special Rules' do
         end
 
         it 'should fail if thaw_don is not complete' do
-          expect(@cqv.check(@answer)).to eq('My error message')
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
       end
     end
@@ -699,7 +701,7 @@ describe 'Special Rules' do
       @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
       @don_age = create(:question, code: 'DON_AGE', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_surr', question: @don_age, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_surr', question: @don_age, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -780,7 +782,7 @@ describe 'Special Rules' do
         end
 
         it 'should fail when don_age is not present' do
-          expect(@cqv.check(@answer)).to eq('My error message')
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
       end
     end
@@ -805,7 +807,7 @@ describe 'Special Rules' do
       @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
       @cyc_date = create(:question, code: 'CYC_DATE', section: @section, question_type: Question::TYPE_DATE)
       @fdob = create(:question, code: 'FDOB', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_mtage', question: @n_embdisp, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_mtage', question: @n_embdisp, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -847,7 +849,7 @@ describe 'Special Rules' do
         create(:answer, question: @cyc_date, answer_value: '2017-12-31', response: @response)
         create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
         @answer.reload
-        expect(@cqv.check(@answer)).to eq('My error message')
+        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       it 'should fail when cyc_date-fdob is > 55 years' do
@@ -855,7 +857,7 @@ describe 'Special Rules' do
         create(:answer, question: @cyc_date, answer_value: '2056-01-01', response: @response)
         create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
         @answer.reload
-        expect(@cqv.check(@answer)).to eq('My error message')
+        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       describe 'when cyc_date-fdob is ≥ 18 years & <= 55 years' do
@@ -892,7 +894,7 @@ describe 'Special Rules' do
       @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
       @cyc_date = create(:question, code: 'CYC_DATE', section: @section, question_type: Question::TYPE_DATE)
       @fdob = create(:question, code: 'FDOB', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_mtagedisp', question: @n_embdisp, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_mtagedisp', question: @n_embdisp, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -934,7 +936,7 @@ describe 'Special Rules' do
         create(:answer, question: @cyc_date, answer_value: '2017-12-31', response: @response)
         create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
         @answer.reload
-        expect(@cqv.check(@answer)).to eq('My error message')
+        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       it 'should fail when cyc_date-fdob is > 70 years' do
@@ -942,7 +944,7 @@ describe 'Special Rules' do
         create(:answer, question: @cyc_date, answer_value: '2071-01-01', response: @response)
         create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
         @answer.reload
-        expect(@cqv.check(@answer)).to eq('My error message')
+        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       describe 'when cyc_date-fdob is ≥ 18 years & <= 70 years' do
@@ -978,7 +980,7 @@ describe 'Special Rules' do
       @et_date = create(:question, code: 'ET_DATE', section: @section, question_type: Question::TYPE_DATE)
       @n_cl_et = create(:question, code: 'N_CL_ET', section: @section, question_type: Question::TYPE_INTEGER)
       @n_bl_et = create(:question, code: 'N_BL_ET', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_et_date', question: @et_date, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_et_date', question: @et_date, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -996,7 +998,7 @@ describe 'Special Rules' do
       end
 
       it 'should fail when neither n_cl_et or n_bl_et is answered' do
-        expect(@cqv.check(@answer)).to eq('My error message')
+        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       describe 'when n_cl_et is answered and n_bl_et is unanswered' do
@@ -1015,7 +1017,7 @@ describe 'Special Rules' do
         it 'should fail when n_cl_et < 0' do
           create(:answer, question: @n_cl_et, answer_value: -1, response: @response)
           @answer.reload
-          expect(@cqv.check(@answer)).to eq('My error message')
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
       end
 
@@ -1035,7 +1037,7 @@ describe 'Special Rules' do
         it 'should fail when n_bl_et < 0' do
           create(:answer, question: @n_bl_et, answer_value: -1, response: @response)
           @answer.reload
-          expect(@cqv.check(@answer)).to eq('My error message')
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
       end
     end
@@ -1049,7 +1051,7 @@ describe 'Special Rules' do
       @stim_1st = create(:question, code: 'STIM_1ST', section: @section, question_type: Question::TYPE_CHOICE)
       @opu_date = create(:question, code: 'OPU_DATE', section: @section, question_type: Question::TYPE_DATE)
       @can_date = create(:question, code: 'CAN_DATE', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_stim_1st', question: @stim_1st, error_message: 'My error message', related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_stim_1st', question: @stim_1st, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -1073,7 +1075,7 @@ describe 'Special Rules' do
       end
 
       it 'should fail if neither opu_date or can_date is answered' do
-        expect(@cqv.check(@answer)).to eq('My error message')
+        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
       end
 
       it 'should pass if opu_date is answered' do
