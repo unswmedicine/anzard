@@ -312,7 +312,7 @@ class SpecialRules
       n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
       n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
 
-      break true unless cycle_type == '7'
+      break true unless cycle_type == 7
       (n_embrec_fresh + n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0
     }
 
@@ -326,7 +326,7 @@ class SpecialRules
       n_bl_et = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET')
       n_cl_et = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET')
 
-      break true unless surr == 'y' && cycle_type != '7'
+      break true unless surr == 'y' && cycle_type != 7
       et_date.nil? && (n_bl_et + n_cl_et) == 0
     }
 
@@ -339,7 +339,7 @@ class SpecialRules
       parent_sex = answer.response.comparable_answer_or_nil_for_question_with_code('PARENT_SEX')
 
       break true unless surr == 'n' && !fdob_non_pat.nil?
-      parent_sex == '3'
+      parent_sex == 3
     }
 
     CrossQuestionValidation.register_checker 'special_rule_surr_5', lambda { |answer, ununused_related_answer, checker_params|
@@ -352,7 +352,7 @@ class SpecialRules
       cycle_type = answer.response.comparable_answer_or_nil_for_question_with_code('CYCLE_TYPE')
 
       break true unless surr == 'y' && !fdob_non_pat.nil?
-      ['1', '2', '3'].include?(parent_sex) && cycle_type == '6'
+      [1, 2, 3].include?(parent_sex) && cycle_type == 6
     }
 
     CrossQuestionValidation.register_checker 'special_rule_cycletype_2_don', lambda { |answer, ununused_related_answer, checker_params|
@@ -367,7 +367,7 @@ class SpecialRules
       n_egfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
       n_egfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
 
-      break true unless cycle_type == '2' && n_eggrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0
+      break true unless cycle_type == 2 && n_eggrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0
       n_eggdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0
     }
 
