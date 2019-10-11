@@ -24,4 +24,5 @@
  *       Additional stylesheets are applied after original_rails3_styling to preserve some modularisation.
  *= require original_rails3_styling
  *= require anzard
+ *= require bootstrap-overrides
 */
