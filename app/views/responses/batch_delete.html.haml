@@ -28,9 +28,9 @@
             - @errors.each do |msg|
               %li= msg
       .clearfix
-        = label_tag :registration_type, "Treatment Data"
+        = label_tag :treatment_data, "Treatment Data"
         .input
-          = select_tag :registration_type, options_from_collection_for_select(surveys, :id, :name, @registration_type_id), {class: "large", prompt: "Please select"}
+          = select_tag :treatment_data, options_from_collection_for_select(surveys, :id, :name, @treatment_data_id), {class: "large", prompt: "Please select"}
           = required
       .clearfix
         = label_tag :year_of_registration, "Year of Treatment"

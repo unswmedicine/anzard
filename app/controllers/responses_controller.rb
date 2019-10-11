@@ -136,7 +136,7 @@ class ResponsesController < ApplicationController
     @year_of_registration = params[:year_of_registration]
 
     if @survey_id.blank?
-      @errors = ["Please select a registration type"]
+      @errors = ["Please select a treatment data"]
       render :prepare_download
     else
       generator = CsvGenerator.new(@survey_id, @unit_code, @site_code, @year_of_registration)
@@ -160,17 +160,17 @@ class ResponsesController < ApplicationController
 
   def confirm_batch_delete
     @year = params[:year_of_registration] || ""
-    @registration_type_id = params[:registration_type] || ""
+    @treatment_data_id = params[:treatment_data] || ""
     @clinic_id = params[:clinic_id] || ""
 
-    @errors = validate_batch_delete_form(@year, @registration_type_id)
+    @errors = validate_batch_delete_form(@year, @treatment_data_id)
     if @errors.empty?
-      @registration_type = SURVEYS[@registration_type_id.to_i]
+      @treatment_data = SURVEYS[@treatment_data_id.to_i]
       @clinic_site_code_name = ""
       unless @clinic_id.blank?
         @clinic_site_code_name = Clinic.find(@clinic_id).site_name_with_code
       end
-      @count = Response.count_per_survey_and_year_of_registration_and_clinic(@registration_type_id, @year, @clinic_id)
+      @count = Response.count_per_survey_and_year_of_registration_and_clinic(@treatment_data_id, @year, @clinic_id)
     else
       batch_delete
       render :batch_delete
@@ -179,12 +179,12 @@ class ResponsesController < ApplicationController
 
   def perform_batch_delete
     @year = params[:year_of_registration] || ""
-    @registration_type_id = params[:registration_type] || ""
+    @treatment_data_id = params[:treatment_data] || ""
     @clinic_id = params[:clinic_id] || ""
 
-    @errors = validate_batch_delete_form(@year, @registration_type_id)
+    @errors = validate_batch_delete_form(@year, @treatment_data_id)
     if @errors.empty?
-      Response.delete_by_survey_and_year_of_registration_and_clinic(@registration_type_id, @year, @clinic_id)
+      Response.delete_by_survey_and_year_of_registration_and_clinic(@treatment_data_id, @year, @clinic_id)
       redirect_to batch_delete_responses_path, :notice => 'The records were deleted'
     else
       redirect_to batch_delete_responses_path
@@ -212,7 +212,7 @@ class ResponsesController < ApplicationController
   def validate_batch_delete_form(year, survey_id)
     errors = []
     errors << "Please select a year of registration" if year.blank?
-    errors << "Please select a registration type" if survey_id.blank?
+    errors << "Please select a treatment data" if survey_id.blank?
     errors
   end
 

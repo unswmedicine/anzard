@@ -22,11 +22,11 @@ en:
   activerecord:
     attributes:
       response:
-        survey_id: 'Registration type'
+        survey_id: 'Treatment data'
         cycle_id: 'Cycle ID'
       batch_file:
         file_file_name: 'File'
-        survey_id: 'Registration type'
+        survey_id: 'Treatment data'
     errors:
       models:
         response:
