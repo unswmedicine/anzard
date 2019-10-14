@@ -202,6 +202,40 @@ class ResponsesController < ApplicationController
     send_data index_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'responses.csv'
   end
 
+  def download_submission_summary
+    submission_summary = CSV.generate(:col_sep => ",") do |csv|
+      csv.add_row %w(Treatment\ Data Year\ of\ Treatment Unit\ Name Site\ Number Status Records)
+      submission_summary_data.each do |summary|
+        csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
+                     summary[:num_records]]
+      end
+    end
+    send_data submission_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'submission_summary.csv'
+  end
+
+  def submission_summary_data
+    submissions = []
+    SURVEYS.values.each do |survey|
+      stats = StatsReport.new(survey)
+      unless stats.empty?
+        stats.years.each do |year|
+          Clinic.order(:unit_code, :site_code).each do |clinic|
+            [{name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
+             {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}].each do |status|
+              num_records = stats.response_count(year, status[:name], clinic.id)
+              unless num_records == 'none'
+                submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
+                                  site_code: clinic.site_code, status: status[:str], num_records: num_records})
+              end
+            end
+          end
+        end
+      end
+    end
+    submissions
+  end
+  helper_method :submission_summary_data
+
   private
 
   def organised_cycle_ids(user)
