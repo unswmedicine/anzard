@@ -33,19 +33,11 @@
       %th Status
       %th Records
     %tbody
-      - surveys.each do |survey|
-        - stats = StatsReport.new(survey)
-        - unless stats.empty?
-          - stats.years.each do |year|
-            - Clinic.order(:unit_code, :site_code).each do |clinic|
-              - [{name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
-                 {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}].each do |status|
-                - num_stats = stats.response_count(year, status[:name], clinic.id)
-                - unless num_stats == 'none'
-                  %tr
-                    %td= survey.name
-                    %td= year
-                    %td= clinic.unit_name
-                    %td= clinic.site_code
-                    %td= status[:str]
-                    %td= num_stats
+      - submission_summary_data.each do |summary|
+        %tr
+          %td= summary[:survey_name]
+          %td= summary[:year]
+          %td= summary[:unit_name]
+          %td= summary[:site_code]
+          %td= summary[:status]
+          %td= summary[:num_records]
