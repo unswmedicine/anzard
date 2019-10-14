@@ -191,6 +191,17 @@ class ResponsesController < ApplicationController
     end
   end
 
+  def download_index_summary
+    index_summary = CSV.generate(:col_sep => ",") do |csv|
+      csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment Created\ By Status Date\ Started)
+      Response.accessible_by(current_ability).unsubmitted.order("cycle_id").each do |response|
+        csv.add_row [response.cycle_id, response.survey.name, response.year_of_registration, response.user.full_name,
+                     response.validation_status, response.created_at]
+      end
+    end
+    send_data index_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'responses.csv'
+  end
+
   private
 
   def organised_cycle_ids(user)

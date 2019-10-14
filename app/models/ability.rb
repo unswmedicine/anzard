@@ -61,6 +61,7 @@ class Ability
         can :get_active_sites, User
 
         can :read, Response
+        can :download_index_summary, Response
         can :submission_summary, Response
         can :download, Response
         can :get_sites, Response
@@ -84,26 +85,28 @@ class Ability
 
       when Role::DATA_PROVIDER
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :download_index_summary, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :new, Response
         can :create, Response, clinic_id: user.clinic_ids
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
 
         can :read, BatchFile, clinic_id: user.clinic_ids
+        can :download_index_summary, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile
-        can :download_index_summary, BatchFile, clinic_id: user.clinic_ids
 
       when Role::DATA_PROVIDER_SUPERVISOR
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :download_index_summary, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :new, Response
         can :create, Response, clinic_id: user.clinic_ids
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :destroy, Response, clinic_id: user.clinic_ids
 
         can :read, BatchFile, clinic_id: user.clinic_ids
+        can :download_index_summary, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile
-        can :download_index_summary, BatchFile, clinic_id: user.clinic_ids
       else
         raise "Unknown role #{user.role.name}"
     end

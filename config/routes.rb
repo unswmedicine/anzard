@@ -29,6 +29,7 @@ Anzard::Application.routes.draw do
       post :submit
     end
     collection do
+      get :download_index_summary
       get :submission_summary
       get :prepare_download
       get :download

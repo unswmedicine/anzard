@@ -21,6 +21,8 @@
 
 %div{class: "centered_wrapper"}
   = link_to "Start New Data Entry Form", new_response_path, class: 'btn' if can?(:create, Response)
+  - if not @responses.blank?
+    = link_to "Download Summary", download_index_summary_responses_path, class: 'btn'
 
 %h2 Data Entry Forms In Progress
 - if @responses.blank?
