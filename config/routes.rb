@@ -59,6 +59,10 @@ Anzard::Application.routes.draw do
   end
 
   resources :batch_files, :only => [:new, :create, :index] do
+    collection do
+      get :download_index_summary
+    end
+
     member do
       get :summary_report
       get :detail_report

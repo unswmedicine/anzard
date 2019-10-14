@@ -65,6 +65,18 @@ class BatchFilesController < ApplicationController
     send_file @batch_file.detail_report_path, :type => 'text/csv', :disposition => 'attachment', :filename => "detail-report.csv"
   end
 
+  def download_index_summary
+    index_summary = CSV.generate(:col_sep => ",") do |csv|
+      csv.add_row %w(Treatment\ Data Year\ of\ Treatment Unit\ Name Site\ Number Filename Records Created\ By Date\ Uploaded Status Summary)
+      @batch_files.order("created_at DESC").each do |batch_file|
+        csv.add_row [batch_file.survey.name, batch_file.year_of_registration, batch_file.clinic.unit_name,
+                     batch_file.clinic.site_code, batch_file.file_file_name, batch_file.record_count,
+                     batch_file.user.full_name, batch_file.created_at, batch_file.status, batch_file.message]
+      end
+    end
+    send_data index_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'batch_files.csv'
+  end
+
   private
 
   def create_params
