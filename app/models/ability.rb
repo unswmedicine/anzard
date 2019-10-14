@@ -63,6 +63,7 @@ class Ability
         can :read, Response
         can :download_index_summary, Response
         can :submission_summary, Response
+        can :download_submission_summary, Response
         can :download, Response
         can :get_sites, Response
         can :batch_delete, Response

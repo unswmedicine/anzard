@@ -202,6 +202,34 @@ class ResponsesController < ApplicationController
     send_data index_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'responses.csv'
   end
 
+  def download_submission_summary
+    submissions = []
+    SURVEYS.values.each do |survey|
+      stats = StatsReport.new(survey)
+      unless stats.empty?
+        stats.years.each do |year|
+          Clinic.order(:unit_code, :site_code).each do |clinic|
+            [{name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
+             {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}].each do |status|
+              num_stats = stats.response_count(year, status[:name], clinic.id)
+              unless num_stats == 'none'
+                submissions.push([survey.name, year, clinic.unit_name, clinic.site_code, status[:str], num_stats])
+              end
+            end
+          end
+        end
+      end
+    end
+
+    submission_summary = CSV.generate(:col_sep => ",") do |csv|
+      csv.add_row %w(Treatment\ Data Year\ of\ Treatment Unit\ Name Site\ Number Status Records)
+      submissions.each do |summary|
+        csv.add_row summary
+      end
+    end
+    send_data submission_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'submission_summary.csv'
+  end
+
   private
 
   def organised_cycle_ids(user)

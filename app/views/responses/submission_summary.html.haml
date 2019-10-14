@@ -19,6 +19,10 @@
 
 - title 'Submission Summary', false, true
 
+%div{class: "centered_wrapper"}
+  - if not @responses.blank?
+    = link_to "Download Summary", download_submission_summary_responses_path, class: 'btn'
+
 %table#submission_summary.bordered-table
   %thead
     %tr
@@ -36,12 +40,12 @@
             - Clinic.order(:unit_code, :site_code).each do |clinic|
               - [{name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
                  {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}].each do |status|
-                - num_status = stats.response_count(year, status[:name], clinic.id)
-                - unless num_status == 'none'
+                - num_stats = stats.response_count(year, status[:name], clinic.id)
+                - unless num_stats == 'none'
                   %tr
                     %td= survey.name
                     %td= year
                     %td= clinic.unit_name
                     %td= clinic.site_code
                     %td= status[:str]
-                    %td= num_status
+                    %td= num_stats
