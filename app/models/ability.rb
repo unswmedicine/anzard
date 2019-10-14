@@ -68,6 +68,7 @@ class Ability
         can :confirm_batch_delete, Response
         can :perform_batch_delete, Response
         can :read, BatchFile
+        can :download_index_summary, BatchFile
 
         can :manage, ConfigurationItem
 
@@ -90,6 +91,7 @@ class Ability
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile
+        can :download_index_summary, BatchFile, clinic_id: user.clinic_ids
 
       when Role::DATA_PROVIDER_SUPERVISOR
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
@@ -101,6 +103,7 @@ class Ability
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :new, BatchFile
         can :create, BatchFile
+        can :download_index_summary, BatchFile, clinic_id: user.clinic_ids
       else
         raise "Unknown role #{user.role.name}"
     end

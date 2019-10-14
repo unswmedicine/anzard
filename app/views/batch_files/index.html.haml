@@ -24,6 +24,7 @@
     = link_to "Upload Batch File", new_batch_file_path, class: 'btn'
   - if !@batch_files.blank?
     = link_to "Refresh Status", batch_files_path, class: 'btn'
+    = link_to "Download Summary", download_index_summary_batch_files_path, class: 'btn'
 
 - if @batch_files.blank?
   %p There are no batch files to show.
