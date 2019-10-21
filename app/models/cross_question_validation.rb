@@ -39,6 +39,8 @@ class CrossQuestionValidation < ApplicationRecord
   validate { |cqv| SpecialRules.additional_cqv_validation(cqv) }
   validates_presence_of :rule
   validates_presence_of :error_message
+  validates_length_of :error_message, maximum: 500
+
   validate do |cqv|
     # return true/false if it passed/failed 
     if cqv.rule == 'comparison'

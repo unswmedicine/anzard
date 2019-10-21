@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180523060214) do
+ActiveRecord::Schema.define(version: 20191011113514) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(version: 20180523060214) do
     t.integer "question_id"
     t.integer "related_question_id"
     t.string  "rule"
-    t.string  "error_message"
+    t.text    "error_message",            limit: 65535
     t.string  "operator"
     t.string  "constant"
     t.string  "set_operator"
