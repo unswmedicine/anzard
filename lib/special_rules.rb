@@ -380,13 +380,13 @@ class SpecialRules
 
       cycle_type = answer.response.comparable_answer_or_nil_for_question_with_code('CYCLE_TYPE')
       n_eggdon_fresh = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGDON_FRESH')
-      n_efgz_s = answer.response.comparable_answer_or_nil_for_question_with_code('N_EFGZ_S')
+      n_egfz_s = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
       n_egfz_v = answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
       n_eggrec_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGREC_FRESH')
       n_s_egth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_EGTH')
       n_v_egth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_EGTH')
 
-      break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_efgz_s == 0 && n_egfz_v == 0
+      break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0
       n_eggrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0
     }
 
