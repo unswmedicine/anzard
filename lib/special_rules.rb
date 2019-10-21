@@ -27,6 +27,7 @@ class SpecialRules
     special_rule_gest_et_date
     special_rule_thaw_don
     special_rule_surr
+    special_rule_thaw_1
   )
 
   RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES = {
@@ -50,7 +51,8 @@ class SpecialRules
     'special_rule_surr_5' => 'SURR',
     'special_rule_cycletype_2_don' => 'CYCLE_TYPE',
     'special_rule_cycletype_2_rec' => 'CYCLE_TYPE',
-    'special_rule_ttc' => 'PARENT_SEX'
+    'special_rule_ttc' => 'PARENT_SEX',
+    'special_rule_thaw_1' => 'N_V_EGTH'
   }
 
   def self.additional_cqv_validation(cqv)
@@ -90,6 +92,7 @@ class SpecialRules
       special_rule_cycletype_2_don
       special_rule_cycletype_2_rec
       special_rule_ttc
+      special_rule_thaw_1
     )
 
     CrossQuestionValidation.register_checker 'special_dob', lambda { |answer, unused_related_answer, checker_params|
@@ -397,6 +400,23 @@ class SpecialRules
 
       break true unless parent_sex == 1 && stim_1st == 'y'
       !date_ttc.nil?
+    }
+
+    CrossQuestionValidation.register_checker 'special_rule_thaw_1', lambda { |answer, ununused_related_answer, checker_params|
+      # special_rule_thaw_1: (n_v_egth + n_s_egth + n_eggs + n_eggrec_fresh) >= (n_eggdon_fresh + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+      raise 'Can only be used on question N_V_EGTH' unless answer.question.code == 'N_V_EGTH'
+
+      n_v_egth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_EGTH')
+      n_s_egth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_EGTH')
+      n_eggs = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGS')
+      n_eggrec_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGREC_FRESH')
+      n_eggdon_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGGDON_FRESH')
+      n_ivf = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+      n_icsi = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
+      n_egfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
+      n_egfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
+
+      (n_v_egth + n_s_egth + n_eggs + n_eggrec_fresh) >= (n_eggdon_fresh + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
     }
   end
 

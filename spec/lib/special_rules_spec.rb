@@ -1841,4 +1841,147 @@ describe 'Special Rules' do
       end
     end
   end
+
+  describe 'RULE: special_rule_thaw_1' do
+    # special_rule_thaw_1: (n_v_egth + n_s_egth + n_eggs + n_eggrec_fresh) >= (n_eggdon_fresh + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+    before(:each) do
+      @survey = create(:survey)
+      @section = create(:section, survey: @survey)
+      @n_v_egth = create(:question, code: 'N_V_EGTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_s_egth = create(:question, code: 'N_S_EGTH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_eggs = create(:question, code: 'N_EGGS', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_eggrec_fresh = create(:question, code: 'N_EGGREC_FRESH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_eggdon_fresh = create(:question, code: 'N_EGGDON_FRESH', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_ivf = create(:question, code: 'N_IVF', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_icsi = create(:question, code: 'N_ICSI', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_egfz_s = create(:question, code: 'N_EGFZ_S', section: @section, question_type: Question::TYPE_INTEGER)
+      @n_egfz_v = create(:question, code: 'N_EGFZ_V', section: @section, question_type: Question::TYPE_INTEGER)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_thaw_1', question: @n_v_egth, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
+      @response = create(:response, survey: @survey)
+    end
+
+    it 'should raise an error if used on the wrong question' do
+      q = create(:question, code: 'Blah')
+      cqv = build(:cross_question_validation, rule: 'special_rule_thaw_1', question: q)
+      expect(cqv.valid?).to be false
+      expect(cqv.errors[:base]).to eq ['special_rule_thaw_1 requires question code N_V_EGTH but got Blah']
+    end
+
+    it 'should apply even when N_V_EGTH is not answered' do
+      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_thaw_1')
+    end
+
+    it 'should pass when no questions are answered' do
+      answer = create(:answer, question: @n_v_egth, answer_value: nil, response: @response)
+      answer.reload
+      expect(@cqv.check(answer)).to be_nil
+    end
+
+    describe 'when only one question is answered' do
+      it 'should pass when N_V_EGTH is the only question answered' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      describe 'when N_V_EGTH is unanswered' do
+        before :each do
+          @answer = create(:answer, question: @n_v_egth, answer_value: nil, response: @response)
+          @answer.reload
+        end
+
+        it 'should pass when only N_S_EGTH is answered' do
+          create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGGS is answered' do
+          create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGGREC_FRESH is answered' do
+          create(:answer, question: @n_eggrec_fresh, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGGDON_FRESH is answered' do
+          create(:answer, question: @n_eggdon_fresh, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_IVF is answered' do
+          create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_ICSI is answered' do
+          create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGFZ_S is answered' do
+          create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+
+        it 'should pass when only N_EGFZ_V is answered' do
+          create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+          @answer.reload
+          expect(@cqv.check(@answer)).to be_nil
+        end
+      end
+    end
+
+    describe 'when all questions are answered' do
+      it 'should pass when n_v_egth sum equal to n_eggdon_fresh sum' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggrec_fresh, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggdon_fresh, answer_value: 0, response: @response)
+        create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+        create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      it 'should pass when n_v_egth sum greater than n_eggdon_fresh sum' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 1, response: @response)
+        create(:answer, question: @n_s_egth, answer_value: 1, response: @response)
+        create(:answer, question: @n_eggs, answer_value: 1, response: @response)
+        create(:answer, question: @n_eggrec_fresh, answer_value: 1, response: @response)
+        create(:answer, question: @n_eggdon_fresh, answer_value: 0, response: @response)
+        create(:answer, question: @n_ivf, answer_value: 0, response: @response)
+        create(:answer, question: @n_icsi, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_s, answer_value: 0, response: @response)
+        create(:answer, question: @n_egfz_v, answer_value: 0, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to be_nil
+      end
+
+      it 'should fail when n_v_egth sum less than n_eggdon_fresh sum' do
+        answer = create(:answer, question: @n_v_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_s_egth, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggs, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggrec_fresh, answer_value: 0, response: @response)
+        create(:answer, question: @n_eggdon_fresh, answer_value: 1, response: @response)
+        create(:answer, question: @n_ivf, answer_value: 1, response: @response)
+        create(:answer, question: @n_icsi, answer_value: 1, response: @response)
+        create(:answer, question: @n_egfz_s, answer_value: 1, response: @response)
+        create(:answer, question: @n_egfz_v, answer_value: 1, response: @response)
+        answer.reload
+        expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
+      end
+    end
+  end
 end
