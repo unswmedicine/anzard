@@ -973,7 +973,7 @@ describe 'Special Rules' do
   end
 
   describe 'Rule: special_rule_et_date' do
-    # special_rule_et_date: if et_date is a date, n_cl_et must be >=0 | n_bl_et must be >=0
+    # special_rule_et_date: if et_date is a date, n_cl_et must be >0 | n_bl_et must be >0
     before :each do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
@@ -1008,10 +1008,10 @@ describe 'Special Rules' do
           expect(@cqv.check(@answer)).to be_nil
         end
 
-        it 'should pass if n_cl_et == 0' do
+        it 'should rail when n_cl_et == 0' do
           create(:answer, question: @n_cl_et, answer_value: 0, response: @response)
           @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
 
         it 'should fail when n_cl_et < 0' do
@@ -1028,10 +1028,10 @@ describe 'Special Rules' do
           expect(@cqv.check(@answer)).to be_nil
         end
 
-        it 'should pass if n_bl_et == 0' do
+        it 'should fail if n_bl_et == 0' do
           create(:answer, question: @n_bl_et, answer_value: 0, response: @response)
           @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
+          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
         end
 
         it 'should fail when n_bl_et < 0' do
