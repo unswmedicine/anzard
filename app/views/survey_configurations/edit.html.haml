@@ -14,11 +14,23 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-= tabs_tag(builder: MenuTabBuilder, namespace: :admin_navigation) do |tab|
-  %ul.tabs
-    = tab.users 'Current Users', admin_users_path
-    = tab.access_requests 'Access Requests', access_requests_admin_users_path
-    = tab.year_of_registration 'Year of Treatment Configuration', edit_year_of_registration_configuration_items_path
-    = tab.survey_configuration 'Survey Configuration', survey_configurations_path
-    = tab.delete_responses 'Delete Responses', batch_delete_responses_path
-    = tab.clinics 'Clinics', clinics_path
+- title 'Edit Survey Configuration'
+
+= form_for(@survey_configuration, url: survey_configuration_path(@survey_configuration)) do |f|
+  = render 'shared/error_messages', target: @survey_configuration
+  = fields_for :survey, @survey_configuration.survey do |fs|
+    .clearfix
+      = fs.label :name, 'Treatment Data'
+      .input
+        = fs.text_field :name, disabled: true
+  .clearfix
+    = f.label :start_year_of_registration, 'Start Year'
+    .input
+      = f.text_field :start_year_of_registration
+  .clearfix
+    = f.label :end_year_of_registration, 'End Year'
+    .input
+      = f.text_field :end_year_of_registration
+  .actions
+    = f.submit 'Save', class: 'btn primary'
+    = link_to 'Back', survey_configurations_path, class: 'btn'
