@@ -236,6 +236,15 @@ class ResponsesController < ApplicationController
   end
   helper_method :submission_summary_data
 
+  def treatment_data_for_year
+    survey_configs = SurveyConfiguration.where('start_year_of_registration <= ? and end_year_of_registration >= ?', params['year'], params['year'])
+    surveys = []
+    survey_configs.each do |survey_config|
+      surveys << { 'form_id': survey_config.survey.id, 'form_name': survey_config.survey.name }
+    end
+    render json: surveys
+  end
+
   private
 
   def organised_cycle_ids(user)
