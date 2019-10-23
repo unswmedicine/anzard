@@ -74,7 +74,6 @@ module CsvSurveyOperations
 
   def create_survey(name, question_file, options_file=nil, cross_question_validations_file=nil)
     ActiveRecord::Base.transaction do
-
       survey = Survey.create!(name: name)
 
       questions = read_hashes_from_csv(question_file)
@@ -88,6 +87,8 @@ module CsvSurveyOperations
         cqv_hashes = read_hashes_from_csv(cross_question_validations_file)
         import_cross_question_validations(survey, cqv_hashes)
       end
+
+      SurveyConfiguration.create!(survey: survey)
       StaticModelPreloader.load
       survey
     end
