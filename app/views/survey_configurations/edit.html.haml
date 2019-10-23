@@ -17,6 +17,7 @@
 - title 'Edit Survey Configuration'
 
 = form_for(@survey_configuration, url: survey_configuration_path(@survey_configuration)) do |f|
+  -#ToDo: Investigate why full errors aren't being shown by partial
   = render 'shared/error_messages', target: @survey_configuration
   = fields_for :survey, @survey_configuration.survey do |fs|
     .clearfix

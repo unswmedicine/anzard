@@ -17,8 +17,8 @@
 class SurveyConfiguration < ApplicationRecord
   belongs_to :survey
 
-  validates :start_year_of_registration, numericality: {:less_than => 2100, greater_than: 1900}, allow_nil: true
-  validates :end_year_of_registration, numericality: {:less_than => 2100, greater_than: 1900}, allow_nil: true
+  validates :start_year_of_registration, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
+  validates :end_year_of_registration, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
   validate :both_years_provided
   validate :start_year_before_end_year
 
