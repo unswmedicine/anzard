@@ -29,8 +29,8 @@
     - @survey_configurations.each do |survey_configuration|
       %tr
         %td= survey_configuration.survey.name
-        %td= survey_configuration.start_year_of_registration
-        %td= survey_configuration.end_year_of_registration
+        %td= survey_configuration.start_year_of_treatment
+        %td= survey_configuration.end_year_of_treatment
         %td
           - if can?(:edit, survey_configuration)
             = link_to 'Edit', edit_survey_configuration_path(survey_configuration), id: "edit_survey_configuration_#{survey_configuration.id}", class: 'btn'
