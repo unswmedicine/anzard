@@ -94,6 +94,7 @@ class Ability
         can :new, Response
         can :create, Response, clinic_id: user.clinic_ids
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
+        can :treatment_data_for_year, Response
 
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :download_index_summary, BatchFile, clinic_id: user.clinic_ids
@@ -107,6 +108,7 @@ class Ability
         can :create, Response, clinic_id: user.clinic_ids
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :destroy, Response, clinic_id: user.clinic_ids
+        can :treatment_data_for_year, Response
 
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :download_index_summary, BatchFile, clinic_id: user.clinic_ids

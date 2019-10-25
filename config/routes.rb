@@ -38,6 +38,7 @@ Anzard::Application.routes.draw do
       get :batch_delete
       put :confirm_batch_delete
       put :perform_batch_delete
+      get :treatment_data_for_year
     end
   end
 

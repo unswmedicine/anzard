@@ -27,7 +27,7 @@
     .clearfix
       = f.label :survey_id, "Treatment Data"
       .input
-        = f.collection_select :survey_id, surveys, :id, :name, {:include_blank => "Please select"}, {:class => "large"}
+        = f.select :survey_id, [], {include_blank: "No data for selected year"}, {class: 'large'}
         = required
     .clearfix
       = label_tag 'unit', 'Unit'
