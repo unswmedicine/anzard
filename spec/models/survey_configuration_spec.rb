@@ -22,7 +22,7 @@ describe SurveyConfiguration do
   end
 
   describe "Validations" do
-    it { should validate_numericality_of(:start_year_of_registration).is_greater_than(1900).is_less_than(2100).only_integer.allow_nil }
-    it { should validate_numericality_of(:end_year_of_registration).is_greater_than(1900).is_less_than(2100).only_integer.allow_nil }
+    it { should validate_numericality_of(:start_year_of_treatment).is_greater_than(1900).is_less_than(2100).only_integer.allow_nil }
+    it { should validate_numericality_of(:end_year_of_treatment).is_greater_than(1900).is_less_than(2100).only_integer.allow_nil }
   end
 end

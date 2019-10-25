@@ -18,20 +18,20 @@ class SurveyConfiguration < ApplicationRecord
   # Survey Configuration used to store survey attributes that require dynamic change since surveys are statically pre-loaded on server start
   belongs_to :survey
 
-  validates :start_year_of_registration, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
-  validates :end_year_of_registration, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
+  validates :start_year_of_treatment, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
+  validates :end_year_of_treatment, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
   validate :both_years_provided
   validate :start_year_before_end_year
 
   def start_year_before_end_year
-    unless start_year_of_registration.nil? or end_year_of_registration.nil?
-      errors.add(:start_year_of_registration, "must be less than or equal to end year of registration") unless start_year_of_registration <= end_year_of_registration
-      errors.add(:end_year_of_registration, "must be greater than or equal to start year of registration") unless start_year_of_registration <= end_year_of_registration
+    unless start_year_of_treatment.nil? or end_year_of_treatment.nil?
+      errors.add(:start_year_of_treatment, "must be less than or equal to end year of treatment") unless start_year_of_treatment <= end_year_of_treatment
+      errors.add(:end_year_of_treatment, "must be greater than or equal to start year of treatment") unless start_year_of_treatment <= end_year_of_treatment
     end
   end
 
   def both_years_provided
-    errors.add(:start_year_of_registration, "cannot be empty if a value is provided for end year of registration") if start_year_of_registration.nil? and !end_year_of_registration.nil?
-    errors.add(:end_year_of_registration, "cannot be empty if a value is provided for start year of registration") if end_year_of_registration.nil? and !start_year_of_registration.nil?
+    errors.add(:start_year_of_treatment, "cannot be empty if a value is provided for end year of treatment") if start_year_of_treatment.nil? and !end_year_of_treatment.nil?
+    errors.add(:end_year_of_treatment, "cannot be empty if a value is provided for start year of treatment") if end_year_of_treatment.nil? and !start_year_of_treatment.nil?
   end
 end

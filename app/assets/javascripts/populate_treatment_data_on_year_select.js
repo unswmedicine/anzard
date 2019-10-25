@@ -15,13 +15,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 $(window).load(function () {
-   function get_treatment_data_based_on_year($year_of_registration, $treatment_form) {
+   function get_treatment_data_based_on_year($year_of_treatment, $treatment_form) {
        $.ajax({
            type: 'GET',
            url: '/responses/treatment_data_for_year',
            dataType: 'json',
            async: true,
-           data: { year: $year_of_registration.val()},
+           data: { year: $year_of_treatment.val()},
            success: function (data) {
                let options = '';
                if (data.length === 0) {
@@ -39,29 +39,29 @@ $(window).load(function () {
        });
    }
 
-   let $new_response_registration_year = $('#new_response #response_year_of_registration');
+   let $new_response_treatment_year = $('#new_response #response_year_of_registration');
    let $new_response_treatment_form = $('#new_response #response_survey_id');
 
    // Data Entry Form - populate Treatment Data on page load such as when new response creation was invalid
-   if ($new_response_registration_year.length && $new_response_treatment_form) {
-       get_treatment_data_based_on_year($new_response_registration_year,$new_response_treatment_form);
+   if ($new_response_treatment_year.length && $new_response_treatment_form) {
+       get_treatment_data_based_on_year($new_response_treatment_year,$new_response_treatment_form);
    }
 
    // Data Entry Form - populate Treatment Data on Year of Treatment selection
-   $new_response_registration_year.change(function() {
-       get_treatment_data_based_on_year($new_response_registration_year, $new_response_treatment_form);
+   $new_response_treatment_year.change(function() {
+       get_treatment_data_based_on_year($new_response_treatment_year, $new_response_treatment_form);
    });
 
-   let $new_batch_file_registration_year = $('#new_batch_file #batch_file_year_of_registration');
+   let $new_batch_file_treatment_year = $('#new_batch_file #batch_file_year_of_registration');
    let $new_batch_file_treatment_form = $('#new_batch_file #batch_file_survey_id');
 
    // Batch File Upload - populate Treatment Data on page load such as when new batch file creation was invalid
-   if ($new_batch_file_registration_year.length && $new_batch_file_treatment_form) {
-       get_treatment_data_based_on_year($new_batch_file_registration_year, $new_batch_file_treatment_form);
+   if ($new_batch_file_treatment_year.length && $new_batch_file_treatment_form) {
+       get_treatment_data_based_on_year($new_batch_file_treatment_year, $new_batch_file_treatment_form);
    }
 
    // Data Entry Form - populate Treatment Data on Year of Treatment selection
-   $new_batch_file_registration_year.change(function() {
-       get_treatment_data_based_on_year($new_batch_file_registration_year, $new_batch_file_treatment_form);
+   $new_batch_file_treatment_year.change(function() {
+       get_treatment_data_based_on_year($new_batch_file_treatment_year, $new_batch_file_treatment_form);
    });
 });

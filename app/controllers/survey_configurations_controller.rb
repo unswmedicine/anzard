@@ -29,8 +29,8 @@ class SurveyConfigurationsController < ApplicationController
   end
 
   def update
-    @survey_configuration.start_year_of_registration = params[:survey_configuration][:start_year_of_registration]
-    @survey_configuration.end_year_of_registration = params[:survey_configuration][:end_year_of_registration]
+    @survey_configuration.start_year_of_treatment = params[:survey_configuration][:start_year_of_treatment]
+    @survey_configuration.end_year_of_treatment = params[:survey_configuration][:end_year_of_treatment]
     if @survey_configuration.save
       redirect_to survey_configurations_path, notice: "Survey configuration was successfully updated."
     else

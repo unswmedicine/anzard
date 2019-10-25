@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20191018011956) do
+ActiveRecord::Schema.define(version: 20191025021734) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -161,10 +161,10 @@ ActiveRecord::Schema.define(version: 20191018011956) do
 
   create_table "survey_configurations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "survey_id"
-    t.integer  "start_year_of_registration"
-    t.integer  "end_year_of_registration"
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.integer  "start_year_of_treatment"
+    t.integer  "end_year_of_treatment"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
     t.index ["survey_id"], name: "index_survey_configurations_on_survey_id", using: :btree
   end
 
