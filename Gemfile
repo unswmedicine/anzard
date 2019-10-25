@@ -76,7 +76,7 @@ gem "iconv"
 gem "haml"
 gem "haml-rails"
 gem "tabs_on_rails"
-gem 'devise', '~> 4.6.0'
+gem 'devise', '~> 4.7.1'
 gem "email_spec", :group => :test
 gem "cancancan"
 gem "simplecov", :require => false, :group => :test
