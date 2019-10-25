@@ -18,6 +18,7 @@ class Survey < ApplicationRecord
   has_many :responses, dependent: :destroy
   has_many :sections, -> {order(:section_order)}, dependent: :destroy
   has_many :questions, through: :sections
+  has_one :survey_configuration, dependent: :destroy
 
   scope :by_name, -> {order(:name)}
 

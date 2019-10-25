@@ -74,6 +74,10 @@ class Ability
 
         can :manage, ConfigurationItem
 
+        can :read, SurveyConfiguration
+        can :edit, SurveyConfiguration
+        can :update, SurveyConfiguration
+
         can :read, Clinic
         can :edit, Clinic
         can :update, Clinic

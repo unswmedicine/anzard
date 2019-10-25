@@ -60,6 +60,9 @@ Anzard::Application.routes.draw do
     end
   end
 
+  resources :survey_configurations, :only => [:index, :edit, :update] do
+  end
+
   resources :batch_files, :only => [:new, :create, :index] do
     collection do
       get :download_index_summary
