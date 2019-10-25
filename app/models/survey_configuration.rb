@@ -15,6 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SurveyConfiguration < ApplicationRecord
+  # Survey Configuration used to store survey attributes that require dynamic change since surveys are statically pre-loaded on server start
   belongs_to :survey
 
   validates :start_year_of_registration, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
