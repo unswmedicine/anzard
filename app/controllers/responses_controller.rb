@@ -38,8 +38,7 @@ class ResponsesController < ApplicationController
 
   def submit
     @response.submit!
-    # ToDo: update redirect from root path to data entry form page following addition of root path home page
-    redirect_to root_path, notice: "Data Entry Form for #{@response.cycle_id} to #{@response.survey.name} was submitted successfully."
+    redirect_to responses_path, notice: "Data Entry Form for #{@response.cycle_id} to #{@response.survey.name} was submitted successfully."
   end
 
   def create
@@ -111,8 +110,7 @@ class ResponsesController < ApplicationController
 
   def destroy
     @response.destroy
-    # ToDo: update redirect from root path to data entry form page following addition of root path home page
-    redirect_to root_path
+    redirect_to responses_path
   end
 
   def review_answers
