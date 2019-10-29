@@ -24,6 +24,8 @@ class ResponsesController < ApplicationController
   expose(:clinics) { Clinic.clinics_by_state_with_clinic_id }
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
+  DISABLED_QUESTION_CODES = { UNIT: 'UNIT', SITE: 'SITE' }
+
   def index
     @responses = Response.accessible_by(current_ability).unsubmitted.order("cycle_id")
   end
@@ -45,9 +47,14 @@ class ResponsesController < ApplicationController
   def create
     @response.user = current_user
     @response.submitted_status = Response::STATUS_UNSUBMITTED
+    selected_clinic = Clinic.find(params[:response][:clinic_id])
     original_cycle_id = params[:response][:cycle_id]
     unless original_cycle_id.blank?
-      @response.cycle_id = original_cycle_id + '_' + Clinic.find(params[:response][:clinic_id]).site_code.to_s
+      @response.cycle_id = original_cycle_id + '_' + selected_clinic.site_code.to_s
+    end
+    if @response.valid?
+      @response.build_answers_from_hash([[DISABLED_QUESTION_CODES[:UNIT], selected_clinic.unit_code.to_s],
+                                         [DISABLED_QUESTION_CODES[:SITE], selected_clinic.site_code.to_s]])
     end
     if @response.save
       redirect_to edit_response_path(@response, section: @response.survey.first_section.id), notice: 'Data entry form created'
@@ -70,6 +77,12 @@ class ResponsesController < ApplicationController
   end
 
   def update
+    if params[:answers]
+      DISABLED_QUESTION_CODES.values.each do |disabled_question_code|
+        params[:answers].delete(@response.survey.question_with_code(disabled_question_code).id.to_s)
+      end
+    end
+
     answers = params[:answers]
     answers ||= {}
     submitted_answers = answers.map { |id, val| [id.to_i, val] }
