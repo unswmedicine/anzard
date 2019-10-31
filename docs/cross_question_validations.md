@@ -65,6 +65,7 @@ const_implies_set           | If related_question meets (conditional constant ex
 set_implies_set             | If related_question meets (conditional set expression), this answer must meet (set expression)                                                                          
 blank_if_const              | Unless related_question meets (conditional constant expression), this answer must be blank                                                                              
 blank_unless_present        | Unless this question is answered, related_question must be blank                                                                                                        
+present_if_const            | If related_question meets (conditional constant expression), this question must be answered
 multi_hours_date_to_date    | This rule is a 'comparison' comparing this answer with the difference (in hours) between two pairs of date/times. See below for more info                               
 multi_compare_datetime_quad | This rule is a 'comparison' for two pairs of date/times. This rule should be applied to both the date and the time questions, See below for more info                   
 present_implies_present     | If this question is answered, this related_question must be answered                                                                                                    
