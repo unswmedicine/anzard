@@ -69,6 +69,8 @@ class Ability
         can :batch_delete, Response
         can :confirm_batch_delete, Response
         can :perform_batch_delete, Response
+        can :year_for_treatment_data, Response
+
         can :read, BatchFile
         can :download_index_summary, BatchFile
 
@@ -88,6 +90,8 @@ class Ability
         can :activate, Clinic
         can :deactivate, Clinic
 
+
+
       when Role::DATA_PROVIDER
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :download_index_summary, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
@@ -95,6 +99,7 @@ class Ability
         can :create, Response, clinic_id: user.clinic_ids
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :treatment_data_for_year, Response
+
 
         can :read, BatchFile, clinic_id: user.clinic_ids
         can :download_index_summary, BatchFile, clinic_id: user.clinic_ids

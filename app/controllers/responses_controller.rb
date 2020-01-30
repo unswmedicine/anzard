@@ -29,6 +29,7 @@ class ResponsesController < ApplicationController
   end
 
   def new
+
   end
 
   def show
@@ -193,9 +194,13 @@ class ResponsesController < ApplicationController
 
   def download_index_summary
     index_summary = CSV.generate(:col_sep => ",") do |csv|
-      csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment Created\ By Status Date\ Started)
+      # csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Created\ By Status Date\ Started)
+      csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment Unit\ Name Site\ Number Created\ By Status Date\ Started)
       Response.accessible_by(current_ability).unsubmitted.order("cycle_id").each do |response|
-        csv.add_row [response.cycle_id, response.survey.name, response.year_of_registration, response.user.full_name,
+        csv.add_row [response.cycle_id, response.survey.name, response.year_of_registration,
+                     response.clinic.unit_name,
+                      response.clinic.unit_code,
+                     response.user.full_name,
                      response.validation_status, response.created_at]
       end
     end
@@ -204,10 +209,10 @@ class ResponsesController < ApplicationController
 
   def download_submission_summary
     submission_summary = CSV.generate(:col_sep => ",") do |csv|
-      csv.add_row %w(Treatment\ Data Year\ of\ Treatment Unit\ Name Site\ Number Status Records)
+      csv.add_row %w(Treatment\ Data Year\ of\ Treatment Unit\ Name Site\ Number Status Records Created by)
       submission_summary_data.each do |summary|
         csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
-                     summary[:num_records]]
+                     summary[:num_records],]
       end
     end
     send_data submission_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'submission_summary.csv'
@@ -220,19 +225,26 @@ class ResponsesController < ApplicationController
       unless stats.empty?
         stats.years.each do |year|
           Clinic.order(:unit_code, :site_code).each do |clinic|
-            [{name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
-             {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}].each do |status|
-              num_records = stats.response_count(year, status[:name], clinic.id)
+            [
+                {name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
+                {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}
+            ].each do |status|
+              num_records = stats.response_count(year, status[:name], clinic.id,)
+
               unless num_records == 'none'
                 submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
-                                  site_code: clinic.site_code, status: status[:str], num_records: num_records})
+                                  site_code: clinic.site_code, status: status[:str], num_records: num_records,
+
+                                 })
               end
             end
           end
         end
       end
     end
-    submissions
+    # submissions.sort_by { |h| h[:survey_name] }.reverse!.sort_by{|e| -e[:year]}
+    submissions.sort_by { |h| h[:survey_name] }.reverse!
+
   end
   helper_method :submission_summary_data
 
@@ -243,6 +255,17 @@ class ResponsesController < ApplicationController
       surveys << { 'form_id': survey_config.survey.id, 'form_name': survey_config.survey.name }
     end
     render json: surveys
+  end
+
+  def year_for_treatment_data
+    survey_config = SurveyConfiguration.find_by survey_id: params['treatment_form']
+    years = []
+    if survey_config
+      for i in survey_config.start_year_of_treatment..survey_config.end_year_of_treatment do
+        years << { 'year': i}
+      end
+    end
+    render json: years
   end
 
   private

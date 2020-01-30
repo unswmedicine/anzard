@@ -29,6 +29,8 @@ class SurveyConfigurationsController < ApplicationController
   end
 
   def update
+    # YEAR_OF_REGISTRATION_START = "YearOfRegStart"
+    # YEAR_OF_REGISTRATION_END = "YearOfRegEnd"
     @survey_configuration.start_year_of_treatment = params[:survey_configuration][:start_year_of_treatment]
     @survey_configuration.end_year_of_treatment = params[:survey_configuration][:end_year_of_treatment]
     if @survey_configuration.save
