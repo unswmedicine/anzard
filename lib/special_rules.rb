@@ -380,6 +380,7 @@ class SpecialRules
       n_s_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
       n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
       n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
+      n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
 
       break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
       n_eggrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0
@@ -453,6 +454,7 @@ class SpecialRules
       ci_endo = answer.response.comparable_answer_or_nil_for_question_with_code('CI_ENDO')
       ci_male = answer.response.comparable_answer_or_nil_for_question_with_code('CI_MALE')
       ci_unex = answer.response.comparable_answer_or_nil_for_question_with_code('CI_UNEX')
+      ci_oth = answer.response.comparable_answer_or_nil_for_question_with_code('CI_OTH')
 
       break true unless (art_reason == 'y')
       (ci_tube == 'n' && ci_oth == 'n' && ci_endo == 'n' && ci_male == 'n'&& ci_unex == 'n')
