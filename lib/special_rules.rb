@@ -28,6 +28,15 @@ class SpecialRules
     special_rule_thaw_don
     special_rule_surr
     special_rule_thaw_1
+    special_rule_ttc_1
+    special_rule_ttc_2
+    special_rule_fdob_pat
+    special_rule_ci_1
+    special_rule_stim_1st
+    special_rule_pr_clin
+    special_rule_ivm
+    special_rule_sperm
+
   )
 
   RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES = {
@@ -50,10 +59,6 @@ class SpecialRules
     'special_rule_cycletype_2_rec' => 'CYCLE_TYPE',
     'special_rule_ttc_1' => 'DATE_TTC',
     'special_rule_thaw_1' => 'N_V_EGTH',
-
-
-
-
     'special_rule_ttc_2' => 'DATE_TTC',
     'special_rule_ivm' => 'IVM',
     'special_rule_art_reason' => 'ART_REASON',
@@ -99,7 +104,6 @@ class SpecialRules
       special_rule_cycletype_2_rec
       special_rule_ttc_1
       special_rule_thaw_1
-
       special_rule_ttc_2
       special_rule_ivm
       special_rule_art_reason
@@ -205,7 +209,6 @@ class SpecialRules
 
       # If pr_clin not y or u, then validation passes and no more checks required
       break true unless (p_r_clin == 'y')
-
       # pr_clin is y or u, so do other checks and return valid if one passes
       (!n_bl_et.nil? && n_bl_et > 0) || (!n_cl_et.nil? && n_cl_et > 0) || !iui_date.nil?
     }
@@ -226,7 +229,11 @@ class SpecialRules
     }
 
     CrossQuestionValidation.register_checker 'special_rule_gest_et_date', lambda { |answer, ununused_related_answer, checker_params|
-      # special_rule_gest_et_date: if gestational age (pr_end_dt - et_date) is greater than 20 weeks, n_deliv must be present
+      # special_rule_gest_et_date:
+      # Check if pr_end_dt is present
+      # Check if et_date is present
+      # if gestational age (pr_end_dt - et_date) is greater than 20 weeks,
+      # n_deliv must be present
       raise 'Can only be used on question N_DELIV' unless answer.question.code == 'N_DELIV'
 
       pr_end_dt = answer.response.comparable_answer_or_nil_for_question_with_code('PR_END_DT')
@@ -427,7 +434,8 @@ class SpecialRules
       date_ttc = answer.response.comparable_answer_or_nil_for_question_with_code('DATE_TTC')
 
       break true unless parent_sex == 1 && art_reason == 'y'
-      date_ttc.nil?
+      !date_ttc.nil? # Check if date_ttc is present
+
     }
 
     CrossQuestionValidation.register_checker 'special_rule_ivm', lambda { |answer, ununused_related_answer, checker_params|
@@ -457,7 +465,7 @@ class SpecialRules
       ci_oth = answer.response.comparable_answer_or_nil_for_question_with_code('CI_OTH')
 
       break true unless (art_reason == 'y')
-      (ci_tube == 'n' && ci_oth == 'n' && ci_endo == 'n' && ci_male == 'n'&& ci_unex == 'n')
+      (!ci_tube.nil? && !ci_oth.nil? && !ci_endo.nil? && !ci_male.nil? && ci_unex == 'n')
     }
 
 
@@ -470,7 +478,6 @@ class SpecialRules
       parent_sex = answer.response.comparable_answer_or_nil_for_question_with_code('PARENT_SEX')
       cycle_type = answer.response.comparable_answer_or_nil_for_question_with_code('CYCLE_TYPE')
       male_diag = answer.response.comparable_answer_or_nil_for_question_with_code('MALE_DIAG')
-
 
       break true unless (ci_male == 'y' && parent_sex==1 && [1,3,4,5,6,7].include?(cycle_type) )
       !male_diag.nil?
@@ -499,8 +506,7 @@ class SpecialRules
 
       cycle_type = answer.response.comparable_answer_or_nil_for_question_with_code('CYCLE_TYPE')
       parent_sex = answer.response.comparable_answer_or_nil_for_question_with_code('PARENT_SEX')
-      fdob_pat = answer.response.comparable_answer_or_nil_for_question_with_code('fdob_pat')
-
+      fdob_pat = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB_PAT')
 
       break true unless (cycle_type == 8 || [1,2,3].include?(parent_sex))
       !fdob_pat.nil?
@@ -517,7 +523,7 @@ class SpecialRules
     ni_pgt_th = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('NI_PGT_TH')
     ni_pgt_et = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('NI_PGT_ET')
 
-    (ni_pgt_assay + ni_pgt_th) >=ni_pgt_et
+    (ni_pgt_assay + ni_pgt_th) >= ni_pgt_et
 
   }
 
