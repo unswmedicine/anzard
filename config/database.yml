@@ -24,9 +24,9 @@
 development: &default
   adapter: mysql2
   host: db
-  database: anzard-dev
-  username: root
-  password: root
+  database: anzard
+  username: anzard
+  password: anzard
   pool: 5
   timeout: 5000
 

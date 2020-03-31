@@ -39,6 +39,7 @@ def populate_data(big=false)
     create_responses(big)
   end
 
+  puts "Ended creating sample data in #{Rails.env} environment..."
 end
 
 def create_responses(big)
