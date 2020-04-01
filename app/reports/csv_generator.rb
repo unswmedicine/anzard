@@ -17,7 +17,7 @@
 require 'csv'
 class CsvGenerator
 
-  BASIC_HEADERS = %w(TREATMENT_DATA YEAR_OF_TREATMENT UNIT_NAME SITE_NAME UNIT SITE CYCLE_ID)
+  BASIC_HEADERS = %w(TREATMENT_DATA YEAR_OF_TREATMENT ANZARD_Unit_Name ART_Unit_Name)
   attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code
 
   def initialize(survey_id, unit_code, site_code, year_of_registration)
@@ -60,7 +60,7 @@ class CsvGenerator
     CSV.generate(:col_sep => ",") do |csv|
       csv.add_row BASIC_HEADERS + question_codes
       records.each do |response|
-        basic_row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.clinic.unit_code, response.clinic.site_code, response.cycle_id]
+        basic_row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name]
         csv.add_row basic_row_data + answers(response)
       end
     end
