@@ -209,7 +209,7 @@ class ResponsesController < ApplicationController
 
   def download_submission_summary
     submission_summary = CSV.generate(:col_sep => ",") do |csv|
-      csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Status Records Created by)
+      csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Status Records)
       submission_summary_data.each do |summary|
         csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
                      summary[:num_records],]

@@ -30,11 +30,11 @@
         = f.select :survey_id, [], {include_blank: "No data for selected year"}, {class: 'large'}
         = required
     .clearfix
-      = label_tag 'unit', 'Unit'
+      = label_tag 'unit', 'ANZARD Unit Name'
       .input
         = text_field_tag 'unit', current_user.clinics.first.unit_name_with_code, disabled: true # All user clinics are from the same unit
     .clearfix
-      = f.label :clinic_id, 'Site'
+      = f.label :clinic_id, 'ART Unit'
       .input
         = f.collection_select :clinic_id, current_user.clinics, :id, :site_name_with_full_code, {},  {:class => "large"}
         = required
@@ -44,7 +44,7 @@
         = f.text_field :cycle_id, placeholder: 'Code uniquely identifying this cycle', size: Response::CYCLE_ID_MAX_SIZE, maxlength: Response::CYCLE_ID_MAX_SIZE
         = required
 
-    %em Note: The Site Number will be automatically appended to the Cycle ID upon creation to ensure uniqueness.
+    %em Note: The ART Unit number will be automatically appended to the cycle ID upon creation to ensure uniqueness.
 
     .actions
       = f.submit "Save", class: "btn primary"

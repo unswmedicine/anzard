@@ -200,6 +200,7 @@ class SpecialRules
 
     CrossQuestionValidation.register_checker 'special_rule_pr_clin', lambda { |answer, ununused_related_answer, checker_params|
       # special_rule_pr_clin: if pr_clin equals 'y' then n_bl_et > 0 or n_cl_et > 0 or iui_date must be present
+      #
       raise 'Can only be used on question PR_CLIN' unless answer.question.code == 'PR_CLIN'
 
       p_r_clin = answer.response.comparable_answer_or_nil_for_question_with_code('PR_CLIN')
@@ -365,12 +366,13 @@ class SpecialRules
       n_clfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_S')
       n_clfz_v  = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_V')
 
-      break true unless cycle_type == 2 && n_eggrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 && n_embrec_fresh == 0 && n_s_clth == 0 && n_s_blth == 0 && n_v_clth ==0  && n_v_blth == 0
+      break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
       n_eggdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0
     }
 
     CrossQuestionValidation.register_checker 'special_rule_cycletype_2_rec', lambda { |answer, ununused_related_answer, checker_params|
       # special_rule_cycletype_2_rec: if cycle_type = 2 & n_eggdon_fresh,  n_efgz_s,  n_egfz_v, n_blfz_s, n_blfz_v, n_clfz_s & n_clfz_v=0 then  (at least one of n_eggrec_fresh or n_s_egth or n_v_egth or n_s_clth or n_s_blth or n_v_blth or n_v_clth >0)
+
       raise 'Can only be used on question CYCLE_TYPE' unless answer.question.code == 'CYCLE_TYPE'
 
       cycle_type = answer.response.comparable_answer_or_nil_for_question_with_code('CYCLE_TYPE')
@@ -391,11 +393,12 @@ class SpecialRules
 
       break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
       n_eggrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0
+
     }
 
     CrossQuestionValidation.register_checker 'special_rule_ttc_1', lambda { |answer, ununused_related_answer, checker_params|
-      # special_rule_ttc_1: if parent_sex = 1 and stim_1st =y, then date_ttc must be complete
-      #                     if parent_sex=1 & art_reason=n then date_ttc!= "" "
+      # special_rule_ttc_1: if parent_sex=1   and art_reason=n then date_ttc!= "" "
+
       raise 'Can only be used on question DATE_TTC' unless answer.question.code == 'DATE_TTC'
 
       parent_sex = answer.response.comparable_answer_or_nil_for_question_with_code('PARENT_SEX')
@@ -465,7 +468,7 @@ class SpecialRules
       ci_oth = answer.response.comparable_answer_or_nil_for_question_with_code('CI_OTH')
 
       break true unless (art_reason == 'y')
-      (!ci_tube.nil? && !ci_oth.nil? && !ci_endo.nil? && !ci_male.nil? && ci_unex == 'n')
+      (ci_tube =='n' && ci_oth == 'n' && ci_endo == 'n' && ci_male == 'n' && ci_unex == 'n')
     }
 
 
@@ -485,16 +488,18 @@ class SpecialRules
 
 
     CrossQuestionValidation.register_checker 'special_rule_sperm', lambda { |answer, ununused_related_answer, checker_params|
-      # special_rule_sperm: if sp_site=e & sp_source=1 then sp_qual!=.
-
+      # special_rule_sperm: if sp_site=e & sp_source=1 & (n_ivf>0|n_icsi>0) then sp_qual!=
+      
       raise 'Can only be used on question SP_QUAL' unless answer.question.code == 'SP_QUAL'
 
       sp_site = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SITE')
       sp_source = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SOURCE')
       sp_qual = answer.response.comparable_answer_or_nil_for_question_with_code('SP_QUAL')
+      n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
+      n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
 
 
-      break true unless (sp_site == 'e' && sp_source==1)
+      break true unless (sp_site == 'e' && sp_source==1) &&  (n_ivf > 0 || n_icsi > 0)
       !sp_qual.nil?
     }
 
