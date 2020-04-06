@@ -53,12 +53,12 @@ class Survey < ApplicationRecord
 
   def destroy
     # This is here as a safety measure, if we implement delete, it will need to be removed.
-    #if Rails.env.development? or Rails.env.test?
-    super
-    #else
-    #  raise "Can't destroy surveys in production! \n" +
-    #            "Destroying a survey would destroy *all* of the questions and answers that have been associated with it."
-    #end
+    if Rails.env.development? or Rails.env.test?
+      super
+    else
+      raise "Can't destroy surveys in production! \n" +
+                "Destroying a survey would destroy *all* of the questions and answers that have been associated with it."
+    end
   end
 
   def question_with_code(code)
