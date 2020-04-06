@@ -441,7 +441,7 @@ class SpecialRules
       date_ttc = answer.response.comparable_answer_or_nil_for_question_with_code('DATE_TTC')
 
       break true unless parent_sex == 1 && art_reason == 'y'
-      !date_ttc.nil? # Check if date_ttc is present
+      date_ttc.nil?
 
     }
 
@@ -455,7 +455,7 @@ class SpecialRules
       can_date = answer.response.comparable_answer_or_nil_for_question_with_code('CAN_DATE')
       ivm = answer.response.comparable_answer_or_nil_for_question_with_code('IVM')
 
-      break true unless [1,2,3,6].include?(cycle_type) && (!opu_date.nil? || !can_date.nil?)
+      break true unless ((!opu_date.nil? || !can_date.nil?) && [1,2,3,6].include?(cycle_type))
       !ivm.nil?
     }
 
