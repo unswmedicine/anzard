@@ -149,9 +149,10 @@ class SpecialRules
     }
 
     CrossQuestionValidation.register_checker 'special_rule_comp3', lambda { |answer, ununused_related_answer, checker_params|
-      # special_rule_comp3: (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v)
+      # special_rule_comp3: (n_embrec_fresh+n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v+n_embdon_fresh)
       raise 'Can only be used on question N_S_CLTH' unless answer.question.code == 'N_S_CLTH'
 
+      n_embrec_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBREC_FRESH')
       n_s_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
       n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
       n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
@@ -163,8 +164,9 @@ class SpecialRules
       n_clfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_V')
       n_blfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_BLFZ_S')
       n_blfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_BLFZ_V')
+      n_embdon_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDON_FRESH')
 
-      (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v)
+      (n_embrec_fresh + n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdon_fresh)
     }
 
 
@@ -211,7 +213,7 @@ class SpecialRules
       # If pr_clin not y or u, then validation passes and no more checks required
       break true unless (p_r_clin == 'y')
       # pr_clin is y or u, so do other checks and return valid if one passes
-      (!n_bl_et.nil? && n_bl_et > 0) || (!n_cl_et.nil? && n_cl_et > 0) || !iui_date.nil?
+      (n_bl_et > 0) || ( n_cl_et > 0) || !iui_date.nil?
     }
 
     CrossQuestionValidation.register_checker 'special_rule_gest_iui_date', lambda { |answer, ununused_related_answer, checker_params|
@@ -327,7 +329,7 @@ class SpecialRules
       n_pgt_th = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_PGT_TH')
       ni_pgt_th = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('NI_PGT_TH')
 
-      (n_s_clth + n_v_clth + n_s_blth + n_v_blth) >= n_pgt_th+ ni_pgt_th
+      (n_s_clth + n_v_clth + n_s_blth + n_v_blth) >= (n_pgt_th + ni_pgt_th)
     }
 
     CrossQuestionValidation.register_checker 'special_rule_surr_3', lambda { |answer, ununused_related_answer, checker_params|
@@ -345,7 +347,7 @@ class SpecialRules
     }
 
     CrossQuestionValidation.register_checker 'special_rule_cycletype_2_don', lambda { |answer, ununused_related_answer, checker_params|
-      # special_rule_cycletype_2_don: if cycle_type = 2 & n_eggrec_fresh, n_embrec_fresh, n_s_egth, n_v_egth, n_s_clth, n_s_blth, n_v_clth & n_v_blth=0, then (at least one of n_eggdon_fresh or n_egfz_s or n_egfz_v or n_blfz_s, n_blfz_v, n_clfz_s or n_clfz_v >0)
+      # special_rule_cycletype_2_don: if cycle_type = 2 & n_eggrec_fresh, n_embrec_fresh, n_s_egth, n_v_egth, n_s_clth, n_s_blth, n_v_clth & n_v_blth=0, then (at least one of n_eggdon_fresh or n_embdon_fresh or n_egfz_s or n_egfz_v or n_blfz_s, n_blfz_v, n_clfz_s or n_clfz_v >0)
 
       raise 'Can only be used on question CYCLE_TYPE' unless answer.question.code == 'CYCLE_TYPE'
 
@@ -365,14 +367,15 @@ class SpecialRules
       n_blfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_BLFZ_V')
       n_clfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_S')
       n_clfz_v  = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_V')
+      n_embdon_fresh  = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDON_FRESH')
 
       break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-      n_eggdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0
+      n_eggdon_fresh > 0 || n_embdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0
     }
 
     CrossQuestionValidation.register_checker 'special_rule_cycletype_2_rec', lambda { |answer, ununused_related_answer, checker_params|
-      # special_rule_cycletype_2_rec: if cycle_type = 2 & n_eggdon_fresh,  n_efgz_s,  n_egfz_v, n_blfz_s, n_blfz_v, n_clfz_s & n_clfz_v=0 then  (at least one of n_eggrec_fresh or n_s_egth or n_v_egth or n_s_clth or n_s_blth or n_v_blth or n_v_clth >0)
-
+      # special_rule_cycletype_2_rec: if cycle_type = 2 & n_eggdon_fresh,  n_efgz_s,  n_egfz_v, n_blfz_s, n_blfz_v, n_clfz_s & n_clfz_v=0 then  (at least one of n_eggrec_fresh, n_embrec_fresh or n_s_egth or n_v_egth or n_s_clth or n_s_blth or n_v_blth or n_v_clth >0)if cycle_type = 2 & n_eggdon_fresh,  n_efgz_s,  n_egfz_v, n_blfz_s, n_blfz_v, n_clfz_s & n_clfz_v=0 then  (at least one of n_eggrec_fresh                 or n_s_egth or n_v_egth or n_s_clth or n_s_blth or n_v_blth or n_v_clth >0)
+      #
       raise 'Can only be used on question CYCLE_TYPE' unless answer.question.code == 'CYCLE_TYPE'
 
       cycle_type = answer.response.comparable_answer_or_nil_for_question_with_code('CYCLE_TYPE')
@@ -390,10 +393,11 @@ class SpecialRules
       n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
       n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
       n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
+      n_embrec_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBREC_FRESH')
+      n_embdon_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDON_FRESH')
 
-      break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
-      n_eggrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0
-
+      break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_embdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
+      n_eggrec_fresh > 0 || n_embrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0
     }
 
     CrossQuestionValidation.register_checker 'special_rule_ttc_1', lambda { |answer, ununused_related_answer, checker_params|
@@ -489,7 +493,7 @@ class SpecialRules
 
     CrossQuestionValidation.register_checker 'special_rule_sperm', lambda { |answer, ununused_related_answer, checker_params|
       # special_rule_sperm: if sp_site=e & sp_source=1 & (n_ivf>0|n_icsi>0) then sp_qual!=
-      
+
       raise 'Can only be used on question SP_QUAL' unless answer.question.code == 'SP_QUAL'
 
       sp_site = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SITE')
