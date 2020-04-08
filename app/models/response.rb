@@ -97,6 +97,10 @@ class Response < ApplicationRecord
     end
   end
 
+  def self.years_associated_with_survey(survey_id)
+    select("distinct year_of_registration").collect(&:year_of_registration).sort
+  end
+
   def self.existing_years_of_registration
     select("distinct year_of_registration").collect(&:year_of_registration).sort
   end

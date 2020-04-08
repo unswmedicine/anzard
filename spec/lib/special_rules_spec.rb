@@ -415,7 +415,7 @@ describe 'Special Rules' do
       expect(@cqv.check(answer)).to be_nil
     end
 
-    ['y', 'u'].each do |pr_clin_trigger_value|
+    ['y','u'].each do |pr_clin_trigger_value|
       describe "when pr_clin is #{pr_clin_trigger_value}" do
         before :each do
           @answer = create(:answer, question: @pr_clin, answer_value: pr_clin_trigger_value, response: @response)
@@ -582,114 +582,6 @@ describe 'Special Rules' do
     end
   end
 
-  describe 'RULE: special_rule_thaw_don' do
-    # special_rule_thaw_don: if (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete, thaw_don must be complete
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @n_s_clth = create(:question, code: 'N_S_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_v_clth = create(:question, code: 'N_V_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @don_age = create(:question, code: 'DON_AGE', section: @section, question_type: Question::TYPE_INTEGER)
-      @thaw_don = create(:question, code: 'THAW_DON', section: @section, question_type: Question::TYPE_CHOICE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_thaw_don', question: @thaw_don, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
-
-    it 'should raise an error if used on the wrong question' do
-      q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_thaw_don', question: q)
-      expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_thaw_don requires question code THAW_DON but got Blah']
-    end
-
-    it 'should apply even when THAW_DON is unanswered' do
-      expect(SpecialRules::RULES_THAT_APPLY_EVEN_WHEN_ANSWER_NIL).to include('special_rule_thaw_don')
-    end
-
-    it 'should pass when don_age is not complete' do
-      answer = create(:answer, question: @thaw_don, answer_value: nil, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
-    end
-
-    describe 'when don_age is complete' do
-      before :each do
-        @answer = create(:answer, question: @thaw_don, answer_value: nil, response: @response)
-        create(:answer, question: @don_age, answer_value: 20, response: @response)
-        @answer.reload
-      end
-
-      describe 'when n_s_clth is unanswered' do
-        it 'should pass when (n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
-          create(:answer, question: @n_v_clth, answer_value: -1, response: @response)
-          create(:answer, question: @n_s_blth, answer_value: -1, response: @response)
-          create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        describe 'when n_v_clth is unanswered' do
-          it 'should pass when (n_s_blth + n_v_blth) is not greater than 0' do
-            create(:answer, question: @n_s_blth, answer_value: -1, response: @response)
-            create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
-            @answer.reload
-            expect(@cqv.check(@answer)).to be_nil
-          end
-
-          describe 'when n_s_blth is unanswered' do
-            it 'should pass when n_v_blth is not greater than 0' do
-              create(:answer, question: @n_v_blth, answer_value: -1, response: @response)
-              @answer.reload
-              expect(@cqv.check(@answer)).to be_nil
-            end
-
-            describe 'when n_v_blth is unanswered' do
-              it 'should pass' do
-                expect(@cqv.check(@answer)).to be_nil
-              end
-            end
-          end
-        end
-      end
-
-      it 'should pass when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) is not greater than 0' do
-        create(:answer, question: @n_s_clth, answer_value: 0, response: @response)
-        create(:answer, question: @n_v_clth, answer_value: 0, response: @response)
-        create(:answer, question: @n_s_blth, answer_value: 0, response: @response)
-        create(:answer, question: @n_v_blth, answer_value: 0, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      describe 'when (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0' do
-        before :each do
-          create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-          create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-          create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-          create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
-          @answer.reload
-        end
-
-        it 'should fail if thaw_don is not complete' do
-          expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-        end
-      end
-    end
-
-    it 'should pass if don_age is complete, (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and thaw_don is complete' do
-      answer = create(:answer, question: @thaw_don, answer_value: 0, response: @response)
-      create(:answer, question: @don_age, answer_value: 20, response: @response)
-      create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-      create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-      create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-      create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
-    end
-  end
-
   describe 'Rule: special_rule_surr' do
     # special_rule_surr: if surr=y & (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0, don_age must be present
     before :each do
@@ -798,179 +690,9 @@ describe 'Special Rules' do
     end
   end
 
-  describe 'Rule: special_rule_mtage' do
-    # special_rule_mtage: if n_embdisp =0, cyc_date-fdob must be ≥ 18 years & cyc_date-fdob must be <= 55 years
-    # i.e if n_embdisp == 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 55 years
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
-      @cyc_date = create(:question, code: 'CYC_DATE', section: @section, question_type: Question::TYPE_DATE)
-      @fdob = create(:question, code: 'FDOB', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_mtage', question: @n_embdisp, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
 
-    it 'should raise an error if used on the wrong question' do
-      q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_mtage', question: q)
-      expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_mtage requires question code N_EMBDISP but got Blah']
-    end
 
-    it 'should pass if n_embdisp != 0' do
-      [-1, 1].each do |val|
-        answer = create(:answer, question: @n_embdisp, answer_value: val, response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
-    end
 
-    describe 'when n_embdisp == 0' do
-      before :each do
-        @answer = create(:answer, question: @n_embdisp, answer_value: 0, response: @response)
-        @answer.reload
-      end
-
-      it 'should pass when cyc_date is unanswered' do
-        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should pass when fdob is unanswered' do
-        create(:answer, question: @cyc_date, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should fail when cyc_date-fdob is < 18 years' do
-        # date difference is 18 years minus 1 day
-        create(:answer, question: @cyc_date, answer_value: '2017-12-31', response: @response)
-        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should fail when cyc_date-fdob is > 55 years' do
-        # date difference is 55 years plus 1 day
-        create(:answer, question: @cyc_date, answer_value: '2056-01-01', response: @response)
-        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      describe 'when cyc_date-fdob is ≥ 18 years & <= 55 years' do
-        it 'should pass when cyc_date-fdob is == 18 years' do
-          create(:answer, question: @cyc_date, answer_value: '2018-01-01', response: @response)
-          create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass when cyc_date-fdob is == 55 years' do
-          create(:answer, question: @cyc_date, answer_value: '2055-01-01', response: @response)
-          create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass when cyc_date-fdob is > 18 & < 55 years' do
-          create(:answer, question: @cyc_date, answer_value: '2035-10-15', response: @response)
-          create(:answer, question: @fdob, answer_value: '2000-11-06', response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-      end
-    end
-  end
-
-  describe 'Rule: special_rule_mtagedisp' do
-    # special_rule_mtagedisp: if n_embdisp >0, cyc_date-fdob must be ≥ 18 years & <= 70 years
-    # i.e. if n_embdisp > 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 70 years
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @n_embdisp = create(:question, code: 'N_EMBDISP', section: @section, question_type: Question::TYPE_INTEGER)
-      @cyc_date = create(:question, code: 'CYC_DATE', section: @section, question_type: Question::TYPE_DATE)
-      @fdob = create(:question, code: 'FDOB', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_mtagedisp', question: @n_embdisp, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
-
-    it 'should raise an error if used on the wrong question' do
-      q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_mtagedisp', question: q)
-      expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_mtagedisp requires question code N_EMBDISP but got Blah']
-    end
-
-    it 'should pass if n_embdisp <= 0' do
-      [-1, 0].each do |val|
-        answer = create(:answer, question: @n_embdisp, answer_value: val, response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
-    end
-
-    describe 'when n_embdisp > 0' do
-      before :each do
-        @answer = create(:answer, question: @n_embdisp, answer_value: 1, response: @response)
-        @answer.reload
-      end
-
-      it 'should pass when cyc_date is unanswered' do
-        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should pass when fdob is unanswered' do
-        create(:answer, question: @cyc_date, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should fail when cyc_date-fdob is < 18 years' do
-        # date difference is 18 years minus 1 day
-        create(:answer, question: @cyc_date, answer_value: '2017-12-31', response: @response)
-        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should fail when cyc_date-fdob is > 70 years' do
-        # date difference is 70 years plus 1 day
-        create(:answer, question: @cyc_date, answer_value: '2071-01-01', response: @response)
-        create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      describe 'when cyc_date-fdob is ≥ 18 years & <= 70 years' do
-        it 'should pass when cyc_date-fdob is == 18 years' do
-          create(:answer, question: @cyc_date, answer_value: '2018-01-01', response: @response)
-          create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass when cyc_date-fdob is == 70 years' do
-          create(:answer, question: @cyc_date, answer_value: '2070-01-01', response: @response)
-          create(:answer, question: @fdob, answer_value: '2000-01-01', response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass when cyc_date-fdob is > 18 & < 70 years' do
-          create(:answer, question: @cyc_date, answer_value: '2050-10-15', response: @response)
-          create(:answer, question: @fdob, answer_value: '2000-11-06', response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-      end
-    end
-  end
 
   describe 'Rule: special_rule_et_date' do
     # special_rule_et_date: if et_date is a date, n_cl_et must be >0 | n_bl_et must be >0
@@ -1051,6 +773,7 @@ describe 'Special Rules' do
       @stim_1st = create(:question, code: 'STIM_1ST', section: @section, question_type: Question::TYPE_CHOICE)
       @opu_date = create(:question, code: 'OPU_DATE', section: @section, question_type: Question::TYPE_DATE)
       @can_date = create(:question, code: 'CAN_DATE', section: @section, question_type: Question::TYPE_DATE)
+      @iui_date = create(:question, code: 'IUI_DATE', section: @section, question_type: Question::TYPE_DATE)
       @cqv = create(:cross_question_validation, rule: 'special_rule_stim_1st', question: @stim_1st, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
@@ -1077,6 +800,13 @@ describe 'Special Rules' do
       it 'should fail if neither opu_date or can_date is answered' do
         expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
       end
+
+      it 'should pass if iui_date is not answered' do
+        create(:answer, question: @iui_date, answer_value: -1, response: @response)
+        @answer.reload
+        expect(@cqv.check(@answer)).to be_nil
+      end
+
 
       it 'should pass if opu_date is answered' do
         create(:answer, question: @opu_date, answer_value: '2000-01-01', response: @response)
@@ -1174,214 +904,129 @@ describe 'Special Rules' do
     end
   end
 
-  describe 'special_rule_pgt_3' do
-    # special_rule_pgt_3: n_s_clth + n_v_clth + n_s_blth + n_v_blth>=n_pgt_th
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @n_s_clth = create(:question, code: 'N_S_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_v_clth = create(:question, code: 'N_V_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_pgt_th = create(:question, code: 'N_PGT_TH', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_pgt_3', question: @n_pgt_th, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
-
-    it 'should raise an error if used on the wrong question' do
-      q = create(:question, code: 'Blah')
-      cqv = build(:cross_question_validation, rule: 'special_rule_pgt_3', question: q)
-      expect(cqv.valid?).to be false
-      expect(cqv.errors[:base]).to eq ['special_rule_pgt_3 requires question code N_PGT_TH but got Blah']
-    end
-
-    context 'when only one question is answered' do
-      before :each do
-        @answer = create(:answer, question: @n_pgt_th, answer_value: 1, response: @response)
-      end
-
-      it 'should pass when n_s_clth >= n_pgt_th' do
-        tmp = create(:answer, question: @n_s_clth, answer_value: @answer.answer_value, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-        tmp.delete
-        create(:answer, question: @n_s_clth, answer_value: @answer.answer_value + 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should fail when n_s_clth < n_pgt_th' do
-        create(:answer, question: @n_s_clth, answer_value: @answer.answer_value - 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should pass when n_v_clth >= n_pgt_th' do
-        tmp = create(:answer, question: @n_v_clth, answer_value: @answer.answer_value, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-        tmp.delete
-        create(:answer, question: @n_v_clth, answer_value: @answer.answer_value + 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should fail when n_v_clth < n_pgt_th' do
-        create(:answer, question: @n_v_clth, answer_value: @answer.answer_value - 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should pass when n_s_blth >= n_pgt_th' do
-        tmp = create(:answer, question: @n_s_blth, answer_value: @answer.answer_value, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-        tmp.delete
-        create(:answer, question: @n_s_blth, answer_value: @answer.answer_value + 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should fail when n_s_blth < n_pgt_th' do
-        create(:answer, question: @n_s_blth, answer_value: @answer.answer_value - 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should pass when n_v_blth >= n_pgt_th' do
-        tmp = create(:answer, question: @n_v_blth, answer_value: @answer.answer_value, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-        tmp.delete
-        create(:answer, question: @n_v_blth, answer_value: @answer.answer_value + 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      it 'should fail when n_v_blth < n_pgt_th' do
-        create(:answer, question: @n_v_blth, answer_value: @answer.answer_value - 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-    end
-
-    context 'when all questions are answered' do
-      it 'should pass when n_s_clth + n_v_clth + n_s_blth + n_v_blth > n_pgt_th' do
-        answer = create(:answer, question: @n_pgt_th, answer_value: 1, response: @response)
-        create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
-
-      it 'should pass when n_s_clth + n_v_clth + n_s_blth + n_v_blth == n_pgt_th' do
-        answer = create(:answer, question: @n_pgt_th, answer_value: 4, response: @response)
-        create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
-
-      it 'should fail when n_s_clth + n_v_clth + n_s_blth + n_v_blth < n_pgt_th' do
-        answer = create(:answer, question: @n_pgt_th, answer_value: 5, response: @response)
-        create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
-      end
-    end
-  end
-
-  describe 'special_rule_surr_2' do
-    # special_rule_surr_2: if cycle_type = 7, then n_embrec_fresh + n_s_clth + n_v_clth + n_s_blth + n_v_blth >0
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @cycle_type = create(:question, code: 'CYCLE_TYPE', section: @section, question_type: Question::TYPE_CHOICE)
-      @n_embrec_fresh = create(:question, code: 'N_EMBREC_FRESH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_s_clth = create(:question, code: 'N_S_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_v_clth = create(:question, code: 'N_V_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_surr_2', question: @cycle_type, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
-
-    it 'should pass if cycle_type != 7' do
-      answer = create(:answer, question: @cycle_type, answer_value: 1, response: @response)
-      answer.reload
-      expect(@cqv.check(answer)).to be_nil
-    end
-
-    context 'when cycle_type == 7' do
-      before :each do
-        @answer = create(:answer, question: @cycle_type, answer_value: '7', response: @response)
-      end
-
-      it 'should fail if none of the other questions are answered' do
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should fail if sum is not > 0' do
-        create(:answer, question: @n_embrec_fresh, answer_value: 0, response: @response)
-        create(:answer, question: @n_s_clth, answer_value: 0, response: @response)
-        create(:answer, question: @n_v_clth, answer_value: 0, response: @response)
-        create(:answer, question: @n_s_blth, answer_value: 0, response: @response)
-        create(:answer, question: @n_v_blth, answer_value: 0, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should pass if sum is > 0' do
-        create(:answer, question: @n_embrec_fresh, answer_value: 1, response: @response)
-        create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-        create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-        create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-
-      context 'when only question is answered' do
-        it 'should pass if n_embrec_fresh > 0' do
-          create(:answer, question: @n_embrec_fresh, answer_value: 1, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass if n_s_clth > 0' do
-          create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass if n_v_clth > 0' do
-          create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass if n_s_blth > 0' do
-          create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-
-        it 'should pass if n_v_blth > 0' do
-          create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
-          @answer.reload
-          expect(@cqv.check(@answer)).to be_nil
-        end
-      end
-    end
-  end
+  # describe 'special_rule_pgt_3' do
+  #   # special_rule_pgt_3: n_s_clth + n_v_clth + n_s_blth + n_v_blth>=n_pgt_th
+  #   before :each do
+  #     @survey = create(:survey)
+  #     @section = create(:section, survey: @survey)
+  #     @n_s_clth = create(:question, code: 'N_S_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
+  #     @n_v_clth = create(:question, code: 'N_V_CLTH', section: @section, question_type: Question::TYPE_INTEGER)
+  #     @n_s_blth = create(:question, code: 'N_S_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
+  #     @n_v_blth = create(:question, code: 'N_V_BLTH', section: @section, question_type: Question::TYPE_INTEGER)
+  #     @n_pgt_th = create(:question, code: 'N_PGT_TH', section: @section, question_type: Question::TYPE_INTEGER)
+  #     @cqv = create(:cross_question_validation, rule: 'special_rule_pgt_3', question: @n_pgt_th, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
+  #     @response = create(:response, survey: @survey)
+  #   end
+  #
+  #   it 'should raise an error if used on the wrong question' do
+  #     q = create(:question, code: 'Blah')
+  #     cqv = build(:cross_question_validation, rule: 'special_rule_pgt_3', question: q)
+  #     expect(cqv.valid?).to be false
+  #     expect(cqv.errors[:base]).to eq ['special_rule_pgt_3 requires question code N_PGT_TH but got Blah']
+  #   end
+  #
+  #   context 'when only one question is answered' do
+  #     before :each do
+  #       @answer = create(:answer, question: @n_pgt_th, answer_value: 1, response: @response)
+  #     end
+  #
+  #     it 'should pass when n_s_clth >= n_pgt_th' do
+  #       tmp = create(:answer, question: @n_s_clth, answer_value: @answer.answer_value, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #       tmp.delete
+  #       create(:answer, question: @n_s_clth, answer_value: @answer.answer_value + 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #     end
+  #
+  #     it 'should fail when n_s_clth < n_pgt_th' do
+  #       create(:answer, question: @n_s_clth, answer_value: @answer.answer_value - 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
+  #     end
+  #
+  #     it 'should pass when n_v_clth >= n_pgt_th' do
+  #       tmp = create(:answer, question: @n_v_clth, answer_value: @answer.answer_value, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #       tmp.delete
+  #       create(:answer, question: @n_v_clth, answer_value: @answer.answer_value + 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #     end
+  #
+  #     it 'should fail when n_v_clth < n_pgt_th' do
+  #       create(:answer, question: @n_v_clth, answer_value: @answer.answer_value - 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
+  #     end
+  #
+  #     it 'should pass when n_s_blth >= n_pgt_th' do
+  #       tmp = create(:answer, question: @n_s_blth, answer_value: @answer.answer_value, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #       tmp.delete
+  #       create(:answer, question: @n_s_blth, answer_value: @answer.answer_value + 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #     end
+  #
+  #     it 'should fail when n_s_blth < n_pgt_th' do
+  #       create(:answer, question: @n_s_blth, answer_value: @answer.answer_value - 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
+  #     end
+  #
+  #     it 'should pass when n_v_blth >= n_pgt_th' do
+  #       tmp = create(:answer, question: @n_v_blth, answer_value: @answer.answer_value, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #       tmp.delete
+  #       create(:answer, question: @n_v_blth, answer_value: @answer.answer_value + 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to be_nil
+  #     end
+  #
+  #     it 'should fail when n_v_blth < n_pgt_th' do
+  #       create(:answer, question: @n_v_blth, answer_value: @answer.answer_value - 1, response: @response)
+  #       @answer.reload
+  #       expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
+  #     end
+  #   end
+  #
+  #   context 'when all questions are answered' do
+  #     it 'should pass when n_s_clth + n_v_clth + n_s_blth + n_v_blth > n_pgt_th' do
+  #       answer = create(:answer, question: @n_pgt_th, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+  #       answer.reload
+  #       expect(@cqv.check(answer)).to be_nil
+  #     end
+  #
+  #     it 'should pass when n_s_clth + n_v_clth + n_s_blth + n_v_blth == n_pgt_th' do
+  #       answer = create(:answer, question: @n_pgt_th, answer_value: 4, response: @response)
+  #       create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+  #       answer.reload
+  #       expect(@cqv.check(answer)).to be_nil
+  #     end
+  #
+  #     it 'should fail when n_s_clth + n_v_clth + n_s_blth + n_v_blth < n_pgt_th' do
+  #       answer = create(:answer, question: @n_pgt_th, answer_value: 5, response: @response)
+  #       create(:answer, question: @n_s_clth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_v_clth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_s_blth, answer_value: 1, response: @response)
+  #       create(:answer, question: @n_v_blth, answer_value: 1, response: @response)
+  #       answer.reload
+  #       expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
+  #     end
+  #   end
+  # end
 
   describe 'special_rule_surr_3' do
     # special_rule_surr_3: if surr=y & cycle_type!= 7, then et_date = NULL & (n_bl_et+n_cl_et)=0
@@ -1468,122 +1113,6 @@ describe 'Special Rules' do
         create(:answer, question: @et_date, answer_value: nil, response: @response)
         create(:answer, question: @n_bl_et, answer_value: '0', response: @response)
         create(:answer, question: @n_cl_et, answer_value: '0', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-    end
-  end
-
-  describe 'special_rule_surr_4' do
-    # special_rule_surr_4: if surr = "n" & fdob_non_pat!=NULL, then PARENT_SEX = 3
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @surr = create(:question, code: 'SURR', section: @section, question_type: Question::TYPE_CHOICE)
-      @fdob_non_pat = create(:question, code: 'FDOB_NON_PAT', section: @section, question_type: Question::TYPE_DATE)
-      @parent_sex = create(:question, code: 'PARENT_SEX', section: @section, question_type: Question::TYPE_CHOICE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_surr_4', question: @surr, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
-
-    context 'pre-condition not met' do
-      it 'should pass if either surr != n or fdob_non_pat == NULL' do
-        answer = create(:answer, question: @surr, answer_value: 'y', response: @response)
-        tmp = create(:answer, question: @fdob_non_pat, answer_value: '2013-01-01', response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-
-        tmp.delete
-        answer.answer_value = 'n'
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
-    end
-
-    context 'pre-condition met' do
-      before :each do
-        @answer = create(:answer, question: @surr, answer_value: 'n', response: @response)
-        create(:answer, question: @fdob_non_pat, answer_value: '2013-01-01', response: @response)
-      end
-
-      it 'should fail if parent_sex != 3' do
-        create(:answer, question: @parent_sex, answer_value: '1', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should pass if parent_sex == 3' do
-        create(:answer, question: @parent_sex, answer_value: '3', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-      end
-    end
-  end
-
-  describe 'special_rule_surr_5' do
-    # special_rule_surr_5: if surr = "y" & fdob_non_pat!=NULL, then PARENT_SEX = 1,2 or 3 & CYCLE_TYPE = 6
-    before :each do
-      @survey = create(:survey)
-      @section = create(:section, survey: @survey)
-      @surr = create(:question, code: 'SURR', section: @section, question_type: Question::TYPE_CHOICE)
-      @fdob_non_pat = create(:question, code: 'FDOB_NON_PAT', section: @section, question_type: Question::TYPE_DATE)
-      @parent_sex = create(:question, code: 'PARENT_SEX', section: @section, question_type: Question::TYPE_CHOICE)
-      @cycle_type = create(:question, code: 'CYCLE_TYPE', section: @section, question_type: Question::TYPE_CHOICE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_surr_5', question: @surr, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
-      @response = create(:response, survey: @survey)
-    end
-
-    context 'pre-condition not met' do
-      it 'should pass if either surr != y or fdob_non_pat == NULL' do
-        answer = create(:answer, question: @surr, answer_value: 'n', response: @response)
-        tmp = create(:answer, question: @fdob_non_pat, answer_value: '2013-01-01', response: @response)
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-
-        tmp.delete
-        answer.answer_value = 'y'
-        answer.reload
-        expect(@cqv.check(answer)).to be_nil
-      end
-    end
-
-    context 'pre-condition met' do
-      before :each do
-        @answer = create(:answer, question: @surr, answer_value: 'y', response: @response)
-        create(:answer, question: @fdob_non_pat, answer_value: '2013-01-01', response: @response)
-      end
-
-      it 'should fail if parent_sex != 1, 2 or 3 or cycle_type != 6' do
-        tmp_cycle_type = create(:answer, question: @cycle_type, answer_value: '6', response: @response)
-        tmp_parent_sex = create(:answer, question: @parent_sex, answer_value: '0', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-
-        tmp_cycle_type.answer_value = 0
-        tmp_parent_sex.answer_value = 1
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-
-        tmp_parent_sex.answer_value = 2
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-
-        tmp_parent_sex.answer_value = 3
-        @answer.reload
-        expect(@cqv.check(@answer)).to eq(GENERIC_ERROR_MSG)
-      end
-
-      it 'should pass if parent_sex == 1, 2 or 3 and cycle_type == 6' do
-        create(:answer, question: @cycle_type, answer_value: '6', response: @response)
-        tmp_parent_sex = create(:answer, question: @parent_sex, answer_value: '1', response: @response)
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-
-        tmp_parent_sex.answer_value = 2
-        @answer.reload
-        expect(@cqv.check(@answer)).to be_nil
-
-        tmp_parent_sex.answer_value = 3
         @answer.reload
         expect(@cqv.check(@answer)).to be_nil
       end
@@ -1794,15 +1323,15 @@ describe 'Special Rules' do
     end
   end
 
-  describe 'special_rule_ttc' do
-    # special_rule_ttc: if parent_sex = 1 and stim_1st =y, then date_ttc must be complete
+  describe 'special_rule_ttc_1' do
+    # special_rule_ttc_1: if parent_sex = 1 and stim_1st =y, then date_ttc must be complete
     before :each do
       @survey = create(:survey)
       @section = create(:section, survey: @survey)
       @parent_sex = create(:question, code: 'PARENT_SEX', section: @section, question_type: Question::TYPE_CHOICE)
       @stim_1st = create(:question, code: 'STIM_1ST', section: @section, question_type: Question::TYPE_CHOICE)
       @date_ttc = create(:question, code: 'DATE_TTC', section: @section, question_type: Question::TYPE_DATE)
-      @cqv = create(:cross_question_validation, rule: 'special_rule_ttc', question: @parent_sex, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
+      @cqv = create(:cross_question_validation, rule: 'special_rule_ttc_1', question: @parent_sex, error_message: GENERIC_ERROR_MSG, related_question_id: nil)
       @response = create(:response, survey: @survey)
     end
 
@@ -1983,5 +1512,10 @@ describe 'Special Rules' do
         expect(@cqv.check(answer)).to eq(GENERIC_ERROR_MSG)
       end
     end
+
+
+
+
+
   end
 end

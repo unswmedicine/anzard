@@ -28,10 +28,11 @@
     %tr
       %th Treatment Data
       %th Year of Treatment
-      %th Unit Name
-      %th Site #
+      %th ANZARD Unit
+      %th ART Unit
       %th Status
       %th Records
+      -#%th Users
     %tbody
       - submission_summary_data.each do |summary|
         %tr
@@ -41,3 +42,4 @@
           %td= summary[:site_code]
           %td= summary[:status]
           %td= summary[:num_records]
+          -#%td= summary[:users]

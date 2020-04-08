@@ -34,6 +34,7 @@
 //= require populate_site_on_unit_select
 //= require new_clinic
 //= require populate_treatment_data_on_year_select
+//= require populate_years_on_treatment_select.js
 
 $(window).load(function () {
   $('.row div[class^="span"]:last-child').addClass('last-child');
