@@ -74,7 +74,7 @@ class SpecialRules
       required_question_code = RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES[cqv.rule]
       actual_question_code = cqv.question.code
       if required_question_code and actual_question_code != required_question_code
-	cqv.errors[:base] << "#{cqv.rule} requires question code #{required_question_code} but got #{actual_question_code}"
+	      cqv.errors[:base] << "#{cqv.rule} requires question code #{required_question_code} but got #{actual_question_code}"
       end
     end
   end
@@ -370,7 +370,7 @@ class SpecialRules
       n_embdon_fresh  = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDON_FRESH')
 
       break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-      n_eggdon_fresh > 0 || n_embdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0
+      break true unless (n_eggdon_fresh > 0 || n_embdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
     }
 
     CrossQuestionValidation.register_checker 'special_rule_cycletype_2_rec', lambda { |answer, ununused_related_answer, checker_params|
@@ -426,8 +426,9 @@ class SpecialRules
       n_icsi = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
       n_egfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_S')
       n_egfz_v = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EGFZ_V')
+      n_gift = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_GIFT')
 
-      (n_v_egth + n_s_egth + n_eggs + n_eggrec_fresh) >= (n_eggdon_fresh + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+      (n_v_egth + n_s_egth + n_eggs + n_eggrec_fresh) >= (n_eggdon_fresh + n_ivf + n_icsi + n_gift+ n_egfz_s + n_egfz_v)
     }
 
 
