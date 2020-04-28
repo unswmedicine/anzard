@@ -27,4 +27,6 @@ rerun.txt
 # Mac finder artifacts
 .DS_Store
 
+*.swo
+*.swp
 docker_dir/db

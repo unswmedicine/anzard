@@ -20,7 +20,7 @@ describe Survey do
   describe "Associations" do
     it { should have_many :responses }
     it { should have_many :sections }
-    it { should have_one :survey_configurations }
+    it { should have_one :survey_configuration }
   end
   describe "Validations" do
     before :each do

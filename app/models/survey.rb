@@ -20,6 +20,10 @@ class Survey < ApplicationRecord
   has_many :questions, through: :sections
   has_one :survey_configuration, dependent: :destroy
 
+  has_many :capturesystem_surveys
+  has_many :capturesystems, through: :capturesystem_surveys
+
+
   scope :by_name, -> {order(:name)}
 
   validates :name, presence: true, uniqueness: {case_sensitive: false}

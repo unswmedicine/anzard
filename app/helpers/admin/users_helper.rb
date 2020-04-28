@@ -17,12 +17,12 @@
 module Admin::UsersHelper
 
   def users_clinic_unit_filter_options(current_selection)
-    clinics = grouped_options_for_select(Clinic.units_by_state_with_unit_code, current_selection)
+    clinics = grouped_options_for_select(Clinic.units_by_state_with_unit_code(current_capturesystem), current_selection)
     filter_options_with_selected(clinics, current_selection)
   end
 
   def users_clinic_site_filter_options(current_selection)
-    clinics = grouped_options_for_select(Clinic.clinics_by_state_with_clinic_id, current_selection)
+    clinics = grouped_options_for_select(Clinic.clinics_by_state_with_clinic_id(current_capturesystem), current_selection)
     filter_options_with_selected(clinics, current_selection)
   end
 

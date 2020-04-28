@@ -32,9 +32,9 @@ class ClinicsController < ApplicationController
     sort += ", #{TERTIARY_SORT_COLUMN} ASC" unless sort_column == TERTIARY_SORT_COLUMN
     @clinic_filter = { unit: params[:clinics_unit_filter] }
     if !@clinic_filter[:unit].blank?
-      @clinics = Clinic.where(unit_code: @clinic_filter[:unit]).order(sort)
+      @clinics = Clinic.where(capturesystem_id: current_capturesystem.id, unit_code: @clinic_filter[:unit]).order(sort)
     else
-      @clinics = Clinic.all.order(sort)
+      @clinics = Clinic.where(capturesystem_id: current_capturesystem.id).order(sort)
     end
   end
 
@@ -43,6 +43,7 @@ class ClinicsController < ApplicationController
 
   def create
     @clinic = Clinic.new(clinic_params)
+    @clinic.capturesystem_id = current_capturesystem&.id;
     if @clinic.save
       redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully created."
     else
@@ -51,9 +52,12 @@ class ClinicsController < ApplicationController
   end
 
   def edit
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
   end
 
   def update
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
+
     @clinic.site_name = params[:clinic][:site_name]
     if @clinic.save
       redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully updated."
@@ -69,17 +73,19 @@ class ClinicsController < ApplicationController
     if params[:updated_unit_name].blank?
       redirect_to(edit_unit_clinics_path, alert: 'Unit Name cannot be blank')
     else
-      Clinic.where(unit_code: params[:selected_unit_code]).update_all(unit_name: params[:updated_unit_name])
+      Clinic.where(capturesystem_id: current_capturesystem.id, unit_code: params[:selected_unit_code]).update_all(unit_name: params[:updated_unit_name])
       redirect_to clinics_path, notice: "Unit #{params[:selected_unit_code]} was successfully updated."
     end
   end
 
   def activate
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
     @clinic.activate
     redirect_to(clinics_path, notice: 'The clinic has been activated.')
   end
 
   def deactivate
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
     @clinic.deactivate
     allocations_for_clinic = ClinicAllocation.where(clinic: @clinic)
     deactivated_clinic_users = User.where(id: allocations_for_clinic.pluck(:user_id).uniq)

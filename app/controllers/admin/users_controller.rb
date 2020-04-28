@@ -26,23 +26,28 @@ class Admin::UsersController < Admin::AdminBaseController
     sort = sort_column + ' ' + sort_direction
     sort = sort + ", #{SECONDARY_SORT_COLUMN} ASC" unless sort_column == SECONDARY_SORT_COLUMN # add secondary sort so its predictable when there's multiple values
 
-    @users = User.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
+    @users = current_capturesystem.users.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
     @clinic_filter = { unit: params[:users_clinic_unit_filter], unit_and_site: params[:users_clinic_site_filter] }
     filter_users_by_unit_code @clinic_filter[:unit], @clinic_filter[:unit]
     filter_users_by_clinic_ids @clinic_filter[:unit_and_site], @clinic_filter[:unit_and_site]
   end
 
   def show
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
   end
 
   def access_requests
     set_tab :access_requests, :admin_navigation
-    @users = User.pending_approval
+    @users = current_capturesystem.users.pending_approval
   end
 
   def deactivate
-    if !@user.check_number_of_superusers(params[:id], current_user.id)
-      redirect_to(admin_user_path(@user), alert: 'You cannot deactivate this account as it is the only account with Administrator privileges.')
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
+    #if !@user.check_number_of_superusers(params[:id], current_user.id)
+    the_capturesystem = last_admin_in_any_capturesystem(current_user.id)
+    if current_user.id == params[:id].to_i && !the_capturesystem.nil?
+      redirect_to(admin_user_path(@user), alert: "You cannot deactivate this account as it is the only account with Administrator privileges in capture system[#{the_capturesystem.name}].")
     else
       @user.deactivate
       redirect_to(admin_user_path(@user), notice: 'The user has been deactivated.')
@@ -50,6 +55,8 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
   def activate
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
     if @user.clinics.empty?
       redirect_to(admin_user_path(@user), alert: "You cannot activate this account as it is not associated with any sites. Edit this user's site allocation before activating.")
     else
@@ -59,17 +66,24 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
   def reject
-    @user.reject_access_request
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
+    @user.reject_access_request(current_capturesystem)
+    @user.capturesystem_users.where(capturesystem_id:current_capturesystem.id).destroy_all
     @user.destroy
     redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected.")
   end
 
   def reject_as_spam
-    @user.reject_access_request
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
+    @user.reject_access_request(current_capturesystem)
     redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected and this email address will be permanently blocked.")
   end
 
   def edit_role
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
     if @user == current_user
       flash.now[:alert] = 'You are changing the access level of the user you are logged in as.'
     elsif @user.rejected?
@@ -79,10 +93,14 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
   def edit_approval
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
     @roles = Role.by_name
   end
 
   def update_role
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
     if params[:user][:role_id].blank?
       redirect_to(edit_role_admin_user_path(@user), alert: 'Please select a role for the user.')
     else
@@ -94,8 +112,10 @@ class Admin::UsersController < Admin::AdminBaseController
         redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')
       else
         @user.clinics = updated_user_clinics
-        if !@user.check_number_of_superusers(params[:id], current_user.id)
-          redirect_to(edit_role_admin_user_path(@user), alert: 'Only one superuser exists. You cannot change this role.')
+        #if !@user.check_number_of_superusers(params[:id], current_user.id)
+        the_capturesystem = last_admin_in_any_capturesystem(current_user.id)
+        if current_user.id == params[:id].to_i && !the_capturesystem.nil?
+          redirect_to(edit_role_admin_user_path(@user), alert: "Only one superuser exists in capture system [#{the_capturesystem.name}]. You cannot change this role.")
         elsif @user.save
           redirect_to(admin_user_path(@user), notice: "The access level for #{@user.email} was successfully updated.")
         else
@@ -106,13 +126,15 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
   def approve
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
+
     if params[:user][:role_id].blank?
       redirect_to(edit_approval_admin_user_path(@user), alert: 'Please select a role for the user.')
     else
       @user.role_id = params[:user][:role_id]
       @user.clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
       if @user.save
-        @user.approve_access_request
+        @user.approve_access_request(current_capturesystem)
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")
       else
         redirect_to(edit_approval_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')
@@ -122,7 +144,7 @@ class Admin::UsersController < Admin::AdminBaseController
 
 
   def get_active_sites
-    render json: Clinic.where(unit_code: params['unit_code'], active: true)
+    render json: Clinic.where(capturesystem_id: current_capturesystem.id, unit_code: params['unit_code'], active: true)
   end
 
   private
@@ -157,6 +179,14 @@ class Admin::UsersController < Admin::AdminBaseController
         @users = @users.where(id: matching_clinic_allocations.pluck(:user_id))
       end
     end
+  end
+
+  def last_admin_in_any_capturesystem(user_id)
+    User.find_by(id:user_id).capturesystems.each do |cs|
+      return cs if cs.users.approved_superusers.length < 2
+    end
+
+    return nil
   end
 
 end

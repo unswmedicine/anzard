@@ -27,10 +27,23 @@ class UserRegistersController < Devise::RegistrationsController
   def create
     build_resource(sign_up_params)
 
-    resource.save
+    if resource.save
+      capturesystem = current_capturesystem
+      if !capturesystem.nil?
+        capturesystem_user = CapturesystemUser.new
+        capturesystem_user.capturesystem = capturesystem
+        capturesystem_user.user = resource
+        if capturesystem_user.save
+          logger.debug("Created new capturesystem_user [#{capturesystem.name}:#{resource.email}]")
+        else
+          logger.error("Failed to create new capturesystem_user [#{capturesystem.name} : #{resource.email}]")
+        end
+      end
+    end
+
     yield resource if block_given?
     if resource.persisted?
-      Notifier.notify_superusers_of_access_request(resource).deliver
+      Notifier.notify_superusers_of_access_request(resource, current_capturesystem).deliver
       if resource.active_for_authentication?
         set_flash_message! :notice, :signed_up
         sign_up(resource_name, resource)

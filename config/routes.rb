@@ -15,12 +15,16 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Anzard::Application.routes.draw do
-  devise_for :users, :controllers => {:registrations => "user_registers", :passwords => "user_passwords"}
+  devise_for :users, :controllers => {:registrations => "user_registers", :passwords => "user_passwords", :sessions => "user_sessions"}  
+
+  root :to => "pages#home"
 
   as :user do
     get "/users/profile", :to => "user_registers#profile" #page which gives options to edit details or change password
     get "/users/edit_password", :to => "user_registers#edit_password" #allow users to edit their own password
     put "/users/update_password", :to => "user_registers#update_password" #allow users to edit their own password
+    post '/users/sign_in_from', to: 'user_sessions#create_from'
+    post '/goto_system', to: 'user_sessions#goto_system'
   end
 
   resources :responses, :only => [:index, :new, :create, :edit, :update, :show, :destroy] do
@@ -103,7 +107,6 @@ Anzard::Application.routes.draw do
 
   end
 
-  root :to => "pages#home"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

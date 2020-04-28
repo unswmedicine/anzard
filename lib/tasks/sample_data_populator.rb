@@ -27,12 +27,24 @@ FEW = 3
 def populate_data(big=false)
   puts "Creating sample data in #{Rails.env} environment..."
 
-  load_password
+  puts "Deleting all CapturesystemUser,User records !!!"
+  CapturesystemUser.delete_all
   User.delete_all
+
+  load_password
   puts "Creating test users..."
   create_test_users
+  puts 'Upadate and add capture system'
+  update_and_add_new_capturesystem
+  puts 'Add config items for capturesystems'
+  add_config_items
+  puts "Creating capturesystem_users..."
+  create_capturesystem_users
+
   puts "Creating surveys..."
   create_surveys
+  puts "Creating capturesystem_surveys..."
+  create_capturesystem_surveys
 
   if %w(development qa).include? Rails.env
     puts "Creating responses..."
@@ -70,6 +82,17 @@ def create_responses(big)
 
 end
 
+def update_and_add_new_capturesystem
+  Capturesystem.where(name: 'ANZARD').update(base_url:'http://anzard.med.unsw.edu.au:3000')
+  Capturesystem.create(name: 'VARTA', base_url: 'http://varta.med.unsw.edu.au:3000')
+end
+
+def add_config_items
+  ConfigurationItem.create!(name: "ANZARD_LONG_NAME", configuration_value: "Australian & New Zealand Assisted Reproduction Database")
+  ConfigurationItem.create!(name: "VARTA_LONG_NAME", configuration_value: "Victoria Assisted Reproduction Treatment Authority")
+end
+
+
 def create_surveys
   Response.delete_all
   BatchFile.delete_all
@@ -80,6 +103,12 @@ def create_surveys
   CrossQuestionValidation.delete_all
 
   create_survey_from_lib_tasks(SURVEY_NAME, 'main_questions.csv', 'main_question_options.csv', 'main_cross_question_validations.csv', 'test_data/survey/real_survey')
+  create_survey_from_lib_tasks('VARTA 1.0', 'main_questions.csv', 'main_question_options.csv', 'main_cross_question_validations.csv', 'test_data/survey/real_survey')
+end
+
+def create_capturesystem_surveys
+  CapturesystemSurvey.create(survey_id: Survey.find_by(name:'ANZARD 2.0').id, capturesystem_id: Capturesystem.find_by(name:'ANZARD').id)
+  CapturesystemSurvey.create(survey_id: Survey.find_by(name:'VARTA 1.0').id, capturesystem_id: Capturesystem.find_by(name:'VARTA').id)
 end
 
 def create_survey_from_lib_tasks(name, question_file, options_file, cross_question_validations_file, dir='lib/tasks')
@@ -108,6 +137,14 @@ def create_test_users
 
   create_unapproved_user(email: 'unapproved1@anzard.intersect.org.au', first_name: 'Unapproved', last_name: 'One')
   create_unapproved_user(email: 'unapproved2@anzard.intersect.org.au', first_name: 'Unapproved', last_name: 'Two')
+end
+
+def create_capturesystem_users
+  User.order(:id).each do |r|
+    CapturesystemUser.create(user_id: r.id, capturesystem_id: Capturesystem.find_by(name:'ANZARD').id)
+  end
+
+  CapturesystemUser.create(user_id: User.find_by(email:'admin@anzard.intersect.org.au').id, capturesystem_id: Capturesystem.find_by(name:'VARTA').id)
 end
 
 def set_role(email, role, clinic_id=nil)

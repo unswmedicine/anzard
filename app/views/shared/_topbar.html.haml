@@ -17,7 +17,7 @@
 .topbar
   .topbar-inner
     .container
-      .brand Australian & New Zealand Assisted Reproduction Database
+      .brand #{current_capturesystem&.long_name||'National Perinatal Epidemiology and Statistics Unit'}
       = tabs_tag(builder: MenuTabBuilder) do |tab|
         %ul.nav
           = tab.home 'Home', root_path
@@ -29,3 +29,13 @@
             = tab.logout "Logout", destroy_user_session_path, class: "logout"
           - else
             = tab.signup "Request An Account", new_user_registration_path, class: "signup"
+
+          - if user_signed_in? && current_user.role.name == Role::SUPER_USER
+            %li
+              = select_tag 'select_system', options_for_select(capturesystems_for_user(current_user), "#{request.protocol}#{request.host}:#{request.port}"),
+                { class: "form-control form-control-lg large", onchange: "{ $('input[name=\"system_url\"]').val(this.value);document.request_goto.submit();}"}
+
+              = form_tag "#{request.protocol}#{request.host}:#{request.port}/goto_system", name: :request_goto, method: :post do
+                = hidden_field_tag 'system_url', ""
+                = hidden_field_tag 'from_url', "#{request.protocol}#{request.host}:#{request.port} "
+                %input{name:'commit', type:'submit', value:'goto_system', style:'display:none;'}

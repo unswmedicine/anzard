@@ -14,5 +14,17 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-%p Hello #{@user.first_name} #{@user.last_name},
-%p You made a request for access to the #{@capturesystem.name} System. Your request has been rejected. Please contact the #{@capturesystem.name} team for further information.
+- if user_signed_in?
+  - title 'Welcome to the Victoria Assisted Reproduction Treatment Authority', false, true
+  %div{class: "centered_wrapper"}
+    %h3 Please select the appropriate icon below to begin your submission.
+
+  = render(partial: 'pages/nav')
+
+- else
+  - title 'VARTA Home'
+  #content_container
+    .container_home
+      = form_for("user", url: user_session_path) do |f|
+        = render(partial: 'devise/sessions/form', locals: { f: f })
+

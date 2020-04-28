@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20191025021734) do
+ActiveRecord::Schema.define(version: 20200428020513) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -44,6 +44,35 @@ ActiveRecord::Schema.define(version: 20191025021734) do
     t.index ["survey_id"], name: "index_batch_files_on_survey_id", using: :btree
   end
 
+  create_table "capturesystem_surveys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "capturesystem_id"
+    t.integer  "survey_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.index ["capturesystem_id", "survey_id"], name: "index_capturesystem_surveys_on_capturesystem_id_and_survey_id", unique: true, using: :btree
+    t.index ["capturesystem_id"], name: "index_capturesystem_surveys_on_capturesystem_id", using: :btree
+    t.index ["survey_id", "capturesystem_id"], name: "index_capturesystem_surveys_on_survey_id_and_capturesystem_id", unique: true, using: :btree
+    t.index ["survey_id"], name: "index_capturesystem_surveys_on_survey_id", using: :btree
+  end
+
+  create_table "capturesystem_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "capturesystem_id"
+    t.integer  "user_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.index ["capturesystem_id", "user_id"], name: "index_capturesystem_users_on_capturesystem_id_and_user_id", unique: true, using: :btree
+    t.index ["capturesystem_id"], name: "index_capturesystem_users_on_capturesystem_id", using: :btree
+    t.index ["user_id", "capturesystem_id"], name: "index_capturesystem_users_on_user_id_and_capturesystem_id", unique: true, using: :btree
+    t.index ["user_id"], name: "index_capturesystem_users_on_user_id", using: :btree
+  end
+
+  create_table "capturesystems", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
+    t.string   "base_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "clinic_allocations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "clinic_id"
     t.integer  "user_id"
@@ -61,7 +90,9 @@ ActiveRecord::Schema.define(version: 20191025021734) do
     t.integer  "unit_code"
     t.integer  "site_code"
     t.string   "site_name"
-    t.boolean  "active",     default: true, null: false
+    t.boolean  "active",           default: true, null: false
+    t.integer  "capturesystem_id"
+    t.index ["capturesystem_id", "unit_code", "site_code"], name: "index_clinics_on_capturesystem_id_and_unit_code_and_site_code", unique: true, using: :btree
   end
 
   create_table "configuration_items", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -69,6 +100,7 @@ ActiveRecord::Schema.define(version: 20191025021734) do
     t.string   "configuration_value"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["name"], name: "index_configuration_items_on_name", unique: true, using: :btree
   end
 
   create_table "cross_question_validations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -195,6 +227,7 @@ ActiveRecord::Schema.define(version: 20191025021734) do
     t.datetime "updated_at"
     t.integer  "allocated_unit_code"
     t.string   "unlock_token"
+    t.string   "session_token"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree

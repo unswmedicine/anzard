@@ -28,6 +28,8 @@ class User < ApplicationRecord
   has_many :responses
   has_many :clinic_allocations
   has_many :clinics, through: :clinic_allocations
+  has_many :capturesystem_users
+  has_many :capturesystems, through: :capturesystem_users
 
   validates_presence_of :first_name
   validates_presence_of :last_name
@@ -143,26 +145,27 @@ class User < ApplicationRecord
     save!(validate: false)
   end
 
-  def approve_access_request
+  def approve_access_request(capturesystem)
     self.status = STATUS_ACTIVE
     save!(validate: false)
 
     # send an email to the user
-    Notifier.notify_user_of_approved_request(self).deliver
+    Notifier.notify_user_of_approved_request(self, capturesystem).deliver
   end
 
-  def reject_access_request
+  def reject_access_request(capturesystem)
     self.status = STATUS_REJECTED
     save!(validate: false)
 
     # send an email to the user
-    Notifier.notify_user_of_rejected_request(self).deliver
+    Notifier.notify_user_of_rejected_request(self, capturesystem).deliver
   end
 
-  def notify_admin_by_email
-    Notifier.notify_superusers_of_access_request(self).deliver
+  def notify_admin_by_email(capturesystem)
+    Notifier.notify_superusers_of_access_request(self, capturesystem).deliver
   end
 
+  #deperated
   def check_number_of_superusers(id, current_user_id)
     current_user_id != id.to_i or User.approved_superusers.length >= 2
   end
@@ -184,6 +187,14 @@ class User < ApplicationRecord
   def self.super_user? (user)
     return false unless user.role.present?
     user.role.super_user?
+  end
+
+  def authenticatable_salt
+    "#{super}#{session_token}"
+  end
+
+  def invalidate_sessions!
+    self.update(session_token: SecureRandom.hex(16))
   end
 
   private
