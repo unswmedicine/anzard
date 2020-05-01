@@ -20,12 +20,12 @@
     = f.collection_select :role_id, @roles, :id, :name, {include_blank: ""}, {class: 'large'}
 
 .clearfix#clinic_units
-  = label_tag :clinic_unit, 'Unit'
+  = label_tag :clinic_unit, 'ANZARD Unit'
   .input
     = select_tag :clinic_unit, grouped_options_for_select(Clinic.units_by_state_with_unit_code, @user.allocated_unit_code), include_blank: true, disabled: disable_unit_select, class: 'large'
 
 .clearfix#clinic_sites
-  = f.label :clinic_ids, 'Sites'
+  = f.label :clinic_ids, 'ART Unit'
   .input#user_clinics
     -# Collection checkbox used for initial rendering and editing access level. The content of this input is replaced by JS when the user selects a different unit.
     = f.collection_check_boxes :clinic_ids, Clinic.clinics_with_unit_code(@user.allocated_unit_code, true), :id, :site_name_with_full_code do |b|

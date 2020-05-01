@@ -14,15 +14,15 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-- title 'Edit Unit'
+- title 'Edit ANZARD Unit'
 
 = form_tag(controller: :clinics, action: :update_unit, method: :post) do
   .clearfix
-    = label_tag :selected_unit_code, 'Unit Selection'
+    = label_tag :selected_unit_code, 'ANZARD Unit Selection'
     .input
       = select_tag :selected_unit_code, clinics_unit_options, {class: 'large'}
   .clearfix
-    = label_tag :updated_unit_name, 'Unit Name'
+    = label_tag :updated_unit_name, 'ANZARD Unit Name'
     .input
       = text_field_tag :updated_unit_name
       = required
