@@ -32,8 +32,8 @@ class BatchSummaryReportGenerator
       text "Status: #{batch_file.status} (#{batch_file.message})"
 
       move_down 10
-      text "Number of records: #{batch_file.record_count}"
-      text "Number of records with problems: #{batch_file.problem_record_count}"
+      text "Number of cycles: #{batch_file.record_count}"
+      text "Number of cycles with problems: #{batch_file.problem_record_count}"
 
       move_down 10
       problems_table = organiser.summary_problems_as_table
