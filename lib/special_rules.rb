@@ -40,32 +40,32 @@ class SpecialRules
   )
 
   RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES = {
-    'special_rule_comp1' => 'N_V_EGTH',
-    'special_rule_comp2' => 'N_FERT',
-    'special_rule_comp3' => 'N_S_CLTH',
-    'special_rule_mtage' => 'N_EMBDISP',
-    'special_rule_mtagedisp' => 'N_EMBDISP',
-    'special_rule_pr_clin' => 'PR_CLIN',
-    'special_rule_gest_iui_date' => 'N_DELIV',
-    'special_rule_gest_et_date' => 'N_DELIV',
-    'special_rule_thaw_don' => 'THAW_DON',
-    'special_rule_surr' => 'DON_AGE',
-    'special_rule_et_date' => 'ET_DATE',
-    'special_rule_stim_1st' => 'STIM_1ST',
-    'special_rule_pgt_2' => 'N_PGT_ET',
-    'special_rule_pgt_3' => 'N_PGT_TH',
-    'special_rule_surr_3' => 'CYCLE_TYPE',
-    'special_rule_cycletype_2_don' => 'CYCLE_TYPE',
-    'special_rule_cycletype_2_rec' => 'CYCLE_TYPE',
-    'special_rule_ttc_1' => 'DATE_TTC',
-    'special_rule_thaw_1' => 'N_V_EGTH',
-    'special_rule_ttc_2' => 'DATE_TTC',
-    'special_rule_ivm' => 'IVM',
-    'special_rule_art_reason' => 'ART_REASON',
-    'special_rule_ci_1' => 'MALE_DIAG',
-    'special_rule_sperm' => 'SP_QUAL',
-    'special_rule_fdob_pat' => 'FDOB_PAT',
-    'special_rule_pgt_9' => 'NI_PGT_ET'
+      'special_rule_comp1' => 'N_V_EGTH',
+      'special_rule_comp2' => 'N_FERT',
+      'special_rule_comp3' => 'N_S_CLTH',
+      'special_rule_mtage' => 'N_EMBDISP',
+      'special_rule_mtagedisp' => 'N_EMBDISP',
+      'special_rule_pr_clin' => 'PR_CLIN',
+      'special_rule_gest_iui_date' => 'N_DELIV',
+      'special_rule_gest_et_date' => 'N_DELIV',
+      'special_rule_thaw_don' => 'THAW_DON',
+      'special_rule_surr' => 'DON_AGE',
+      'special_rule_et_date' => 'ET_DATE',
+      'special_rule_stim_1st' => 'STIM_1ST',
+      'special_rule_pgt_2' => 'N_PGT_ET',
+      'special_rule_pgt_3' => 'N_PGT_TH',
+      'special_rule_surr_3' => 'CYCLE_TYPE',
+      'special_rule_cycletype_2_don' => 'CYCLE_TYPE',
+      'special_rule_cycletype_2_rec' => 'CYCLE_TYPE',
+      'special_rule_ttc_1' => 'DATE_TTC',
+      'special_rule_thaw_1' => 'N_V_EGTH',
+      'special_rule_ttc_2' => 'DATE_TTC',
+      'special_rule_ivm' => 'IVM',
+      'special_rule_art_reason' => 'ART_REASON',
+      'special_rule_ci_1' => 'MALE_DIAG',
+      'special_rule_sperm' => 'SP_QUAL',
+      'special_rule_fdob_pat' => 'FDOB_PAT',
+      'special_rule_pgt_9' => 'NI_PGT_ET'
 
   }
 
@@ -92,7 +92,7 @@ class SpecialRules
       required_question_code = RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES[cqv.rule]
       actual_question_code = cqv.question.code
       if required_question_code and actual_question_code != required_question_code
-	      cqv.errors[:base] << "#{cqv.rule} requires question code #{required_question_code} but got #{actual_question_code}"
+        cqv.errors[:base] << "#{cqv.rule} requires question code #{required_question_code} but got #{actual_question_code}"
       end
     end
   end
@@ -172,12 +172,12 @@ class SpecialRules
 
       check_N_EMBREC_FRESH_exists = check_value(answer, 'N_EMBREC_FRESH')
       if check_N_EMBREC_FRESH_exists == true
-          n_embrec_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBREC_FRESH')
+        n_embrec_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBREC_FRESH')
       end
 
       check_N_EMBDON_FRESH_exists = check_value(answer, 'N_EMBDON_FRESH')
       if check_N_EMBDON_FRESH_exists == true
-          n_embdon_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDON_FRESH')
+        n_embdon_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDON_FRESH')
       end
 
       n_s_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_CLTH')
@@ -384,7 +384,7 @@ class SpecialRules
       check_N_EMBREC_FRESH_exists = check_value(answer, 'N_EMBREC_FRESH')
       if check_N_EMBREC_FRESH_exists == true
         n_embrec_fresh = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBREC_FRESH')
-        end
+      end
 
       check_N_EMBDON_FRESH_exists = check_value(answer, 'N_EMBDON_FRESH')
       if check_N_EMBDON_FRESH_exists == true
@@ -576,7 +576,7 @@ class SpecialRules
       parent_sex = answer.response.comparable_answer_or_nil_for_question_with_code('PARENT_SEX')
       fdob_pat = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB_PAT')
 
-      break true unless (cycle_type == 8 || [1,2,3].include?(parent_sex))
+      break true unless (cycle_type == 8 && [1,2,3].include?(parent_sex))
       !fdob_pat.nil?
     }
 

@@ -54,7 +54,7 @@
           %td= 'Deactivated'
         %td
           - if can?(:edit, clinic)
-            = link_to 'Edit Site', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn edit_clinic'
+            = link_to 'Edit ART Unit', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn edit_clinic'
           - if clinic.active
             = link_to 'Deactivate', deactivate_clinic_path(clinic), class: 'btn', method: :post, data: {confirm: 'Are you sure? Deactivating a clinic will deallocate all users from that clinic. User accounts with no other clinics will also be deactivated.'}
           - else
