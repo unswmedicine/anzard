@@ -38,11 +38,41 @@ class BatchSummaryReportGenerator
       move_down 10
       problems_table = organiser.summary_problems_as_table
       if problems_table.size > 1
-        table(problems_table, header: true, row_colors: ["FFFFFF", "F0F0F0"], column_widths: {0 => 95, 1 => 65, 2 => 95}) do
-          row(0).font_style = :bold
-        end
-      end
+        table(problems_table,
+              header: true,
+              row_colors: ["FFFFFF", "F0F0F0"],
+              column_widths: {0 => 95, 1 => 65, 2 => 95},
+              ) do |t|
 
+          t.row(0).font_style = :bold
+          col_0 = t.cells.columns(0)
+
+          col_0_not_blank_values = col_0.filter do |cell|
+            cell.content.to_s != ""
+          end
+
+          col_0_blank_values = col_0.filter do |cell|
+            cell.content.to_s == ""
+          end
+
+          col_0_blank_values.background_color = "FFFFFF"
+          col_0_not_blank_values.background_color = "FFFFFF"
+
+          col_0_blank_values.border_top_color = "FFFFFF"
+          col_0_blank_values.border_bottom_color = "FFFFFF"
+          col_0_not_blank_values.border_bottom_color = "FFFFFF"
+
+
+          # The following line is needed because when table is split into different pdf pages, the bottom border for
+          # col(0) is made "FFFFFF" from above
+
+          t.before_rendering_page do |page|
+            page.row(-1).border_bottom_color = "000000"
+          end
+
+        end
+
+      end
     end
   end
 end
