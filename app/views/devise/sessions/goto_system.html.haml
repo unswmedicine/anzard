@@ -1,10 +1,9 @@
 %html
-  -#%body{onload:"$('#goto_system').find('[name=\"commit\"]').click();"}
-  %body{onload:"document.goto_system.submit();"}
-    - title "Loading Capture System at: #{params[:system_url]}", false, true
-    = form_tag "#{params[:system_url]}/users/sign_in_from", id: :goto_system, name: :goto_system, method: :post do
-      = hidden_field_tag 'from_url', "#{params[:from_url]}"
-      = hidden_field_tag 'stored_session', "#{request.cookies[Rails.application.config.session_options[:key]]}"
-      = hidden_field_tag 'user[email]', "not set"
-      = hidden_field_tag 'user[password]', "not set"
-      %input{name:'commit', type:'submit', value:'sign_in_from', style:'display:none;'}
+  - if master_site_base_url == params[:system_url] 
+    = render partial: 'request_new_session'
+  - else
+    - case @requested_capturesystem_user&.access_status 
+    - when nil
+      = render partial: 'request_access_to_system'
+    - when CapturesystemUser::STATUS_ACTIVE
+      = render partial: 'request_new_session'

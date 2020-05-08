@@ -42,14 +42,18 @@ class Answer < ApplicationRecord
 
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of questions that are loaded once in an initializer
-  def question
-    QUESTIONS[self.question_id]
-  end
+  #def question
+    #QUESTIONS[self.question_id]
+  #end
+  ##REMOVE_ABOVE
+  #TODO loops on .question
+  belongs_to :question
 
   # As above
-  def question=(question)
-    self.question_id = question.id
-  end
+  #def question=(question)
+  #  self.question_id = question.id
+  #end
+  ##REMOVE_ABOVE
 
   def has_warning?
     warnings.present? or fatal_warnings.present?

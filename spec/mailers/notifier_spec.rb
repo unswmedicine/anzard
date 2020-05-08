@@ -47,7 +47,7 @@ describe Notifier do
     address = 'user@email.org'
     user = create(:user, :status => "U", :email => address)
     User.should_receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
-    email = Notifier.notify_superusers_of_access_request(user, Capturesystem.find(1)).deliver
+    email = Notifier.notify_superusers_of_access_request(user, Capturesystem.find(1).name, Capturesystem.find(1).base_url).deliver
 
     # check that the email has been queued for sending
     ActionMailer::Base.deliveries.empty?.should eq(false)

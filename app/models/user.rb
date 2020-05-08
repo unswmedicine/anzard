@@ -122,17 +122,30 @@ class User < ApplicationRecord
     self.status == STATUS_ACTIVE
   end
 
+  def approved_in_capturesystem?(capturesystem)
+    self.approved? && !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_ACTIVE).nil?
+  end
+
   def pending_approval?
     self.status == STATUS_UNAPPROVED
+  end
+  def pending_approval_in_capturesystem?(capturesystem)
+    self.pending_approval? || self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_UNAPPROVED).nil?
   end
 
   def deactivated?
     self.status == STATUS_DEACTIVATED
   end
+  def deactivated_in_capturesystem?(capturesystem)
+    self.deactivated? || !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_DEACTIVATED).nil?
+  end
 
 
   def rejected?
     self.status == STATUS_REJECTED
+  end
+  def rejected_in_capturesystem?(capturesystem)
+    self.rejected? || !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_REJECTED).nil?
   end
 
   def deactivate
@@ -140,29 +153,42 @@ class User < ApplicationRecord
     save!(validate: false)
   end
 
+  def deactivate_in_capturesystem(capturesystem)
+    self.capturesystem_users.where(capturesystem: capturesystem).update(access_status: CapturesystemUser::STATUS_DEACTIVATED)
+  end
+
+
   def activate
     self.status = STATUS_ACTIVE
     save!(validate: false)
   end
 
-  def approve_access_request(capturesystem)
+  def activate_in_capturesystem(capturesystem)
+    self.capturesystem_users.where(capturesystem: capturesystem).update(access_status: CapturesystemUser::STATUS_ACTIVE)
+  end
+
+  def approve_access_request(system_name, system_base_url, capturesystem)
     self.status = STATUS_ACTIVE
     save!(validate: false)
+    CapturesystemUser.where(user:self, capturesystem:capturesystem).update(access_status:CapturesystemUser::STATUS_ACTIVE)
 
     # send an email to the user
-    Notifier.notify_user_of_approved_request(self, capturesystem).deliver
+    Notifier.notify_user_of_approved_request(self, system_name, system_base_url, capturesystem).deliver
   end
 
   def reject_access_request(capturesystem)
     self.status = STATUS_REJECTED
     save!(validate: false)
+    #reject as spam will keep the above user and prevent it from register again, and prevent it from access all the capture systems
+    CapturesystemUser.where(user:self, capturesystem:capturesystem).update(access_status:CapturesystemUser::STATUS_REJECTED)
 
     # send an email to the user
     Notifier.notify_user_of_rejected_request(self, capturesystem).deliver
   end
 
-  def notify_admin_by_email(capturesystem)
-    Notifier.notify_superusers_of_access_request(self, capturesystem).deliver
+  #deprecated
+  def notify_admin_by_email( system_name, system_base_url)
+    Notifier.notify_superusers_of_access_request(self, system_name, system_base_url).deliver
   end
 
   #deperated

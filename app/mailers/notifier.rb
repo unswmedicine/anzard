@@ -16,14 +16,15 @@
 
 class Notifier < ActionMailer::Base
 
-  def notify_user_of_approved_request(recipient, capturesystem)
+  def notify_user_of_approved_request(recipient, system_name, system_base_url, capturesystem)
     @user = recipient
     @capturesystem = capturesystem
+    @host_url = system_base_url
 
     mail( to: @user.email,
           from: APP_CONFIG['account_request_user_status_email_sender'],
           reply_to: APP_CONFIG['account_request_user_status_email_sender'],
-          subject: "#{@capturesystem.name} -Your access request has been approved")
+          subject: "#{system_name} | #{@capturesystem.name} -Your access request has been approved")
   end
 
   def notify_user_of_rejected_request(recipient, capturesystem)
@@ -37,15 +38,14 @@ class Notifier < ActionMailer::Base
   end
 
   # notifications for super users
-  def notify_superusers_of_access_request(applicant, capturesystem)
+  def notify_superusers_of_access_request(applicant, system_name, system_base_url)
     superusers_emails = applicant.capturesystems.map {|r| r.users.get_superuser_emails }.flatten.uniq
     @user = applicant
-    @capturesystem = capturesystem
-
+    @host_url = system_base_url
     mail( to: superusers_emails,
           from: APP_CONFIG['account_request_admin_notification_sender'],
           reply_to: @user.email,
-          subject: "#{@capturesystem.name} - There has been a new access request")
+          subject: "#{@system_name} - There has been a new access request")
   end
 
   def notify_user_that_they_cant_reset_their_password(user, capturesystem)
@@ -61,7 +61,7 @@ class Notifier < ActionMailer::Base
   private
 
   def mail(headers, &block)
-    self.default_url_options[:host] = @capturesystem.base_url
+    self.default_url_options[:host] = @host_url
     super
   end
 

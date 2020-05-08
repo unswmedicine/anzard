@@ -21,6 +21,7 @@
     .formerror= render "shared/error_messages", target: @user
     = render partial: 'personal_details', :locals  => {f: f}
     = render partial: 'account_details', :locals  => {f: f}
+    = render partial: 'capturesystem_selection', :locals  => {f: f}
     .actions
       = f.submit "Submit Request", class: "btn primary"
       = link_to 'Cancel', root_path, class: "btn"

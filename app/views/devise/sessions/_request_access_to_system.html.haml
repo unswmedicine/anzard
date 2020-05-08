@@ -1,0 +1,13 @@
+%body
+  = form_tag users_request_capturesystem_access_path, id: :request_for_system, name: :request_for_system, method: :post do
+    .container
+      .container-flex
+        .container-fixed-item
+          %h2 Please request permission to access capture system: #{Capturesystem.find_by(base_url:params[:system_url])&.name}
+          .clearfix
+            = label_tag :capturesystem_name, "Capture System:"
+            .input
+              = text_field_tag :capturesystem_name, "#{Capturesystem.find_by(base_url:params[:system_url])&.name}", readonly: true, class: "xlarge"
+      .actions
+        = submit_tag 'Submit Request', class: 'btn primary'
+        = link_to 'Back', master_site_base_url, class: 'btn'

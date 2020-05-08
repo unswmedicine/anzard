@@ -1,11 +1,20 @@
 class UserSessionsController < Devise::SessionsController
   skip_before_action :verify_authenticity_token, only: [:create_from]
-  prepend_before_action only: [:create_from] do
-    request.env["devise.skip_timeout"] = true
+  skip_before_action :authenticate_user!, only: [:create_from], raise: false
+  #prepend_before_action only: [:create_from] do
+    #request.env["devise.skip_timeout"] = true
+  #end
+
+  def new
+    #Always go to the master site for login
+    if !current_capturesystem.nil? && !user_signed_in?
+      return redirect_to master_site_base_url
+    end
+    super
   end
 
   def create
-    if current_capturesystem.users.find_by(email: params[:user][:email]).nil?
+    if User.find_by(email: params[:user][:email]).nil?
       set_flash_message!(:alert, :invalid, scope: [:devise, :failure])
       return redirect_to root_path
     end
@@ -17,52 +26,31 @@ class UserSessionsController < Devise::SessionsController
     super
   end
 
-  #todo system accessability check
   def create_from
-    the_user_id,the_authenticatable_salt=get_warden_user_user_key_from_cookie(params[:stored_session])
+    the_user_id,the_authenticatable_salt = get_warden_user_user_key_from_cookie(params[:stored_session])
 
-    if current_capturesystem.users.find_by(id: the_user_id).nil?
-      set_flash_message!(:alert, :invalid, scope: [:devise, :failure])
-      return redirect_to root_path
-    end
-
-    the_user=User.find_by_id(the_user_id)
+    the_user = User.find_by_id(the_user_id)
     if the_user.nil?
       set_flash_message!(:alert, :invalid, scope: [:devise, :failure])
+      logger.error "Received stored_session with an invalid user_id [#{the_user_id}]"
+      return redirect_to root_path
+    end
+    if !current_capturesystem.nil? && the_user.capturesystem_users.find_by(capturesystem: current_capturesystem, access_status: CapturesystemUser::STATUS_ACTIVE).nil?
+      set_flash_message!(:alert, :invalid, scope: [:devise, :failure])
+      logger.error "Received stored_session for user [#{the_user.email}] with no permission to capture system at [#{request.host}]"
       return redirect_to root_path
     end
 
-    if user_signed_in? 
-      logger.debug "Request is received with a pre-existing session"
-      if the_user_id == current_user[:id]
-        logger.debug "Request appears to be from the same user"
-      else
-        logger.debug "Request received with a different pre-existing user"
-        current_user.invalidate_sessions!
-        logger.debug "Sign out the pre-existing user [#{current_user.email}]"
-        sign_out(current_user)
-      end
-
-      if the_user.authenticatable_salt == the_authenticatable_salt
-        bypass_sign_in(the_user)
-        set_flash_message!(:notice, :signed_in_with_session_in_cookie)
-        logger.debug "Session has been created for the user [#{the_user.email}]"
-      else
-        set_flash_message!(:alert, :invalid, scope: [:devise, :failure])
-        logger.error "Received invalid stored_session"
-      end
+    if the_user.authenticatable_salt == the_authenticatable_salt
+      reset_session
+      bypass_sign_in(the_user)
+      #session.update old_values.except('session_id')
+      #set_flash_message!(:notice, :signed_in_with_session_in_cookie)
+      logger.debug "Session has been created for the user [#{the_user.email}] at [#{request.host}]"
     else
-      logger.debug "There is no pre-existing session stored in the current cookie"
-      if the_user.authenticatable_salt == the_authenticatable_salt
-        bypass_sign_in(the_user)
-        set_flash_message!(:notice, :signed_in_with_session_in_cookie)
-        logger.debug "Session has been created for the user [#{the_user.email}]"
-      else
-        set_flash_message!(:alert, :invalid, scope: [:devise, :failure])
-        logger.error "Received invalid stored_session"
-      end
+      set_flash_message!(:alert, :invalid, scope: [:devise, :failure])
+      logger.error "Received invalid stored_session for user [#{the_user.email}] at [#{request.host}]"
     end
-
     return redirect_to root_path
   end
 
@@ -71,7 +59,22 @@ class UserSessionsController < Devise::SessionsController
       response.headers['Access-Control-Allow-Origin']=params[:from_url]
       response.headers['Access-Control-Request-Method']= %w{GET POST OPTIONS}.join(",")
 
-      render :goto_system && return
+      @requested_capturesystem = Capturesystem.find_by(base_url: params[:system_url])
+      if @requested_capturesystem.nil? && master_site_base_url != params[:system_url] 
+        return redirect_to(root_path, alert: 'You have requested an invalid capture system')
+      else
+        @requested_capturesystem_user = CapturesystemUser.find_by(capturesystem: @requested_capturesystem, user: current_user)
+        case @requested_capturesystem_user&.access_status
+        when CapturesystemUser::STATUS_UNAPPROVED
+          return redirect_to(root_path, alert:"Your request to access #{@requested_capturesystem.name} is pending")
+        when CapturesystemUser::STATUS_DEACTIVATED
+          return redirect_to(root_path, alert:"Your access to #{@requested_capturesystem.name} has been dactivated")
+        when CapturesystemUser::STATUS_REJECTED
+          return redirect_to(root_path, alert:"Your request to access #{@requested_capturesystem.name} has been rejected")
+        else
+          render :goto_system && return
+        end
+      end
     else
       return redirect_to root_path
     end

@@ -73,7 +73,7 @@ describe User do
     it "should set the status flag to A" do
       user = create(:user, :status => 'U')
       capturesystem = create(:capturesystem, :name => 'capture_system_1', :base_url => 'http://capture.system.one.org')
-      user.approve_access_request(capturesystem)
+      user.approve_access_request('','',capturesystem)
       user.status.should eq("A")
     end
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200428020513) do
+ActiveRecord::Schema.define(version: 20200507080709) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 20200428020513) do
     t.integer "integer_answer"
     t.string  "choice_answer"
     t.string  "raw_answer"
+    t.index ["question_id"], name: "index_answers_on_question_id", using: :btree
     t.index ["response_id"], name: "index_answers_on_response_id", using: :btree
   end
 
@@ -60,6 +61,7 @@ ActiveRecord::Schema.define(version: 20200428020513) do
     t.integer  "user_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
+    t.string   "access_status"
     t.index ["capturesystem_id", "user_id"], name: "index_capturesystem_users_on_capturesystem_id_and_user_id", unique: true, using: :btree
     t.index ["capturesystem_id"], name: "index_capturesystem_users_on_capturesystem_id", using: :btree
     t.index ["user_id", "capturesystem_id"], name: "index_capturesystem_users_on_user_id_and_capturesystem_id", unique: true, using: :btree

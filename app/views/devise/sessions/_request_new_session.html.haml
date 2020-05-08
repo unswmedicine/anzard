@@ -1,0 +1,8 @@
+%body{onload:"document.goto_system.submit();"}
+  - title "Loading: #{params[:system_url]}", false, true
+  = form_tag "#{params[:system_url]}/users/sign_in_from", id: :goto_system, name: :goto_system, method: :post do
+    = hidden_field_tag 'sign_in_from_url', "#{params[:from_url]}"
+    = hidden_field_tag 'stored_session', "#{request.cookies[Rails.application.config.session_options[:key]]}"
+    = hidden_field_tag 'user[email]', "not set"
+    = hidden_field_tag 'user[password]', "not set"
+    %input{name:'commit', type:'submit', value:'sign_in_from', style:'display:none;'}

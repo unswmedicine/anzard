@@ -23,6 +23,7 @@ Anzard::Application.routes.draw do
     get "/users/profile", :to => "user_registers#profile" #page which gives options to edit details or change password
     get "/users/edit_password", :to => "user_registers#edit_password" #allow users to edit their own password
     put "/users/update_password", :to => "user_registers#update_password" #allow users to edit their own password
+    post "/users/request_capturesystem_access", :to => "user_registers#request_capturesystem_access" #allow users to edit their own password
     post '/users/sign_in_from', to: 'user_sessions#create_from'
     post '/goto_system', to: 'user_sessions#goto_system'
   end

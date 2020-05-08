@@ -16,10 +16,14 @@
 
 - if user_signed_in?
   - title 'Welcome to the Australia and New Zealand Assisted Reproduction Database', false, true
-  %div{class: "centered_wrapper"}
-    %h3 Please select the appropriate icon below to begin your submission.
 
-  = render(partial: 'pages/nav')
+  - if current_user.role.super_user? || !current_user.clinics.where(capturesystem:current_capturesystem).empty?
+    %div{class: "centered_wrapper"}
+      %h3 Please select the appropriate icon below to begin your submission.
+    = render(partial: 'pages/nav')
+  - else
+    %div{class: "centered_wrapper"}
+      %h3 You need to be allocated to at least one clinic to submit.
 
 - else
   - title 'Home'

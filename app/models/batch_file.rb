@@ -64,14 +64,18 @@ class BatchFile < ApplicationRecord
 
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of surveys that are loaded once in an initializer
-  def survey
-    SURVEYS[survey_id]
-  end
+  #def survey
+    #SURVEYS[survey_id]
+  #end
+  ##REMOVE_ABOVE
 
   # as above
-  def survey=(survey)
-    self.survey_id = survey.id
-  end
+  #def survey=(survey)
+    #self.survey_id = survey.id
+  #end
+  ##REMOVE_ABOVE
+
+  belongs_to :survey
 
   def make_file_path
     # this is a method so that APP_CONFIG has been loaded by the time is executes
@@ -200,7 +204,7 @@ class BatchFile < ApplicationRecord
       @csv_row_count += 1
       cycle_id = row[sanitise_question_code(COLUMN_CYCLE_ID)]
       cycle_id.strip! unless cycle_id.nil?
-      clinic_in_row = Clinic.find_by(unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+      clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
 
       concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
       response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
@@ -282,7 +286,7 @@ class BatchFile < ApplicationRecord
           end
         end
 
-        clinic_in_row = Clinic.find_by(unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
         if clinic_in_row.nil?
           set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false

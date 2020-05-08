@@ -92,8 +92,9 @@ class ClinicsController < ApplicationController
     allocations_for_clinic.destroy_all
     users_deactivated = []
     deactivated_clinic_users.each do |user|
-      if user.clinics.empty?
-        user.deactivate
+      if user.clinics.where(capturesystem: current_capturesystem).empty?
+        #user.deactivate
+        user.deactivate_in_capturesystem(current_capturesystem)
         users_deactivated.append user
       end
     end

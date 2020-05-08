@@ -58,14 +58,17 @@ class Response < ApplicationRecord
 
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of surveys that are loaded once in an initializer
-  def survey
-    SURVEYS[survey_id]
-  end
+  #def survey
+    #SURVEYS[survey_id]
+  #end
+  ##REMOVE_ABOVE
+  #TODO remove above code because optiomisation should be done in a more rails frendly place
 
   # as above
-  def survey=(survey)
-    self.survey_id = survey.id
-  end
+  #def survey=(survey)
+    #self.survey_id = survey.id
+  #end
+  ##REMOVE_ABOVE
 
   def self.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
     results = submitted.for_survey(survey).order(:cycle_id)
@@ -77,7 +80,7 @@ class Response < ApplicationRecord
       end
     end
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
-    results.includes([:clinic])
+    results.includes([:clinic, :survey, answers: :question])
   end
 
   def self.count_per_survey_and_year_of_registration_and_clinic(survey_id, year, clinic_id)
@@ -124,7 +127,6 @@ class Response < ApplicationRecord
 
   def prepare_answers_to_section_with_blanks_created(section)
     existing_answers = answers_to_section(section).each_with_object({}) { |answer, hash| hash[answer.question_id] = answer }
-
     section.questions.each do |question|
       #if there's no answer object already, build an empty one
       if !existing_answers.include?(question.id)
@@ -231,6 +233,7 @@ class Response < ApplicationRecord
 
   def answers_to_section(section)
     answers.select {|a| a.question.section_id == section.id}
+    #answers.all.where(question: section.questions)
   end
 
   def strip_whitespace

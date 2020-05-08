@@ -26,7 +26,7 @@ describe Response do
 
   describe "Validations" do
     it { should validate_presence_of :cycle_id }
-    it { should validate_length_of(:cycle_id).is_at_least(1).is_at_most(20)}
+    it { should validate_length_of(:cycle_id).is_at_least(1).is_at_most(Response::CYCLE_ID_MAX_SIZE + Clinic::SITE_CODE_MAX_SIZE + 1)}
     it { should validate_presence_of :user }
     it { should validate_presence_of :survey_id }
     it { should validate_presence_of :year_of_registration }

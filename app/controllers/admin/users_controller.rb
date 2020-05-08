@@ -18,6 +18,11 @@ class Admin::UsersController < Admin::AdminBaseController
 
   ALLOWED_SORT_COLUMNS = %w(email first_name last_name allocated_unit_code roles.name status last_sign_in_at)
   SECONDARY_SORT_COLUMN = 'email'
+
+  before_action only:[:show, :deactivate, :activate, :reject, :reject_as_spam, :edit_role, :edit_approval, :update_role, :approve] do
+    redirect_back(fallback_location: root_path, alert: 'Please select a capture system before this action.') if current_capturesystem.users.find_by(id:params[:id].to_i).nil?
+  end
+
   load_and_authorize_resource
   helper_method :sort_column, :sort_direction
 
@@ -26,92 +31,88 @@ class Admin::UsersController < Admin::AdminBaseController
     sort = sort_column + ' ' + sort_direction
     sort = sort + ", #{SECONDARY_SORT_COLUMN} ASC" unless sort_column == SECONDARY_SORT_COLUMN # add secondary sort so its predictable when there's multiple values
 
-    @users = current_capturesystem.users.deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
+    @users = current_capturesystem.users.where(capturesystem_users:{access_status:[CapturesystemUser::STATUS_ACTIVE, CapturesystemUser::STATUS_DEACTIVATED]}).deactivated_or_approved.includes(:role).includes(:clinics).order(sort)
     @clinic_filter = { unit: params[:users_clinic_unit_filter], unit_and_site: params[:users_clinic_site_filter] }
     filter_users_by_unit_code @clinic_filter[:unit], @clinic_filter[:unit]
     filter_users_by_clinic_ids @clinic_filter[:unit_and_site], @clinic_filter[:unit_and_site]
   end
 
   def show
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
   end
 
   def access_requests
+    return redirect_back(fallback_location: root_path, alert: 'Please select a capture system first for the Access Requests page.') if at_master_site?
     set_tab :access_requests, :admin_navigation
-    @users = current_capturesystem.users.pending_approval
+    @users = current_capturesystem.users.where(capturesystem_users:{access_status:[CapturesystemUser::STATUS_UNAPPROVED, nil]}).order(:email)
   end
 
   def deactivate
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
     #if !@user.check_number_of_superusers(params[:id], current_user.id)
     the_capturesystem = last_admin_in_any_capturesystem(current_user.id)
     if current_user.id == params[:id].to_i && !the_capturesystem.nil?
       redirect_to(admin_user_path(@user), alert: "You cannot deactivate this account as it is the only account with Administrator privileges in capture system[#{the_capturesystem.name}].")
     else
-      @user.deactivate
-      redirect_to(admin_user_path(@user), notice: 'The user has been deactivated.')
+      #@user.deactivate
+      @user.deactivate_in_capturesystem(current_capturesystem)
+      redirect_to(admin_user_path(@user), notice: "The user has been deactivated in #{current_capturesystem.name}.")
     end
   end
 
   def activate
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
-    if @user.clinics.empty?
+    if @user.clinics.where(capturesystem:current_capturesystem).empty? && !@user.role.super_user?
       redirect_to(admin_user_path(@user), alert: "You cannot activate this account as it is not associated with any sites. Edit this user's site allocation before activating.")
     else
       @user.activate
-      redirect_to(admin_user_path(@user), notice: 'The user has been activated.')
+      @user.activate_in_capturesystem(current_capturesystem)
+      redirect_to(admin_user_path(@user), notice: "The user has been activated in #{current_capturesystem.name}.")
     end
   end
 
   def reject
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
     @user.reject_access_request(current_capturesystem)
+    #@user.destroy
+    #reject account request to one capturesystem does not imply rejecting account request to the other
     @user.capturesystem_users.where(capturesystem_id:current_capturesystem.id).destroy_all
-    @user.destroy
+    #TODO need cleanup
+    @user.update(status: User::STATUS_ACTIVE)
     redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected.")
   end
 
   def reject_as_spam
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
     @user.reject_access_request(current_capturesystem)
     redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected and this email address will be permanently blocked.")
   end
 
   def edit_role
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
     if @user == current_user
       flash.now[:alert] = 'You are changing the access level of the user you are logged in as.'
-    elsif @user.rejected?
+    elsif @user.rejected_in_capturesystem?(current_capturesystem)
       redirect_to(admin_users_path, alert: 'Access level can not be set. This user has previously been rejected as a spammer.')
     end
     @roles = Role.by_name
   end
 
   def edit_approval
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
     @roles = Role.by_name
   end
 
   def update_role
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
     if params[:user][:role_id].blank?
       redirect_to(edit_role_admin_user_path(@user), alert: 'Please select a role for the user.')
     else
       @user.role_id = params[:user][:role_id]
       # ToDo: Refactor as this duplicates the user clinic validation which isn't ideal.
-      updated_user_clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
+      updated_user_clinics = current_capturesystem.clinics.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
       if updated_user_clinics.empty? && !@user.super_user?
         # Don't modify clinic association (which doesn't revert if clinic is invalid) if clinic set is empty and user isn't admin.
         redirect_to(edit_role_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')
       else
-        @user.clinics = updated_user_clinics
+        #@user.clinics = updated_user_clinics
+        @user.clinic_allocations.where(clinic: @user.clinics.where(capturesystem:current_capturesystem)).destroy_all
+        updated_user_clinics.each do |selected_clinic|
+          @user.clinics << selected_clinic
+        end
+
         #if !@user.check_number_of_superusers(params[:id], current_user.id)
         the_capturesystem = last_admin_in_any_capturesystem(current_user.id)
         if current_user.id == params[:id].to_i && !the_capturesystem.nil?
@@ -126,15 +127,23 @@ class Admin::UsersController < Admin::AdminBaseController
   end
 
   def approve
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.users.find_by(id:@user.id).nil?
-
     if params[:user][:role_id].blank?
       redirect_to(edit_approval_admin_user_path(@user), alert: 'Please select a role for the user.')
     else
       @user.role_id = params[:user][:role_id]
-      @user.clinics = Clinic.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
+      selected_clinic_ids = params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? }
+      begin
+        #@user.clinics = current_capturesystem.clinics.find(params[:user][:clinic_ids].reject{ |clinic_id| clinic_id.blank? })
+        @user.clinic_allocations.where(clinic: @user.clinics.where(capturesystem:current_capturesystem)).destroy_all
+        selected_clinic_ids.each do |clinic_id|
+          @user.clinics << current_capturesystem.clinics.find(clinic_id)
+        end
+      rescue ActiveRecord::RecordInvalid => invalid
+        return redirect_back(fallback_location: root_path, alert: "#{invalid.record.errors.full_messages}")
+      end
+
       if @user.save
-        @user.approve_access_request(current_capturesystem)
+        @user.approve_access_request(master_site_name, master_site_base_url, current_capturesystem)
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")
       else
         redirect_to(edit_approval_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')

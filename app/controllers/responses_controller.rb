@@ -17,15 +17,21 @@
 class ResponsesController < ApplicationController
   before_action :authenticate_user!
 
+  before_action except:[] do
+    redirect_back(fallback_location: root_path, alert: 'There are no clinic allocated to you.') if !current_user.role.super_user? && current_user.clinics.where(capturesystem:current_capturesystem).empty?
+  end
+
   load_and_authorize_resource
 
   expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
-  expose(:surveys) { SURVEYS.values }
-  expose(:clinics) { Clinic.clinics_by_state_with_clinic_id }
+  #expose(:surveys) { SURVEYS.values }
+  #REMOVE_ABOVE
+  expose(:clinics) { Clinic.where(capturesystem_id: current_capturesystem.id).clinics_by_state_with_clinic_id }
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
   def index
-    @responses = Response.accessible_by(current_ability).unsubmitted.order("cycle_id")
+
+    @responses = Response.accessible_by(current_ability).unsubmitted.order("cycle_id").where(survey: current_capturesystem.surveys)
   end
 
   def new
@@ -33,7 +39,9 @@ class ResponsesController < ApplicationController
 
   def show
     #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
-    set_response_value_on_answers(@response)
+    #set_response_value_on_answers(@response)
+    #Remove above unverifiable WARNING and reduntant code in the next release
+    @loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
   end
 
   def submit
@@ -57,14 +65,17 @@ class ResponsesController < ApplicationController
   end
 
   def edit
-    set_response_value_on_answers(@response)
+    #set_response_value_on_answers(@response)
+    #REMOVE_ABOVE reduntant code in the next release
 
     section_id = params[:section]
-    @section = section_id.blank? ? @response.survey.first_section : @response.survey.section_with_id(section_id)
+    @loaded_response = Response.includes(answers: [question: [:cross_question_validations]], survey: [sections: [questions: [:cross_question_validations, :question_options]]]).find(@response.id)
+
+    @section = section_id.blank? ? @loaded_response.survey.first_section : @loaded_response.survey.section_with_id(section_id)
 
     @questions = @section.questions
-    @flag_mandatory = @response.section_started? @section
-    @question_id_to_answers = @response.prepare_answers_to_section_with_blanks_created(@section)
+    @flag_mandatory = @loaded_response.section_started? @section
+    @question_id_to_answers = @loaded_response.prepare_answers_to_section_with_blanks_created(@section)
     @group_info = calculate_group_info(@section, @questions)
   end
 
@@ -74,36 +85,42 @@ class ResponsesController < ApplicationController
     submitted_answers = answers.map { |id, val| [id.to_i, val] }
     submitted_questions = submitted_answers.map { |q_a| q_a.first }
      #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
-    set_response_value_on_answers(@response)
+    #set_response_value_on_answers(@response)
+    #REMOVE_ABOVE in the next release
+
+    @loaded_response = Response.includes(answers:[:question], survey: [sections: [:questions]]).find(@response.id)
 
     Answer.transaction do
       submitted_answers.each do |q_id, answer_value|
-        answer = @response.get_answer_to(q_id)
+        answer = @loaded_response.get_answer_to(q_id)
         if blank_answer?(answer_value)
           answer.destroy if answer
         else
-          answer = @response.answers.build(question_id: q_id) unless answer
+          answer = @loaded_response.answers.build(question_id: q_id) unless answer
           answer.answer_value = answer_value
           answer.save!
         end
       end
 
       # destroy answers for questions not in section
-      section = @response.survey.section_with_id(params[:current_section])
+      section = @loaded_response.survey.section_with_id(params[:current_section])
       if section
         missing_questions = section.questions.select { |q| !submitted_questions.include?(q.id) && q.question_type == Question::TYPE_CHOICE }
         missing_questions.each do |question|
-          answer = @response.get_answer_to(question.id)
+          answer = @loaded_response.get_answer_to(question.id)
           answer.destroy if answer
         end
       end
     end
 
     # reload and trigger a save so that status is recomputed afresh - DONT REMOVE THIS
-    @response.reload
+    #@loaded_response.reload
+    ActiveRecord::Base.connection.clear_query_cache
+    @loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
      #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
-    set_response_value_on_answers(@response)
-    @response.save!
+    #set_response_value_on_answers(@response)
+    #Remove above unverifiable WARNING and reduntant code in the next release
+    @loaded_response.save!
 
     redirect_after_update(params)
   end
@@ -115,9 +132,11 @@ class ResponsesController < ApplicationController
 
   def review_answers
     #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
-    set_response_value_on_answers(@response)
+    #set_response_value_on_answers(@response)
+    #Remove above unverifiable WARNING and reduntant code in the next release
 
-    @sections_to_answers = @response.sections_to_answers_with_blanks_created
+    loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
+    @sections_to_answers = loaded_response.sections_to_answers_with_blanks_created
   end
 
   def submission_summary
@@ -135,11 +154,12 @@ class ResponsesController < ApplicationController
     @site_code = params[:site_code]
     @year_of_registration = params[:year_of_registration]
 
-    if @survey_id.blank?
-      @errors = ["Please select a treatment data"]
+    selected_survey = current_capturesystem.surveys.includes(sections: [questions: :section]).find_by(id: @survey_id)
+    if selected_survey.nil?
+      @errors = ["Please select a valid treatment data"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(@survey_id, @unit_code, @site_code, @year_of_registration)
+      generator = CsvGenerator.new(selected_survey, @unit_code, @site_code, @year_of_registration)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
@@ -150,12 +170,12 @@ class ResponsesController < ApplicationController
   end
 
   def get_sites
-    render json: Clinic.where(unit_code: params['unit_code'])
+    render json: Clinic.where(capturesystem_id: current_capturesystem.id, unit_code: params['unit_code'])
   end
 
   def batch_delete
     set_tab :delete_responses, :admin_navigation
-    @sorted_clinics = Clinic.order(:site_code)
+    @sorted_clinics = current_capturesystem.clinics.order(:site_code)
   end
 
   def confirm_batch_delete
@@ -165,7 +185,7 @@ class ResponsesController < ApplicationController
 
     @errors = validate_batch_delete_form(@year, @treatment_data_id)
     if @errors.empty?
-      @treatment_data = SURVEYS[@treatment_data_id.to_i]
+      @treatment_data = current_capturesystem.surveys.find(@treatment_data_id.to_i)
       @clinic_site_code_name = ""
       unless @clinic_id.blank?
         @clinic_site_code_name = Clinic.find(@clinic_id).site_name_with_code
@@ -194,7 +214,7 @@ class ResponsesController < ApplicationController
   def download_index_summary
     index_summary = CSV.generate(:col_sep => ",") do |csv|
       csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment Created\ By Status Date\ Started)
-      Response.accessible_by(current_ability).unsubmitted.order("cycle_id").each do |response|
+      Response.accessible_by(current_ability).unsubmitted.order("cycle_id").where(survey: current_capturesystem.surveys).each do |response|
         csv.add_row [response.cycle_id, response.survey.name, response.year_of_registration, response.user.full_name,
                      response.validation_status, response.created_at]
       end
@@ -215,11 +235,11 @@ class ResponsesController < ApplicationController
 
   def submission_summary_data
     submissions = []
-    SURVEYS.values.each do |survey|
+    current_capturesystem.surveys.each do |survey|
       stats = StatsReport.new(survey)
       unless stats.empty?
         stats.years.each do |year|
-          Clinic.order(:unit_code, :site_code).each do |clinic|
+          Clinic.where(capturesystem_id: current_capturesystem.id).order(:unit_code, :site_code).each do |clinic|
             [{name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
              {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}].each do |status|
               num_records = stats.response_count(year, status[:name], clinic.id)
@@ -237,7 +257,8 @@ class ResponsesController < ApplicationController
   helper_method :submission_summary_data
 
   def treatment_data_for_year
-    survey_configs = SurveyConfiguration.where('start_year_of_treatment <= ? and end_year_of_treatment >= ?', params['year'], params['year'])
+    #VARTA_YEAER
+    survey_configs = SurveyConfiguration.where('start_year_of_treatment <= ? and end_year_of_treatment >= ?', params['year'], params['year']).where(survey: current_capturesystem.surveys)
     surveys = []
     survey_configs.each do |survey_config|
       surveys << { 'form_id': survey_config.survey.id, 'form_name': survey_config.survey.name }
@@ -247,6 +268,7 @@ class ResponsesController < ApplicationController
 
   private
 
+  #deprecated not_used
   def organised_cycle_ids(user)
     clinics = user.clinics
     responses = Response.includes(:survey).where(submitted_status: Response::STATUS_SUBMITTED, clinic_id: clinics)
@@ -265,6 +287,7 @@ class ResponsesController < ApplicationController
 
   def validate_batch_delete_form(year, survey_id)
     errors = []
+    errors << "Please select a valid survey" if current_capturesystem.surveys.find(survey_id).nil?
     errors << "Please select a year of registration" if year.blank?
     errors << "Please select a treatment data" if survey_id.blank?
     errors
@@ -286,7 +309,7 @@ class ResponsesController < ApplicationController
     if clicked =~ /^Save and return to summary page/
       go_to_section = 'summary'
     elsif clicked =~ /^Save and go to next section/
-      go_to_section = @response.survey.section_id_after(go_to_section.to_i)
+      go_to_section = @loaded_response.survey.section_id_after(go_to_section.to_i)
     end
 
     if go_to_section == "summary"
@@ -306,6 +329,7 @@ class ResponsesController < ApplicationController
     result
   end
 
+  #deprecated method to be removed in the next release
   def set_response_value_on_answers(response)
     #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
     response.answers.each { |a| a.response = response }

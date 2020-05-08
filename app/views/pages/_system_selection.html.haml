@@ -1,6 +1,6 @@
 .container
   .container-flex
     .container-flex-item
-      = link_to (image_tag 'banner_fertility_society_australia.png', class: 'logo'), 'http://varta.med.unsw.edu.au:3000/'
+      = link_to (image_tag 'banner_fertility_society_australia.png', class: 'logo'), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'ANZARD').base_url}');document.request_goto.submit();"
     .container-flex-item
-      = link_to (image_tag 'logo_unsw.png', class: 'logo'), 'http://anzard.med.unsw.edu.au:3000/'
+      = link_to (image_tag 'logo_unsw.png', class: 'logo'), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'VARTA').base_url}');document.request_goto.submit();"
