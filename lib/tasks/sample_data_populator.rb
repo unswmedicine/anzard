@@ -34,10 +34,10 @@ def populate_data(big=false)
   load_password
   puts "Creating test users..."
   create_test_users
-  puts 'Upadate and add capture system'
-  update_and_add_new_capturesystem
-  puts 'Add config items for capturesystems'
-  update_and_add_config_items
+  puts 'Upadate capture system'
+  update_capturesystem
+  puts 'Update config items for capturesystems'
+  update_config_items
   puts "Creating capturesystem_users..."
   create_capturesystem_users
 
@@ -82,18 +82,27 @@ def create_responses(big)
 
 end
 
-def update_and_add_new_capturesystem
-  Capturesystem.where(name: 'ANZARD').update(base_url:'http://anzard.med.unsw.edu.au:3000')
-
-  Capturesystem.create(name: 'VARTA', base_url: 'http://varta.med.unsw.edu.au:3000')
+def update_capturesystem
+  if Rails.env.development?
+    Capturesystem.where(name: 'ANZARD').update(base_url:'http://anzard.med.unsw.edu.au:3000')
+    Capturesystem.where(name: 'VARTA').update(base_url:'http://varta.med.unsw.edu.au:3000')
+  elsif Rails.env.qa?
+    Capturesystem.where(name: 'ANZARD').update(base_url:'https://anzard-npesu-qa.intersect.org.au')
+    Capturesystem.where(name: 'VARTA').update(base_url:'https://varta-npesu-qa.intersect.org.au')
+  elsif Rails.env.staging?
+    Capturesystem.where(name: 'ANZARD').update(base_url:'https://anzard-npesu-staging.intersect.org.au')
+    Capturesystem.where(name: 'VARTA').update(base_url:'https://varta-npesu-staging.intersect.org.au')
+  end
 end
 
-def add_config_items
-  ConfigurationItem.where(name: 'master_site_base_url').update(configuration_value: 'http://npesu.med.unsw.edu.au:3000')
-  ConfigurationItem.create!(name: 'master_site_name', configuration_value: 'NPESU')
-
-  ConfigurationItem.create!(name: "ANZARD_LONG_NAME", configuration_value: "Australian & New Zealand Assisted Reproduction Database")
-  ConfigurationItem.create!(name: "VARTA_LONG_NAME", configuration_value: "Victoria Assisted Reproduction Treatment Authority")
+def update_config_items
+  if Rails.env.development?
+    ConfigurationItem.where(name: 'master_site_base_url').update(configuration_value: 'http://npesu.med.unsw.edu.au:3000')
+  elsif Rails.env.qa?
+    ConfigurationItem.where(name: 'master_site_base_url').update(configuration_value: 'https://npesu-qa.intersect.org.au')
+  elsif Rails.env.staging?
+    ConfigurationItem.where(name: 'master_site_base_url').update(configuration_value: 'https://npesu-staging.intersect.org.au')
+  end
 end
 
 
@@ -145,10 +154,10 @@ end
 
 def create_capturesystem_users
   User.order(:id).each do |r|
-    CapturesystemUser.create(user_id: r.id, capturesystem_id: Capturesystem.find_by(name:'ANZARD').id)
+    CapturesystemUser.create(user_id: r.id, capturesystem_id: Capturesystem.find_by(name:'ANZARD').id, access_status: CapturesystemUser::STATUS_ACTIVE)
   end
 
-  CapturesystemUser.create(user_id: User.find_by(email:'admin@anzard.intersect.org.au').id, capturesystem_id: Capturesystem.find_by(name:'VARTA').id)
+  CapturesystemUser.create(user_id: User.find_by(email:'admin@anzard.intersect.org.au').id, capturesystem_id: Capturesystem.find_by(name:'VARTA').id, access_status: CapturesystemUser::STATUS_ACTIVE)
 end
 
 def set_role(email, role, clinic_id=nil)

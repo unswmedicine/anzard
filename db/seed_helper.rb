@@ -1,7 +1,8 @@
 def create_capturesystems
   Capturesystem.delete_all
 
-  Capturesystem.create(name: 'ANZARD', base_url: 'https://anzard.med.unsw.edu.au')
+  Capturesystem.create!(name: 'ANZARD', base_url: 'https://anzard.med.unsw.edu.au')
+  Capturesystem.create!(name: 'VARTA', base_url: 'https://varta.med.unsw.edu.au')
 end
 
 
@@ -23,6 +24,9 @@ def create_config_items
   #ANZARD year range (interpreated as calendar year)
   ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_START, configuration_value: "2005")
   ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2012")
+
+  ConfigurationItem.create!(name: "ANZARD_LONG_NAME", configuration_value: "Australian & New Zealand Assisted Reproduction Database")
+  ConfigurationItem.create!(name: "VARTA_LONG_NAME", configuration_value: "Victoria Assisted Reproduction Treatment Authority")
 end
 
 def create_clinics
