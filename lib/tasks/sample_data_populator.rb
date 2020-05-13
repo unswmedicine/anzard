@@ -37,7 +37,7 @@ def populate_data(big=false)
   puts 'Upadate and add capture system'
   update_and_add_new_capturesystem
   puts 'Add config items for capturesystems'
-  add_config_items
+  update_and_add_config_items
   puts "Creating capturesystem_users..."
   create_capturesystem_users
 
@@ -84,10 +84,14 @@ end
 
 def update_and_add_new_capturesystem
   Capturesystem.where(name: 'ANZARD').update(base_url:'http://anzard.med.unsw.edu.au:3000')
+
   Capturesystem.create(name: 'VARTA', base_url: 'http://varta.med.unsw.edu.au:3000')
 end
 
 def add_config_items
+  ConfigurationItem.where(name: 'master_site_base_url').update(configuration_value: 'http://npesu.med.unsw.edu.au:3000')
+  ConfigurationItem.create!(name: 'master_site_name', configuration_value: 'NPESU')
+
   ConfigurationItem.create!(name: "ANZARD_LONG_NAME", configuration_value: "Australian & New Zealand Assisted Reproduction Database")
   ConfigurationItem.create!(name: "VARTA_LONG_NAME", configuration_value: "Victoria Assisted Reproduction Treatment Authority")
 end
@@ -261,7 +265,7 @@ def create_batch_file(survey, count_of_rows)
   responses = Response.where(survey_id: survey.id).all
   responses_to_use = responses.sample(count_of_rows)
 
-  csv = CsvGenerator.new(survey.id, nil, nil,nil)
+  csv = CsvGenerator.new(survey, nil, nil,nil)
   csv.records = responses_to_use
 
   filepath = "#{Rails.root}/tmp/batch-#{survey.name.parameterize}-#{count_of_rows}.csv"

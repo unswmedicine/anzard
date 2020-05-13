@@ -43,7 +43,7 @@ class Admin::UsersController < Admin::AdminBaseController
   def access_requests
     return redirect_back(fallback_location: root_path, alert: 'Please select a capture system first for the Access Requests page.') if at_master_site?
     set_tab :access_requests, :admin_navigation
-    @users = current_capturesystem.users.where(capturesystem_users:{access_status:[CapturesystemUser::STATUS_UNAPPROVED, nil]}).order(:email)
+    @users = current_capturesystem.users.where(capturesystem_users:{access_status:[CapturesystemUser::STATUS_UNAPPROVED, nil, '']}).order(:email)
   end
 
   def deactivate
@@ -68,19 +68,35 @@ class Admin::UsersController < Admin::AdminBaseController
     end
   end
 
+  #TODO need cleanup
   def reject
     @user.reject_access_request(current_capturesystem)
     #@user.destroy
     #reject account request to one capturesystem does not imply rejecting account request to the other
     @user.capturesystem_users.where(capturesystem_id:current_capturesystem.id).destroy_all
-    #TODO need cleanup
-    @user.update(status: User::STATUS_ACTIVE)
+    if @user.capturesystem_users.where(access_status: CapturesystemUser::STATUS_ACTIVE).count > 0
+      @user.update(status: User::STATUS_ACTIVE)
+    elsif @user.capturesystem_users.where(access_status: [CapturesystemUser::STATUS_UNAPPROVED, '', nil]).count > 0
+      @user.update(status: User::STATUS_UNAPPROVED)
+    elsif @user.capturesystem_users.where(access_status: CapturesystemUser::STATUS_DEACTIVATED).count > 0
+      @user.update(status: User::STATUS_DEACTIVATED)
+    elsif @user.capturesystem_users.where(access_status: CapturesystemUser::STATUS_REJECTED).count == @user.capturesystem_users.count
+      #only remove the account record where all the access requests have been rejected
+      if @user.capturesystem_users.destroy_all
+        @user.destroy
+      end
+    end
+
     redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected.")
   end
 
   def reject_as_spam
-    @user.reject_access_request(current_capturesystem)
-    redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected and this email address will be permanently blocked.")
+    if @user.capturesystem_users.where(access_status:[CapturesystemUser::STATUS_ACTIVE, CapturesystemUser::STATUS_DEACTIVATED]).count > 0
+      return redirect_to(access_requests_admin_users_path, alert: "Cannot permanently block #{@user.email}, it has been approved in the other capture system(s). However you can reject this request with the 'Reject' button.")
+    else
+      @user.reject_access_request(current_capturesystem)
+      return redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected and this email address will be permanently blocked.")
+    end
   end
 
   def edit_role
@@ -190,9 +206,10 @@ class Admin::UsersController < Admin::AdminBaseController
     end
   end
 
+  # returns the first capturesystem that this user is the last admin of
   def last_admin_in_any_capturesystem(user_id)
     User.find_by(id:user_id).capturesystems.each do |cs|
-      return cs if cs.users.approved_superusers.length < 2
+      return cs if cs.users.approved_superusers.where(capturesystem_users: {access_status: CapturesystemUser::STATUS_ACTIVE}).length < 2
     end
 
     return nil

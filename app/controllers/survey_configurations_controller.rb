@@ -22,7 +22,7 @@ class SurveyConfigurationsController < ApplicationController
 
   def index
     # ToDo: order by associated survey name
-    @survey_configurations = SurveyConfiguration.accessible_by(current_ability).where(survey_id: current_capturesystem.surveys)
+    @survey_configurations = SurveyConfiguration.accessible_by(current_ability).where(survey_id: current_capturesystem.survey_ids)
   end
 
   def edit

@@ -17,7 +17,7 @@
 - title 'User Details'
 %div
   %h2 Actions
-  - if @user.pending_approval?
+  - if @user.pending_approval_in_capturesystem?(current_capturesystem)
     .user_details_menu
       - if can?(:approve, @user) then
         = link_to 'Approve', edit_approval_admin_user_path(@user), method: :get, class: 'btn'
@@ -29,7 +29,7 @@
         &nbsp;
       = link_to 'Back', access_requests_admin_users_path, class: 'btn'
 
-  - if @user.approved_in_capturesystem?(current_capturesystem)
+  - elsif @user.approved_in_capturesystem?(current_capturesystem)
     .user_details_menu
       - if can?(:update_role, User)
         = link_to 'Edit Access Level', edit_role_admin_user_path(@user), class: 'btn'
@@ -43,7 +43,7 @@
           &nbsp;
       = link_to 'Back', admin_users_path, class: 'btn'
 
-  - if @user.deactivated_in_capturesystem?(current_capturesystem)
+  - elsif @user.deactivated_in_capturesystem?(current_capturesystem)
     .user_details_menu
       - if can?(:update_role, User)
         = link_to 'Edit Access Level', edit_role_admin_user_path(@user), class: 'btn'

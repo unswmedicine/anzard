@@ -11,7 +11,10 @@ class Capturesystem < ApplicationRecord
   validates :base_url, presence: true, uniqueness: {case_sensitive: false}
 
   def long_name
-    ConfigurationItem.find_by(name:"#{self.name}_LONG_NAME")&.configuration_value || self.name
+    Rails.cache.fetch("capturesystem#long_name/#{self.name}", compress:false) do
+      logger.debug("Fetching [capturesystem#long_name/#{self.name}]")
+      ConfigurationItem.find_by(name:"#{self.name}_LONG_NAME")&.configuration_value || self.name
+    end
   end
 
   def host

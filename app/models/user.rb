@@ -130,7 +130,7 @@ class User < ApplicationRecord
     self.status == STATUS_UNAPPROVED
   end
   def pending_approval_in_capturesystem?(capturesystem)
-    self.pending_approval? || self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_UNAPPROVED).nil?
+    self.pending_approval? || !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_UNAPPROVED).nil?
   end
 
   def deactivated?

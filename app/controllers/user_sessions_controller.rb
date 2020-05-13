@@ -61,11 +61,13 @@ class UserSessionsController < Devise::SessionsController
 
       @requested_capturesystem = Capturesystem.find_by(base_url: params[:system_url])
       if @requested_capturesystem.nil? && master_site_base_url != params[:system_url] 
-        return redirect_to(root_path, alert: 'You have requested an invalid capture system')
+        return redirect_to(root_path, alert: 'Your access request to capture system is invalid')
       else
         @requested_capturesystem_user = CapturesystemUser.find_by(capturesystem: @requested_capturesystem, user: current_user)
-        case @requested_capturesystem_user&.access_status
-        when CapturesystemUser::STATUS_UNAPPROVED
+        (render :goto_system && return) if @requested_capturesystem_user.nil? 
+
+        case @requested_capturesystem_user.access_status
+        when nil, '', CapturesystemUser::STATUS_UNAPPROVED
           return redirect_to(root_path, alert:"Your request to access #{@requested_capturesystem.name} is pending")
         when CapturesystemUser::STATUS_DEACTIVATED
           return redirect_to(root_path, alert:"Your access to #{@requested_capturesystem.name} has been dactivated")

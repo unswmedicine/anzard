@@ -30,7 +30,6 @@ class ResponsesController < ApplicationController
   expose(:existing_years_of_registration) { Response.existing_years_of_registration }
 
   def index
-
     @responses = Response.accessible_by(current_ability).unsubmitted.order("cycle_id").where(survey: current_capturesystem.surveys)
   end
 
@@ -41,7 +40,8 @@ class ResponsesController < ApplicationController
     #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
     #set_response_value_on_answers(@response)
     #Remove above unverifiable WARNING and reduntant code in the next release
-    @loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
+    #@loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
+    @loaded_response = Response.includes(:answers).find(@response.id)
   end
 
   def submit
@@ -69,11 +69,13 @@ class ResponsesController < ApplicationController
     #REMOVE_ABOVE reduntant code in the next release
 
     section_id = params[:section]
-    @loaded_response = Response.includes(answers: [question: [:cross_question_validations]], survey: [sections: [questions: [:cross_question_validations, :question_options]]]).find(@response.id)
+    #@loaded_response = Response.includes(answers: [question: [:cross_question_validations]], survey: [sections: [questions: [:cross_question_validations, :question_options]]]).find(@response.id)
+    @loaded_response = Response.includes(:answers).find(@response.id)
 
     @section = section_id.blank? ? @loaded_response.survey.first_section : @loaded_response.survey.section_with_id(section_id)
 
     @questions = @section.questions
+    #@questions = @section.questions.includes(:cross_question_validations, :question_options)
     @flag_mandatory = @loaded_response.section_started? @section
     @question_id_to_answers = @loaded_response.prepare_answers_to_section_with_blanks_created(@section)
     @group_info = calculate_group_info(@section, @questions)
@@ -88,7 +90,8 @@ class ResponsesController < ApplicationController
     #set_response_value_on_answers(@response)
     #REMOVE_ABOVE in the next release
 
-    @loaded_response = Response.includes(answers:[:question], survey: [sections: [:questions]]).find(@response.id)
+    #@loaded_response = Response.includes(answers:[:question], survey: [sections: [:questions]]).find(@response.id)
+    @loaded_response = Response.includes(:answers).find(@response.id)
 
     Answer.transaction do
       submitted_answers.each do |q_id, answer_value|
@@ -116,7 +119,8 @@ class ResponsesController < ApplicationController
     # reload and trigger a save so that status is recomputed afresh - DONT REMOVE THIS
     #@loaded_response.reload
     ActiveRecord::Base.connection.clear_query_cache
-    @loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
+    #@loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
+    @loaded_response = Response.includes(:answers).find(@response.id)
      #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
     #set_response_value_on_answers(@response)
     #Remove above unverifiable WARNING and reduntant code in the next release
@@ -135,7 +139,8 @@ class ResponsesController < ApplicationController
     #set_response_value_on_answers(@response)
     #Remove above unverifiable WARNING and reduntant code in the next release
 
-    loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
+    #loaded_response = Response.includes(answers: [question: [:cross_question_validations, :question_options]], survey: [sections: [questions: [:answers, :cross_question_validations] ]]).find(@response.id)
+    loaded_response = Response.includes(:answers).find(@response.id)
     @sections_to_answers = loaded_response.sections_to_answers_with_blanks_created
   end
 

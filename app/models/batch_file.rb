@@ -158,7 +158,7 @@ class BatchFile < ApplicationRecord
       end
 
       r.answers.each do |answer|
-        organiser.add_problems(answer.question.code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
+        organiser.add_problems(Question.find(answer.question_id).code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
       end
       r.missing_mandatory_questions.each do |question|
         organiser.add_problems(question.code, cycle_id_without_site_code, ['This question is mandatory'], [], '')

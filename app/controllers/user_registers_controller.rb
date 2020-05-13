@@ -73,7 +73,7 @@ class UserRegistersController < Devise::RegistrationsController
     else
       clean_up_passwords resource
       set_minimum_password_length
-      respond_with resource
+      respond_with resource, location: new_user_registration_path
     end
   end
 
@@ -112,6 +112,9 @@ class UserRegistersController < Devise::RegistrationsController
     unless capturesystem.nil? || current_user.nil? || !current_user.approved?
       if CapturesystemUser.create( capturesystem: capturesystem, user: current_user, access_status: CapturesystemUser::STATUS_UNAPPROVED)
         Notifier.notify_superusers_of_access_request(current_user, master_site_name, master_site_base_url).deliver
+      else
+        logger.error("Failed to create a new access for user [#{current_user.email}] to capturesystem [#{capturesystem_name.name}]")
+        return redirect_to(root_path, alert: "Your request has been rejected.")
       end
       return redirect_to(root_path, notice: "Your request to access #{capturesystem.name} has been sent.")
     else

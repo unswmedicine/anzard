@@ -17,6 +17,10 @@ end
 def create_config_items
   ConfigurationItem.delete_all
 
+  ConfigurationItem.create!(name: 'master_site_base_url', configuration_value: 'https://npesu.med.unsw.edu.au')
+  ConfigurationItem.create!(name: 'master_site_name', configuration_value: 'NPESU')
+
+  #ANZARD year range (interpreated as calendar year)
   ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_START, configuration_value: "2005")
   ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2012")
 end
