@@ -38,14 +38,14 @@ class Notifier < ActionMailer::Base
   end
 
   # notifications for super users
-  def notify_superusers_of_access_request(applicant, system_name, system_base_url)
-    superusers_emails = applicant.capturesystems.map {|r| r.users.get_superuser_emails }.flatten.uniq
+  def notify_superusers_of_access_request(applicant, system_name, system_base_url, capturesystem)
+    superusers_emails = capturesystem.users.get_superuser_emails.flatten.uniq
     @user = applicant
     @host_url = system_base_url
     mail( to: superusers_emails,
           from: APP_CONFIG['account_request_admin_notification_sender'],
           reply_to: @user.email,
-          subject: "#{system_name} - There has been a new access request")
+          subject: "#{system_name} | #{capturesystem.name} - There has been a new access request")
   end
 
   def notify_user_that_they_cant_reset_their_password(user, capturesystem)

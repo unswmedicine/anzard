@@ -187,9 +187,9 @@ class User < ApplicationRecord
   end
 
   #deprecated
-  def notify_admin_by_email( system_name, system_base_url)
-    Notifier.notify_superusers_of_access_request(self, system_name, system_base_url).deliver
-  end
+  #def notify_admin_by_email( system_name, system_base_url)
+    #Notifier.notify_superusers_of_access_request(self, system_name, system_base_url).deliver
+  #end
 
   #deperated
   def check_number_of_superusers(id, current_user_id)
