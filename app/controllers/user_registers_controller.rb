@@ -110,7 +110,7 @@ class UserRegistersController < Devise::RegistrationsController
   def request_capturesystem_access
     capturesystem = Capturesystem.find_by(name:params[:capturesystem_name])
     unless capturesystem.nil? || current_user.nil? || !current_user.approved?
-      if CapturesystemUser.create( capturesystem: capturesystem, user: current_user, access_status: CapturesystemUser::STATUS_UNAPPROVED)
+      if CapturesystemUser.create( capturesystem: capturesystem, user: current_user, access_status: CapturesystemUser::STATUS_UNAPPROVED).persisted?
         Notifier.notify_superusers_of_access_request(current_user, master_site_name, master_site_base_url).deliver
       else
         logger.error("Failed to create a new access for user [#{current_user.email}] to capturesystem [#{capturesystem_name.name}]")

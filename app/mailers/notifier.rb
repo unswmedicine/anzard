@@ -45,7 +45,7 @@ class Notifier < ActionMailer::Base
     mail( to: superusers_emails,
           from: APP_CONFIG['account_request_admin_notification_sender'],
           reply_to: @user.email,
-          subject: "#{@system_name} - There has been a new access request")
+          subject: "#{system_name} - There has been a new access request")
   end
 
   def notify_user_that_they_cant_reset_their_password(user, capturesystem)
