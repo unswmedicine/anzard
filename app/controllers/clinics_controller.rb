@@ -17,6 +17,11 @@
 class ClinicsController < ApplicationController
   before_action :authenticate_user!
 
+  before_action only: [:activate, :deactivate] do
+    clinic = Clinic.find(params[:id])
+    redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') unless current_user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id).include?(clinic.capturesystem_id)
+  end
+
   ALLOWED_SORT_COLUMNS = %w(unit_name unit_code site_name site_code state active)
   DEFAULT_SORT_COLUMN = 'unit_code'
   SECONDARY_SORT_COLUMN = 'unit_code'
@@ -39,6 +44,7 @@ class ClinicsController < ApplicationController
   end
 
   def new
+    @allowed_states = current_capturesystem.name == 'VARTA' ? %w(VIC) : Clinic::PERMITTED_STATES
   end
 
   def create
@@ -84,6 +90,7 @@ class ClinicsController < ApplicationController
     redirect_to(clinics_path, notice: 'The clinic has been activated.')
   end
 
+  #TODO this action needs cleanup
   def deactivate
     return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
     @clinic.deactivate

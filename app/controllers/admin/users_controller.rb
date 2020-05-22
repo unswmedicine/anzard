@@ -70,7 +70,7 @@ class Admin::UsersController < Admin::AdminBaseController
 
   #TODO need cleanup
   def reject
-    @user.reject_access_request(current_capturesystem)
+    @user.reject_access_request(master_site_name, current_capturesystem)
     #@user.destroy
     #reject account request to one capturesystem does not imply rejecting account request to the other
     @user.capturesystem_users.where(capturesystem_id:current_capturesystem.id).destroy_all
@@ -82,8 +82,15 @@ class Admin::UsersController < Admin::AdminBaseController
       @user.update(status: User::STATUS_DEACTIVATED)
     elsif @user.capturesystem_users.where(access_status: CapturesystemUser::STATUS_REJECTED).count == @user.capturesystem_users.count
       #only remove the account record where all the access requests have been rejected
-      if @user.capturesystem_users.destroy_all
-        @user.destroy
+      if Response.find_by(user:@user) || BatchFile.find_by(user:@user) || ClinicAllocation.find_by(user:@user)
+        return redirect_to(access_requests_admin_users_path, alert: "Skipped to remove an existing contributor.")
+      else
+        if @user.capturesystem_users.destroy_all
+          removed_user=@user.destroy
+          if removed_user&.destroyed?
+            logger.warn("All account request(s) from email [#{removed_user.email}] have been rejected.")
+          end
+        end
       end
     end
 
@@ -92,10 +99,12 @@ class Admin::UsersController < Admin::AdminBaseController
 
   def reject_as_spam
     if @user.capturesystem_users.where(access_status:[CapturesystemUser::STATUS_ACTIVE, CapturesystemUser::STATUS_DEACTIVATED]).count > 0
-      return redirect_to(access_requests_admin_users_path, alert: "Cannot permanently block #{@user.email}, it has been approved in the other capture system(s). However you can reject this request with the 'Reject' button.")
+      return redirect_to(access_requests_admin_users_path, 
+        alert: "Cannot permanently block #{@user.email}, it has been approved in the other capture system(s). However you can reject this request with the 'Reject' button.")
     else
-      @user.reject_access_request(current_capturesystem)
-      return redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was rejected and this email address will be permanently blocked.")
+      @user.reject_access_request(master_site_name, current_capturesystem)
+      return redirect_to(access_requests_admin_users_path, 
+        notice: "The access request for #{@user.email} was rejected and this email address will be permanently blocked.")
     end
   end
 

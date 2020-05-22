@@ -75,7 +75,7 @@ class User < ApplicationRecord
       token
     else
       if pending_approval? or deactivated?
-        Notifier.notify_user_that_they_cant_reset_their_password(self).deliver
+        Notifier.notify_user_that_they_cant_reset_their_password(self, 'NPESU').deliver
       end
     end
   end
@@ -176,14 +176,14 @@ class User < ApplicationRecord
     Notifier.notify_user_of_approved_request(self, system_name, system_base_url, capturesystem).deliver
   end
 
-  def reject_access_request(capturesystem)
+  def reject_access_request(system_name, capturesystem)
     self.status = STATUS_REJECTED
     save!(validate: false)
     #reject as spam will keep the above user and prevent it from register again, and prevent it from access all the capture systems
     CapturesystemUser.where(user:self, capturesystem:capturesystem).update(access_status:CapturesystemUser::STATUS_REJECTED)
 
     # send an email to the user
-    Notifier.notify_user_of_rejected_request(self, capturesystem).deliver
+    Notifier.notify_user_of_rejected_request(self, system_name, capturesystem).deliver
   end
 
   #deprecated

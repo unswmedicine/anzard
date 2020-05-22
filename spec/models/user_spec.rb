@@ -82,7 +82,7 @@ describe User do
     it "should set the status flag to R" do
       user = create(:user, :status => 'U')
       capturesystem = create(:capturesystem, :name => 'capture_system_1', :base_url => 'http://capture.system.one.org')
-      user.reject_access_request(capturesystem)
+      user.reject_access_request('NPESU',capturesystem)
       user.status.should eq("R")
     end
   end

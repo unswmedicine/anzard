@@ -57,8 +57,16 @@ class Ability
 
     case user.role.name
       when Role::SUPER_USER
-        can :read, User
-        can :update, User
+        can :read, User do |the_user|
+          the_user_css = the_user.capturesystem_users.pluck(:capturesystem_id)
+          user_css = user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+          !(the_user_css & user_css).empty?
+        end
+        can :update, User do |the_user|
+          the_user_css = the_user.capturesystem_users.pluck(:capturesystem_id)
+          user_css = user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+          !(the_user_css & user_css).empty?
+        end
         can :get_active_sites, User
 
         can :read, Response
@@ -79,9 +87,18 @@ class Ability
         can :edit, SurveyConfiguration
         can :update, SurveyConfiguration
 
-        can :read, Clinic
-        can :edit, Clinic
-        can :update, Clinic
+        can :read, Clinic do |the_clinic| 
+          user_css = user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+          user_css.include?(the_clinic.capturesystem_id)
+        end
+        can :edit, Clinic do |the_clinic| 
+          user_css = user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+          user_css.include?(the_clinic.capturesystem_id)
+        end
+        can :update, Clinic do |the_clinic| 
+          user_css = user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+          user_css.include?(the_clinic.capturesystem_id)
+        end
         can :new, Clinic
         can :create, Clinic
         can :edit_unit, Clinic

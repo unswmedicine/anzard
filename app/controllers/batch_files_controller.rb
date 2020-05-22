@@ -63,11 +63,21 @@ class BatchFilesController < ApplicationController
 
   def summary_report
     raise "No summary report for batch file" unless @batch_file.has_summary_report?
+
+    the_batch_file_css = @batch_file.survey.capturesystems.ids
+    user_css = current_user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if (the_batch_file_css & user_css).empty?
+
     send_file @batch_file.summary_report_path, :type => 'application/pdf', :disposition => 'attachment', :filename => "summary-report.pdf"
   end
 
   def detail_report
     raise "No detail report for batch file" unless @batch_file.has_detail_report?
+
+    the_batch_file_css = @batch_file.survey.capturesystems.ids
+    user_css = current_user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if (the_batch_file_css & user_css).empty?
+
     send_file @batch_file.detail_report_path, :type => 'text/csv', :disposition => 'attachment', :filename => "detail-report.csv"
   end
 

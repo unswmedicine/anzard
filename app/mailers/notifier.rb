@@ -27,14 +27,14 @@ class Notifier < ActionMailer::Base
           subject: "#{system_name} | #{@capturesystem.name} -Your access request has been approved")
   end
 
-  def notify_user_of_rejected_request(recipient, capturesystem)
+  def notify_user_of_rejected_request(recipient, system_name, capturesystem)
     @user = recipient
     @capturesystem = capturesystem
 
     mail( to: @user.email,
           from: APP_CONFIG['account_request_user_status_email_sender'],
           reply_to: APP_CONFIG['account_request_user_status_email_sender'],
-          subject: "#{@capturesystem.name} - Your access request has been rejected")
+          subject: "#{system_name} | #{@capturesystem.name} - Your access request has been rejected")
   end
 
   # notifications for super users
@@ -48,20 +48,23 @@ class Notifier < ActionMailer::Base
           subject: "#{system_name} | #{capturesystem.name} - There has been a new access request")
   end
 
-  def notify_user_that_they_cant_reset_their_password(user, capturesystem)
+  def notify_user_that_they_cant_reset_their_password(user, system_name)
     @user = user
-    @capturesystem = capturesystem
+    @system_name = system_name
 
     mail( to: @user.email,
           from: APP_CONFIG['password_reset_email_sender'],
           reply_to: APP_CONFIG['password_reset_email_sender'],
-          subject: "#{@capturesystem.name} - Reset password instructions")
+          subject: "#{@system_name} - Reset password instructions")
   end
 
   private
 
   def mail(headers, &block)
-    self.default_url_options[:host] = @host_url
+    #TODO cleanup this legacy class
+    #it appears self.default_url_options is pointing at Rails.application.config.action_mailer.default_url_options
+    #hence only update if not nil
+    self.default_url_options[:host] = @host_url unless @host_url.nil?
     super
   end
 

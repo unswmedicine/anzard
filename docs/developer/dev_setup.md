@@ -175,7 +175,7 @@ Running `bundle install` should now work.
 
 
 # Navigating The Code
-ANZARD is a Ruby on Rails (3.1) application so it follows the standard Rails application layout. Refer to the official Rails guides if you need an explanation of the directory layout.
+ANZARD is a Ruby on Rails (5.0) application so it follows the standard Rails application layout. Refer to the official Rails guides if you need an explanation of the directory layout.
 Some key libraries we use are:
 * Devise (authentication)
 * Cancan (authorisation)

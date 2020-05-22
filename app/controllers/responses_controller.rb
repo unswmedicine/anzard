@@ -37,6 +37,7 @@ class ResponsesController < ApplicationController
   end
 
   def show
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') unless @response.survey.capturesystems.ids.include?(current_capturesystem&.id)
     #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
     #set_response_value_on_answers(@response)
     #Remove above unverifiable WARNING and reduntant code in the next release
@@ -135,6 +136,7 @@ class ResponsesController < ApplicationController
   end
 
   def review_answers
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') unless @response.survey.capturesystems.ids.include?(current_capturesystem&.id)
     #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
     #set_response_value_on_answers(@response)
     #Remove above unverifiable WARNING and reduntant code in the next release

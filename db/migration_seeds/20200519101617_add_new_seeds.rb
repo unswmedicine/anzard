@@ -144,7 +144,7 @@ def main_main(version_list)
           where: {capturesystem_id:[nil, '']},
           update: [{capturesystem_id: anzard_cs_id}]
         },
-        find_or_create_by: Clinic.where(capturesystem_id: anzard_cs_id, state:'VIC').map { |c|
+        find_or_create_by: Clinic.where(state:'VIC').map { |c|
           {
             state:c.state, 
             unit_name:c.unit_name, 

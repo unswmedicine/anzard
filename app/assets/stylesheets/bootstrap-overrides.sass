@@ -1,3 +1,15 @@
+////////
+$unsw_primary_black: #000000
+$unsw_primary_yellow: #FFDC00
+$unsw_primary_black_tint_30: rgba(0,0,0,.3)
+$unsw_primary_black_tint_15: rgba(0,0,0,.15)
+$unsw_accent_indigo: #3F61C4
+$unsw_accent_teal: #007882
+$unsw_accent_red: #FF635D
+$unsw_accent_green: #1AC987
+
+$info_color: $unsw_accent_green
+
 body
   padding: 60px 0 0 0
 
@@ -18,28 +30,105 @@ a.btn
   *vertical-align: middle
 
 
-.topbar-inner, .topbar .fill
-  background-color: #0064CD
-  background-color: #0064CD
+.btn
+  color: $unsw_primary_black
+  background: none
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF333333', endColorstr='#FF222222', GradientType=0)
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+ 
+.btn:hover
+  background-color: $unsw_primary_black_tint_15
+
+.btn.primary
+  color: $unsw_primary_black
+  border-color: $unsw_primary_black_tint_15
+  background-color: $unsw_primary_yellow
   background-repeat: repeat-x
-  background-image: -khtml-gradient(linear, left top, left bottom, from(#049CDB), to(#0064CD))
-  background-image: -moz-linear-gradient(top, #049CDB, #0064CD)
-  background-image: -ms-linear-gradient(top, #049CDB, #0064CD)
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #049CDB), color-stop(100%, #0064CD))
-  background-image: -webkit-linear-gradient(top, #049CDB, #0064CD)
-  background-image: -o-linear-gradient(top, #049CDB, #0064CD)
-  background-image: linear-gradient(top, #049CDB, #0064CD)
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#F0D80A), to($unsw_primary_yellow))
+  background-image: -moz-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: -ms-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #F0D80A), color-stop(100%, $unsw_primary_yellow))
+  background-image: -webkit-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: -o-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF333333', endColorstr='#FF222222', GradientType=0)
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+
+
+.btn.primary:hover, .alert-message.info:hover
+  color: $unsw_primary_black_tint_30
+
+
+.alert-message.info
+  color: $unsw_primary_black
+  border-color: $info_color
+  background-color: $info_color
+  background-repeat: repeat-x
+  background-image: -khtml-gradient(linear, left top, left bottom, from($info_color), to($info_color))
+  background-image: -moz-linear-gradient(top, $info_color, $info_color)
+  background-image: -ms-linear-gradient(top, $info_color, $info_color)
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, $info_color), color-stop(100%, $info_color))
+  background-image: -webkit-linear-gradient(top, $info_color, $info_color)
+  background-image: -o-linear-gradient(top, $info_color, $info_color)
+  background-image: linear-gradient(top, $info_color, $info_color)
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF333333', endColorstr='#FF222222', GradientType=0)
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+
+.alert-message.error
+  color: $unsw_primary_black
+  border-color: $unsw_accent_red
+  background-color: $unsw_accent_red
+  background-repeat: repeat-x
+  background-image: -khtml-gradient(linear, left top, left bottom, from($unsw_accent_red), to($unsw_accent_red))
+  background-image: -moz-linear-gradient(top, $unsw_accent_red, $unsw_accent_red)
+  background-image: -ms-linear-gradient(top, $unsw_accent_red, $unsw_accent_red)
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, $unsw_accent_red), color-stop(100%, $unsw_accent_red))
+  background-image: -webkit-linear-gradient(top, $unsw_accent_red, $unsw_accent_red)
+  background-image: -o-linear-gradient(top, $unsw_accent_red, $unsw_accent_red)
+  background-image: linear-gradient(top, $unsw_accent_red, $unsw_accent_red)
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF333333', endColorstr='#FF222222', GradientType=0)
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+ 
+////////
+
+.topbar div > ul a:hover, .nav a:hover 
+  color: $unsw_primary_black_tint_30
+
+.topbar-inner, .topbar .fill
+  background-color: $unsw_primary_yellow
+  background-repeat: repeat-x
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#F0D80A), to($unsw_primary_yellow))
+  background-image: -moz-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: -ms-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #F0D80A), color-stop(100%, $unsw_primary_yellow))
+  background-image: -webkit-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: -o-linear-gradient(top, #F0D80A, $unsw_primary_yellow)
+  background-image: linear-gradient(top, #F0D80A, $unsw_primary_yellow)
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF333333', endColorstr='#FF222222', GradientType=0)
   -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1)
 
 .topbar a
-  color: #EEE
+  color: $unsw_primary_black
+  font-weight: bold
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25)
 
 .topbar h3 a, .topbar .brand
+  color: $unsw_primary_black
+  font-weight: bold
   padding: 8px 20px 12px 20px
+
+.topbar .brand:hover
+  color: $unsw_primary_black_tint_30
 
 #help_box
   position: fixed

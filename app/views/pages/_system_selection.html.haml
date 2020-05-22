@@ -1,6 +1,8 @@
 .container
   .container-flex
     .container-flex-item
-      = link_to (image_tag 'banner_fertility_society_australia.png', class: 'logo'), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'ANZARD').base_url}');document.request_goto.submit();"
+      %div{class: "centered_wrapper"}
+        = link_to (image_tag 'anzard_logo.png', width: 400), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'ANZARD').base_url}');document.request_goto.submit();"
     .container-flex-item
-      = link_to (image_tag 'logo_unsw.png', class: 'logo'), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'VARTA').base_url}');document.request_goto.submit();"
+      %div{class: "centered_wrapper"}
+        = link_to (image_tag 'varta_landscape_small.jpg', width: 400), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'VARTA').base_url}');document.request_goto.submit();"
