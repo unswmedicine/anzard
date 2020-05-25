@@ -37,8 +37,8 @@
       %tr
         %th Treatment Data
         %th Year of Treatment
-        %th Unit Name
-        %th Site #
+        %th ANZARD Unit
+        %th ART Unit
         %th Filename
         %th Records
         %th Created By
@@ -49,7 +49,6 @@
           %th
     - @batch_files.each do |batch_file|
       %tr
-
         %td= batch_file.survey.name
         %td= batch_file.year_of_registration
         %td= batch_file.clinic.unit_name

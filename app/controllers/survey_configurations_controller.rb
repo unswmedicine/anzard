@@ -30,8 +30,10 @@ class SurveyConfigurationsController < ApplicationController
   end
 
   def update
+    #Merged from ANZARD3.0 remove below comments if not necessary.
+    # YEAR_OF_REGISTRATION_START = "YearOfRegStart"
+    # YEAR_OF_REGISTRATION_END = "YearOfRegEnd"
     return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.surveys.find_by(id: @survey_configuration.id).nil?
-
     @survey_configuration.start_year_of_treatment = params[:survey_configuration][:start_year_of_treatment]
     @survey_configuration.end_year_of_treatment = params[:survey_configuration][:end_year_of_treatment]
     if @survey_configuration.save

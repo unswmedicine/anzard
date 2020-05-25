@@ -28,15 +28,15 @@
 
 = link_to 'New Clinic', new_clinic_path, id: 'new_clinic', class: 'btn'
 
-= link_to 'Edit Unit', edit_unit_clinics_path, id: 'edit_unit', class: 'btn'
+= link_to 'Edit ANZARD Unit', edit_unit_clinics_path, id: 'edit_unit', class: 'btn'
 
 %table#clinics
   %thead
     %tr.sortable
-      %th= sortable 'unit_code'
-      %th= sortable 'unit_name'
-      %th= sortable 'site_code'
-      %th= sortable 'site_name'
+      %th= sortable 'unit_code', 'ANZARD Unit'
+      %th= sortable 'unit_name', 'ANZARD Unit Name'
+      %th= sortable 'site_code', 'ART Unit'
+      %th= sortable 'site_name', 'ART Unit Name'
       %th= sortable 'state'
       %th= sortable 'active', 'Status'
       %th Actions
@@ -54,7 +54,7 @@
           %td= 'Deactivated'
         %td
           - if can?(:edit, clinic)
-            = link_to 'Edit Site', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn edit_clinic'
+            = link_to 'Edit ART Unit', edit_clinic_path(clinic), id: "edit_clinic_#{clinic.id}", class: 'btn edit_clinic'
           - if clinic.active
             = link_to 'Deactivate', deactivate_clinic_path(clinic), class: 'btn', method: :post, data: {confirm: 'Are you sure? Deactivating a clinic will deallocate all users from that clinic. User accounts with no other clinics will also be deactivated.'}
           - else

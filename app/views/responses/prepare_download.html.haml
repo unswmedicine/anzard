@@ -32,12 +32,12 @@
         = select_tag :survey_id, options_from_collection_for_select(current_capturesystem.surveys, :id, :name, @survey_id), {class: "large", prompt: "Please select"}
         = required
     .clearfix
-      = label_tag :unit_code, 'Unit'
+      = label_tag :unit_code, 'ANZARD Unit'
       .input
         = select_tag :unit_code, grouped_options_for_select(Clinic.units_by_state_with_unit_code(current_capturesystem), @unit_code), {prompt: "ALL", class: 'large'}
         = required
     .clearfix
-      = label_tag :site_code, "Site"
+      = label_tag :site_code, "ART Unit"
       .input
         = select_tag :site_code, nil, {prompt: "ALL", class: 'large'}
     .clearfix

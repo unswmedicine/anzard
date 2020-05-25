@@ -26,11 +26,14 @@ class BatchFile < ApplicationRecord
   COLUMN_CYCLE_ID = 'CYCLE_ID'
   COLUMN_UNIT_CODE = 'UNIT'
   COLUMN_SITE_CODE = 'SITE'
+  COLUMN_ANZARD_UNIT_CODE = 'ANZARD_UNIT'
+  COLUMN_ART_UNIT_SITE_CODE = 'ART_UNIT'
 
   MESSAGE_WARNINGS = 'The file you uploaded has one or more warnings. Please review the reports for details.'
   MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{COLUMN_CYCLE_ID} column."
-  MESSAGE_UNKNOWN_UNIT_SITE = "The file you uploaded contains a #{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE} that is unknown to our database."
-  MESSAGE_UNAUTHORISED_UNIT_SITE = 'The file you uploaded contains a Unit_Site that you are not allocated to.'
+  MESSAGE_UNKNOWN_UNIT_SITE = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{COLUMN_ANZARD_UNIT_CODE} or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
+  
+  MESSAGE_UNAUTHORISED_UNIT_SITE = 'The file you uploaded contains a ART_UNIT that you are not allocated to.'
   MESSAGE_MISSING_CYCLE_IDS = 'The file you uploaded is missing one or more cycle IDs. Each record must have a cycle ID.'
   MESSAGE_EMPTY = 'The file you uploaded did not contain any data.'
   MESSAGE_FAILED_VALIDATION = 'The file you uploaded did not pass validation. Please review the reports for details.'
@@ -204,7 +207,11 @@ class BatchFile < ApplicationRecord
       @csv_row_count += 1
       cycle_id = row[sanitise_question_code(COLUMN_CYCLE_ID)]
       cycle_id.strip! unless cycle_id.nil?
+      #merged the below fallback behavior from ANZARD3.0 changes
       clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+      if clinic_in_row.nil?
+        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+      end
 
       concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
       response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
@@ -286,7 +293,12 @@ class BatchFile < ApplicationRecord
           end
         end
 
-        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+        clinic_in_row = Clinic.find_by(apturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+        if clinic_in_row.nil?
+          clinic_in_row = Clinic.find_by(unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+        end
+
+
         if clinic_in_row.nil?
           set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false

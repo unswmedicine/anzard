@@ -19,7 +19,7 @@
   = render "admin/users/tabs"
 
 .container
-  = form_tag confirm_batch_delete_responses_path, method: :put do
+  = form_tag confirm_batch_delete_responses_path, id: "batch_delete_form", method: :put do
     %fieldset
       - unless @errors.blank?
         #form_errors.alert-message.block-message.error
@@ -35,10 +35,12 @@
       .clearfix
         = label_tag :year_of_registration, "Year of Treatment"
         .input
-          = select_tag :year_of_registration, options_for_select(existing_years_of_registration, @year), {prompt: "Please select", class: 'large'}
+          -#= select_tag :year_of_registration, options_for_select(existing_years_of_registration, @year), {prompt: "Please select", class: 'large'}
+          = select_tag :year_of_registration, options_for_select([], @year), {prompt: "Please select", class: 'large'}
+
           = required
       .clearfix
-        = label_tag :clinic_id, "Site"
+        = label_tag :clinic_id, "ART Unit"
         .input
           = select_tag :clinic_id, options_from_collection_for_select(@sorted_clinics, :id, :site_name_with_code, @clinic_id),  {prompt: "Please select", :class => 'large'}
       .actions

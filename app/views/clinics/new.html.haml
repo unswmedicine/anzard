@@ -19,26 +19,26 @@
 = form_for @clinic do |f|
   = render 'shared/error_messages', target: @clinic
   .clearfix
-    = f.label :unit_selection, 'Unit Selection'
+    = f.label :unit_selection, 'ANZARD Unit Selection'
     .input
       = select_tag :unit_selection, clinics_unit_options_with_new, {class: 'large'}
   .clearfix
-    = f.label :unit_code, 'Unit Code'
+    = f.label :unit_code, 'ANZARD Unit'
     .input
       = f.text_field :unit_code
       = required
   .clearfix
-    = f.label :unit_name, 'Unit Name'
+    = f.label :unit_name, 'ANZARD Unit Name'
     .input
       = f.text_field :unit_name
       = required
   .clearfix
-    = f.label :site_code, 'Site Code'
+    = f.label :site_code, 'ART Unit'
     .input
       = f.text_field :site_code
       = required
   .clearfix
-    = f.label :site_name, 'Site Name'
+    = f.label :site_name, 'ART Unit Name'
     .input
       = f.text_field :site_name
       = required
