@@ -27,5 +27,9 @@ FactoryGirl.define do
       sequence(:site_code, 100) { |n| n }
       site_name { "Some Site Name #{site_code}" }
       active true
+      association :capturesystem
+      after(:create) do |capturesystem|
+        StaticModelPreloader.load
+      end
     end
 end

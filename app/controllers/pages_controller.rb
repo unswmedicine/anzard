@@ -19,5 +19,9 @@ class PagesController < ApplicationController
   skip_before_action :authenticate_user!, only: :home, raise: false
 
   def home
+    #Always go to the master site for login
+    if !current_capturesystem.nil? && !user_signed_in?
+      return redirect_to master_site_base_url
+    end
   end
 end

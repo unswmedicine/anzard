@@ -98,4 +98,4 @@ gem 'jekyll', :require => false
 gem 'highline' # This has (up until now) been implicitly included by capistrano
 gem 'passenger', '~> 5.1.2', :require => false
 
-
+gem 'rails_request_stats', group: :development

@@ -22,15 +22,18 @@ class SurveyConfigurationsController < ApplicationController
 
   def index
     # ToDo: order by associated survey name
-    @survey_configurations = SurveyConfiguration.accessible_by(current_ability)
+    @survey_configurations = SurveyConfiguration.accessible_by(current_ability).where(survey_id: current_capturesystem.survey_ids)
   end
 
   def edit
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.surveys.find_by(id: @survey_configuration.id).nil?
   end
 
   def update
+    #Merged from ANZARD3.0 remove below comments if not necessary.
     # YEAR_OF_REGISTRATION_START = "YearOfRegStart"
     # YEAR_OF_REGISTRATION_END = "YearOfRegEnd"
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.surveys.find_by(id: @survey_configuration.id).nil?
     @survey_configuration.start_year_of_treatment = params[:survey_configuration][:start_year_of_treatment]
     @survey_configuration.end_year_of_treatment = params[:survey_configuration][:end_year_of_treatment]
     if @survey_configuration.save

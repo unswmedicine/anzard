@@ -15,18 +15,20 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'csv'
+#TODO this class needs cleanup !
 class CsvGenerator
 
   BASIC_HEADERS = %w(TREATMENT_DATA YEAR_OF_TREATMENT ANZARD_Unit_Name ART_Unit_Name CYCLE_ID)
   attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code
 
-  def initialize(survey_id, unit_code, site_code, year_of_registration)
+  def initialize(the_survey, unit_code, site_code, year_of_registration)
     self.survey_id = survey_id
     self.unit_code = unit_code
     self.site_code = site_code
     self.year_of_registration = year_of_registration
 
-    self.survey = SURVEYS[survey_id.to_i]
+    #self.survey = SURVEYS[survey_id.to_i]# un-verifieable performance tweak this moment
+    self.survey = the_survey
     self.question_codes = survey.ordered_questions.collect(&:code)
 
     self.records = Response.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
@@ -37,10 +39,11 @@ class CsvGenerator
 
     unless unit_code.blank?
       if site_code.blank?
-        clinic = Clinic.find_by(unit_code: unit_code)
+        #currently a survey can only be used in one capture system hence get the `first`
+        clinic = Clinic.find_by(capturesystem_id: self.survey.capturesystems.first.id, unit_code: unit_code)
         name_parts << clinic.unit_name.parameterize(separator: '_')
       else
-        clinic = Clinic.find_by(unit_code: unit_code, site_code: site_code)
+        clinic = Clinic.find_by(capturesystem_id: self.survey.capturesystems.first.id, unit_code: unit_code, site_code: site_code)
         name_parts << clinic.unit_name.parameterize(separator: '_')
         name_parts << clinic.site_name.parameterize(separator: '_')
       end
@@ -88,7 +91,10 @@ class CsvGenerator
     # instead of this
     # answer_array = response.answers
     # do this (avoiding loading raw_answer saves most of the time)
-    answer_array = response.answers.select([:question_id, :choice_answer, :date_answer, :decimal_answer, :integer_answer, :text_answer, :time_answer])
+    #answer_array = response.answers.select([:question_id, :choice_answer, :date_answer, :decimal_answer, :integer_answer, :text_answer, :time_answer])
+    #REMOVE_ABOVE
+    answer_array = response.answers 
+    #optimised in 'Response.for_survey_clinic_and_year_of_registration'
     answer_hash = answer_array.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
     question_codes.collect do |code|
       answer = answer_hash[code]

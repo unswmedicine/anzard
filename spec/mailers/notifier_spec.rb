@@ -22,23 +22,23 @@ describe Notifier do
     it "should send mail to user if access request approved" do
       address = 'user@email.org'
       user = create(:user, :status => "A", :email => address)
-      email = Notifier.notify_user_of_approved_request(user).deliver
+      email = Notifier.notify_user_of_approved_request(user, 'NPESU', 'localhost', Capturesystem.find(1)).deliver
   
       # check that the email has been queued for sending
       ActionMailer::Base.deliveries.empty?.should eq(false) 
       email.to.should eq([address])
-      email.subject.should eq("ANZARD - Your access request has been approved")
+      email.subject.should eq("NPESU | ANZARD - Your access request has been approved")
     end
 
     it "should send mail to user if access request denied" do
       address = 'user@email.org'
       user = create(:user, :status => "A", :email => address)
-      email = Notifier.notify_user_of_rejected_request(user).deliver
+      email = Notifier.notify_user_of_rejected_request(user, 'NPESU', Capturesystem.find(1)).deliver
   
       # check that the email has been queued for sending
       ActionMailer::Base.deliveries.empty?.should eq(false) 
       email.to.should eq([address])
-      email.subject.should eq("ANZARD - Your access request has been rejected")
+      email.subject.should eq("NPESU | ANZARD - Your access request has been rejected")
     end
   end
 
@@ -47,7 +47,7 @@ describe Notifier do
     address = 'user@email.org'
     user = create(:user, :status => "U", :email => address)
     User.should_receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
-    email = Notifier.notify_superusers_of_access_request(user).deliver
+    email = Notifier.notify_superusers_of_access_request(user, Capturesystem.find(1).name, Capturesystem.find(1).base_url, Capturesystem.find(1)).deliver
 
     # check that the email has been queued for sending
     ActionMailer::Base.deliveries.empty?.should eq(false)

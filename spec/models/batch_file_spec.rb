@@ -18,14 +18,16 @@ require 'rails_helper'
 include CsvSurveyOperations
 
 describe BatchFile do
+  let(:capturesystem) { create(:capturesystem) }
   let(:survey) do
     question_file = Rails.root.join 'test_data/survey', 'survey_questions.csv'
     options_file = Rails.root.join 'test_data/survey', 'survey_options.csv'
     cross_question_validations_file = Rails.root.join 'test_data/survey', 'cross_question_validations.csv'
     create_survey("some_name", question_file, options_file, cross_question_validations_file)
   end
+  let(:capturesystem_survey) { create(:capturesystem_survey, capturesystem: capturesystem, survey: survey) }
   let(:user) { create(:user) }
-  let(:clinic) { create(:clinic, unit_code: 100, site_code: 100) }
+  let(:clinic) { create(:clinic, capturesystem: capturesystem, unit_code: 100, site_code: 100) }
   let(:clinic_allocation) { create(:clinic_allocation, user: user, clinic: clinic) }
 
   describe "Associations" do
@@ -210,7 +212,7 @@ describe BatchFile do
       end
 
       it 'should reject files that contain a row with a Site Code the user is not allocated to' do
-        create(:clinic, unit_code: 100, site_code: 999)
+        create(:clinic, capturesystem: capturesystem, unit_code: 100, site_code: 999)
         batch_file = process_batch_file('unauthorised_site_code.csv', survey, user)
         expect_fail_status_with_message(batch_file, 'The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
         expect_no_records_and_no_problem_records(batch_file)
@@ -218,7 +220,7 @@ describe BatchFile do
       end
 
       it 'should reject files that contain a row with a Unit Code the user is not allocated to' do
-        create(:clinic, unit_code: 999, site_code: 100)
+        create(:clinic, capturesystem: capturesystem, unit_code: 999, site_code: 100)
         batch_file = process_batch_file('unauthorised_unit_code.csv', survey, user)
         expect_fail_status_with_message(batch_file, 'The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
         expect_no_records_and_no_problem_records(batch_file)
@@ -231,7 +233,7 @@ describe BatchFile do
       describe 'CSV header formatting' do
         def check_batch_file_ok(batch_file, survey, user, clinic)
           expect_successful_status_with_message(batch_file, 'Your file has been processed successfully.')
-          response = Response.find_by_cycle_id!('12345')
+          response = Response.find_by_cycle_id!("12345_#{batch_file.clinic.site_code}")#updated according to ANZARD-234
           response.survey.should eq(survey)
           response.user.should eq(user)
           response.clinic.should eq(clinic)
@@ -277,9 +279,9 @@ describe BatchFile do
         batch_file.problem_record_count.should == 0
         batch_file.record_count.should == 3
 
-        r1 = Response.find_by_cycle_id!("B1")
-        r2 = Response.find_by_cycle_id!("B2")
-        r3 = Response.find_by_cycle_id!("B3")
+        r1 = Response.find_by_cycle_id!("B1_#{batch_file.clinic.site_code}")#updated according to ANZARD-234
+        r2 = Response.find_by_cycle_id!("B2_#{batch_file.clinic.site_code}")
+        r3 = Response.find_by_cycle_id!("B3_#{batch_file.clinic.site_code}")
 
         [r1, r2, r3].each do |r|
           r.survey.should eq(survey)
@@ -315,9 +317,9 @@ describe BatchFile do
         batch_file.problem_record_count.should == 0
         batch_file.record_count.should == 3
 
-        r1 = Response.find_by_cycle_id!("B1")
-        r2 = Response.find_by_cycle_id!("B2")
-        r3 = Response.find_by_cycle_id!("B3")
+        r1 = Response.find_by_cycle_id!("B1_#{batch_file.clinic.site_code}")#updated according to ANZARD-234
+        r2 = Response.find_by_cycle_id!("B2_#{batch_file.clinic.site_code}")
+        r3 = Response.find_by_cycle_id!("B3_#{batch_file.clinic.site_code}")
 
         [r1, r2, r3].each do |r|
           r.survey.should eq(survey)
@@ -352,10 +354,10 @@ describe BatchFile do
         batch_file.problem_record_count.should == 0
         batch_file.record_count.should == 4
 
-        r1 = Response.find_by_cycle_id!('B1')
-        r2 = Response.find_by_cycle_id!('B2')
-        r3 = Response.find_by_cycle_id!('B3')
-        r4 = Response.find_by_cycle_id!('B4')
+        r1 = Response.find_by_cycle_id!("B1_#{batch_file.clinic.site_code}")#updated according to ANZARD-234
+        r2 = Response.find_by_cycle_id!("B2_#{batch_file.clinic.site_code}")
+        r3 = Response.find_by_cycle_id!("B3_#{batch_file.clinic.site_code}")
+        r4 = Response.find_by_cycle_id!("B4_#{batch_file.clinic.site_code}")
 
         [r1, r2, r3, r4].each do |r|
           r.survey.should eq(survey)
@@ -502,7 +504,7 @@ describe BatchFile do
         create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user, 2010)
         expect_successful_status_with_message(batch_file, 'Your file has been processed successfully.')
-        response = Response.find_by!(cycle_id: 'B2', year_of_registration: 2010)
+        response = Response.find_by!(cycle_id: "B2_#{batch_file.clinic.site_code}", year_of_registration: 2010)#updated according to ANZARD-234
         response.survey.should eq(survey)
         response.user.should eq(user)
         response.clinic.should eq(clinic)
@@ -518,7 +520,7 @@ describe BatchFile do
       end
 
       it "should reject records where the cycle id is already in the system within the survey and year of treatment" do
-        create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
+        create(:response, survey: survey, cycle_id: "B2_#{clinic.site_code}", year_of_registration: "2005")#updated according to ANZARD-234
         batch_file = process_batch_file('no_errors_or_warnings.csv', survey, user, 2005)
         expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier
@@ -536,7 +538,7 @@ describe BatchFile do
       end
 
       it "should reject records where the cycle id is already in the system within the survey and year of treatment even with whitespace padding" do
-        create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
+        create(:response, survey: survey, cycle_id: "B2_#{clinic.site_code}", year_of_registration: "2005")#updated according to ANZARD-234
         batch_file = process_batch_file('no_errors_or_warnings_whitespace.csv', survey, user, 2005)
         expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier
@@ -554,7 +556,7 @@ describe BatchFile do
       end
 
       it "can detect both duplicate cycle id and other errors on the same record" do
-        create(:response, survey: survey, cycle_id: "B2", year_of_registration: "2005")
+        create(:response, survey: survey, cycle_id: "B2_#{clinic.site_code}", year_of_registration: "2005")#updated according to ANZARD-234
         batch_file = process_batch_file('missing_mandatory_fields.csv', survey, user, 2005)
         expect_fail_status_with_message(batch_file, "The file you uploaded did not pass validation. Please review the reports for details.")
         Response.count.should == 1 #the one we created earlier

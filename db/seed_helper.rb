@@ -1,3 +1,11 @@
+def create_capturesystems
+  Capturesystem.delete_all
+
+  Capturesystem.create!(name: 'ANZARD', base_url: 'https://anzard.med.unsw.edu.au')
+  Capturesystem.create!(name: 'VARTA', base_url: 'https://varta.med.unsw.edu.au')
+end
+
+
 def create_roles_and_permissions
   Role.delete_all
 
@@ -8,8 +16,17 @@ def create_roles_and_permissions
 end
 
 def create_config_items
+  ConfigurationItem.delete_all
+
+  ConfigurationItem.create!(name: 'master_site_base_url', configuration_value: 'https://npesu.med.unsw.edu.au')
+  ConfigurationItem.create!(name: 'master_site_name', configuration_value: 'NPESU')
+
+  #ANZARD year range (interpreated as calendar year)
   ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_START, configuration_value: "2005")
   ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2012")
+
+  ConfigurationItem.create!(name: "ANZARD_LONG_NAME", configuration_value: "Australian & New Zealand Assisted Reproduction Database")
+  ConfigurationItem.create!(name: "VARTA_LONG_NAME", configuration_value: "Victoria Assisted Reproduction Treatment Authority")
 end
 
 def create_clinics
@@ -17,7 +34,8 @@ def create_clinics
 
   clinics = read_hashes_from_csv(Rails.root.join("db/seed_files", "clinics.csv"))
   clinics.each do |hash|
-    clinic = Clinic.new(state:hash['State'].strip,
+    clinic = Clinic.new(capturesystem: Capturesystem.find(1),
+                        state:hash['State'].strip,
                         unit_name: hash['Unit_Name'].strip,
                         unit_code: hash['Unit_Code'].strip,
                         site_name: hash['Site_Name'].strip,

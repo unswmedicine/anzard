@@ -22,6 +22,7 @@ describe User do
     it { should have_many(:responses) }
     it { should have_many(:clinic_allocations) }
     it { should have_many(:clinics).through(:clinic_allocations) }
+    it { expect have_many(:capturesystems).through(:capturesystem_users) }
   end
 
   describe "Named Scopes" do
@@ -71,7 +72,8 @@ describe User do
   describe "Approve Access Request" do
     it "should set the status flag to A" do
       user = create(:user, :status => 'U')
-      user.approve_access_request
+      capturesystem = create(:capturesystem, :name => 'capture_system_1', :base_url => 'http://capture.system.one.org')
+      user.approve_access_request('','',capturesystem)
       user.status.should eq("A")
     end
   end
@@ -79,7 +81,8 @@ describe User do
   describe "Reject Access Request" do
     it "should set the status flag to R" do
       user = create(:user, :status => 'U')
-      user.reject_access_request
+      capturesystem = create(:capturesystem, :name => 'capture_system_1', :base_url => 'http://capture.system.one.org')
+      user.reject_access_request('NPESU',capturesystem)
       user.status.should eq("R")
     end
   end

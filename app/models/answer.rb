@@ -43,13 +43,20 @@ class Answer < ApplicationRecord
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of questions that are loaded once in an initializer
   def question
-    QUESTIONS[self.question_id]
+    #QUESTIONS[self.question_id]
+    Rails.cache.fetch("#{self.question_id}_QUESTION", compress:false) do
+      logger.debug("Fetching [#{self.question_id}_QUESTION]")
+      Question.includes(:cross_question_validations, :question_options).find(self.question_id)
+    end
   end
+  ##TODO Split question and remove above
+  #belongs_to :question
 
   # As above
-  def question=(question)
-    self.question_id = question.id
-  end
+  #def question=(question)
+  #  self.question_id = question.id
+  #end
+  ##REMOVE_ABOVE
 
   def has_warning?
     warnings.present? or fatal_warnings.present?

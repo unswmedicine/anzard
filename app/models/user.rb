@@ -28,6 +28,8 @@ class User < ApplicationRecord
   has_many :responses
   has_many :clinic_allocations
   has_many :clinics, through: :clinic_allocations
+  has_many :capturesystem_users
+  has_many :capturesystems, through: :capturesystem_users
 
   validates_presence_of :first_name
   validates_presence_of :last_name
@@ -73,7 +75,7 @@ class User < ApplicationRecord
       token
     else
       if pending_approval? or deactivated?
-        Notifier.notify_user_that_they_cant_reset_their_password(self).deliver
+        Notifier.notify_user_that_they_cant_reset_their_password(self, 'NPESU').deliver
       end
     end
   end
@@ -120,17 +122,30 @@ class User < ApplicationRecord
     self.status == STATUS_ACTIVE
   end
 
+  def approved_in_capturesystem?(capturesystem)
+    self.approved? && !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_ACTIVE).nil?
+  end
+
   def pending_approval?
     self.status == STATUS_UNAPPROVED
+  end
+  def pending_approval_in_capturesystem?(capturesystem)
+    self.pending_approval? || !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_UNAPPROVED).nil?
   end
 
   def deactivated?
     self.status == STATUS_DEACTIVATED
   end
+  def deactivated_in_capturesystem?(capturesystem)
+    self.deactivated? || !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_DEACTIVATED).nil?
+  end
 
 
   def rejected?
     self.status == STATUS_REJECTED
+  end
+  def rejected_in_capturesystem?(capturesystem)
+    self.rejected? || !self.capturesystem_users.find_by(capturesystem: capturesystem, access_status: CapturesystemUser::STATUS_REJECTED).nil?
   end
 
   def deactivate
@@ -138,31 +153,45 @@ class User < ApplicationRecord
     save!(validate: false)
   end
 
+  def deactivate_in_capturesystem(capturesystem)
+    self.capturesystem_users.where(capturesystem: capturesystem).update(access_status: CapturesystemUser::STATUS_DEACTIVATED)
+  end
+
+
   def activate
     self.status = STATUS_ACTIVE
     save!(validate: false)
   end
 
-  def approve_access_request
+  def activate_in_capturesystem(capturesystem)
+    self.capturesystem_users.where(capturesystem: capturesystem).update(access_status: CapturesystemUser::STATUS_ACTIVE)
+  end
+
+  def approve_access_request(system_name, system_base_url, capturesystem)
     self.status = STATUS_ACTIVE
     save!(validate: false)
+    CapturesystemUser.where(user:self, capturesystem:capturesystem).update(access_status:CapturesystemUser::STATUS_ACTIVE)
 
     # send an email to the user
-    Notifier.notify_user_of_approved_request(self).deliver
+    Notifier.notify_user_of_approved_request(self, system_name, system_base_url, capturesystem).deliver
   end
 
-  def reject_access_request
+  def reject_access_request(system_name, capturesystem)
     self.status = STATUS_REJECTED
     save!(validate: false)
+    #reject as spam will keep the above user and prevent it from register again, and prevent it from access all the capture systems
+    CapturesystemUser.where(user:self, capturesystem:capturesystem).update(access_status:CapturesystemUser::STATUS_REJECTED)
 
     # send an email to the user
-    Notifier.notify_user_of_rejected_request(self).deliver
+    Notifier.notify_user_of_rejected_request(self, system_name, capturesystem).deliver
   end
 
-  def notify_admin_by_email
-    Notifier.notify_superusers_of_access_request(self).deliver
-  end
+  #deprecated
+  #def notify_admin_by_email( system_name, system_base_url)
+    #Notifier.notify_superusers_of_access_request(self, system_name, system_base_url).deliver
+  #end
 
+  #deperated
   def check_number_of_superusers(id, current_user_id)
     current_user_id != id.to_i or User.approved_superusers.length >= 2
   end
@@ -184,6 +213,14 @@ class User < ApplicationRecord
   def self.super_user? (user)
     return false unless user.role.present?
     user.role.super_user?
+  end
+
+  def authenticatable_salt
+    "#{super}#{session_token}"
+  end
+
+  def invalidate_sessions!
+    self.update(session_token: SecureRandom.hex(16))
   end
 
   private

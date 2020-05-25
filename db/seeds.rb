@@ -7,6 +7,7 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 require File.dirname(__FILE__) + '/seed_helper.rb'
 
+create_capturesystems
 create_roles_and_permissions
 create_config_items
 create_clinics

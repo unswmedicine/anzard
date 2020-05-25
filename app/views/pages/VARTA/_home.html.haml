@@ -1,0 +1,37 @@
+-# ANZARD - Australian & New Zealand Assisted Reproduction Database
+-# Copyright (C) 2017 Intersect Australia Ltd
+-#
+-# This program is free software: you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation, either version 3 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+- if user_signed_in?
+  %div{class: "centered_wrapper"}
+    = image_tag 'varta_landscape_small.jpg', width: 400
+  - title 'Welcome to the Victoria Assisted Reproduction Treatment Authority', false, true
+
+  - if current_user.role.super_user? || !current_user.clinics.where(capturesystem:current_capturesystem).empty?
+    %div{class: "centered_wrapper"}
+      %h3 Please select the appropriate icon below to begin your submission.
+    = render(partial: 'pages/nav')
+  - else
+    %div{class: "centered_wrapper"}
+      %h3 You need to be allocated to at least one clinic to submit.
+
+
+- else
+  - title 'VARTA Home'
+  #content_container
+    .container_home
+      = form_for("user", url: user_session_path) do |f|
+        = render(partial: 'devise/sessions/form', locals: { f: f })
+

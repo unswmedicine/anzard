@@ -17,7 +17,7 @@
 - title 'User Details'
 %div
   %h2 Actions
-  - if @user.pending_approval?
+  - if @user.pending_approval_in_capturesystem?(current_capturesystem)
     .user_details_menu
       - if can?(:approve, @user) then
         = link_to 'Approve', edit_approval_admin_user_path(@user), method: :get, class: 'btn'
@@ -29,7 +29,7 @@
         &nbsp;
       = link_to 'Back', access_requests_admin_users_path, class: 'btn'
 
-  - if @user.approved?
+  - elsif @user.approved_in_capturesystem?(current_capturesystem)
     .user_details_menu
       - if can?(:update_role, User)
         = link_to 'Edit Access Level', edit_role_admin_user_path(@user), class: 'btn'
@@ -43,7 +43,7 @@
           &nbsp;
       = link_to 'Back', admin_users_path, class: 'btn'
 
-  - if @user.deactivated?
+  - elsif @user.deactivated_in_capturesystem?(current_capturesystem)
     .user_details_menu
       - if can?(:update_role, User)
         = link_to 'Edit Access Level', edit_role_admin_user_path(@user), class: 'btn'
@@ -66,14 +66,14 @@
         = @user.last_sign_in_at.localtime.strftime('%d/%m/%Y %I:%M%p')
   = render_field 'Role', (@user.role ? @user.role.name : '(None set)')
   - if @user.clinics.count > 0
-    = render_field 'ANZARD Unit', @user.clinics.first.unit_name_with_code
-    = render_field 'ART Unit(s)', @user.clinics.map { |clinic| "#{clinic.site_name_with_code} - #{clinic.state}" }.join(', ')
+    = render_field 'ANZARD Unit', @user.clinics.where(capturesystem:current_capturesystem).first.unit_name_with_code
+    = render_field 'ART Unit(s)', @user.clinics.where(capturesystem:current_capturesystem).map { |clinic| "#{clinic.site_name_with_code} - #{clinic.state}" }.join(', ')
   = render_field_with_block 'Status' do
-    - if @user.status == 'A'
+    - if @user.approved_in_capturesystem?(current_capturesystem)
       Active
-    - elsif @user.status == 'D'
+    - elsif @user.deactivated_in_capturesystem?(current_capturesystem)
       Deactivated
-    - elsif @user.status == 'U'
+    - elsif @user.pending_approval_in_capturesystem?(current_capturesystem)
       Pending Approval
-    - elsif @user.status == 'R'
+    - elsif @user.rejected_in_capturesystem?(current_capturesystem)
       Rejected

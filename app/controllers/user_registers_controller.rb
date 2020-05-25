@@ -18,19 +18,46 @@ class UserRegistersController < Devise::RegistrationsController
 
   prepend_before_action :authenticate_scope!, only: [:edit, :update, :destroy, :edit_password, :update_password, :profile]
 
-  def profile
+  before_action only:[:create] do
+    devise_parameter_sanitizer.permit(:sign_up, keys:[capturesystem_ids:[]])
+  end
 
+  def profile
+    return redirect_back(fallback_location: root_path, notice: 'Please go to NPESU Home for updating your profile.') unless at_master_site?
   end
 
   # Override the create method in the RegistrationsController to add the notification hook
   # https://github.com/plataformatec/devise/blob/v4.2.0/app/controllers/devise/registrations_controller.rb#L14
   def create
-    build_resource(sign_up_params)
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') unless at_master_site?
 
+    sign_up_params_without_cs_ids = sign_up_params
+    capturesystem_ids = sign_up_params_without_cs_ids.slice(:capturesystem_ids)[:capturesystem_ids]
+    capturesystem_ids.reject!(&:blank?)
+
+    if capturesystem_ids.empty? || Capturesystem.where(id:capturesystem_ids).length != capturesystem_ids.length
+      return redirect_back(fallback_location: root_path, alert: 'Please select at least 1 capture system')
+    end
+
+    sign_up_params_without_cs_ids.delete(:capturesystem_ids)
+    build_resource(sign_up_params_without_cs_ids)
     resource.save
+
     yield resource if block_given?
     if resource.persisted?
-      Notifier.notify_superusers_of_access_request(resource).deliver
+      capturesystem_ids.each do |capturesystem_id|
+        logger.debug(capturesystem_id)
+        resource.reload
+        capturesystem = Capturesystem.find_by(id:capturesystem_id)
+        capturesystem_user = CapturesystemUser.new(capturesystem: capturesystem, user: resource)
+        if capturesystem_user.save!
+          logger.debug("Created new capturesystem_user [#{capturesystem.name}:#{resource.email}]")
+          Notifier.notify_superusers_of_access_request(resource, master_site_name, master_site_base_url, capturesystem).deliver
+        else
+          logger.error("Failed to create new capturesystem_user [#{capturesystem.name} : #{resource.email}]")
+        end
+      end
+
       if resource.active_for_authentication?
         set_flash_message! :notice, :signed_up
         sign_up(resource_name, resource)
@@ -43,7 +70,7 @@ class UserRegistersController < Devise::RegistrationsController
     else
       clean_up_passwords resource
       set_minimum_password_length
-      respond_with resource
+      respond_with resource, location: new_user_registration_path
     end
   end
 
@@ -76,5 +103,20 @@ class UserRegistersController < Devise::RegistrationsController
     end
   end
 
+
+  def request_capturesystem_access
+    capturesystem = Capturesystem.find_by(name:params[:capturesystem_name])
+    unless capturesystem.nil? || current_user.nil? || !current_user.approved?
+      if CapturesystemUser.create( capturesystem: capturesystem, user: current_user, access_status: CapturesystemUser::STATUS_UNAPPROVED).persisted?
+        Notifier.notify_superusers_of_access_request(current_user, master_site_name, master_site_base_url, capturesystem).deliver
+      else
+        logger.error("Failed to create a new access for user [#{current_user.email}] to capturesystem [#{capturesystem_name.name}]")
+        return redirect_to(root_path, alert: "Your request has been rejected.")
+      end
+      return redirect_to(root_path, notice: "Your request to access #{capturesystem.name} has been sent.")
+    else
+      return redirect_to(root_path, alert: "Invalid request.")
+    end
+  end
 end
 

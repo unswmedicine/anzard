@@ -16,8 +16,10 @@
 
 .container
   .container-flex
+    .container-flex-item{style:'width:600px; height:500px; overflow:hidden;'}
+      = link_to image_tag('npesu_landscape_logo.png', style:'height:500px; margin:0 0 0 10px;'), 'https://npesu.unsw.edu.au/'
     .container-fixed-item
-      %h2 Please enter your email and password to log in
+      %h2{:style=>'text-align: center'} Please log in to begin
       .clearfix
         = f.label :email, "Email:"
         .input
@@ -26,10 +28,10 @@
         = f.label :password, "Password:"
         .input
           = f.password_field :password, class: "xlarge"
+      .actions
+        = f.submit "Log in", class: "btn primary"
+        = link_to "Forgot your password?", new_user_password_path, class: "btn"
     .container-flex-item
-      = link_to (image_tag 'banner_fertility_society_australia.png', class: 'logo'), 'https://www.fertilitysociety.com.au/'
+      - #= link_to (image_tag 'logo_unsw.png', class: 'logo'), 'https://www.unsw.edu.au/'
+  .container-flex
     .container-flex-item
-      = link_to (image_tag 'logo_unsw.png', class: 'logo'), 'https://www.unsw.edu.au/'
-  .actions
-    = f.submit "Log in", class: "btn primary"
-    = link_to "Forgot your password?", new_user_password_path, class: "btn"

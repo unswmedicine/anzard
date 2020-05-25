@@ -18,10 +18,13 @@ class Clinic < ApplicationRecord
 
   SITE_CODE_MAX_SIZE = 3
 
+  belongs_to :capturesystem
+
   has_many :clinic_allocations
   has_many :users, through: :clinic_allocations
   has_many :responses
 
+  validates_presence_of :capturesystem
   validates_presence_of :unit_code
   validates_presence_of :unit_name
   validates_presence_of :site_code
@@ -30,7 +33,7 @@ class Clinic < ApplicationRecord
 
   validates_inclusion_of :active, in: [true, false]
 
-  validates_uniqueness_of :site_code, scope: :unit_code
+  validates_uniqueness_of :site_code, scope: [:capturesystem_id, :unit_code]
   validates_numericality_of :unit_code, greater_than_or_equal_to: 100, less_than_or_equal_to: 999
   validates_numericality_of :site_code, greater_than_or_equal_to: 100, less_than_or_equal_to: 999
 
@@ -40,7 +43,7 @@ class Clinic < ApplicationRecord
   validate :no_unit_with_same_code_and_different_name
 
   def no_unit_with_same_code_and_different_name
-    units_with_same_code_and_different_name = Clinic.where(unit_code: unit_code).where.not(unit_name: unit_name)
+    units_with_same_code_and_different_name = Clinic.where(capturesystem_id: capturesystem_id, unit_code: unit_code).where.not(unit_name: unit_name)
     if units_with_same_code_and_different_name.count > 0
       errors.add(:clinic_id, 'already exists with that Unit Code under a different Unit Name')
     end
@@ -78,35 +81,35 @@ class Clinic < ApplicationRecord
     clinic.unit_name_with_code
   end
 
-  def self.clinics_with_unit_code(unit_code, only_active_clinics=false)
+  def self.clinics_with_unit_code(capturesystem, unit_code, only_active_clinics=false)
     if only_active_clinics
-      clinics = where(unit_code: unit_code, active: true)
+      clinics = where(capturesystem_id: capturesystem.id, unit_code: unit_code, active: true)
     else
-      clinics = where(unit_code: unit_code)
+      clinics = where(capturesystem_id: capturesystem.id, unit_code: unit_code)
     end
     clinics.order(:site_code)
   end
 
   # Returns all Clinics grouped by State in the format [[State], [Unit Name - Site Name', Clinic_id_1], [Unit Name - Site Name', Clinic_id_2], ...]
-  def self.clinics_by_state_with_clinic_id
-    group_clinics(GROUP_BY_STATE_WITH_CLINIC)
+  def self.clinics_by_state_with_clinic_id(capturesystem)
+    group_clinics(capturesystem, GROUP_BY_STATE_WITH_CLINIC)
   end
 
   # Returns all Units grouped by State in the format [[State], [Unit Name (Unit Code)', Clinic_1_unit_code], [Unit Name - Site Name', Clinic_id_2_unit_code], ...]
-  def self.units_by_state_with_unit_code
-    group_clinics(GROUP_BY_STATE_WITH_UNIT)
+  def self.units_by_state_with_unit_code(capturesystem)
+    group_clinics(capturesystem, GROUP_BY_STATE_WITH_UNIT)
   end
 
   # Returns a list of all distinct Units, ordered by unit code
-  def self.distinct_unit_list
-    units = order(:unit_code).pluck('DISTINCT unit_code, unit_name')
+  def self.distinct_unit_list(capturesystem)
+    units = order(:unit_code).where(capturesystem_id:capturesystem.id).pluck('DISTINCT unit_code, unit_name')
     units.map{ |code, name| {unit_code: code, unit_name: name}}
   end
 
   private
 
-  def self.group_clinics(grouping_type=GROUP_BY_STATE_WITH_CLINIC)
-    clinics = order(:unit_name, :site_name).all
+  def self.group_clinics(capturesystem, grouping_type=GROUP_BY_STATE_WITH_CLINIC)
+    clinics = order(:unit_name, :site_name).where(capturesystem_id: capturesystem.id)
     grouped = clinics.group_by(&:state)
 
     if grouping_type == GROUP_BY_STATE_WITH_CLINIC

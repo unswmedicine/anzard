@@ -20,7 +20,7 @@ QUESTIONS = {}
 class StaticModelPreloader
   def self.load
     SURVEYS.clear
-    Survey.order(:name).all.each do |survey|
+    Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).order(:name).all.each do |survey|
       SURVEYS[survey.id] = survey
     end
 
@@ -31,4 +31,5 @@ class StaticModelPreloader
   end
 end
 
-StaticModelPreloader.load unless ENV['SKIP_PRELOAD_MODELS'] == 'skip'
+#StaticModelPreloader.load unless ENV['SKIP_PRELOAD_MODELS'] == 'skip'
+#TODO Remove above anti-pattern by splitting 'Question' table

@@ -16,40 +16,56 @@
 
 class Notifier < ActionMailer::Base
 
-  PREFIX = 'ANZARD - '
-
-  def notify_user_of_approved_request(recipient)
+  def notify_user_of_approved_request(recipient, system_name, system_base_url, capturesystem)
     @user = recipient
+    @capturesystem = capturesystem
+    @host_url = system_base_url
+
     mail( to: @user.email,
           from: APP_CONFIG['account_request_user_status_email_sender'],
           reply_to: APP_CONFIG['account_request_user_status_email_sender'],
-          subject: "#{PREFIX}Your access request has been approved")
+          subject: "#{system_name} | #{@capturesystem.name} -Your access request has been approved")
   end
 
-  def notify_user_of_rejected_request(recipient)
+  def notify_user_of_rejected_request(recipient, system_name, capturesystem)
     @user = recipient
+    @capturesystem = capturesystem
+
     mail( to: @user.email,
           from: APP_CONFIG['account_request_user_status_email_sender'],
           reply_to: APP_CONFIG['account_request_user_status_email_sender'],
-          subject: "#{PREFIX}Your access request has been rejected")
+          subject: "#{system_name} | #{@capturesystem.name} - Your access request has been rejected")
   end
 
   # notifications for super users
-  def notify_superusers_of_access_request(applicant)
-    superusers_emails = User.get_superuser_emails
+  def notify_superusers_of_access_request(applicant, system_name, system_base_url, capturesystem)
+    superusers_emails = capturesystem.users.get_superuser_emails.flatten.uniq
     @user = applicant
+    @host_url = system_base_url
     mail( to: superusers_emails,
           from: APP_CONFIG['account_request_admin_notification_sender'],
           reply_to: @user.email,
-          subject: "#{PREFIX}There has been a new access request")
+          subject: "#{system_name} | #{capturesystem.name} - There has been a new access request")
   end
 
-  def notify_user_that_they_cant_reset_their_password(user)
+  def notify_user_that_they_cant_reset_their_password(user, system_name)
     @user = user
+    @system_name = system_name
+
     mail( to: @user.email,
           from: APP_CONFIG['password_reset_email_sender'],
           reply_to: APP_CONFIG['password_reset_email_sender'],
-          subject: "#{PREFIX}Reset password instructions")
+          subject: "#{@system_name} - Reset password instructions")
+  end
+
+  private
+
+  def mail(headers, &block)
+    #TODO cleanup this legacy class
+    #it appears self.default_url_options is pointing at Rails.application.config.action_mailer.default_url_options
+    #hence only update if not nil
+    self.default_url_options[:host] = @host_url unless @host_url.nil?
+    super
   end
 
 end

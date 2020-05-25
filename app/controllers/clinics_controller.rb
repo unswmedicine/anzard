@@ -17,6 +17,11 @@
 class ClinicsController < ApplicationController
   before_action :authenticate_user!
 
+  before_action only: [:activate, :deactivate] do
+    clinic = Clinic.find(params[:id])
+    redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') unless current_user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id).include?(clinic.capturesystem_id)
+  end
+
   ALLOWED_SORT_COLUMNS = %w(unit_name unit_code site_name site_code state active)
   DEFAULT_SORT_COLUMN = 'unit_code'
   SECONDARY_SORT_COLUMN = 'unit_code'
@@ -32,17 +37,19 @@ class ClinicsController < ApplicationController
     sort += ", #{TERTIARY_SORT_COLUMN} ASC" unless sort_column == TERTIARY_SORT_COLUMN
     @clinic_filter = { unit: params[:clinics_unit_filter] }
     if !@clinic_filter[:unit].blank?
-      @clinics = Clinic.where(unit_code: @clinic_filter[:unit]).order(sort)
+      @clinics = Clinic.where(capturesystem_id: current_capturesystem.id, unit_code: @clinic_filter[:unit]).order(sort)
     else
-      @clinics = Clinic.all.order(sort)
+      @clinics = Clinic.where(capturesystem_id: current_capturesystem.id).order(sort)
     end
   end
 
   def new
+    @allowed_states = current_capturesystem.name == 'VARTA' ? %w(VIC) : Clinic::PERMITTED_STATES
   end
 
   def create
     @clinic = Clinic.new(clinic_params)
+    @clinic.capturesystem_id = current_capturesystem&.id;
     if @clinic.save
       redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully created."
     else
@@ -51,9 +58,12 @@ class ClinicsController < ApplicationController
   end
 
   def edit
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
   end
 
   def update
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
+
     @clinic.site_name = params[:clinic][:site_name]
     if @clinic.save
       redirect_to clinics_path, notice: "Clinic #{@clinic.unit_site_code} was successfully updated."
@@ -69,25 +79,29 @@ class ClinicsController < ApplicationController
     if params[:updated_unit_name].blank?
       redirect_to(edit_unit_clinics_path, alert: 'Unit Name cannot be blank')
     else
-      Clinic.where(unit_code: params[:selected_unit_code]).update_all(unit_name: params[:updated_unit_name])
+      Clinic.where(capturesystem_id: current_capturesystem.id, unit_code: params[:selected_unit_code]).update_all(unit_name: params[:updated_unit_name])
       redirect_to clinics_path, notice: "Unit #{params[:selected_unit_code]} was successfully updated."
     end
   end
 
   def activate
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
     @clinic.activate
     redirect_to(clinics_path, notice: 'The clinic has been activated.')
   end
 
+  #TODO this action needs cleanup
   def deactivate
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.clinics.find_by(id: @clinic.id).nil?
     @clinic.deactivate
     allocations_for_clinic = ClinicAllocation.where(clinic: @clinic)
     deactivated_clinic_users = User.where(id: allocations_for_clinic.pluck(:user_id).uniq)
     allocations_for_clinic.destroy_all
     users_deactivated = []
     deactivated_clinic_users.each do |user|
-      if user.clinics.empty?
-        user.deactivate
+      if user.clinics.where(capturesystem: current_capturesystem).empty?
+        #user.deactivate
+        user.deactivate_in_capturesystem(current_capturesystem)
         users_deactivated.append user
       end
     end

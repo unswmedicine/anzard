@@ -45,7 +45,7 @@
   .clearfix
     = f.label :state, 'State'
     .input
-      = f.select :state, Clinic::PERMITTED_STATES
+      = f.select :state, @allowed_states
       = required
   .actions
     = f.submit 'Save', class: 'btn primary'

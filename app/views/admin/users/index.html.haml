@@ -56,14 +56,14 @@
           %td (None)
         - else
           %td= Clinic.unit_name_with_code_for_unit(user.allocated_unit_code)
-        - if user.clinics.empty?
+        - if user.clinics.where(capturesystem:current_capturesystem).empty?
           %td (None)
         - else
-          - user_clinics = "#{user.clinics.first.site_name} (#{user.clinics.first.state})"
-          - user_clinics += " & #{user.clinics.count - 1} other site#{'s' if user.clinics.count > 2}" if user.clinics.count > 1
+          - user_clinics = "#{user.clinics.where(capturesystem:current_capturesystem).first.site_name} (#{user.clinics.where(capturesystem:current_capturesystem).first.state})"
+          - user_clinics += " & #{user.clinics.where(capturesystem:current_capturesystem).count - 1} other site#{'s' if user.clinics.where(capturesystem:current_capturesystem).count > 2}" if user.clinics.where(capturesystem:current_capturesystem).count > 1
           %td= user_clinics
         %td
-          - if user.status == 'A'
+          - if user.approved_in_capturesystem?(current_capturesystem)
             Active
           - else
             Deactivated

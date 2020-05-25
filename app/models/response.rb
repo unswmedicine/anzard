@@ -59,13 +59,20 @@ class Response < ApplicationRecord
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of surveys that are loaded once in an initializer
   def survey
-    SURVEYS[survey_id]
+    #SURVEYS[survey_id]
+    Rails.cache.fetch("#{self.survey_id}_SURVEY", compress:false) do
+      logger.debug("Fetching [#{self.survey_id}_SURVEY]")
+      Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).find(self.survey_id)
+    end
   end
+  #TODO above code can be removed, because optiomisation should be done in a more rails frendly place
+  #i.e split up the Question table and leave out the wide fields to a secondary table
 
   # as above
-  def survey=(survey)
-    self.survey_id = survey.id
-  end
+  #def survey=(survey)
+    #self.survey_id = survey.id
+  #end
+  ##REMOVE_ABOVE
 
   def self.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
     results = submitted.for_survey(survey).order(:cycle_id)
@@ -77,7 +84,7 @@ class Response < ApplicationRecord
       end
     end
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
-    results.includes([:clinic])
+    results.includes([:clinic, :survey, :answers])
   end
 
   def self.count_per_survey_and_year_of_registration_and_clinic(survey_id, year, clinic_id)
@@ -128,11 +135,11 @@ class Response < ApplicationRecord
 
   def prepare_answers_to_section_with_blanks_created(section)
     existing_answers = answers_to_section(section).each_with_object({}) { |answer, hash| hash[answer.question_id] = answer }
-
     section.questions.each do |question|
       #if there's no answer object already, build an empty one
       if !existing_answers.include?(question.id)
-        answer = self.answers.build(question: question)
+        #answer = self.answers.build(question_id: question)
+        answer = self.answers.build(question_id: question.id)
         answer.response=self
         existing_answers[question.id] = answer
         @dummy_answers << answer
@@ -183,7 +190,7 @@ class Response < ApplicationRecord
       cleaned_text = answer_text.nil? ? "" : answer_text.strip
       question = survey.question_with_code(question_code)
       if question && !cleaned_text.blank?
-        answer = answers.build(question: question, response: self)
+        answer = answers.build(question_id: question.id, response: self)
         answer.answer_value = cleaned_text
       end
     end
@@ -235,6 +242,7 @@ class Response < ApplicationRecord
 
   def answers_to_section(section)
     answers.select {|a| a.question.section_id == section.id}
+    #answers.where(question: section.questions)
   end
 
   def strip_whitespace

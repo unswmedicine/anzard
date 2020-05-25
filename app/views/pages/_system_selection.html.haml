@@ -1,0 +1,8 @@
+.container
+  .container-flex
+    .container-flex-item
+      %div{class: "centered_wrapper"}
+        = link_to (image_tag 'anzard_logo.png', width: 400), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'ANZARD').base_url}');document.request_goto.submit();"
+    .container-flex-item
+      %div{class: "centered_wrapper"}
+        = link_to (image_tag 'varta_landscape_small.jpg', width: 400), "#", onclick:"$('input[name=\"system_url\"]').val('#{Capturesystem.find_by(name:'VARTA').base_url}');document.request_goto.submit();"

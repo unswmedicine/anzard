@@ -30,7 +30,7 @@
       .clearfix
         = label_tag :treatment_data, "Treatment Data"
         .input
-          = select_tag :treatment_data, options_from_collection_for_select(surveys, :id, :name, @treatment_data_id), {class: "large", prompt: "Please select"}
+          = select_tag :treatment_data, options_from_collection_for_select(current_capturesystem.surveys, :id, :name, @treatment_data_id), {class: "large", prompt: "Please select"}
           = required
       .clearfix
         = label_tag :year_of_registration, "Year of Treatment"

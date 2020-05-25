@@ -21,18 +21,24 @@ class BatchFilesController < ApplicationController
   PAPERCLIP_SPOOFED_MEDIA_TYPE_MSG = 'has contents that are not what they are reported to be'
 
   before_action :authenticate_user!
+
+  before_action except:[] do
+    redirect_back(fallback_location: root_path, alert: 'There are no clinic allocated to you.') if !current_user.role.super_user? && current_user.clinics.where(capturesystem:current_capturesystem).empty?
+  end
+
   load_and_authorize_resource
 
   expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
   expose(:group_names_by_survey) { Question.group_names_by_survey }
-  expose(:surveys) { SURVEYS.values }
+  #expose(:surveys) { SURVEYS.values }
+  #REMOVE_ABOVE
 
   def new
   end
 
   def index
     set_tab :batches, :home
-    @batch_files = @batch_files.order("created_at DESC").page(params[:page]).per_page(20)
+    @batch_files = @batch_files.where(clinic: current_capturesystem.clinics).order("created_at DESC").page(params[:page]).per_page(20)
   end
 
   def force_submit
@@ -57,11 +63,21 @@ class BatchFilesController < ApplicationController
 
   def summary_report
     raise "No summary report for batch file" unless @batch_file.has_summary_report?
+
+    the_batch_file_css = @batch_file.survey.capturesystems.ids
+    user_css = current_user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if (the_batch_file_css & user_css).empty?
+
     send_file @batch_file.summary_report_path, :type => 'application/pdf', :disposition => 'attachment', :filename => "summary-report.pdf"
   end
 
   def detail_report
     raise "No detail report for batch file" unless @batch_file.has_detail_report?
+
+    the_batch_file_css = @batch_file.survey.capturesystems.ids
+    user_css = current_user.capturesystem_users.where(access_status:CapturesystemUser::STATUS_ACTIVE).pluck(:capturesystem_id)
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if (the_batch_file_css & user_css).empty?
+
     send_file @batch_file.detail_report_path, :type => 'text/csv', :disposition => 'attachment', :filename => "detail-report.csv"
   end
 
@@ -69,7 +85,7 @@ class BatchFilesController < ApplicationController
     index_summary = CSV.generate(:col_sep => ",") do |csv|
       # csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
       csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
-      @batch_files.order("created_at DESC").each do |batch_file|
+      @batch_files.where(clinic: current_capturesystem.clinics).order("created_at DESC").each do |batch_file|
         csv.add_row [batch_file.survey.name, batch_file.year_of_registration, batch_file.clinic.unit_name,
                      batch_file.clinic.site_code, batch_file.file_file_name, batch_file.record_count,
                      batch_file.user.full_name, batch_file.created_at, batch_file.status, batch_file.message]
