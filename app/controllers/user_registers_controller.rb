@@ -52,7 +52,7 @@ class UserRegistersController < Devise::RegistrationsController
         capturesystem_user = CapturesystemUser.new(capturesystem: capturesystem, user: resource)
         if capturesystem_user.save!
           logger.debug("Created new capturesystem_user [#{capturesystem.name}:#{resource.email}]")
-          Notifier.notify_superusers_of_access_request(resource, master_site_name, master_site_base_url, capturesystem).deliver
+          Notifier.notify_superusers_of_access_request(resource, CapturesystemUtils.master_site_name, CapturesystemUtils.master_site_base_url, capturesystem).deliver
         else
           logger.error("Failed to create new capturesystem_user [#{capturesystem.name} : #{resource.email}]")
         end
@@ -108,7 +108,7 @@ class UserRegistersController < Devise::RegistrationsController
     capturesystem = Capturesystem.find_by(name:params[:capturesystem_name])
     unless capturesystem.nil? || current_user.nil? || !current_user.approved?
       if CapturesystemUser.create( capturesystem: capturesystem, user: current_user, access_status: CapturesystemUser::STATUS_UNAPPROVED).persisted?
-        Notifier.notify_superusers_of_access_request(current_user, master_site_name, master_site_base_url, capturesystem).deliver
+        Notifier.notify_superusers_of_access_request(current_user, CapturesystemUtils.master_site_name, CapturesystemUtils.master_site_base_url, capturesystem).deliver
       else
         logger.error("Failed to create a new access for user [#{current_user.email}] to capturesystem [#{capturesystem_name.name}]")
         return redirect_to(root_path, alert: "Your request has been rejected.")

@@ -10,4 +10,4 @@
               = text_field_tag :capturesystem_name, "#{Capturesystem.find_by(base_url:params[:system_url])&.name}", readonly: true, class: "xlarge"
       .actions
         = submit_tag 'Submit Request', class: 'btn primary'
-        = link_to 'Back', master_site_base_url, class: 'btn'
+        = link_to 'Back', CapturesystemUtils.master_site_base_url, class: 'btn'

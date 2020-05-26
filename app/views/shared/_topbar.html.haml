@@ -18,7 +18,7 @@
   .topbar-inner
     .container
       - if !current_capturesystem.nil?
-        .brand{onclick: "$('input[name=\"system_url\"]').val('#{master_site_base_url}');document.request_goto.submit();"} NPESU Home
+        .brand{onclick: "$('input[name=\"system_url\"]').val('#{CapturesystemUtils.master_site_base_url}');document.request_goto.submit();"} NPESU Home
       -#.brand #{current_capturesystem&.long_name||'National Perinatal Epidemiology and Statistics Unit'}
       = tabs_tag(builder: MenuTabBuilder) do |tab|
         %ul.nav
