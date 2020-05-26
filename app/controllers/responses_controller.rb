@@ -222,7 +222,8 @@ class ResponsesController < ApplicationController
   def download_index_summary
     index_summary = CSV.generate(:col_sep => ",") do |csv|
       # csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Created\ By Status Date\ Started)
-      csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Created\ By Status Date\ Started)
+      #csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Created\ By Status Date\ Started)
+      csv.add_row ['Cycle ID', 'Treatment Data', 'Year of Treatment', "#{current_capturesystem.name} Unit", 'ART Unit', 'Created By', 'Status', 'Date Started']
       Response.accessible_by(current_ability).unsubmitted.order("cycle_id").where(survey: current_capturesystem.surveys).each do |response|
         csv.add_row [response.cycle_id, response.survey.name, response.year_of_registration,
                      response.clinic.unit_name,
@@ -236,7 +237,8 @@ class ResponsesController < ApplicationController
 
   def download_submission_summary
     submission_summary = CSV.generate(:col_sep => ",") do |csv|
-      csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Status Records)
+      #csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Status Records)
+      csv.add_row ['Treatment Data', 'Year of Treatment', "#{current_capturesystem.name} Unit", 'ART Unit', 'Status', 'Records']
       submission_summary_data.each do |summary|
         csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
                      summary[:num_records],]

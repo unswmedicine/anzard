@@ -84,7 +84,8 @@ class BatchFilesController < ApplicationController
   def download_index_summary
     index_summary = CSV.generate(:col_sep => ",") do |csv|
       # csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
-      csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
+      #csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
+      csv.add_row ['Treatment Data', 'Year of Treatment', "#{current_capturesystem.name} Unit", 'ART Unit', 'Filename', 'Records', 'Created By', 'Date Uploaded', 'Status', 'Summary']
       @batch_files.where(clinic: current_capturesystem.clinics).order("created_at DESC").each do |batch_file|
         csv.add_row [batch_file.survey.name, batch_file.year_of_registration, batch_file.clinic.unit_name,
                      batch_file.clinic.site_code, batch_file.file_file_name, batch_file.record_count,

@@ -28,7 +28,7 @@ Devise.setup do |config|
   if Rails.env.production?
     config.mailer_sender = 'no-reply@unsw.edu.au'
   else
-    config.mailer_sender = 'ANZARD <no-reply@intersect.org.au>'
+    config.mailer_sender = 'NPESU <no-reply@intersect.org.au>'
   end
 
   # Configure the class responsible to send e-mails.

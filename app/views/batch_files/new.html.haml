@@ -23,7 +23,7 @@
   %fieldset
     = render 'shared/error_messages', target: @batch_file
     .clearfix
-      = label_tag 'unit', 'ANZARD Unit Name'
+      = label_tag 'unit', "#{current_capturesystem.name} Unit Name"
       .input
         = text_field_tag 'unit', current_user.clinics.first.unit_name_with_code, disabled: true # All user clinics are from the same unit
     .clearfix
