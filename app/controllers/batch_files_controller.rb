@@ -28,7 +28,7 @@ class BatchFilesController < ApplicationController
 
   load_and_authorize_resource
 
-  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
+  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range(current_capturesystem) }
   expose(:group_names_by_survey) { Question.group_names_by_survey }
   #expose(:surveys) { SURVEYS.values }
   #REMOVE_ABOVE

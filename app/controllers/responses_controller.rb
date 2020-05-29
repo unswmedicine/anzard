@@ -23,11 +23,11 @@ class ResponsesController < ApplicationController
 
   load_and_authorize_resource
 
-  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
+  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range(current_capturesystem) }
   #expose(:surveys) { SURVEYS.values }
   #REMOVE_ABOVE
   expose(:clinics) { Clinic.where(capturesystem_id: current_capturesystem.id).clinics_by_state_with_clinic_id }
-  expose(:existing_years_of_registration) { Response.existing_years_of_registration }
+  expose(:existing_years_of_registration) { Response.existing_years_of_registration(current_capturesystem) }
 
   def index
     @responses = Response.accessible_by(current_ability).unsubmitted.order("cycle_id").where(survey: current_capturesystem.surveys)
@@ -167,7 +167,8 @@ class ResponsesController < ApplicationController
       @errors = ["Please select a valid treatment data"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(selected_survey, @unit_code, @site_code, @year_of_registration)
+      prepend_columns = ['TREATMENT_DATA', 'YEAR_OF_TREATMENT', "#{current_capturesystem.name}_Unit_Name", 'ART_Unit_Name', 'CYCLE_ID']
+      generator = CsvGenerator.new(selected_survey, @unit_code, @site_code, @year_of_registration, prepend_columns)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
@@ -240,8 +241,11 @@ class ResponsesController < ApplicationController
       #csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Status Records)
       csv.add_row ['Treatment Data', 'Year of Treatment', "#{current_capturesystem.name} Unit", 'ART Unit', 'Status', 'Records']
       submission_summary_data.each do |summary|
+        #csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
+        #             summary[:num_records],]
+        #no use case is identified for above extra comma from discussion with darsha
         csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
-                     summary[:num_records],]
+                     summary[:num_records]]
       end
     end
     send_data submission_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'submission_summary.csv'
@@ -259,11 +263,17 @@ class ResponsesController < ApplicationController
                 {name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
                 {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}
             ].each do |status|
-              num_records = stats.response_count(year, status[:name], clinic.id,)
+              #num_records = stats.response_count(year, status[:name], clinic.id,)
+              #no use case is identified for above extra comma from discussion with darsha
+              num_records = stats.response_count(year, status[:name], clinic.id)
               unless num_records == 'none'
-                submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
-                                  site_code: clinic.site_code, status: status[:str], num_records: num_records,
+                #submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
+                                  #site_code: clinic.site_code, status: status[:str], num_records: num_records,
 
+                                 #})
+                #no use case is identified for above extra comma from discussion with darsha
+                submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
+                                  site_code: clinic.site_code, status: status[:str], num_records: num_records
                                  })
               end
             end

@@ -2,6 +2,7 @@
   - if current_capturesystem.nil?
     - title('NPESU Data Portal Home', false, true)
     %h3{:style=>'text-align: center'} Select the appropriate registry to begin your submission
+    %div{style: 'height:20px;'}
     #landing_container
       .container_landing
       = render 'system_selection'
@@ -10,6 +11,8 @@
 
 - else
   - title('Welcome to the National Perinatal Epidemiology and Statistics Unit Data Portal', false, true)
+  #content_container
+    %div{style: 'height:20px;'}
   #content_container
     .container_home
       = form_for("user", url: user_session_path) do |f|

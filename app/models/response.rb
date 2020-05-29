@@ -108,8 +108,8 @@ class Response < ApplicationRecord
     select("distinct year_of_registration").collect(&:year_of_registration).sort
   end
 
-  def self.existing_years_of_registration
-    select("distinct year_of_registration").collect(&:year_of_registration).sort
+  def self.existing_years_of_registration(capturesystem)
+    select("distinct year_of_registration").where(survey: capturesystem.surveys).collect(&:year_of_registration).sort
   end
 
   def submit!

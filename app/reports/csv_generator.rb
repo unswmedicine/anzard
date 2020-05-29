@@ -18,14 +18,15 @@ require 'csv'
 #TODO this class needs cleanup !
 class CsvGenerator
 
-  BASIC_HEADERS = %w(TREATMENT_DATA YEAR_OF_TREATMENT ANZARD_Unit_Name ART_Unit_Name CYCLE_ID)
-  attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code
+  #BASIC_HEADERS = %w(TREATMENT_DATA YEAR_OF_TREATMENT ANZARD_Unit_Name ART_Unit_Name CYCLE_ID)
+  attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code, :prepend_columns
 
-  def initialize(the_survey, unit_code, site_code, year_of_registration)
+  def initialize(the_survey, unit_code, site_code, year_of_registration, prepend_columns)
     self.survey_id = survey_id
     self.unit_code = unit_code
     self.site_code = site_code
     self.year_of_registration = year_of_registration
+    self.prepend_columns = prepend_columns
 
     #self.survey = SURVEYS[survey_id.to_i]# un-verifieable performance tweak this moment
     self.survey = the_survey
@@ -63,7 +64,7 @@ class CsvGenerator
     CSV.generate(:col_sep => ",") do |csv|
       report_indexes = []
       report_headers = []
-      (BASIC_HEADERS + question_codes).each_with_index do |each_header, index|
+      (prepend_columns + question_codes).each_with_index do |each_header, index|
         if report_headers.include? each_header
           report_indexes.append(index)
         else
@@ -71,7 +72,7 @@ class CsvGenerator
         end
       end
 
-      # csv.add_row BASIC_HEADERS + question_codes
+      # csv.add_row prepend_columns + question_codes
       csv.add_row report_headers
       records.each do |response|
         # basic_row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.cycle_id]

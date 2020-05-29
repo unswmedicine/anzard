@@ -173,6 +173,25 @@ def main_main(version_list)
       }
     }
     migrate_seeds(seeds_data)
+
+    seeds_data = {
+      ConfigurationItem: {
+        update_ANZARD_YearOfRegStart_name: {
+          where: {name: 'YearOfRegStart'},
+          update: [{name: 'ANZARD_YearOfRegStart'}]
+        },
+        update_ANZARD_YearOfRegEnd_name: {
+          where: {name: 'YearOfRegEnd'},
+          update: [{name: 'ANZARD_YearOfRegEnd'}]
+        },
+        find_or_create_by: [
+          {name: 'VARTA_YearOfRegStart', configuration_value:'2015'},
+          {name: 'VARTA_YearOfRegEnd', configuration_value:'2025'}
+        ]
+      }
+    }
+    migrate_seeds(seeds_data)
+
   end
 end
 

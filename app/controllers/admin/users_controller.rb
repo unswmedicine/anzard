@@ -163,6 +163,8 @@ class Admin::UsersController < Admin::AdminBaseController
         selected_clinic_ids.each do |clinic_id|
           @user.clinics << current_capturesystem.clinics.find(clinic_id)
         end
+      rescue ActiveRecord::RecordNotFound => invalid
+        return redirect_back(fallback_location: root_path, alert: "#{invalid.record.errors.full_messages}")
       rescue ActiveRecord::RecordInvalid => invalid
         return redirect_back(fallback_location: root_path, alert: "#{invalid.record.errors.full_messages}")
       end

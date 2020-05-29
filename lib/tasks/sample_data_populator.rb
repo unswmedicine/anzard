@@ -274,7 +274,7 @@ def create_batch_file(survey, count_of_rows)
   responses = Response.where(survey_id: survey.id).all
   responses_to_use = responses.sample(count_of_rows)
 
-  csv = CsvGenerator.new(survey, nil, nil,nil)
+  csv = CsvGenerator.new(survey, nil, nil,nil, [])
   csv.records = responses_to_use
 
   filepath = "#{Rails.root}/tmp/batch-#{survey.name.parameterize}-#{count_of_rows}.csv"

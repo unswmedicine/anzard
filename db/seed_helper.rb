@@ -22,8 +22,12 @@ def create_config_items
   ConfigurationItem.create!(name: 'master_site_name', configuration_value: 'NPESU')
 
   #ANZARD year range (interpreated as calendar year)
-  ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_START, configuration_value: "2005")
-  ConfigurationItem.create!(name: ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2012")
+  ConfigurationItem.create!(name: 'ANZARD_'+ConfigurationItem::YEAR_OF_REGISTRATION_START, configuration_value: "2005")
+  ConfigurationItem.create!(name: 'ANZARD_'+ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2012")
+
+  #VARTA year range (interpreated as fiscal year)
+  ConfigurationItem.create!(name: 'VARTA_'+ConfigurationItem::YEAR_OF_REGISTRATION_START, configuration_value: "2017")
+  ConfigurationItem.create!(name: 'VARTA_'+ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2020")
 
   ConfigurationItem.create!(name: "ANZARD_LONG_NAME", configuration_value: "Australian & New Zealand Assisted Reproduction Database")
   ConfigurationItem.create!(name: "VARTA_LONG_NAME", configuration_value: "Victoria Assisted Reproduction Treatment Authority")
