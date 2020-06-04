@@ -13,7 +13,7 @@ body {background:#ffffff;background-image:none; padding:0}
 
 /* Forms */
 .button-reset {height:auto;width:auto;margin-bottom:0px}
-.input-text {display:inline-block;line-height:18px;height:18px;padding:4px;margin:0px;margin-bottom:9px;border:1px solid #ccc;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif}
+.input-text {display:inline-block;line-height:18px;height:18px;padding:4px;margin:0px;margin-bottom:9px;border:1px solid #ccc;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif}
 .help-inline {display:block;line-height:18px;height:18px;padding:4px 0px 4px 5px}
 
 label.checkbox {display:block;line-height:18px;height:18px;width:100%;padding-left:0px;margin: 0px 0px 9px -2px}

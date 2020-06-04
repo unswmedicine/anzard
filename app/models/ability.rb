@@ -114,7 +114,9 @@ class Ability
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :download_index_summary, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :new, Response
-        can :create, Response, clinic_id: user.clinic_ids
+        #can :create, Response, clinic_id: user.clinic_ids
+        #check clinic_id at controller to give feedback
+        can :create, Response
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :treatment_data_for_year, Response
 
@@ -128,7 +130,9 @@ class Ability
         can :read, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :download_index_summary, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :new, Response
-        can :create, Response, clinic_id: user.clinic_ids
+        #can :create, Response, clinic_id: user.clinic_ids
+        #check clinic_id at controller to give feedback
+        can :create, Response
         can :update, Response, clinic_id: user.clinic_ids, submitted_status: Response::STATUS_UNSUBMITTED
         can :destroy, Response, clinic_id: user.clinic_ids
         can :treatment_data_for_year, Response

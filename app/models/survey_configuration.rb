@@ -15,6 +15,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SurveyConfiguration < ApplicationRecord
+
+  YEAR_RANGE_TYPE_CALENDAR = 'C'
+  YEAR_RANGE_TYPE_FISCAL = 'F'
+
   # Survey Configuration used to store survey attributes that require dynamic change since surveys are statically pre-loaded on server start
   belongs_to :survey
 
@@ -22,6 +26,7 @@ class SurveyConfiguration < ApplicationRecord
   validates :end_year_of_treatment, numericality: {less_than: 2100, greater_than: 1900, only_integer: true}, allow_nil: true
   validate :both_years_provided
   validate :start_year_before_end_year
+  validates :year_range_type, inclusion: { in: [YEAR_RANGE_TYPE_CALENDAR, YEAR_RANGE_TYPE_FISCAL] }
 
   def start_year_before_end_year
     unless start_year_of_treatment.nil? or end_year_of_treatment.nil?

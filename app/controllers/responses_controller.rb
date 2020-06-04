@@ -52,6 +52,8 @@ class ResponsesController < ApplicationController
   end
 
   def create
+    return redirect_back(fallback_location: root_path, alert: 'Please select a valid clinic.') unless current_user.clinic_ids.include?(@response.clinic_id)
+
     @response.user = current_user
     @response.submitted_status = Response::STATUS_UNSUBMITTED
     original_cycle_id = params[:response][:cycle_id]

@@ -32,6 +32,11 @@
     = f.label :end_year_of_treatment, 'End Year'
     .input
       = f.text_field :end_year_of_treatment
+  - if current_capturesystem.name == 'VARTA'
+    .clearfix
+      = f.label :year_range_type, 'Use Fiscal year'
+      .input
+        = f.check_box :year_range_type, {}, 'F', 'C'
   .actions
     = f.submit 'Save', class: 'btn primary'
     = link_to 'Back', survey_configurations_path, class: 'btn'

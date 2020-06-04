@@ -22,7 +22,7 @@ class CsvGenerator
   attr_accessor :survey_id, :unit_code, :year_of_registration, :records, :survey, :question_codes, :site_code, :prepend_columns
 
   def initialize(the_survey, unit_code, site_code, year_of_registration, prepend_columns)
-    self.survey_id = survey_id
+    self.survey_id = the_survey.id
     self.unit_code = unit_code
     self.site_code = site_code
     self.year_of_registration = year_of_registration

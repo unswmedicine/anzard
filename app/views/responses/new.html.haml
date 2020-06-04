@@ -36,7 +36,7 @@
     .clearfix
       = f.label :clinic_id, 'ART Unit'
       .input
-        = f.collection_select :clinic_id, current_user.clinics, :id, :site_name_with_full_code, {},  {:class => "large"}
+        = f.collection_select :clinic_id, current_user.clinics, :id, :site_name_with_full_code, {prompt:'Please select'},  {:class => "large"}
         = required
     .clearfix
       = f.label :cycle_id, 'Cycle ID'

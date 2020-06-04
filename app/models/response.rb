@@ -65,6 +65,7 @@ class Response < ApplicationRecord
       Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).find(self.survey_id)
     end
   end
+  #Note:Because above, don't retrieve survey_configuration via association, get it the otherway around like SurveyConfiguration.find_by(survey:suvery_1)
   #TODO above code can be removed, because optiomisation should be done in a more rails frendly place
   #i.e split up the Question table and leave out the wide fields to a secondary table
 

@@ -55,9 +55,7 @@ def main_main(version_list)
     ########################
     seeds_data = {}
 
-    varta_admin_emails = [
-      'admin@anzard.intersect.org.au'
-    ]
+    varta_admin_emails = []
     if Rails.env.development?
       seeds_data = {
         Capturesystem: {
@@ -75,6 +73,9 @@ def main_main(version_list)
          ]
         }
       }
+      varta_admin_emails = [
+        'admin@intersect.org.au'
+      ]
     elsif Rails.env.qa?
       seeds_data = {
         Capturesystem: {
@@ -92,6 +93,9 @@ def main_main(version_list)
          ]
         } 
       }
+      varta_admin_emails = [
+        'admin@intersect.org.au'
+      ]
     elsif Rails.env.staging?
       seeds_data = {
         Capturesystem: {
@@ -109,7 +113,9 @@ def main_main(version_list)
          ]
         } 
       }
-
+      varta_admin_emails = [
+        'admin@intersect.org.au'
+      ]
     else
     #default production
       seeds_data = {
@@ -130,7 +136,6 @@ def main_main(version_list)
       } 
       #TODO udpate this
       varta_admin_emails = [
-        'admin@anzard.intersect.org.au'
       ]
     end
     migrate_seeds(seeds_data)

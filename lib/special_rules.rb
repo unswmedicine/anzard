@@ -133,7 +133,12 @@ class SpecialRules
 
     CrossQuestionValidation.register_checker 'special_dob', lambda { |answer, unused_related_answer, checker_params|
       # DOB must be in the same year as the year of registration
-      answer.date_answer.year == answer.response.year_of_registration
+      if SurveyConfiguration.find_by(survey: answer.response.survey).year_range_type == SurveyConfiguration::YEAR_RANGE_TYPE_FISCAL
+        fy_se = getFiscalYearStartEnd(answer.response.year_of_registration)
+        return answer.date_answer.between?(fy_se[:start_date], fy_se[:end_date])
+      else
+        return answer.date_answer.year == answer.response.year_of_registration
+      end
     }
 
     CrossQuestionValidation.register_checker 'special_rule_comp1', lambda { |answer, ununused_related_answer, checker_params|
@@ -609,4 +614,12 @@ class SpecialRules
     result = answer if !answer.nil?
     result
   end
+
+  def self.getFiscalYearStartEnd(start_year)
+    {
+      start_date: Date.iso8601("#{start_year}-07-01"), 
+      end_date: Date.iso8601("#{start_year+1}-06-30")
+    }
+  end
+
 end

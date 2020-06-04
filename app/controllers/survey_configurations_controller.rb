@@ -34,6 +34,12 @@ class SurveyConfigurationsController < ApplicationController
 
     @survey_configuration.start_year_of_treatment = params[:survey_configuration][:start_year_of_treatment]
     @survey_configuration.end_year_of_treatment = params[:survey_configuration][:end_year_of_treatment]
+
+    # restrict to 'VARTA' at this release for backward compatibility
+    if current_capturesystem.name == 'VARTA'
+      @survey_configuration.year_range_type = params[:survey_configuration][:year_range_type]
+    end
+
     if @survey_configuration.save
       redirect_to survey_configurations_path, notice: "Survey configuration was successfully updated."
     else

@@ -50,12 +50,22 @@
         = select_day(day, {field_name: "#{q.id}][day", prompt: true, prefix: "answers"},
           class: "small field_trigger",
           data: data)
-        = select_month(month, {field_name: "#{q.id}][month", prompt: true, prefix: "answers", use_month_numbers: true},
+        = select_month(month, {field_name: "#{q.id}][month", prompt: true, prefix: "answers", use_short_month: true},
           class: "small field_trigger",
           data: data)
-        = select_year(year, {field_name: "#{q.id}][year", prompt: true, prefix: "answers", :start_year => (year_of_registration_range.first - 2), :end_year => (year_of_registration_range.last + 2)},
-          class: "small field_trigger",
-          data: data)
+        -# belows need cleanup, cop with the inconsist design for now
+        - if ['FDOB', 'FDOB_PAT', 'PDOB'].include?(q.code)
+          = select_year(year, {field_name: "#{q.id}][year", prompt: true, prefix: "answers", :start_year => (Date.today.year-100)-2, :end_year => Date.today.year+2},
+            class: "small field_trigger",
+            data: data)
+        - elsif ['CYC_DATE'].include?(q.code)
+          = select_year(year, {field_name: "#{q.id}][year", prompt: true, prefix: "answers", :start_year => SurveyConfiguration.find_by(survey: answer.response.survey).start_year_of_treatment-2, :end_year => SurveyConfiguration.find_by(survey: answer.response.survey).end_year_of_treatment+2},
+            class: "small field_trigger",
+            data: data)
+        - else
+          = select_year(year, {field_name: "#{q.id}][year", prompt: true, prefix: "answers", :start_year => (year_of_registration_range.first - 2), :end_year => (year_of_registration_range.last + 2)},
+            class: "small field_trigger",
+            data: data)
       - when 'Time'
         - hour = answer.answer_value ? answer.answer_value.hour : nil
         - min = answer.answer_value ? answer.answer_value.min : nil
