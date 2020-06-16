@@ -37,7 +37,11 @@ class SurveyConfigurationsController < ApplicationController
 
     # restrict to 'VARTA' at this release for backward compatibility
     if current_capturesystem.name == 'VARTA'
-      @survey_configuration.year_range_type = params[:survey_configuration][:year_range_type]
+      #@survey_configuration.year_range_type = params[:survey_configuration][:year_range_type]
+      #encforce the fiscal year range type for VARTA to maintain consistent entry range type in dropdown on 'New Data Entry' page and 'Batch Upload' page
+      @survey_configuration.year_range_type = SurveyConfiguration::YEAR_RANGE_TYPE_FISCAL
+    else
+      @survey_configuration.year_range_type = SurveyConfiguration::YEAR_RANGE_TYPE_CALENDAR
     end
 
     if @survey_configuration.save

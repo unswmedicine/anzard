@@ -25,7 +25,11 @@
             - unless request.fullpath == '/'
               = tab.home((current_capturesystem&.name || 'NPESU') + ' Home', root_path)
             %li
+            - # use pdfs for varta docs fow now
+            - if current_capturesystem&.name == 'ANZARD'
               = tab.manual 'User Manual', '/user_manual/index.html'
+            - elsif current_capturesystem&.name == 'VARTA'
+              = tab.manual 'User Manual', '/user_manual/index_varta.html'
           %ul.nav.secondary-nav
             = (tab.admin 'Admin', admin_users_path) if !at_master_site? && can?(:read, User)
             - if at_master_site?
@@ -48,11 +52,11 @@
 - else
   .topbar{style:'height:80px;'}
     .topbar-inner
+      %ul.nav
+        %li
+        = link_to image_tag('unsw_sydney_portrait.svg', style:'height:80px;'), 'https://npesu.unsw.edu.au/'
       .container
         = tabs_tag(builder: MenuTabBuilder) do |tab|
-          %ul.nav
-            %li
-            = link_to image_tag('unsw_sydney_portrait.svg', style:'height:80px;'), 'https://npesu.unsw.edu.au/'
           %ul.nav.secondary-nav
             - if current_capturesystem.nil?
               = tab.signup "Request An Account", new_user_registration_path, class: "signup"

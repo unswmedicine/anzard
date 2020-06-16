@@ -22,4 +22,7 @@
     - unless current_user.role.name == Role::SUPER_USER
       - submit_warning = response.submit_warning
       - if submit_warning
+        - # Requested by VARTA-19
+        - if current_capturesystem.name == 'VARTA'
+          - submit_warning = submit_warning.gsub('administrator', 'varta@unsw.edu.au')
         %span.warning-display.submit_warning= submit_warning

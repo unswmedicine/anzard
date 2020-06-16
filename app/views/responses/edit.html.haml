@@ -15,6 +15,11 @@
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 - title response_title(@response), true
+%h4
+  = "#{current_capturesystem.name} Unit Name - #{@response.clinic.unit_name}"
+%h4
+  = "ART Unit Name - #{@response.clinic.site_name}"
+
 = render 'section_navigation'
 .row
   .span12#question_box

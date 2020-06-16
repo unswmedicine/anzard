@@ -48,6 +48,9 @@ end
 
 ###################
 def main_main(version_list)
+  #varsion_list inlcudes versions included in this release
+  (puts 'Aborted. Mis-matching the latest db sechema migration version.';return) if version_list.last != SchemaMigration.order(version: :desc).limit(1).pluck(:version).last
+
   unless SchemaMigration.where(version: version_list ).count == version_list.count
     puts 'You have missing migrations to run this script'
   else
@@ -210,7 +213,8 @@ if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('1.9')
 '20200428011938',
 '20200428020513',
 '20200507075811',
-'20200507080709'
+'20200507080709',
+'20200602003801'
 ])
 else
   puts 'Aborted, your ruby version is too older: <= 1.9 !!'

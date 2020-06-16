@@ -24,6 +24,9 @@ class ResponsesController < ApplicationController
   load_and_authorize_resource
 
   expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range(current_capturesystem) }
+  expose(:fiscal_year_of_registration_range) { 
+    ConfigurationItem.year_of_registration_range(current_capturesystem).map { |year| [ "July #{year-1} to June #{year}", year ] } 
+  }
   #expose(:surveys) { SURVEYS.values }
   #REMOVE_ABOVE
   expose(:clinics) { Clinic.where(capturesystem_id: current_capturesystem.id).clinics_by_state_with_clinic_id }
@@ -331,7 +334,7 @@ class ResponsesController < ApplicationController
 
   def validate_batch_delete_form(year, survey_id)
     errors = []
-    errors << "Please select a valid survey" if current_capturesystem.surveys.find(survey_id).nil?
+    errors << "Please select a valid survey" if current_capturesystem.surveys.find_by(id: survey_id).nil?
     errors << "Please select a year of registration" if year.blank?
     errors << "Please select a treatment data" if survey_id.blank?
     errors

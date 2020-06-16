@@ -14,7 +14,14 @@
 -# You should have received a copy of the GNU General Public License
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+- content_for :nav do
+  = render 'pages/nav'
+
 - title response_title(@response)
+%h4
+  = "#{current_capturesystem.name} Unit Name - #{@response.clinic.unit_name}"
+%h4
+  = "ART Unit Name - #{@response.clinic.site_name}"
 
 = link_to "Go To Summary Page", @response, class: 'btn'
 %br/

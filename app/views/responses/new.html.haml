@@ -20,10 +20,17 @@
   %fieldset
     = render "shared/error_messages", target: @response
     .clearfix
-      = f.label :year_of_registration, "Year of Treatment"
-      .input
-        = f.select :year_of_registration, year_of_registration_range.reverse, {:include_blank => "Please select"}, {:class => "medium"}
-        = required
+      - # Required by VARTA-24 specifically 
+      - if current_capturesystem.name == 'VARTA'
+        = f.label :year_of_registration, "Period of Treatment"
+        .input
+          = f.select :year_of_registration, fiscal_year_of_registration_range.reverse, {:include_blank => "Please select"}, {:class => "large"}
+          = required
+      - else
+        = f.label :year_of_registration, "Year of Treatment"
+        .input
+          = f.select :year_of_registration, year_of_registration_range.reverse, {:include_blank => "Please select"}, {:class => "medium"}
+          = required
     .clearfix
       = f.label :survey_id, "Treatment Data"
       .input

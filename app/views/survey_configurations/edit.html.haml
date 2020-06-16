@@ -36,7 +36,7 @@
     .clearfix
       = f.label :year_range_type, 'Use Fiscal year'
       .input
-        = f.check_box :year_range_type, {}, 'F', 'C'
+        = f.check_box :year_range_type, {disabled: true}, 'F', 'C'
   .actions
     = f.submit 'Save', class: 'btn primary'
     = link_to 'Back', survey_configurations_path, class: 'btn'
