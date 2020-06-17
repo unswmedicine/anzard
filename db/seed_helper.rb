@@ -38,7 +38,7 @@ def create_clinics
 
   clinics = read_hashes_from_csv(Rails.root.join("db/seed_files", "clinics.csv"))
   clinics.each do |hash|
-    clinic = Clinic.new(capturesystem: Capturesystem.find(1),
+    clinic = Clinic.new(capturesystem: Capturesystem.find_by(name:'ANZARD'),
                         state:hash['State'].strip,
                         unit_name: hash['Unit_Name'].strip,
                         unit_code: hash['Unit_Code'].strip,

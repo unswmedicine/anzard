@@ -60,6 +60,7 @@ class Response < ApplicationRecord
   # to a cached set of surveys that are loaded once in an initializer
   def survey
     #SURVEYS[survey_id]
+    return Survey.find(self.survey_id) if Rails.env.test?
     Rails.cache.fetch("#{self.survey_id}_SURVEY", compress:false) do
       logger.debug("Fetching [#{self.survey_id}_SURVEY]")
       Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).find(self.survey_id)

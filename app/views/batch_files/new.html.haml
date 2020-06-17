@@ -25,11 +25,11 @@
     .clearfix
       = label_tag 'unit', "#{current_capturesystem.name} Unit Name"
       .input
-        = text_field_tag 'unit', current_user.clinics.first.unit_name_with_code, disabled: true # All user clinics are from the same unit
+        = text_field_tag 'unit', current_user.clinics.where(capturesystem: current_capturesystem).first.unit_name_with_code, disabled: true # All user clinics are from the same unit
     .clearfix
       = f.label :clinic_id, 'ART Unit'
       .input
-        = f.collection_select :clinic_id, current_user.clinics, :id, :site_name_with_full_code, {},  {:class => 'large'}
+        = f.collection_select :clinic_id, current_user.clinics.where(capturesystem: current_capturesystem), :id, :site_name_with_full_code, {prompt:'Please select'},  {:class => 'large'}
         = required
     .clearfix
       - # Required by VARTA-24 specifically 

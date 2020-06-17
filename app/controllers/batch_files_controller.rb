@@ -54,6 +54,8 @@ class BatchFilesController < ApplicationController
   end
 
   def create
+    return redirect_back(fallback_location: root_path, alert: 'Please select a valid clinic.') unless current_user.clinics.where(capturesystem: current_capturesystem).ids.include?(@batch_file.clinic_id)
+
     @batch_file.user = current_user
     if @batch_file.save
       @batch_file.delay.process

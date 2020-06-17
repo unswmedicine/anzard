@@ -44,6 +44,7 @@ class Answer < ApplicationRecord
   # to a cached set of questions that are loaded once in an initializer
   def question
     #QUESTIONS[self.question_id]
+    return Question.find(self.question_id) if Rails.env.test?
     Rails.cache.fetch("#{self.question_id}_QUESTION", compress:false) do
       logger.debug("Fetching [#{self.question_id}_QUESTION]")
       Question.includes(:cross_question_validations, :question_options).find(self.question_id)
