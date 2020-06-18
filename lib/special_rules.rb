@@ -411,23 +411,17 @@ class SpecialRules
       n_clfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_S')
       n_clfz_v  = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_V')
 
-
-      #if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
-        #break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        #break true unless (n_eggdon_fresh > 0 || n_embdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
-      #else
-        #break true unless (cycle_type == 2 && n_eggrec_fresh == 0 &&  n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        #break true unless (n_eggdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
-      #end
-
-      if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
-        (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        (n_eggdon_fresh > 0 || n_embdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
-      else
-        (cycle_type == 2 && n_eggrec_fresh == 0 &&  n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        (n_eggdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
+      if cycle_type != 2
+        break true
       end
 
+      if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
+        break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
+        (n_eggdon_fresh <= 0 || n_embdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <=0 || n_clfz_v <=0)
+      else
+        break true unless (cycle_type == 2 && n_eggrec_fresh == 0 &&  n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
+        (n_eggdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <= 0 || n_clfz_v <=0)
+      end
     }
 
     CrossQuestionValidation.register_checker 'special_rule_cycletype_2_rec', lambda { |answer, ununused_related_answer, checker_params|
@@ -460,6 +454,10 @@ class SpecialRules
       n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
       n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
       n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
+
+      if cycle_type != 2
+        break true
+      end
 
       if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
         break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_embdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
