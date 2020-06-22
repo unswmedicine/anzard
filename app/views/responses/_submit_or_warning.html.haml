@@ -23,6 +23,6 @@
       - submit_warning = response.submit_warning
       - if submit_warning
         - # Requested by VARTA-19
-        - if current_capturesystem.name == 'VARTA'
-          - submit_warning = submit_warning.gsub('an administrator', 'varta@unsw.edu.au')
+        - #TODO re-strucutre to use user-driven message from survey questionnaires csv files
+          - submit_warning = submit_warning.gsub('an administrator', "#{current_capturesystem.name}@unsw.edu.au".downcase)
         %span.warning-display.submit_warning= submit_warning
