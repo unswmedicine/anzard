@@ -136,18 +136,15 @@ describe Answer do
   describe "accept and sanitise all input (via assignment of answer_value), and have a warning if invalid" do
     describe "Decimal" do
       it "saves a decimal as a decimal" do
-        a = Answer.new(question: decimal_question)
-        a.answer_value = '1.23'
+        a = create(:answer, question: decimal_question, answer_value: '1.23')
         a.decimal_answer.should eq 1.23
       end
       it "saves an integer as a decimal" do
-        a = Answer.new(question: decimal_question)
-        a.answer_value = '123'
+        a = create(:answer, question: decimal_question, answer_value: '123')
         a.decimal_answer.should eq 123
       end
       it "saves invalid input as 'raw input' and has a warning" do
-        a = Answer.new(question: decimal_question)
-        a.answer_value = '1.23f'
+        a = create(:answer, question: decimal_question, answer_value: '1.23f')
         a.decimal_answer.should be nil
         a.raw_answer.should eq '1.23f'
         a.has_warning?.should be true
@@ -176,13 +173,11 @@ describe Answer do
     describe "Integer" do
 
       it "saves an integer as an integer" do
-        a = Answer.new(question: integer_question)
-        a.answer_value = '1234'
+        a = create(:answer, question: integer_question, answer_value: '1234')
         a.integer_answer.should eq 1234
       end
       it "saves invalid input as 'raw input' and has a warning" do
-        a = Answer.new(question: integer_question)
-        a.answer_value = '1234d'
+        a = create(:answer, question: integer_question, answer_value: '1234d')
         a.raw_answer.should eq '1234d'
         a.has_warning?.should be true
 
@@ -233,13 +228,13 @@ describe Answer do
 
     describe "For time questions, should delegate to TimeInputHandler to process the input" do
       it "should set the time answer if the input is valid" do
-        time = Time.now.utc
+        time = Time.now.round.utc
         mock_ih = double('mock input handler')
         TimeInputHandler.should_receive(:new).and_return(mock_ih)
         mock_ih.should_receive(:valid?).and_return(true)
         mock_ih.should_receive(:to_time).and_return(time)
         a = build(:answer, question: time_question, answer_value: "abc")
-        a.time_answer.should be(time)
+        a.time_answer.should eq(time)
         a.raw_answer.should be_nil
       end
 
@@ -257,35 +252,35 @@ describe Answer do
 
   describe "answer_value should contain the correct data on load with valid data" do
     it "Valid text" do
-      a = Answer.new(response: response, question: text_question, answer_value: "abc")
+      a = create(:answer, question: text_question, answer_value: "abc")
       a.save!; a.answer_value = nil; a.reload
       a.answer_value.should eq("abc")
     end
     it "Valid date" do
       date = Time.now.to_date
       date_hash = PartialDateTimeHash.new({day: date.day, month: date.month, year: date.year})
-      a = Answer.new(response: response, question: date_question, answer_value: date_hash)
+      a = create(:answer, question: date_question, answer_value: date_hash)
       a.save!; a.answer_value = nil; a.reload
       PartialDateTimeHash.new(a.answer_value).should eq(date_hash)
     end
     it "Valid time" do
       time_hash = PartialDateTimeHash.new(Time.now)
-      a = Answer.new(response: response, question: time_question, answer_value: time_hash)
+      a = create(:answer, question: time_question, answer_value: time_hash)
       a.save!; a.answer_value = nil; a.reload
       PartialDateTimeHash.new(a.answer_value).should eq(time_hash)
     end
     it "Valid decimal" do
-      a = Answer.new(response: response, question: decimal_question, answer_value: "3.45")
+      a = create(:answer, question: decimal_question, answer_value: "3.45")
       a.save!; a.answer_value = nil; a.reload
       a.answer_value.should eq(3.45)
     end
     it "Valid integer" do
-      a = Answer.new(response: response, question: integer_question, answer_value: "423")
+      a = create(:answer, question: integer_question, answer_value: "423")
       a.save!; a.answer_value = nil; a.reload
       a.answer_value.should eq(423)
     end
     it "Valid choice" do
-      a = Answer.new(response: response, question: choice_question, answer_value: "1")
+      a = create(:answer, question: choice_question, answer_value: "1")
       a.save!; a.answer_value = nil; a.reload
       a.answer_value.should eq("1")
     end
@@ -295,7 +290,7 @@ describe Answer do
   describe "answer_value should contain the inputted data on load with invalid data, and a warning should be present" do
 
     it "invalid date from a string" do
-      a = Answer.create!(response: response, question: date_question, answer_value: "blah")
+      a = create(:answer, question: date_question, answer_value: "blah")
       a.reload
       a.answer_value.should eq("blah")
       a.has_warning?.should be true
@@ -305,7 +300,7 @@ describe Answer do
     it "invalid date from a hash" do
       date_a_s_hash = ActiveSupport::HashWithIndifferentAccess.new ({day: 31, month: 2, year: 2000})
       date_hash = PartialDateTimeHash.new date_a_s_hash
-      a = Answer.create!(response: response, question: date_question, answer_value: date_a_s_hash)
+      a = create(:answer, question: date_question, answer_value: date_a_s_hash)
       a.reload
       a.answer_value.should eq(date_hash)
       a.has_warning?.should be true
@@ -315,7 +310,7 @@ describe Answer do
     it "partial date from a hash" do
       date_a_s_hash = ActiveSupport::HashWithIndifferentAccess.new ({day: 1, year: 2000})
       date_hash = PartialDateTimeHash.new date_a_s_hash
-      a = Answer.create!(response: response, question: date_question, answer_value: date_a_s_hash)
+      a = create(:answer, question: date_question, answer_value: date_a_s_hash)
       a.reload
       a.answer_value.should eq(date_hash)
       a.has_warning?.should be true
@@ -323,7 +318,7 @@ describe Answer do
     end
 
     it "invalid time from a string" do
-      a = Answer.create!(response: response, question: time_question, answer_value: "ab:11")
+      a = create(:answer, question: time_question, answer_value: "ab:11")
       a.reload
       a.answer_value.should eq("ab:11")
       a.has_warning?.should be true
@@ -333,7 +328,7 @@ describe Answer do
     it "invalid time from a hash" do
       time_a_s_hash = ActiveSupport::HashWithIndifferentAccess.new ({hour: 20, min: 61})
       time_hash = PartialDateTimeHash.new time_a_s_hash
-      a = Answer.create!(response: response, question: time_question, answer_value: time_a_s_hash)
+      a = create(:answer, question: time_question, answer_value: time_a_s_hash)
       a.reload
       a.answer_value.should eq(time_hash)
       a.has_warning?.should be true
@@ -343,7 +338,7 @@ describe Answer do
     it "partial time" do
       time_a_s_hash = ActiveSupport::HashWithIndifferentAccess.new ({hour: 20})
       time_hash = PartialDateTimeHash.new time_a_s_hash
-      a = Answer.create!(response: response, question: time_question, answer_value: time_a_s_hash)
+      a = create(:answer, question: time_question, answer_value: time_a_s_hash)
       a.reload
       a.answer_value.should eq(time_hash)
       a.fatal_warnings.should eq(["Answer is incomplete (a field was left blank)"])
@@ -351,7 +346,7 @@ describe Answer do
 
     it "invalid integer" do
       input = "4.5"
-      a = Answer.new(response: response, question: integer_question, answer_value: input)
+      a = create(:answer, question: integer_question, answer_value: input)
       a.save!; b = Answer.find(a.id); a = b
       a.answer_value.should eq(input)
       a.has_warning?.should be true
@@ -359,7 +354,7 @@ describe Answer do
 
     it "invalid decimal" do
       input = "abc"
-      a = Answer.new(response: response, question: decimal_question, answer_value: input)
+      a = create(:answer, question: decimal_question, answer_value: input)
       a.save!; b = Answer.find(a.id); a = b
       a.answer_value.should eq(input)
       a.has_warning?.should be true
@@ -382,24 +377,24 @@ describe Answer do
     end
 
     it "should handle answers that are not filled out yet" do
-      Answer.new(question: text_question).format_for_display.should eq("Not answered")
-      Answer.new(question: integer_question).format_for_display.should eq("Not answered")
-      Answer.new(question: decimal_question).format_for_display.should eq("Not answered")
-      Answer.new(question: date_question).format_for_display.should eq("Not answered")
-      Answer.new(question: time_question).format_for_display.should eq("Not answered")
-      Answer.new(question: choice_question).format_for_display.should eq("Not answered")
+      create(:answer, question: text_question, answer_value: nil).format_for_display.should eq("Not answered")
+      create(:answer, question: integer_question, answer_value: nil).format_for_display.should eq("Not answered")
+      create(:answer, question: decimal_question, answer_value: nil).format_for_display.should eq("Not answered")
+      create(:answer, question: date_question, answer_value: nil).format_for_display.should eq("Not answered")
+      create(:answer, question: time_question, answer_value: nil).format_for_display.should eq("Not answered")
+      create(:answer, question: choice_question, answer_value: nil).format_for_display.should eq("Not answered")
     end
 
     it "should return blank for answers that are invalid" do
-      Answer.new(question: integer_question, raw_answer: "asdf").format_for_display.should eq("")
+      create(:answer, question: integer_question, raw_answer: "asdf").format_for_display.should eq("")
 
-      Answer.new(question: decimal_question, raw_answer: "asdf").format_for_display.should eq("")
+      create(:answer, question: decimal_question, raw_answer: "asdf").format_for_display.should eq("")
 
       date_as_hash = ActiveSupport::HashWithIndifferentAccess.new ({day: 1, year: 2000})
-      Answer.new(question: date_question, raw_answer: PartialDateTimeHash.new(date_as_hash)).format_for_display.should eq("")
+      create(:answer, question: date_question, raw_answer: PartialDateTimeHash.new(date_as_hash)).format_for_display.should eq("")
 
       time_as_hash = ActiveSupport::HashWithIndifferentAccess.new ({hour: 1})
-      Answer.new(question: time_question, raw_answer: PartialDateTimeHash.new(time_as_hash)).format_for_display.should eq("")
+      create(:answer, question: time_question, raw_answer: PartialDateTimeHash.new(time_as_hash)).format_for_display.should eq("")
     end
   end
 
@@ -417,10 +412,10 @@ describe Answer do
     end
 
     it "should return the raw answer for answers that are invalid" do
-      Answer.new(question: integer_question, raw_answer: "asdf").format_for_csv.should eq("asdf")
-      Answer.new(question: decimal_question, raw_answer: "asdf").format_for_csv.should eq("asdf")
-      Answer.new(question: date_question, raw_answer: "12/ff/3333").format_for_csv.should eq("12/ff/3333")
-      Answer.new(question: time_question, raw_answer: "18:ab").format_for_csv.should eq("18:ab")
+      create(:answer, question: integer_question, raw_answer: "asdf").format_for_csv.should eq("asdf")
+      create(:answer, question: decimal_question, raw_answer: "asdf").format_for_csv.should eq("asdf")
+      create(:answer, question: date_question, raw_answer: "12/ff/3333").format_for_csv.should eq("12/ff/3333")
+      create(:answer, question: time_question, raw_answer: "18:ab").format_for_csv.should eq("18:ab")
     end
   end
 

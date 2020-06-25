@@ -17,6 +17,7 @@
 require 'rails_helper'
 
 describe Response do
+  let(:capturesystem) { create(:capturesystem, name:'ANZARD', base_url:'http://localhost:3000') }
   describe "Associations" do
     it { should belong_to :user }
     it { should belong_to :clinic }
@@ -125,11 +126,13 @@ describe Response do
 
   describe "Getting the full set of possible years of registration" do
     it "returns unique values in ascending order" do
-      create(:response, year_of_registration: 2009)
-      create(:response, year_of_registration: 2007)
-      create(:response, year_of_registration: 2009)
-      create(:response, year_of_registration: 2011)
-      Response.existing_years_of_registration.should eq([2007, 2009, 2011])
+      survey = create(:survey)
+      capturesystem_survey = create(:capturesystem_survey, capturesystem_id:capturesystem.id, survey_id:survey.id)
+      create(:response, year_of_registration: 2009, survey: survey)
+      create(:response, year_of_registration: 2007, survey: survey)
+      create(:response, year_of_registration: 2009, survey: survey)
+      create(:response, year_of_registration: 2011, survey: survey)
+      Response.existing_years_of_registration(capturesystem).should eq([2007, 2009, 2011])
     end
   end
 

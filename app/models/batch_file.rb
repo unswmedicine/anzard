@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'csv'
-
+#TODO this class needs cleanup
 class BatchFile < ApplicationRecord
 
   STATUS_FAILED = 'Failed'
@@ -210,8 +210,10 @@ class BatchFile < ApplicationRecord
       #merged the below fallback behavior from ANZARD3.0 changes
       clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
       if clinic_in_row.nil?
-        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+        #clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code("#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}")], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
       end
+
 
       concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
       response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
@@ -293,14 +295,17 @@ class BatchFile < ApplicationRecord
           end
         end
 
-        clinic_in_row = Clinic.find_by(apturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+        #merged the below fallback behavior from ANZARD3.0 changes
         if clinic_in_row.nil?
-          clinic_in_row = Clinic.find_by(unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+          #clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+          clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code("#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}")], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
         end
 
 
         if clinic_in_row.nil?
-          set_outcome(STATUS_FAILED, MESSAGE_UNKNOWN_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+          message_unknown_unit_site = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
+          set_outcome(STATUS_FAILED, message_unknown_unit_site + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         else
           unless user.clinics.exists? clinic_in_row.id

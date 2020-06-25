@@ -6,7 +6,8 @@ highlighter: null
 
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
-title : Australian & New Zealand Assisted Reproduction Database
+#title : Australian & New Zealand Assisted Reproduction Database
+title : NPESU Data Capture Portal
 
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #

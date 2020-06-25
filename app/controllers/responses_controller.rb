@@ -23,11 +23,14 @@ class ResponsesController < ApplicationController
 
   load_and_authorize_resource
 
-  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
+  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range(current_capturesystem) }
+  expose(:fiscal_year_of_registration_range) { 
+    ConfigurationItem.year_of_registration_range(current_capturesystem).map { |year| [ "July #{year-1} to June #{year}", year ] } 
+  }
   #expose(:surveys) { SURVEYS.values }
   #REMOVE_ABOVE
   expose(:clinics) { Clinic.where(capturesystem_id: current_capturesystem.id).clinics_by_state_with_clinic_id }
-  expose(:existing_years_of_registration) { Response.existing_years_of_registration }
+  expose(:existing_years_of_registration) { Response.existing_years_of_registration(current_capturesystem) }
 
   def index
     @responses = Response.accessible_by(current_ability).unsubmitted.order("cycle_id").where(survey: current_capturesystem.surveys)
@@ -52,6 +55,8 @@ class ResponsesController < ApplicationController
   end
 
   def create
+    return redirect_back(fallback_location: root_path, alert: 'Please select a valid clinic.') unless current_user.clinics.where(capturesystem: current_capturesystem).ids.include?(@response.clinic_id)
+
     @response.user = current_user
     @response.submitted_status = Response::STATUS_UNSUBMITTED
     original_cycle_id = params[:response][:cycle_id]
@@ -167,7 +172,8 @@ class ResponsesController < ApplicationController
       @errors = ["Please select a valid treatment data"]
       render :prepare_download
     else
-      generator = CsvGenerator.new(selected_survey, @unit_code, @site_code, @year_of_registration)
+      prepend_columns = ['TREATMENT_DATA', 'YEAR_OF_TREATMENT', "#{current_capturesystem.name}_Unit_Name", 'ART_Unit_Name', 'CYCLE_ID']
+      generator = CsvGenerator.new(selected_survey, @unit_code, @site_code, @year_of_registration, prepend_columns)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
@@ -222,7 +228,8 @@ class ResponsesController < ApplicationController
   def download_index_summary
     index_summary = CSV.generate(:col_sep => ",") do |csv|
       # csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Created\ By Status Date\ Started)
-      csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Created\ By Status Date\ Started)
+      #csv.add_row %w(Cycle\ ID Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Created\ By Status Date\ Started)
+      csv.add_row ['Cycle ID', 'Treatment Data', 'Year of Treatment', "#{current_capturesystem.name} Unit", 'ART Unit', 'Created By', 'Status', 'Date Started']
       Response.accessible_by(current_ability).unsubmitted.order("cycle_id").where(survey: current_capturesystem.surveys).each do |response|
         csv.add_row [response.cycle_id, response.survey.name, response.year_of_registration,
                      response.clinic.unit_name,
@@ -236,10 +243,14 @@ class ResponsesController < ApplicationController
 
   def download_submission_summary
     submission_summary = CSV.generate(:col_sep => ",") do |csv|
-      csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Status Records)
+      #csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Status Records)
+      csv.add_row ['Treatment Data', 'Year of Treatment', "#{current_capturesystem.name} Unit", 'ART Unit', 'Status', 'Records']
       submission_summary_data.each do |summary|
+        #csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
+        #             summary[:num_records],]
+        #no use case is identified for above extra comma from discussion with darsha
         csv.add_row [summary[:survey_name], summary[:year], summary[:unit_name], summary[:site_code], summary[:status],
-                     summary[:num_records],]
+                     summary[:num_records]]
       end
     end
     send_data submission_summary, :type => 'text/csv', :disposition => "attachment", :filename =>'submission_summary.csv'
@@ -257,11 +268,17 @@ class ResponsesController < ApplicationController
                 {name: Response::STATUS_SUBMITTED, str: Response::STATUS_SUBMITTED},
                 {name: Response::STATUS_UNSUBMITTED, str: 'In Progress'}
             ].each do |status|
-              num_records = stats.response_count(year, status[:name], clinic.id,)
+              #num_records = stats.response_count(year, status[:name], clinic.id,)
+              #no use case is identified for above extra comma from discussion with darsha
+              num_records = stats.response_count(year, status[:name], clinic.id)
               unless num_records == 'none'
-                submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
-                                  site_code: clinic.site_code, status: status[:str], num_records: num_records,
+                #submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
+                                  #site_code: clinic.site_code, status: status[:str], num_records: num_records,
 
+                                 #})
+                #no use case is identified for above extra comma from discussion with darsha
+                submissions.push({survey_name: survey.name, year: year, unit_name: clinic.unit_name,
+                                  site_code: clinic.site_code, status: status[:str], num_records: num_records
                                  })
               end
             end
@@ -317,7 +334,7 @@ class ResponsesController < ApplicationController
 
   def validate_batch_delete_form(year, survey_id)
     errors = []
-    errors << "Please select a valid survey" if current_capturesystem.surveys.find(survey_id).nil?
+    errors << "Please select a valid survey" if current_capturesystem.surveys.find_by(id: survey_id).nil?
     errors << "Please select a year of registration" if year.blank?
     errors << "Please select a treatment data" if survey_id.blank?
     errors

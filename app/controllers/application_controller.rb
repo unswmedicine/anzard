@@ -30,25 +30,8 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:sign_up, keys: [:first_name, :last_name])
   end
 
-  def master_site_base_url
-    Rails.cache.fetch("master_site_base_url", compress:false) do
-      logger.debug('Fetching [master_site_base_url]')
-      ConfigurationItem.find_by(name:'master_site_base_url').configuration_value
-    end
-  end
-  helper_method :master_site_base_url
-
-  def master_site_name
-    Rails.cache.fetch("master_site_name", compress:false) do
-      logger.debug('Fetching [master_site_name]')
-      ConfigurationItem.find_by(name:'master_site_name').configuration_value
-    end
-  end
-  helper_method :master_site_name
-
-
   def at_master_site?
-    request.host == URI.parse(master_site_base_url).host
+    request.host == URI.parse(CapturesystemUtils.master_site_base_url).host
   end
   helper_method :at_master_site?
 

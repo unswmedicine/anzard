@@ -17,7 +17,7 @@
 !!!
 %html
   = render partial: "shared/head"
-  %body
+  %body{style:"#{user_signed_in? ? 'padding: 60px 0 0 0': 'padding: 140px 0 0 0'}"}
     #page_container
       #content_wrapper
         = render partial: "shared/topbar"

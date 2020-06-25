@@ -21,5 +21,10 @@ FactoryGirl.define do
     association :response
     association :question
     answer_value "100"
+    initialize_with {
+      answer = response.answers.build(question_id: question&.id)
+      answer.answer_value = answer_value unless answer_value.nil?
+      answer
+    }
   end
 end

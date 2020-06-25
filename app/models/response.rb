@@ -60,11 +60,13 @@ class Response < ApplicationRecord
   # to a cached set of surveys that are loaded once in an initializer
   def survey
     #SURVEYS[survey_id]
+    return Survey.find(self.survey_id) if Rails.env.test?
     Rails.cache.fetch("#{self.survey_id}_SURVEY", compress:false) do
       logger.debug("Fetching [#{self.survey_id}_SURVEY]")
       Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).find(self.survey_id)
     end
   end
+  #Note:Because above, don't retrieve survey_configuration via association, get it the otherway around like SurveyConfiguration.find_by(survey:suvery_1)
   #TODO above code can be removed, because optiomisation should be done in a more rails frendly place
   #i.e split up the Question table and leave out the wide fields to a secondary table
 
@@ -108,8 +110,8 @@ class Response < ApplicationRecord
     select("distinct year_of_registration").collect(&:year_of_registration).sort
   end
 
-  def self.existing_years_of_registration
-    select("distinct year_of_registration").collect(&:year_of_registration).sort
+  def self.existing_years_of_registration(capturesystem)
+    select("distinct year_of_registration").where(survey: capturesystem.surveys).collect(&:year_of_registration).sort
   end
 
   def submit!

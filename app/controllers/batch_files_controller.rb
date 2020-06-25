@@ -28,7 +28,10 @@ class BatchFilesController < ApplicationController
 
   load_and_authorize_resource
 
-  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range }
+  expose(:year_of_registration_range) { ConfigurationItem.year_of_registration_range(current_capturesystem) }
+  expose(:fiscal_year_of_registration_range) { 
+    ConfigurationItem.year_of_registration_range(current_capturesystem).map { |year| [ "July #{year-1} to June #{year}", year ] } 
+  }
   expose(:group_names_by_survey) { Question.group_names_by_survey }
   #expose(:surveys) { SURVEYS.values }
   #REMOVE_ABOVE
@@ -51,6 +54,8 @@ class BatchFilesController < ApplicationController
   end
 
   def create
+    return redirect_back(fallback_location: root_path, alert: 'Please select a valid clinic.') unless current_user.clinics.where(capturesystem: current_capturesystem).ids.include?(@batch_file.clinic_id)
+
     @batch_file.user = current_user
     if @batch_file.save
       @batch_file.delay.process
@@ -84,7 +89,8 @@ class BatchFilesController < ApplicationController
   def download_index_summary
     index_summary = CSV.generate(:col_sep => ",") do |csv|
       # csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
-      csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
+      #csv.add_row %w(Treatment\ Data Year\ of\ Treatment ANZARD\ Unit ART\ Unit Filename Records Created\ By Date\ Uploaded Status Summary)
+      csv.add_row ['Treatment Data', 'Year of Treatment', "#{current_capturesystem.name} Unit", 'ART Unit', 'Filename', 'Records', 'Created By', 'Date Uploaded', 'Status', 'Summary']
       @batch_files.where(clinic: current_capturesystem.clinics).order("created_at DESC").each do |batch_file|
         csv.add_row [batch_file.survey.name, batch_file.year_of_registration, batch_file.clinic.unit_name,
                      batch_file.clinic.site_code, batch_file.file_file_name, batch_file.record_count,

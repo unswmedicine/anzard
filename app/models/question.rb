@@ -16,6 +16,11 @@
 
 class Question < ApplicationRecord
 
+  #self.ignored_columns = %w(description)
+  #self.ignored_columns = ['description', 'guide_for_use']
+
+
+
   TYPE_CHOICE = 'Choice'
   TYPE_DATE = 'Date'
   TYPE_DECIMAL = 'Decimal'

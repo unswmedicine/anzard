@@ -48,6 +48,9 @@ end
 
 ###################
 def main_main(version_list)
+  #varsion_list inlcudes versions included in this release
+  (puts 'Aborted. Mis-matching the latest db sechema migration version.';return) if version_list.last != SchemaMigration.order(version: :desc).limit(1).pluck(:version).last
+
   unless SchemaMigration.where(version: version_list ).count == version_list.count
     puts 'You have missing migrations to run this script'
   else
@@ -55,9 +58,7 @@ def main_main(version_list)
     ########################
     seeds_data = {}
 
-    varta_admin_emails = [
-      'admin@anzard.intersect.org.au'
-    ]
+    varta_admin_emails = []
     if Rails.env.development?
       seeds_data = {
         Capturesystem: {
@@ -75,6 +76,9 @@ def main_main(version_list)
          ]
         }
       }
+      varta_admin_emails = [
+        'admin@intersect.org.au'
+      ]
     elsif Rails.env.qa?
       seeds_data = {
         Capturesystem: {
@@ -92,6 +96,9 @@ def main_main(version_list)
          ]
         } 
       }
+      varta_admin_emails = [
+        'admin@intersect.org.au'
+      ]
     elsif Rails.env.staging?
       seeds_data = {
         Capturesystem: {
@@ -109,7 +116,9 @@ def main_main(version_list)
          ]
         } 
       }
-
+      varta_admin_emails = [
+        'admin@intersect.org.au'
+      ]
     else
     #default production
       seeds_data = {
@@ -130,7 +139,6 @@ def main_main(version_list)
       } 
       #TODO udpate this
       varta_admin_emails = [
-        'admin@anzard.intersect.org.au'
       ]
     end
     migrate_seeds(seeds_data)
@@ -173,6 +181,25 @@ def main_main(version_list)
       }
     }
     migrate_seeds(seeds_data)
+
+    seeds_data = {
+      ConfigurationItem: {
+        update_ANZARD_YearOfRegStart_name: {
+          where: {name: 'YearOfRegStart'},
+          update: [{name: 'ANZARD_YearOfRegStart'}]
+        },
+        update_ANZARD_YearOfRegEnd_name: {
+          where: {name: 'YearOfRegEnd'},
+          update: [{name: 'ANZARD_YearOfRegEnd'}]
+        },
+        find_or_create_by: [
+          {name: 'VARTA_YearOfRegStart', configuration_value:'2015'},
+          {name: 'VARTA_YearOfRegEnd', configuration_value:'2025'}
+        ]
+      }
+    }
+    migrate_seeds(seeds_data)
+
   end
 end
 
@@ -186,7 +213,8 @@ if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('1.9')
 '20200428011938',
 '20200428020513',
 '20200507075811',
-'20200507080709'
+'20200507080709',
+'20200602003801'
 ])
 else
   puts 'Aborted, your ruby version is too older: <= 1.9 !!'

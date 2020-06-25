@@ -21,7 +21,7 @@ class PagesController < ApplicationController
   def home
     #Always go to the master site for login
     if !current_capturesystem.nil? && !user_signed_in?
-      return redirect_to master_site_base_url
+      return redirect_to CapturesystemUtils.master_site_base_url
     end
   end
 end

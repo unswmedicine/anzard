@@ -1,5 +1,5 @@
 %html
-  - if master_site_base_url == params[:system_url] 
+  - if CapturesystemUtils.master_site_base_url == params[:system_url] 
     = render partial: 'request_new_session'
   - else
     - case @requested_capturesystem_user&.access_status 

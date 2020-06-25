@@ -8,7 +8,7 @@ class UserSessionsController < Devise::SessionsController
   def new
     #Always go to the master site for login
     if !current_capturesystem.nil? && !user_signed_in?
-      return redirect_to master_site_base_url
+      return redirect_to CapturesystemUtils.master_site_base_url
     end
     super
   end
@@ -60,7 +60,7 @@ class UserSessionsController < Devise::SessionsController
       response.headers['Access-Control-Request-Method']= %w{GET POST OPTIONS}.join(",")
 
       @requested_capturesystem = Capturesystem.find_by(base_url: params[:system_url])
-      if @requested_capturesystem.nil? && master_site_base_url != params[:system_url] 
+      if @requested_capturesystem.nil? && CapturesystemUtils.master_site_base_url != params[:system_url] 
         return redirect_to(root_path, alert: 'Your access request to capture system is invalid')
       else
         @requested_capturesystem_user = CapturesystemUser.find_by(capturesystem: @requested_capturesystem, user: current_user)

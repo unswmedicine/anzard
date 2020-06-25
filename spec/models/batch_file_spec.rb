@@ -185,28 +185,28 @@ describe BatchFile do
 
       it 'should reject files that have a row without a UNIT field' do
         batch_file = process_batch_file('no_unit_code_field.csv', survey, user)
-        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
+        expect_fail_status_with_message(batch_file, "The file you uploaded contains a UNIT/#{capturesystem.name}_UNIT or SITE/ART_UNIT that is unknown to our database. Processing stopped on CSV row 1")
         expect_no_records_and_no_problem_records(batch_file)
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that have a row with an unknown Unit Code' do
         batch_file = process_batch_file('unknown_unit_code.csv', survey, user)
-        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
+        expect_fail_status_with_message(batch_file, "The file you uploaded contains a UNIT/#{capturesystem.name}_UNIT or SITE/ART_UNIT that is unknown to our database. Processing stopped on CSV row 2")
         expect_no_records_and_no_problem_records(batch_file)
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that have a row without a SITE field' do
         batch_file = process_batch_file('no_site_code_field.csv', survey, user)
-        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 1')
+        expect_fail_status_with_message(batch_file, "The file you uploaded contains a UNIT/#{capturesystem.name}_UNIT or SITE/ART_UNIT that is unknown to our database. Processing stopped on CSV row 1")
         expect_no_records_and_no_problem_records(batch_file)
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
 
       it 'should reject files that have a row with an Unknown Site Code' do
         batch_file = process_batch_file('unknown_site_code.csv', survey, user)
-        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a UNIT or SITE that is unknown to our database. Processing stopped on CSV row 2')
+        expect_fail_status_with_message(batch_file, "The file you uploaded contains a UNIT/#{capturesystem.name}_UNIT or SITE/ART_UNIT that is unknown to our database. Processing stopped on CSV row 2")
         expect_no_records_and_no_problem_records(batch_file)
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
@@ -214,7 +214,7 @@ describe BatchFile do
       it 'should reject files that contain a row with a Site Code the user is not allocated to' do
         create(:clinic, capturesystem: capturesystem, unit_code: 100, site_code: 999)
         batch_file = process_batch_file('unauthorised_site_code.csv', survey, user)
-        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a ART_UNIT that you are not allocated to. Processing stopped on CSV row 2')
         expect_no_records_and_no_problem_records(batch_file)
         expect_no_summary_report_and_no_detail_report(batch_file)
       end
@@ -222,7 +222,7 @@ describe BatchFile do
       it 'should reject files that contain a row with a Unit Code the user is not allocated to' do
         create(:clinic, capturesystem: capturesystem, unit_code: 999, site_code: 100)
         batch_file = process_batch_file('unauthorised_unit_code.csv', survey, user)
-        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a Unit_Site that you are not allocated to. Processing stopped on CSV row 2')
+        expect_fail_status_with_message(batch_file, 'The file you uploaded contains a ART_UNIT that you are not allocated to. Processing stopped on CSV row 2')
         expect_no_records_and_no_problem_records(batch_file)
         expect_no_summary_report_and_no_detail_report(batch_file)
       end

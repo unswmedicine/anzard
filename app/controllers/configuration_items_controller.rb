@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#TODO This class needs cleanup
 class ConfigurationItemsController < ApplicationController
 
   before_action :authenticate_user!
@@ -58,8 +59,8 @@ class ConfigurationItemsController < ApplicationController
   end
 
   def load_values
-    @start_year = ConfigurationItem.find_by_name!(ConfigurationItem::YEAR_OF_REGISTRATION_START)
-    @end_year = ConfigurationItem.find_by_name!(ConfigurationItem::YEAR_OF_REGISTRATION_END)
+    @start_year = ConfigurationItem.find_by_name!("#{current_capturesystem.name}_"+ConfigurationItem::YEAR_OF_REGISTRATION_START)
+    @end_year = ConfigurationItem.find_by_name!("#{current_capturesystem.name}_"+ConfigurationItem::YEAR_OF_REGISTRATION_END)
   end
 
 

@@ -16,7 +16,7 @@
 
 %head
   %title
-    #{current_capturesystem&.name || master_site_name} - #{yield :title}
+    #{current_capturesystem&.name || CapturesystemUtils::master_site_name} - #{yield :title}
   = stylesheet_link_tag    "application"
   <!--[if IE 6]><link href="/ie6.css" media="screen" rel="stylesheet" type="text/css" /><![endif]-->
   <!--[if IE 8]><link href="/ie8.css" media="screen" rel="stylesheet" type="text/css" /><![endif]-->

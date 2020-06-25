@@ -34,6 +34,10 @@ class Clinic < ApplicationRecord
   validates_inclusion_of :active, in: [true, false]
 
   validates_uniqueness_of :site_code, scope: [:capturesystem_id, :unit_code]
+  # uniqueness of site_code across different units is not enforced according to current existing data
+  # for instance site_code 108 and 606 exist under two different Unit code
+  #validates_uniqueness_of :site_code, scope: :capturesystem_id
+
   validates_numericality_of :unit_code, greater_than_or_equal_to: 100, less_than_or_equal_to: 999
   validates_numericality_of :site_code, greater_than_or_equal_to: 100, less_than_or_equal_to: 999
 

@@ -74,3 +74,10 @@ class Warden::SessionSerializer
     keys
   end
 end
+
+def create_new_answer(response, question, val=nil)
+  answer = response.answers.build(question_id: question&.id)
+  answer.answer_value = val unless val.nil?
+  answer.save!
+  answer
+end

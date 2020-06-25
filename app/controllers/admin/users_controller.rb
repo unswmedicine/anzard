@@ -70,7 +70,7 @@ class Admin::UsersController < Admin::AdminBaseController
 
   #TODO need cleanup
   def reject
-    @user.reject_access_request(master_site_name, current_capturesystem)
+    @user.reject_access_request(CapturesystemUtils.master_site_name, current_capturesystem)
     #@user.destroy
     #reject account request to one capturesystem does not imply rejecting account request to the other
     @user.capturesystem_users.where(capturesystem_id:current_capturesystem.id).destroy_all
@@ -102,7 +102,7 @@ class Admin::UsersController < Admin::AdminBaseController
       return redirect_to(access_requests_admin_users_path, 
         alert: "Cannot permanently block #{@user.email}, it has been approved in the other capture system(s). However you can reject this request with the 'Reject' button.")
     else
-      @user.reject_access_request(master_site_name, current_capturesystem)
+      @user.reject_access_request(CapturesystemUtils.master_site_name, current_capturesystem)
       return redirect_to(access_requests_admin_users_path, 
         notice: "The access request for #{@user.email} was rejected and this email address will be permanently blocked.")
     end
@@ -163,12 +163,14 @@ class Admin::UsersController < Admin::AdminBaseController
         selected_clinic_ids.each do |clinic_id|
           @user.clinics << current_capturesystem.clinics.find(clinic_id)
         end
+      rescue ActiveRecord::RecordNotFound => invalid
+        return redirect_back(fallback_location: root_path, alert: "#{invalid.record.errors.full_messages}")
       rescue ActiveRecord::RecordInvalid => invalid
         return redirect_back(fallback_location: root_path, alert: "#{invalid.record.errors.full_messages}")
       end
 
       if @user.save
-        @user.approve_access_request(master_site_name, master_site_base_url, current_capturesystem)
+        @user.approve_access_request(CapturesystemUtils.master_site_name, CapturesystemUtils.master_site_base_url, current_capturesystem)
         redirect_to(access_requests_admin_users_path, notice: "The access request for #{@user.email} was approved.")
       else
         redirect_to(edit_approval_admin_user_path(@user), alert: 'Users with this Role must be assigned to a Unit and Site(s)')

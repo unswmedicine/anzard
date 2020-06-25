@@ -20,7 +20,7 @@
     = f.collection_select :role_id, @roles, :id, :name, {include_blank: ""}, {class: 'large'}
 
 .clearfix#clinic_units
-  = label_tag :clinic_unit, 'ANZARD Unit'
+  = label_tag :clinic_unit, "#{current_capturesystem.name} Unit"
   .input
     = select_tag :clinic_unit, grouped_options_for_select(Clinic.units_by_state_with_unit_code(current_capturesystem), @user.allocated_unit_code), include_blank: true, disabled: disable_unit_select, class: 'large'
 

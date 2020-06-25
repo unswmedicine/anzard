@@ -15,13 +15,16 @@
 -# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 - if user_signed_in?
+  %div{style: 'height:20px;'}
   %div{class: "centered_wrapper"}
     = image_tag 'varta_landscape_small.jpg', width: 400
   - title 'Welcome to the Victoria Assisted Reproduction Treatment Authority', false, true
+  %div{style: 'height:20px;'}
 
   - if current_user.role.super_user? || !current_user.clinics.where(capturesystem:current_capturesystem).empty?
     %div{class: "centered_wrapper"}
       %h3 Please select the appropriate icon below to begin your submission.
+    %div{style: 'height:40px;'}
     = render(partial: 'pages/nav')
   - else
     %div{class: "centered_wrapper"}

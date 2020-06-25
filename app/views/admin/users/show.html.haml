@@ -66,7 +66,7 @@
         = @user.last_sign_in_at.localtime.strftime('%d/%m/%Y %I:%M%p')
   = render_field 'Role', (@user.role ? @user.role.name : '(None set)')
   - if @user.clinics.count > 0
-    = render_field 'ANZARD Unit', @user.clinics.where(capturesystem:current_capturesystem).first.unit_name_with_code
+    = render_field "#{current_capturesystem.name} Unit", @user.clinics.where(capturesystem:current_capturesystem).first.unit_name_with_code
     = render_field 'ART Unit(s)', @user.clinics.where(capturesystem:current_capturesystem).map { |clinic| "#{clinic.site_name_with_code} - #{clinic.state}" }.join(', ')
   = render_field_with_block 'Status' do
     - if @user.approved_in_capturesystem?(current_capturesystem)

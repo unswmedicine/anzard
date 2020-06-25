@@ -133,7 +133,12 @@ class SpecialRules
 
     CrossQuestionValidation.register_checker 'special_dob', lambda { |answer, unused_related_answer, checker_params|
       # DOB must be in the same year as the year of registration
-      answer.date_answer.year == answer.response.year_of_registration
+      if SurveyConfiguration.find_by(survey: answer.response.survey).year_range_type == SurveyConfiguration::YEAR_RANGE_TYPE_FISCAL
+        fy_se = getFiscalYearStartEnd_byEndingYear(answer.response.year_of_registration)
+        return answer.date_answer.between?(fy_se[:start_date], fy_se[:end_date])
+      else
+        return answer.date_answer.year == answer.response.year_of_registration
+      end
     }
 
     CrossQuestionValidation.register_checker 'special_rule_comp1', lambda { |answer, ununused_related_answer, checker_params|
@@ -220,7 +225,7 @@ class SpecialRules
       # i.e. if n_embdisp > 0 then cyc_date ≥ fdob + 18 years && cyc_date <= fdob + 70 years
       raise 'Can only be used on question N_EMBDISP' unless answer.question.code == 'N_EMBDISP'
 
-      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP')
+      n_embdisp = answer.response.comparable_answer_or_nil_for_question_with_code('N_EMBDISP').to_i
       cyc_date = answer.response.comparable_answer_or_nil_for_question_with_code('CYC_DATE')
       fdob = answer.response.comparable_answer_or_nil_for_question_with_code('FDOB')
 
@@ -236,8 +241,8 @@ class SpecialRules
       raise 'Can only be used on question PR_CLIN' unless answer.question.code == 'PR_CLIN'
 
       p_r_clin = answer.response.comparable_answer_or_nil_for_question_with_code('PR_CLIN')
-      n_bl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET')
-      n_cl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET')
+      n_bl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET').to_i
+      n_cl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET').to_i
       iui_date = answer.response.comparable_answer_or_nil_for_question_with_code('IUI_DATE')
 
       # If pr_clin not y or u, then validation passes and no more checks required
@@ -317,8 +322,8 @@ class SpecialRules
       raise 'Can only be used on question ET_DATE' unless answer.question.code == 'ET_DATE'
 
       et_date = answer.response.comparable_answer_or_nil_for_question_with_code('ET_DATE')
-      n_cl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET')
-      n_bl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET')
+      n_cl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_CL_ET').to_i
+      n_bl_et = answer.response.comparable_answer_or_nil_for_question_with_code('N_BL_ET').to_i
 
       !et_date.nil? && ((!n_cl_et.nil? && n_cl_et > 0) || (!n_bl_et.nil? && n_bl_et > 0))
     }
@@ -406,16 +411,17 @@ class SpecialRules
       n_clfz_s = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_S')
       n_clfz_v  = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_CLFZ_V')
 
+      if cycle_type != 2
+        break true
+      end
 
       if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
         break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        break true unless (n_eggdon_fresh > 0 || n_embdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
+        (n_eggdon_fresh <= 0 || n_embdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <=0 || n_clfz_v <=0)
       else
         break true unless (cycle_type == 2 && n_eggrec_fresh == 0 &&  n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        break true unless (n_eggdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
+        (n_eggdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <= 0 || n_clfz_v <=0)
       end
-
-
     }
 
     CrossQuestionValidation.register_checker 'special_rule_cycletype_2_rec', lambda { |answer, ununused_related_answer, checker_params|
@@ -448,6 +454,10 @@ class SpecialRules
       n_s_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_S_BLTH')
       n_v_clth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_CLTH')
       n_v_blth = answer_or_0_if_nil answer.response.comparable_answer_or_nil_for_question_with_code('N_V_BLTH')
+
+      if cycle_type != 2
+        break true
+      end
 
       if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
         break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_embdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
@@ -556,10 +566,10 @@ class SpecialRules
       raise 'Can only be used on question SP_QUAL' unless answer.question.code == 'SP_QUAL'
 
       sp_site = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SITE')
-      sp_source = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SOURCE')
+      sp_source = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SOURCE').to_i
       sp_qual = answer.response.comparable_answer_or_nil_for_question_with_code('SP_QUAL')
-      n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF')
-      n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI')
+      n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF').to_i
+      n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI').to_i
 
 
       break true unless (sp_site == 'e' && sp_source==1) &&  (n_ivf > 0 || n_icsi > 0)
@@ -609,4 +619,19 @@ class SpecialRules
     result = answer if !answer.nil?
     result
   end
+
+  def self.getFiscalYearStartEnd_byStartingYear(start_year)
+    {
+      start_date: Date.iso8601("#{start_year}-07-01"), 
+      end_date: Date.iso8601("#{start_year+1}-06-30")
+    }
+  end
+
+  def self.getFiscalYearStartEnd_byEndingYear(end_year)
+    {
+      start_date: Date.iso8601("#{end_year-1}-07-01"), 
+      end_date: Date.iso8601("#{end_year}-06-30")
+    }
+  end
+
 end

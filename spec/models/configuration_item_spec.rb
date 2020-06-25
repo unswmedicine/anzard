@@ -17,6 +17,7 @@
 require 'rails_helper'
 
 describe ConfigurationItem do
+  let(:capturesystem) { create(:capturesystem) }
   describe "Validations" do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:configuration_value) }
@@ -24,10 +25,10 @@ describe ConfigurationItem do
   
   describe "Get year of registration range" do
     it "should get the start and end years from the config table" do
-      create(:configuration_item, name: ConfigurationItem::YEAR_OF_REGISTRATION_START, configuration_value: "2005")
-      create(:configuration_item, name: ConfigurationItem::YEAR_OF_REGISTRATION_END, configuration_value: "2012")
+      create(:configuration_item, name: "#{capturesystem.name}_#{ConfigurationItem::YEAR_OF_REGISTRATION_START}", configuration_value: "2005")
+      create(:configuration_item, name: "#{capturesystem.name}_#{ConfigurationItem::YEAR_OF_REGISTRATION_END}", configuration_value: "2012")
       
-      ConfigurationItem.year_of_registration_range.should eq((2005..2012).to_a)
+      ConfigurationItem.year_of_registration_range(capturesystem).should eq((2005..2012).to_a)
     end
   end
 end

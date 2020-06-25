@@ -28,13 +28,13 @@
 
 = link_to 'New Clinic', new_clinic_path, id: 'new_clinic', class: 'btn'
 
-= link_to 'Edit ANZARD Unit', edit_unit_clinics_path, id: 'edit_unit', class: 'btn'
+= link_to "Edit #{current_capturesystem.name} Unit", edit_unit_clinics_path, id: 'edit_unit', class: 'btn'
 
 %table#clinics
   %thead
     %tr.sortable
-      %th= sortable 'unit_code', 'ANZARD Unit'
-      %th= sortable 'unit_name', 'ANZARD Unit Name'
+      %th= sortable 'unit_code', "#{current_capturesystem.name} Unit"
+      %th= sortable 'unit_name', "#{current_capturesystem.name} Unit Name"
       %th= sortable 'site_code', 'ART Unit'
       %th= sortable 'site_name', 'ART Unit Name'
       %th= sortable 'state'

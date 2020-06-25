@@ -40,7 +40,7 @@
       %th= sortable 'last_name'
       %th= sortable 'email'
       %th= sortable 'roles.name', 'Role'
-      %th= sortable 'allocated_unit_code', 'ANZARD Unit'
+      %th= sortable 'allocated_unit_code', "#{current_capturesystem.name} Unit"
       %th ART Unit
       %th= sortable 'status'
       %th= sortable 'last_sign_in_at', 'Last signed in'

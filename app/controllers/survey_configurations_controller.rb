@@ -26,16 +26,24 @@ class SurveyConfigurationsController < ApplicationController
   end
 
   def edit
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.surveys.find_by(id: @survey_configuration.id).nil?
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.surveys.find_by(id: @survey_configuration.survey_id).nil?
   end
 
   def update
-    #Merged from ANZARD3.0 remove below comments if not necessary.
-    # YEAR_OF_REGISTRATION_START = "YearOfRegStart"
-    # YEAR_OF_REGISTRATION_END = "YearOfRegEnd"
-    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.surveys.find_by(id: @survey_configuration.id).nil?
+    return redirect_back(fallback_location: root_path, alert: 'Can not access unidentifieable resource.') if current_capturesystem.surveys.find_by(id: @survey_configuration.survey_id).nil?
+
     @survey_configuration.start_year_of_treatment = params[:survey_configuration][:start_year_of_treatment]
     @survey_configuration.end_year_of_treatment = params[:survey_configuration][:end_year_of_treatment]
+
+    # restrict to 'VARTA' at this release for backward compatibility
+    if current_capturesystem.name == 'VARTA'
+      #@survey_configuration.year_range_type = params[:survey_configuration][:year_range_type]
+      #encforce the fiscal year range type for VARTA to maintain consistent entry range type in dropdown on 'New Data Entry' page and 'Batch Upload' page
+      @survey_configuration.year_range_type = SurveyConfiguration::YEAR_RANGE_TYPE_FISCAL
+    else
+      @survey_configuration.year_range_type = SurveyConfiguration::YEAR_RANGE_TYPE_CALENDAR
+    end
+
     if @survey_configuration.save
       redirect_to survey_configurations_path, notice: "Survey configuration was successfully updated."
     else
