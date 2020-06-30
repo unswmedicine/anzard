@@ -166,6 +166,8 @@ class ResponsesController < ApplicationController
     @unit_code = params[:unit_code]
     @site_code = params[:site_code]
     @year_of_registration = params[:year_of_registration]
+    #@download_as_stream = (params[:download_as_stream] == 'true')
+    @download_as_stream = true
 
     selected_survey = current_capturesystem.surveys.includes(sections: [questions: :section]).find_by(id: @survey_id)
     if selected_survey.nil?
@@ -178,7 +180,19 @@ class ResponsesController < ApplicationController
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
       else
-        send_data generator.csv, :type => 'text/csv', :disposition => "attachment", :filename => generator.csv_filename
+        generator_csv_filename = generator.csv_filename
+        if @download_as_stream 
+          headers.delete("Content-Length")
+          headers["Cache-Control"] = "no-cache"
+          headers["Content-Type"] = "text/csv"
+          headers["Content-Disposition"] = "attachment; filename=\"#{generator_csv_filename}\""
+          headers["X-Accel-Buffering"] = "no"
+          self.response_body = generator.csv_enumerator
+          response.status = 200
+          logger.debug("Started responding: #{generator_csv_filename}")
+        else
+          send_data generator.csv, :type => 'text/csv', :disposition => "attachment", :filename => generator_csv_filename
+        end
       end
     end
   end

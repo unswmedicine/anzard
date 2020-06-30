@@ -77,7 +77,8 @@ class Response < ApplicationRecord
   ##REMOVE_ABOVE
 
   def self.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
-    results = submitted.for_survey(survey).order(:cycle_id)
+    #results = submitted.for_survey(survey).order(:cycle_id)
+    results = submitted.for_survey(survey)
     unless unit_code.blank?
       if site_code.blank?
         results = results.joins(:clinic).where(:clinics => {unit_code: unit_code})
@@ -86,7 +87,7 @@ class Response < ApplicationRecord
       end
     end
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
-    results.includes([:clinic, :survey, :answers])
+    results.includes([:clinic, :answers])
   end
 
   def self.count_per_survey_and_year_of_registration_and_clinic(survey_id, year, clinic_id)
