@@ -38,4 +38,7 @@
 
 $(window).load(function () {
   $('.row div[class^="span"]:last-child').addClass('last-child');
+  $('.prepareDownloadButton').on('click', function(){
+      $("#form_errors").hide()
+  })
 });

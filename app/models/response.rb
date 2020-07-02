@@ -75,6 +75,12 @@ class Response < ApplicationRecord
     #self.survey_id = survey.id
   #end
   ##REMOVE_ABOVE
+  #
+  # Duplicate this and without includes statment
+  # Try for specifc download
+  # Check where all places called after stpe 2 works
+  # results.include shouuld not be used
+  # Check what happends when no drop down is selected as we take out is empty out
 
   def self.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
     #results = submitted.for_survey(survey).order(:cycle_id)
@@ -87,6 +93,7 @@ class Response < ApplicationRecord
       end
     end
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
+    # The followiung line needs to come out what about the side effects? Need to check where all this function is called
     results.includes([:clinic, :answers])
   end
 

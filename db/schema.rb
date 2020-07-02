@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200602003801) do
+ActiveRecord::Schema.define(version: 20200702131726) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -166,6 +166,7 @@ ActiveRecord::Schema.define(version: 20200602003801) do
     t.string  "multi_name"
     t.integer "group_number"
     t.integer "order_within_group"
+    t.index ["section_id"], name: "index_questions_on_section_id", using: :btree
   end
 
   create_table "responses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -179,6 +180,8 @@ ActiveRecord::Schema.define(version: 20200602003801) do
     t.integer  "batch_file_id"
     t.integer  "year_of_registration"
     t.string   "validation_status"
+    t.index ["clinic_id"], name: "index_responses_on_clinic_id", using: :btree
+    t.index ["survey_id"], name: "index_responses_on_survey_id", using: :btree
   end
 
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -191,6 +194,7 @@ ActiveRecord::Schema.define(version: 20200602003801) do
     t.integer "survey_id"
     t.integer "section_order"
     t.string  "name"
+    t.index ["survey_id"], name: "index_sections_on_survey_id", using: :btree
   end
 
   create_table "survey_configurations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

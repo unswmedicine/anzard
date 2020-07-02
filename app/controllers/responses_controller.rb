@@ -176,23 +176,27 @@ class ResponsesController < ApplicationController
     else
       prepend_columns = ['TREATMENT_DATA', 'YEAR_OF_TREATMENT', "#{current_capturesystem.name}_Unit_Name", 'ART_Unit_Name', 'CYCLE_ID']
       generator = CsvGenerator.new(selected_survey, @unit_code, @site_code, @year_of_registration, prepend_columns)
-      if generator.empty?
-        @errors = ["No data was found for your search criteria"]
-        render :prepare_download
+      # if generator.empty?
+      #
+      #   @errors = ["No data was found for your search criteria"]
+      #   render :prepare_download
+      # else
+      #
+      # Remove/comment the above code so that QUERY - for a survey that does not have a selected ANZARD Unit, ART unit or year
+      # of registration - that does not have any answers to the selected criteria - is not executed. Which otherwise
+      # wastes time by running the query partially
+      generator_csv_filename = generator.csv_filename
+      if @download_as_stream
+        headers.delete("Content-Length")
+        headers["Cache-Control"] = "no-cache"
+        headers["Content-Type"] = "text/csv"
+        headers["Content-Disposition"] = "attachment; filename=\"#{generator_csv_filename}\""
+        headers["X-Accel-Buffering"] = "no"
+        self.response_body = generator.csv_enumerator
+        response.status = 200
+        logger.debug("Started responding: #{generator_csv_filename}")
       else
-        generator_csv_filename = generator.csv_filename
-        if @download_as_stream 
-          headers.delete("Content-Length")
-          headers["Cache-Control"] = "no-cache"
-          headers["Content-Type"] = "text/csv"
-          headers["Content-Disposition"] = "attachment; filename=\"#{generator_csv_filename}\""
-          headers["X-Accel-Buffering"] = "no"
-          self.response_body = generator.csv_enumerator
-          response.status = 200
-          logger.debug("Started responding: #{generator_csv_filename}")
-        else
-          send_data generator.csv, :type => 'text/csv', :disposition => "attachment", :filename => generator_csv_filename
-        end
+        send_data generator.csv, :type => 'text/csv', :disposition => "attachment", :filename => generator_csv_filename
       end
     end
   end
