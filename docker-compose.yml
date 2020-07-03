@@ -16,10 +16,11 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: anzard-test
+      MYSQL_DATABASE: anzard
       MYSQL_USER: anzard
       MYSQL_PASSWORD: anzard
     volumes:
+      - .:/app
       - "./docker_dir/db:/var/lib/mysql"
       - "./docker_dir/prepare_anzard_mysql_user.sql:/docker-entrypoint-initdb.d/prepare_anzard_mysql_user.sql"
     ports:

@@ -19,7 +19,7 @@ COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3000
-
+RUN export RAILS_ENV=development
 COPY ./docker_dir/start_app.sh /usr/bin/start_app.sh
 RUN chmod +x /usr/bin/start_app.sh
 CMD ["start_app.sh"]
