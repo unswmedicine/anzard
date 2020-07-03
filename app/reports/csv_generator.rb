@@ -130,7 +130,7 @@ class CsvGenerator
             LEFT JOIN  clinics c on r.clinic_id = c.id
             LEFT JOIN  sections sec on sec.survey_id = s.id
             LEFT JOIN  questions q on q.section_id = sec.id
-            WHERE s.id = #{ActiveRecord::Base.sanitize(survey_id)}"
+            WHERE r.submitted_status='Submitted' and s.id = #{ActiveRecord::Base.sanitize(survey_id)}"
 
 
       if unit_code != ""
