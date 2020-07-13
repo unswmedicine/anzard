@@ -59,8 +59,8 @@ class Answer < ApplicationRecord
   #end
   ##REMOVE_ABOVE
 
-  def has_warning?
-    warnings.present? or fatal_warnings.present?
+  def has_warning?(survey_configuration=nil)
+    warnings(survey_configuration).present? or fatal_warnings.present?
   end
 
   def has_fatal_warning?
@@ -79,11 +79,12 @@ class Answer < ApplicationRecord
     end
   end
 
-  def warnings
+  def warnings(survey_configuration=nil)
+    survey_configuration = SurveyConfiguration.find_by(survey: self.response.survey) if survey_configuration.nil?
     if answer_value_set?
-      [warn_on_range, *warn_on_cross_questions].compact
+      [warn_on_range, *warn_on_cross_questions(survey_configuration)].compact
     else
-      warn_on_cross_questions.compact
+      warn_on_cross_questions(survey_configuration).compact
     end
   end
 
@@ -244,8 +245,8 @@ class Answer < ApplicationRecord
     end
   end
 
-  def warn_on_cross_questions
-    CrossQuestionValidation.check self
+  def warn_on_cross_questions(survey_configuration)
+    CrossQuestionValidation.check(self, survey_configuration)
   end
 
   def warn_on_range

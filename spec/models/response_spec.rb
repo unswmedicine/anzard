@@ -84,10 +84,12 @@ describe Response do
   describe "Getting submitted responses by survey, clinic and year of reg" do
     before(:each) do
       @survey_a = create(:survey)
+      create(:capturesystem_survey, capturesystem_id:capturesystem.id, survey_id:@survey_a.id)
       @survey_b = create(:survey)
-      @clinic_a = create(:clinic, unit_code: 100, unit_name: 'Unit 100', site_code: 100)
-      @clinic_b = create(:clinic, unit_code: 200, unit_name: 'Unit 200', site_code: 200)
-      @clinic_c = create(:clinic, unit_code: 100, unit_name: 'Unit 100', site_code: 101)
+      create(:capturesystem_survey, capturesystem_id:capturesystem.id, survey_id:@survey_b.id)
+      @clinic_a = create(:clinic, capturesystem: capturesystem, unit_code: 100, unit_name: 'Unit 100', site_code: 100)
+      @clinic_b = create(:clinic, capturesystem: capturesystem, unit_code: 200, unit_name: 'Unit 200', site_code: 200)
+      @clinic_c = create(:clinic, capturesystem: capturesystem, unit_code: 100, unit_name: 'Unit 100', site_code: 101)
       @r1 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "1").id
       @r2 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2001, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "2").id
       @r3 = create(:response, survey: @survey_a, clinic: @clinic_a, year_of_registration: 2002, submitted_status: Response::STATUS_SUBMITTED, cycle_id: "3").id

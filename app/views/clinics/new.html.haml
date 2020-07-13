@@ -21,7 +21,7 @@
   .clearfix
     = f.label :unit_selection, "#{current_capturesystem.name} Unit Selection"
     .input
-      = select_tag :unit_selection, clinics_unit_options_with_new, {class: 'large'}
+      = select_tag :unit_selection, clinics_unit_options_with_new(current_capturesystem), {class: 'large'}
   .clearfix
     = f.label :unit_code, "#{current_capturesystem.name} Unit"
     .input

@@ -14,15 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
+#require "spec_helper"
+require 'rails_helper'
 
 describe Notifier do
+  let(:capturesystem) { create(:capturesystem, name:'ANZARD', base_url:'http://localhost:3000') }
   
   describe "Email notifications to users should be sent" do
     it "should send mail to user if access request approved" do
       address = 'user@email.org'
       user = create(:user, :status => "A", :email => address)
-      email = Notifier.notify_user_of_approved_request(user, 'NPESU', 'localhost', Capturesystem.find(1)).deliver
+      email = Notifier.notify_user_of_approved_request(user, 'NPESU', 'localhost', capturesystem).deliver
   
       # check that the email has been queued for sending
       ActionMailer::Base.deliveries.empty?.should eq(false) 
@@ -33,7 +35,7 @@ describe Notifier do
     it "should send mail to user if access request denied" do
       address = 'user@email.org'
       user = create(:user, :status => "A", :email => address)
-      email = Notifier.notify_user_of_rejected_request(user, 'NPESU', Capturesystem.find(1)).deliver
+      email = Notifier.notify_user_of_rejected_request(user, 'NPESU', capturesystem).deliver
   
       # check that the email has been queued for sending
       ActionMailer::Base.deliveries.empty?.should eq(false) 
@@ -47,11 +49,11 @@ describe Notifier do
     address = 'user@email.org'
     user = create(:user, :status => "U", :email => address)
     User.should_receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
-    email = Notifier.notify_superusers_of_access_request(user, Capturesystem.find(1).name, Capturesystem.find(1).base_url, Capturesystem.find(1)).deliver
+    email = Notifier.notify_superusers_of_access_request(user, 'NPESU', capturesystem.base_url, capturesystem).deliver
 
     # check that the email has been queued for sending
     ActionMailer::Base.deliveries.empty?.should eq(false)
-    email.subject.should eq("ANZARD - There has been a new access request")
+    email.subject.should eq("NPESU | ANZARD - There has been a new access request")
     email.to.should eq(["super1@intersect.org.au", "super2@intersect.org.au"])
   end
  

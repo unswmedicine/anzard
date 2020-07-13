@@ -180,6 +180,9 @@ class ResponsesController < ApplicationController
         @errors = ["No data was found for your search criteria"]
         render :prepare_download
       else
+        logger.info(
+          "[#{current_user.email}] started downloading responses for survey:[#{selected_survey.name}], unit_code:[#{@unit_code}], site_code:[#{@site_code}], year_of_registration:[#{@year_of_registration}]"
+        )
         generator_csv_filename = generator.csv_filename
         if @download_as_stream 
           headers.delete("Content-Length")
