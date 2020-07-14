@@ -24,7 +24,7 @@ class Notifier < ActionMailer::Base
     mail( to: @user.email,
           from: APP_CONFIG['account_request_user_status_email_sender'],
           reply_to: APP_CONFIG['account_request_user_status_email_sender'],
-          subject: "#{system_name} | #{@capturesystem.name} -Your access request has been approved")
+          subject: "#{system_name} | #{@capturesystem.name} - Your access request has been approved")
   end
 
   def notify_user_of_rejected_request(recipient, system_name, capturesystem)

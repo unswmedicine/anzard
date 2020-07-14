@@ -77,17 +77,19 @@ class Response < ApplicationRecord
   ##REMOVE_ABOVE
 
   def self.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration)
-    #results = submitted.for_survey(survey).order(:cycle_id)
-    results = submitted.for_survey(survey)
+    results = submitted.for_survey(survey).order(:cycle_id)
     unless unit_code.blank?
       if site_code.blank?
-        results = results.joins(:clinic).where(:clinics => {unit_code: unit_code})
+        #results = results.joins(:clinic).where(:clinics => {unit_code: unit_code})
+        results = results.where(clinic_id: Clinic.where(capturesystem_id: survey.capturesystems.first.id, unit_code: unit_code).ids)
       else
-        results = results.joins(:clinic).where(:clinics => {unit_code: unit_code, site_code: site_code})
+        #results = results.joins(:clinic).where(:clinics => {unit_code: unit_code, site_code: site_code})
+        results = results.where(clinic_id: Clinic.where(capturesystem_id: survey.capturesystems.first.id, unit_code: unit_code, site_code: site_code).ids)
       end
     end
     results = results.where(year_of_registration: year_of_registration) unless year_of_registration.blank?
-    results.includes([:clinic, :answers])
+    #results.includes([:clinic, :answers])
+    results
   end
 
   def self.count_per_survey_and_year_of_registration_and_clinic(survey_id, year, clinic_id)
@@ -171,7 +173,7 @@ class Response < ApplicationRecord
     answers_to_sec = prepare_answers_to_section_with_blanks_created(section).values
 
     any_mandatory_question_unanswered = answers_to_sec.any? { |a| a.violates_mandatory }
-    any_warnings = answers_to_sec.any? { |a| a.warnings.present? }
+    any_warnings = answers_to_sec.any? { |a| a.warnings(SurveyConfiguration.find_by(survey: self.survey)).present? }
     any_fatal_warnings = answers_to_sec.any? { |a| a.fatal_warnings.present? }
 
     if any_fatal_warnings or any_mandatory_question_unanswered
@@ -205,9 +207,10 @@ class Response < ApplicationRecord
     end
   end
 
-  def warnings?
+  def warnings?(survey_configuration=nil)
+    survey_configuration = SurveyConfiguration.find_by(survey: self.survey) if survey_configuration.nil?
     all_answers_with_blanks_created.any? do |answer|
-      answer.has_warning?
+      answer.has_warning?(survey_configuration)
     end || fatal_warnings?
   end
 

@@ -131,9 +131,9 @@ class SpecialRules
       special_rule_pgt_9
     )
 
-    CrossQuestionValidation.register_checker 'special_dob', lambda { |answer, unused_related_answer, checker_params|
+    CrossQuestionValidation.register_checker 'special_dob', lambda { |answer, unused_related_answer, checker_params, survey_configuration|
       # DOB must be in the same year as the year of registration
-      if SurveyConfiguration.find_by(survey: answer.response.survey).year_range_type == SurveyConfiguration::YEAR_RANGE_TYPE_FISCAL
+      if survey_configuration.year_range_type == SurveyConfiguration::YEAR_RANGE_TYPE_FISCAL
         fy_se = getFiscalYearStartEnd_byEndingYear(answer.response.year_of_registration)
         return answer.date_answer.between?(fy_se[:start_date], fy_se[:end_date])
       else

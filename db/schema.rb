@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200602003801) do
+ActiveRecord::Schema.define(version: 20200702131003) do
 
   create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "response_id"
@@ -179,6 +179,7 @@ ActiveRecord::Schema.define(version: 20200602003801) do
     t.integer  "batch_file_id"
     t.integer  "year_of_registration"
     t.string   "validation_status"
+    t.index ["survey_id", "year_of_registration", "cycle_id"], name: "index_response_for_upload_records", unique: true, using: :btree
   end
 
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

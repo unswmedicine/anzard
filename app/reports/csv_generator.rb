@@ -62,47 +62,10 @@ class CsvGenerator
   end
 
   def csv
-    CSV.generate(:col_sep => ",") do |csv|
-      report_indexes = []
-      report_headers = []
-      (prepend_columns + question_codes).each_with_index do |each_header, index|
-        if report_headers.include? each_header
-          report_indexes.append(index)
-        else
-          report_headers.append(each_header)
-        end
-      end
-
-      # csv.add_row prepend_columns + question_codes
-      csv.add_row report_headers
-
-      #records.each do |response|
-        # basic_row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.cycle_id]
-      #  row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.cycle_id] + answers(response)
-      #  report_indexes.reverse.each { |x| row_data.delete_at(x) }
-
-        # csv.add_row basic_row_data + answers(response)
-      #  csv.add_row row_data
-      #end
-      data_rows = []
-      Response.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration).find_each(batch_size: 100) do |response|
-        row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.cycle_id] + answers(response)
-        report_indexes.reverse.each { |x| row_data.delete_at(x) }
-        #TODO cleanup the above change merged from anzard3.0
-        data_rows << row_data
-      end
-
-      #sorting by cycle_id to retain current behavior, assuming cycle_id is at idx=4
-      data_rows.sort_by! { |r| r[4] }
-      until data_rows.empty?
-        csv.add_row(data_rows.shift)
-      end
-      GC.start
-
-    end
+    self.csv_enumerator.to_a.join('')
   end
 
-  def csv_enumerator(oder_by_cycle_id=true, batch_size=50)
+  def csv_enumerator(batch_size=50)
     Enumerator.new do |yielder|
       report_indexes = []
       report_headers = []
@@ -116,33 +79,26 @@ class CsvGenerator
       yielder << CSV.generate_line(report_headers)
 
       row_count = 0
-      if oder_by_cycle_id
-        csv_rows = []
-        Response.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration).find_each(batch_size: batch_size) do |response|
-          row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.cycle_id] + answers(response)
-          report_indexes.reverse.each { |x| row_data.delete_at(x) }
-          csv_rows << row_data
-          row_count += 1
-          GC.start if row_count%batch_size == 0
-        end
-        #sorting by cycle_id to retain current behavior, assuming cycle_id is at idx=4
-        csv_rows.sort_by! { |r| r[4] }
+      start = Time.now
+      ordered_reponse_ids = Response.for_survey_clinic_and_year_of_registration(self.survey, self.unit_code, self.site_code, self.year_of_registration).pluck(:id)
+      Rails.logger.info(
+        "Starting download [#{ordered_reponse_ids.count}] responses for survey:[#{self.survey.name}], unit_code:[#{self.unit_code}], site_code:[#{self.site_code}], year_of_registration:[#{self.year_of_registration}] took #{Time.now - start}"
+      )
 
-        until csv_rows.empty?
-          yielder << CSV.generate_line(csv_rows.shift)
-        end
-        GC.start
-      else
-        Response.for_survey_clinic_and_year_of_registration(survey, unit_code, site_code, year_of_registration).find_each(batch_size: batch_size) do |response|
+      ordered_reponse_ids.in_groups_of(batch_size, false).each do |r_ids|
+        Response.order(:cycle_id).includes([:clinic]).where(id: r_ids).each do |response|
           row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.cycle_id] + answers(response)
           report_indexes.reverse.each { |x| row_data.delete_at(x) }
           yielder << CSV.generate_line(row_data)
           row_count += 1
-          GC.start if row_count%batch_size == 0
         end
-        GC.start
+        GC.start if row_count%1000 == 0
       end
 
+      GC.start
+      Rails.logger.info(
+        "Downloading [#{row_count}] responses for survey:[#{self.survey.name}], unit_code:[#{self.unit_code}], site_code:[#{self.site_code}], year_of_registration:[#{self.year_of_registration}] took #{Time.now - start}"
+      )
     end
   end
 
@@ -157,12 +113,34 @@ class CsvGenerator
     # do this (avoiding loading raw_answer saves most of the time)
     #answer_array = response.answers.select([:question_id, :choice_answer, :date_answer, :decimal_answer, :integer_answer, :text_answer, :time_answer])
     #REMOVE_ABOVE
-    answer_array = response.answers 
+    #answer_array = response.answers 
     #optimised in 'Response.for_survey_clinic_and_year_of_registration'
-    answer_hash = answer_array.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+    #answer_hash = answer_array.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
+
+    answer_hash = Question.joins(:answers).where(answers:{response_id:response.id}).pluck(
+      :'questions.code', :'questions.question_type', "CASE WHEN questions.question_type='Choice' THEN answers.choice_answer WHEN questions.question_type='Date' THEN answers.date_answer WHEN questions.question_type='Decimal' THEN answers.decimal_answer WHEN questions.question_type='Integer' THEN answers.integer_answer WHEN questions.question_type='Text' THEN answers.text_answer WHEN questions.question_type='Time' THEN answers.time_answer ELSE '' END"
+    ).map{|a| [ a.slice(0), a.slice(1,2) ]}.to_h
     question_codes.collect do |code|
-      answer = answer_hash[code]
-      answer ? answer.format_for_csv : ''
+      CsvGenerator.format_for_csv(answer_hash[code])
+    end
+  end
+
+  #According to Answer::format_for_csv and Answer::sanitise_and_write_input 
+  def self.format_for_csv(q_a)
+    return '' if q_a.nil?
+    case q_a[0]
+      when Answer::TYPE_TEXT, Answer::TYPE_CHOICE
+        q_a[1].to_s
+      when Answer::TYPE_DECIMAL
+        q_a[1].to_f.to_s
+      when Answer::TYPE_INTEGER 
+        q_a[1].to_i.to_s
+      when Answer::TYPE_DATE
+        Date.strptime(q_a[1], "%Y-%m-%d").try(:strftime, '%Y-%m-%d') || ''
+      when Answer::TYPE_TIME
+        Time.strptime(q_a[1], "%H:%M").try(:strftime, '%H:%M') || ''
+      else
+        raise "Unknown question type #{q_a[0]}"
     end
   end
 

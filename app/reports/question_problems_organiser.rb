@@ -48,6 +48,32 @@ class QuestionProblemsOrganiser
     problems_table
   end
 
+  def organise(r, survey_configuration)
+    # Get original cycle ID (cycle ID without site code) for display in reports to user
+    cycle_id_without_site_code = r.cycle_id
+    concatenated_site_code = '_' + r.clinic.site_code.to_s
+    if r.cycle_id.end_with?(concatenated_site_code)
+      cycle_id_without_site_code = r.cycle_id.slice(0, r.cycle_id.length - concatenated_site_code.length)
+    end
+
+    r.answers.each do |answer|
+      self.add_problems(answer.question.code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings(survey_configuration), answer.format_for_csv)
+    end
+    r.missing_mandatory_questions.each do |question|
+      self.add_problems(question.code, cycle_id_without_site_code, ['This question is mandatory'], [], '')
+    end
+
+    r.valid? # we have to call this to trigger errors getting populated
+    unless r.errors.empty?
+      # Replace auto-concatenated cycle ID with original cycle ID for display of record validation errors
+      response_error_msgs = r.errors.full_messages
+      response_error_msgs.each do |msg|
+        msg.gsub!(r.cycle_id, cycle_id_without_site_code)
+      end
+      self.add_problems(BatchFile::COLUMN_CYCLE_ID, cycle_id_without_site_code, response_error_msgs, [], cycle_id_without_site_code)
+    end
+  end
+
   private
 
   # sort the problems by cycle id, problem type, column name and message

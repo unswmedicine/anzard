@@ -24,10 +24,14 @@ class BatchFile < ApplicationRecord
   STATUS_IN_PROGRESS = 'In Progress'
 
   COLUMN_CYCLE_ID = 'CYCLE_ID'
+  COLUMN_CYCLE_ID_DOWNCASE = 'cycle_id'
   COLUMN_UNIT_CODE = 'UNIT'
+  COLUMN_UNIT_CODE_DOWNCASE = 'unit'
   COLUMN_SITE_CODE = 'SITE'
+  COLUMN_SITE_CODE_DOWNCASE = 'site'
   COLUMN_ANZARD_UNIT_CODE = 'ANZARD_UNIT'
   COLUMN_ART_UNIT_SITE_CODE = 'ART_UNIT'
+  COLUMN_ART_UNIT_SITE_CODE_DOWNCASE = 'art_unit'
 
   MESSAGE_WARNINGS = 'The file you uploaded has one or more warnings. Please review the reports for details.'
   MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{COLUMN_CYCLE_ID} column."
@@ -60,7 +64,9 @@ class BatchFile < ApplicationRecord
   validates_presence_of :file_file_name
   validates_presence_of :year_of_registration
 
-  attr_accessor :responses
+  #attr_accessor :responses
+  attr_accessor :organised_problems
+  attr_accessor :problem_record_count
 
   scope :failed, -> {where(:status => STATUS_FAILED)}
   scope :older_than, lambda { |date| where('updated_at < ?', date) }
@@ -143,42 +149,44 @@ class BatchFile < ApplicationRecord
     end
   end
 
-  def problem_record_count
-    return nil if responses.nil?
-    responses.collect { |r| r.warnings? || !r.valid? }.count(true)
-  end
+#  def problem_record_count
+#    return nil if responses.nil?
+#    survey_configuration = SurveyConfiguration.find_by(survey:self.survey)
+#    responses.collect { |r| r.warnings?(survey_configuration) || !r.valid? }.count(true)
+#  end
 
-  def organised_problems
-    organiser = QuestionProblemsOrganiser.new
-
-    # get all the problems from all the responses organised for reporting
-    responses.each do |r|
-      # Get original cycle ID (cycle ID without site code) for display in reports to user
-      cycle_id_without_site_code = r.cycle_id
-      concatenated_site_code = '_' + r.clinic.site_code.to_s
-      if r.cycle_id.end_with?(concatenated_site_code)
-        cycle_id_without_site_code = r.cycle_id.slice(0, r.cycle_id.length - concatenated_site_code.length)
-      end
-
-      r.answers.each do |answer|
-        organiser.add_problems(Question.find(answer.question_id).code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings, answer.format_for_csv)
-      end
-      r.missing_mandatory_questions.each do |question|
-        organiser.add_problems(question.code, cycle_id_without_site_code, ['This question is mandatory'], [], '')
-      end
-
-      r.valid? # we have to call this to trigger errors getting populated
-      unless r.errors.empty?
-        # Replace auto-concatenated cycle ID with original cycle ID for display of record validation errors
-        response_error_msgs = r.errors.full_messages
-        response_error_msgs.each do |msg|
-          msg.gsub!(r.cycle_id, cycle_id_without_site_code)
-        end
-        organiser.add_problems(COLUMN_CYCLE_ID, cycle_id_without_site_code, response_error_msgs, [], cycle_id_without_site_code)
-      end
-    end
-    organiser
-  end
+#  def organised_problems
+#    survey_configuration = SurveyConfiguration.find_by(survey:self.survey)
+#    organiser = QuestionProblemsOrganiser.new
+#
+#    # get all the problems from all the responses organised for reporting
+#    responses.each do |r|
+#      # Get original cycle ID (cycle ID without site code) for display in reports to user
+#      cycle_id_without_site_code = r.cycle_id
+#      concatenated_site_code = '_' + r.clinic.site_code.to_s
+#      if r.cycle_id.end_with?(concatenated_site_code)
+#        cycle_id_without_site_code = r.cycle_id.slice(0, r.cycle_id.length - concatenated_site_code.length)
+#      end
+#
+#      r.answers.each do |answer|
+#        organiser.add_problems(answer.question.code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings(survey_configuration), answer.format_for_csv)
+#      end
+#      r.missing_mandatory_questions.each do |question|
+#        organiser.add_problems(question.code, cycle_id_without_site_code, ['This question is mandatory'], [], '')
+#      end
+#
+#      r.valid? # we have to call this to trigger errors getting populated
+#      unless r.errors.empty?
+#        # Replace auto-concatenated cycle ID with original cycle ID for display of record validation errors
+#        response_error_msgs = r.errors.full_messages
+#        response_error_msgs.each do |msg|
+#          msg.gsub!(r.cycle_id, cycle_id_without_site_code)
+#        end
+#        organiser.add_problems(COLUMN_CYCLE_ID, cycle_id_without_site_code, response_error_msgs, [], cycle_id_without_site_code)
+#      end
+#    end
+#    organiser
+#  end
 
   private
 
@@ -190,7 +198,10 @@ class BatchFile < ApplicationRecord
 
   def process_batch(force)
     logger.info("Processing batch file with id #{id}")
+    survey_configuration = SurveyConfiguration.find_by(survey:self.survey)
+
     start = Time.now
+    self.problem_record_count = 0
 
     passed_pre_processing = pre_process_file
     unless passed_pre_processing
@@ -202,26 +213,37 @@ class BatchFile < ApplicationRecord
     @csv_row_count = 0
     failures = false
     warnings = false
-    responses = []
+    #responses = []
+    prepared_responses = []
+    response = nil
+    self.organised_problems = QuestionProblemsOrganiser.new
     CSV.foreach(file.path, {headers: true, header_converters: lambda {|header| sanitise_question_code(header)}}) do |row|
       @csv_row_count += 1
-      cycle_id = row[sanitise_question_code(COLUMN_CYCLE_ID)]
+      cycle_id = row[COLUMN_CYCLE_ID_DOWNCASE]
       cycle_id.strip! unless cycle_id.nil?
       #merged the below fallback behavior from ANZARD3.0 changes
-      clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
-      if clinic_in_row.nil?
-        #clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
-        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code("#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}")], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
-      end
+      #clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
+      #if clinic_in_row.nil?
+      #  #clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+      #  clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code("#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}")], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
+      #end
 
 
-      concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
-      response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
-      response.build_answers_from_hash(row.to_hash)
+      #concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
+      #response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      concatenated_cycle_id = cycle_id + '_' + self.clinic.site_code.to_s
+      response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: self.clinic, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      answers_hash = row.to_hash
+      response.build_answers_from_hash(answers_hash)
+      prepared_responses << [concatenated_cycle_id, answers_hash]
 
       failures = true if (response.fatal_warnings? || !response.valid?)
-      warnings = true if response.warnings?
-      responses << response
+      if (response.warnings?(survey_configuration)|| !response.valid?)
+        warnings = true 
+        self.problem_record_count += 1
+      end
+      #responses << response
+      self.organised_problems.organise(response, survey_configuration)
     end
     logger.info("After CSV processing took #{Time.now - start}")
 
@@ -232,14 +254,21 @@ class BatchFile < ApplicationRecord
     elsif warnings and !force
       set_outcome(STATUS_REVIEW, MESSAGE_WARNINGS)
     else
-      responses.each do |r|
-        r.submitted_status = Response::STATUS_SUBMITTED
-        r.save!
+      #responses.each do |r|
+      #  r.submitted_status = Response::STATUS_SUBMITTED
+      #  r.save!
+      #end
+
+      prepared_responses.each do |r|
+        response = Response.new(survey: self.survey, cycle_id: r[0], user: self.user, clinic: self.clinic, year_of_registration: year_of_registration, submitted_status: Response::STATUS_SUBMITTED, batch_file: self)
+        response.build_answers_from_hash(r[1])
+        response.save!
       end
+
       set_outcome(STATUS_SUCCESS, MESSAGE_SUCCESS)
     end
     save!
-    self.responses = responses #this is only ever kept in memory for the sake of reporting, its not an AR association.
+    #self.responses = responses #this is only ever kept in memory for the sake of reporting, its not an AR association.
     logger.info("After rest took #{Time.now - start}")
 
     true
@@ -249,13 +278,11 @@ class BatchFile < ApplicationRecord
     question_code.downcase.strip unless question_code.nil?
   end
 
-  def missing_batch_file_headers(batch_file_headers, survey_question_codes)
+  def missing_batch_file_headers(sanitised_batch_headers, sanitised_question_codes)
     missing_headers = []
-    sanitised_batch_headers = batch_file_headers.map{|header| sanitise_question_code(header)}
-    sanitised_question_codes = survey_question_codes.map{|code| sanitise_question_code(code)}
     unless sanitised_batch_headers.sort == sanitised_question_codes.sort
-      survey_question_codes.each do |question_code|
-        unless sanitised_batch_headers.include? sanitise_question_code(question_code)
+      sanitised_question_codes.each do |question_code|
+        unless sanitised_batch_headers.include?(question_code)
           missing_headers.append(question_code)
         end
       end
@@ -264,15 +291,23 @@ class BatchFile < ApplicationRecord
   end
 
   def pre_process_file
+    unless user.clinics.exists? self.clinic.id
+      set_outcome(STATUS_FAILED, MESSAGE_UNAUTHORISED_UNIT_SITE)
+      return false
+    end
+
     # do basic checks that can result in the file failing completely and not being validated
     cycle_ids = []
     @csv_row_count = 0
+    capturesystem_unit_column_name = sanitise_question_code("#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}")
     CSV.foreach(file.path, {headers: true, return_headers: true,
                             header_converters: lambda {|header| sanitise_question_code(header)}}) do |row|
       if row.header_row?
-        missing_batch_headers = missing_batch_file_headers(row.headers, survey.questions.pluck(:code))
+        survey_question_codes = survey.questions.pluck(:code)
+        sanitised_question_codes = survey_question_codes.map{|code| sanitise_question_code(code)}
+        missing_batch_headers = missing_batch_file_headers(row.headers, sanitised_question_codes)
         unless missing_batch_headers.empty?
-          set_outcome(STATUS_FAILED, MESSAGE_MISSING_HEADER_COLUMNS + missing_batch_headers.join(', '))
+          set_outcome(STATUS_FAILED, MESSAGE_MISSING_HEADER_COLUMNS + survey_question_codes.select{|code| missing_batch_headers.include?(code.downcase)}.join(', '))
           return false
         end
         unless headers_unique?(row.headers)
@@ -281,12 +316,11 @@ class BatchFile < ApplicationRecord
         end
       else
         @csv_row_count += 1
-        cycle_id = row[sanitise_question_code(COLUMN_CYCLE_ID)]
+        cycle_id = row[COLUMN_CYCLE_ID_DOWNCASE]&.strip
         if cycle_id.blank?
           set_outcome(STATUS_FAILED, MESSAGE_MISSING_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         else
-          cycle_id.strip!
           if cycle_ids.include?(cycle_id)
             set_outcome(STATUS_FAILED, MESSAGE_DUPLICATE_CYCLE_IDS + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
             return false
@@ -295,23 +329,13 @@ class BatchFile < ApplicationRecord
           end
         end
 
-        clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_SITE_CODE)])
-        #merged the below fallback behavior from ANZARD3.0 changes
-        if clinic_in_row.nil?
-          #clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code(COLUMN_ANZARD_UNIT_CODE)], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
-          clinic_in_row = Clinic.find_by(capturesystem_id: self.clinic.capturesystem.id, unit_code: row[sanitise_question_code("#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}")], site_code: row[sanitise_question_code(COLUMN_ART_UNIT_SITE_CODE)])
-        end
-
-
-        if clinic_in_row.nil?
+        unless (
+          self.clinic.unit_code == row[COLUMN_UNIT_CODE_DOWNCASE].to_i && self.clinic.site_code == row[COLUMN_SITE_CODE_DOWNCASE].to_i ||
+          self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && self.clinic.site_code == row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i
+        )
           message_unknown_unit_site = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
           set_outcome(STATUS_FAILED, message_unknown_unit_site + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
-        else
-          unless user.clinics.exists? clinic_in_row.id
-            set_outcome(STATUS_FAILED, MESSAGE_UNAUTHORISED_UNIT_SITE + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
-            return false
-          end
         end
       end
     end

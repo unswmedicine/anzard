@@ -76,15 +76,15 @@ class CrossQuestionValidation < ApplicationRecord
 
   SpecialRules.register_additional_rules
 
-  def self.check(answer)
+  def self.check(answer, survey_configuration=nil)
     cqvs = answer.question.cross_question_validations
     warnings = cqvs.map do |cqv|
-      cqv.check answer
+      cqv.check(answer,survey_configuration)
     end
     warnings.compact
   end
 
-  def check(answer)
+  def check(answer, survey_configuration)
     checker_params = {operator: operator, constant: constant,
                       set_operator: set_operator, set: set,
                       conditional_operator: conditional_operator, conditional_constant: conditional_constant,
@@ -103,7 +103,11 @@ class CrossQuestionValidation < ApplicationRecord
     return nil if related_question_id && skip_when_related_unanswered?(rule) && CrossQuestionValidation.unanswered?(related_answer)
 
     # now actually execute the rule
-    error_message unless rule_checkers[rule].call answer, related_answer, checker_params
+    if rule_checkers[rule].arity == 3
+      error_message unless rule_checkers[rule].call answer, related_answer, checker_params
+    else
+      error_message unless rule_checkers[rule].call answer, related_answer, checker_params, survey_configuration
+    end
   end
 
   private
