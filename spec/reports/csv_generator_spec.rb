@@ -21,7 +21,7 @@ describe CsvGenerator do
   let(:survey) { create(:survey, name: "Survey One") }
   let(:clinic) { create(:clinic, unit_name: "Royal North Shore", unit_code: 100, site_name: 'Kent Street', site_code: 102, capturesystem_id: capturesystem.id ) }
   let(:clinic2) { create(:clinic, unit_name: "Royal North Shore", unit_code: 100, site_name: 'George Street', site_code: 103, capturesystem_id: capturesystem.id) }
-  let(:prepend_columns) { ['TREATMENT_DATA', 'YEAR_OF_TREATMENT', "#{capturesystem.name}_Unit_Name", 'ART_Unit_Name', 'CYCLE_ID'] }
+  let(:prepend_columns) { ['TREATMENT_DATA', 'YEAR_OF_TREATMENT', "#{capturesystem.name}_Unit_Name", 'ART_Unit_Name', "#{capturesystem.name}_Unit", 'ART_Unit', 'CYCLE_ID'] }
 
   describe "Generating the filename" do
 
@@ -111,8 +111,8 @@ describe CsvGenerator do
       expected << (prepend_columns + ['ChoiceQ', 'TextQ', 'DateQ', 'TimeQ', 'IntegerQ', 'DecimalQ'])
       #expected << ['Survey One', '2009', 'RNS IVF', 'site one', '112', '104', 'ABC-123', '1', 'ABc', '2001-02-25', '14:56', '877', '15.5673']
       #expected << ['Survey One', '2011', 'RNS IVF', 'site two', '112', '106', 'DEF-567', '', 'ABCdefg Ijkl', '', '', '99', '']
-      expected << ['Survey One', '2011', 'RNS IVF', 'site two', 'ABC-123', '', 'ABCdefg Ijkl', '', '', '99', '']
-      expected << ['Survey One', '2009', 'RNS IVF', 'site one', 'DEF-567', '1', 'ABc', '2001-02-25', '14:56', '877', '15.5673']
+      expected << ['Survey One', '2011', 'RNS IVF', 'site two', '112', '106','ABC-123', '', 'ABCdefg Ijkl', '', '', '99', '']
+      expected << ['Survey One', '2009', 'RNS IVF', 'site one', '112', '104', 'DEF-567', '1', 'ABc', '2001-02-25', '14:56', '877', '15.5673']
       expect(CSV.parse(csv)).to eq(expected)
       expect(csv_enumerated).to eq(expected)
     end

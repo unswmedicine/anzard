@@ -174,7 +174,7 @@ class ResponsesController < ApplicationController
       @errors = ["Please select a valid treatment data"]
       render :prepare_download
     else
-      prepend_columns = ['TREATMENT_DATA', 'YEAR_OF_TREATMENT', "#{current_capturesystem.name}_Unit_Name", 'ART_Unit_Name', 'CYCLE_ID']
+      prepend_columns = ['TREATMENT_DATA', 'YEAR_OF_TREATMENT', "#{current_capturesystem.name}_Unit_Name", 'ART_Unit_Name', "#{current_capturesystem.name}_Unit", 'ART_Unit', 'CYCLE_ID']
       generator = CsvGenerator.new(selected_survey, @unit_code, @site_code, @year_of_registration, prepend_columns)
       if generator.empty?
         @errors = ["No data was found for your search criteria"]
