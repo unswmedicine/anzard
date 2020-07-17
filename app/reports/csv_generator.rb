@@ -87,7 +87,7 @@ class CsvGenerator
 
       ordered_reponse_ids.in_groups_of(batch_size, false).each do |r_ids|
         Response.order(:cycle_id).includes([:clinic]).where(id: r_ids).each do |response|
-          row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.cycle_id] + answers(response)
+          row_data = [response.survey.name, response.year_of_registration, response.clinic.unit_name, response.clinic.site_name, response.clinic.unit_code, response.clinic.site_code, response.cycle_id] + answers(response)
           report_indexes.reverse.each { |x| row_data.delete_at(x) }
           yielder << CSV.generate_line(row_data)
           row_count += 1
