@@ -217,6 +217,8 @@ class BatchFile < ApplicationRecord
     prepared_responses = []
     response = nil
     self.organised_problems = QuestionProblemsOrganiser.new
+    user_allocated_clinics = self.user.clinics.where(capturesystem_id: self.clinic.capturesystem_id).map {|c| {id:c.id, unit_code:c.unit_code, site_code:c.site_code}}
+
     CSV.foreach(file.path, {headers: true, header_converters: lambda {|header| sanitise_question_code(header)}}) do |row|
       @csv_row_count += 1
       cycle_id = row[COLUMN_CYCLE_ID_DOWNCASE]
@@ -231,11 +233,20 @@ class BatchFile < ApplicationRecord
 
       #concatenated_cycle_id = cycle_id + '_' + clinic_in_row.site_code.to_s
       #response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: clinic_in_row, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
-      concatenated_cycle_id = cycle_id + '_' + self.clinic.site_code.to_s
-      response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: self.clinic, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+
+      #concatenated_cycle_id = cycle_id + '_' + self.clinic.site_code.to_s
+      #response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic: self.clinic, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
+      #The above clinic mataching is according to the upload page selection.
+      #Changed above to below as requested to allow records with multiple clinics given the clinic is assigned to the user who uploaded the batch csv file.
+      row_site_code = row[COLUMN_SITE_CODE_DOWNCASE].to_i
+      row_site_code = row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i if row_site_code == 0
+      #the above fallback behavior is introduced from ANZARD3.0 changes
+      concatenated_cycle_id = cycle_id + '_' + row_site_code.to_s
+      matched_clinic_id = user_allocated_clinics.find {|c| c[:site_code] == row_site_code}[:id]
+      response = Response.new(survey: survey, cycle_id: concatenated_cycle_id, user: user, clinic_id: matched_clinic_id, year_of_registration: year_of_registration, submitted_status: Response::STATUS_UNSUBMITTED, batch_file: self)
       answers_hash = row.to_hash
       response.build_answers_from_hash(answers_hash)
-      prepared_responses << [concatenated_cycle_id, answers_hash]
+      prepared_responses << [concatenated_cycle_id, matched_clinic_id, answers_hash]
 
       failures = true if (response.fatal_warnings? || !response.valid?)
       if (response.warnings?(survey_configuration)|| !response.valid?)
@@ -243,7 +254,7 @@ class BatchFile < ApplicationRecord
         self.problem_record_count += 1
       end
       #responses << response
-      self.organised_problems.organise(response, survey_configuration)
+      self.organised_problems.organise(response, survey_configuration, cycle_id)
     end
     logger.info("After CSV processing took #{Time.now - start}")
 
@@ -260,8 +271,8 @@ class BatchFile < ApplicationRecord
       #end
 
       prepared_responses.each do |r|
-        response = Response.new(survey: self.survey, cycle_id: r[0], user: self.user, clinic: self.clinic, year_of_registration: year_of_registration, submitted_status: Response::STATUS_SUBMITTED, batch_file: self)
-        response.build_answers_from_hash(r[1])
+        response = Response.new(survey: self.survey, cycle_id: r[0], user: self.user, clinic_id: r[1], year_of_registration: year_of_registration, submitted_status: Response::STATUS_SUBMITTED, batch_file: self)
+        response.build_answers_from_hash(r[2])
         response.save!
       end
 
@@ -300,6 +311,8 @@ class BatchFile < ApplicationRecord
     cycle_ids = []
     @csv_row_count = 0
     capturesystem_unit_column_name = sanitise_question_code("#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}")
+    user_allocated_clinic_site_codes = self.user.clinics.where(capturesystem_id: self.clinic.capturesystem_id).map {|c| c.site_code}
+
     CSV.foreach(file.path, {headers: true, return_headers: true,
                             header_converters: lambda {|header| sanitise_question_code(header)}}) do |row|
       if row.header_row?
@@ -329,9 +342,19 @@ class BatchFile < ApplicationRecord
           end
         end
 
+       #unless (
+       #  self.clinic.unit_code == row[COLUMN_UNIT_CODE_DOWNCASE].to_i && self.clinic.site_code == row[COLUMN_SITE_CODE_DOWNCASE].to_i ||
+       #  self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && self.clinic.site_code == row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i
+       #)
+       #  message_unknown_unit_site = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
+       #  set_outcome(STATUS_FAILED, message_unknown_unit_site + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
+       #  return false
+       #end
+       #The above clinic mataching is according to the upload page selection.
+       #Changed above to below as requested to allow records with multiple clinics given the clinic is assigned to the user who uploaded the batch csv file.
         unless (
-          self.clinic.unit_code == row[COLUMN_UNIT_CODE_DOWNCASE].to_i && self.clinic.site_code == row[COLUMN_SITE_CODE_DOWNCASE].to_i ||
-          self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && self.clinic.site_code == row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i
+          self.clinic.unit_code == row[COLUMN_UNIT_CODE_DOWNCASE].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_SITE_CODE_DOWNCASE].to_i) ||
+          self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i)
         )
           message_unknown_unit_site = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
           set_outcome(STATUS_FAILED, message_unknown_unit_site + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)

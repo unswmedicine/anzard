@@ -48,13 +48,15 @@ class QuestionProblemsOrganiser
     problems_table
   end
 
-  def organise(r, survey_configuration)
+  def organise(r, survey_configuration, cycle_id_without_site_code)
     # Get original cycle ID (cycle ID without site code) for display in reports to user
-    cycle_id_without_site_code = r.cycle_id
-    concatenated_site_code = '_' + r.clinic.site_code.to_s
-    if r.cycle_id.end_with?(concatenated_site_code)
-      cycle_id_without_site_code = r.cycle_id.slice(0, r.cycle_id.length - concatenated_site_code.length)
-    end
+    #cycle_id_without_site_code = r.cycle_id
+    #concatenated_site_code = '_' + r.clinic.site_code.to_s
+    #if r.cycle_id.end_with?(concatenated_site_code)
+      #cycle_id_without_site_code = r.cycle_id.slice(0, r.cycle_id.length - concatenated_site_code.length)
+    #end
+    #remove bove, passin the cycle_id_without_site_code
+    cycle_id_without_site_code = '' if cycle_id_without_site_code.nil?
 
     r.answers.each do |answer|
       self.add_problems(answer.question.code, cycle_id_without_site_code, answer.fatal_warnings, answer.warnings(survey_configuration), answer.format_for_csv)
