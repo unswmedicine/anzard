@@ -16,7 +16,7 @@
 
 class BatchFilesController < ApplicationController
 
-  UPLOAD_NOTICE = "Your upload has been received and is now being processed. This may take some time depending on the size of the file. The status of your uploads can be seen in the table below. Click the 'Refresh Status' button to see an updated status."
+  UPLOAD_NOTICE = "Your upload has been received and is now queued for processing. The time to process your upload may take up to 90 mins. Please return and refresh the page to re-check the status of your upload, which can be seen in the table below or by selecting “Batch Uploads” when logged in."
   FORCE_SUBMIT_NOTICE = "Your request is now being processed. This may take some time depending on the size of the file. The status of your uploads can be seen in the table below. Click the 'Refresh Status' button to see an updated status."
   PAPERCLIP_SPOOFED_MEDIA_TYPE_MSG = 'has contents that are not what they are reported to be'
 
