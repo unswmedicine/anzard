@@ -269,17 +269,18 @@ def create_batch_files(survey)
   create_batch_file(survey, 500)
 end
 
+#cleanup below, unclear randomness
 def create_batch_file(survey, count_of_rows)
   # this is a useful way to create sample batch files for testing the upload feature
-  responses = Response.where(survey_id: survey.id).all
-  responses_to_use = responses.sample(count_of_rows)
+  #responses = Response.where(survey_id: survey.id).all
+  #responses_to_use = responses.sample(count_of_rows)
 
   csv = CsvGenerator.new(survey, nil, nil,nil, [])
-  csv.records = responses_to_use
+  #csv.records = responses_to_use
 
   filepath = "#{Rails.root}/tmp/batch-#{survey.name.parameterize}-#{count_of_rows}.csv"
   File.open(filepath, 'w') do |out|
-    out.puts csv.csv
+    out.puts csv.csv_enumerator.to_a.sample(count_of_rows).join('')
   end
 
 end
