@@ -23,14 +23,14 @@ describe BatchDetailReportGenerator do
     problems << ['B1', 'C1', 'Err', '2', 'Hello']
     problems << ['B1', 'C2', 'Warn', 'asdf', 'Msg']
     organiser = double
-    organiser.should_receive(:detailed_problems).and_return(problems)
+    expect(organiser).to receive(:detailed_problems).and_return(problems)
     
     BatchDetailReportGenerator.generate_report(organiser, Rails.root.join("tmp/details.csv"))
 
     rows = CSV.read("tmp/details.csv")
-    rows.size.should eq(3)
-    rows[0].should eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
-    rows[1].should eq(['B1', 'C1', 'Err', '2', 'Hello'])
-    rows[2].should eq(['B1', 'C2', 'Warn', 'asdf', 'Msg'])
+    expect(rows.size).to eq(3)
+    expect(rows[0]).to eq(["CYCLE_ID", "Column Name", "Type", "Value", "Message"])
+    expect(rows[1]).to eq(['B1', 'C1', 'Err', '2', 'Hello'])
+    expect(rows[2]).to eq(['B1', 'C2', 'Warn', 'asdf', 'Msg'])
   end
 end

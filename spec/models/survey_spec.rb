@@ -43,7 +43,7 @@ describe Survey do
       expected = %w{q1a q1b q2a q2b}
       actual = survey.ordered_questions.map { |q| q.question }
 
-      actual.should eq expected
+      expect(actual).to eq expected
     end
   end
 
@@ -54,8 +54,8 @@ describe Survey do
       sec3 = create(:section, survey: survey1, section_order: 3)
       sec1 = create(:section, survey: survey1, section_order: 1)
 
-      survey1.section_id_after(sec1.id).should eq(sec2.id)
-      survey1.section_id_after(sec2.id).should eq(sec3.id)
+      expect(survey1.section_id_after(sec1.id)).to eq(sec2.id)
+      expect(survey1.section_id_after(sec2.id)).to eq(sec3.id)
     end
 
     it "should raise error on last section" do
@@ -64,7 +64,7 @@ describe Survey do
       sec3 = create(:section, survey: survey1, section_order: 3)
       sec1 = create(:section, survey: survey1, section_order: 1)
 
-      lambda { survey1.section_id_after(sec3.id) }.should raise_error("Tried to call section_id_after on last section")
+      expect(lambda { survey1.section_id_after(sec3.id) }).to raise_error("Tried to call section_id_after on last section")
     end
 
     it "should raise error when section not found" do
@@ -72,7 +72,7 @@ describe Survey do
       sec2 = create(:section, survey: survey1, section_order: 2)
       sec1 = create(:section, survey: survey1, section_order: 1)
 
-      lambda { survey1.section_id_after(123434) }.should raise_error("Didn't find any section with id 123434 in this survey")
+      expect(lambda { survey1.section_id_after(123434) }).to raise_error("Didn't find any section with id 123434 in this survey")
     end
   end
 
@@ -85,23 +85,23 @@ describe Survey do
     end
 
     it "should find the question, even with mismatching case" do
-      @survey.question_with_code("qOne").should eq(@q1)
-      @survey.question_with_code("QOne").should eq(@q1)
-      @survey.question_with_code("QonE").should eq(@q1)
+      expect(@survey.question_with_code("qOne")).to eq(@q1)
+      expect(@survey.question_with_code("QOne")).to eq(@q1)
+      expect(@survey.question_with_code("QonE")).to eq(@q1)
     end
 
     it "should return the same object when asking twice" do
       q = @survey.question_with_code("qOne")
-      @survey.question_with_code("qOne").should be(q)
+      expect(@survey.question_with_code("qOne")).to be(q)
     end
 
     it "should return nil if no such question exists in the survey" do
-      @survey.question_with_code("blah").should be_nil
+      expect(@survey.question_with_code("blah")).to be_nil
     end
 
     it "should return nil if nil or blank passed in" do
-      @survey.question_with_code("").should be_nil
-      @survey.question_with_code(nil).should be_nil
+      expect(@survey.question_with_code("")).to be_nil
+      expect(@survey.question_with_code(nil)).to be_nil
     end
   end
 

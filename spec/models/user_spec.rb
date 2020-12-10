@@ -32,7 +32,7 @@ describe User do
         u2 = create(:user, :status => 'A')
         u3 = create(:user, :status => 'U', :email => "asdf1@intersect.org.au")
         u2 = create(:user, :status => 'R')
-        User.pending_approval.should eq([u3,u1])
+        expect(User.pending_approval).to eq([u3,u1])
       end
     end
     describe "Approved Users Scope" do
@@ -42,7 +42,7 @@ describe User do
         u3 = create(:user, :status => 'A', :email => "asdf1@intersect.org.au")
         u4 = create(:user, :status => 'R')
         u5 = create(:user, :status => 'D')
-        User.approved.should eq([u3,u1])
+        expect(User.approved).to eq([u3,u1])
       end
     end
     describe "Deactivated or Approved Users Scope" do
@@ -52,7 +52,7 @@ describe User do
         u3 = create(:user, :status => 'A', :email => "asdf1@intersect.org.au")
         u4 = create(:user, :status => 'R')
         u5 = create(:user, :status => 'D', :email => "zz@inter.org")
-        User.deactivated_or_approved.order(:email).should eq([u3, u1, u5])
+        expect(User.deactivated_or_approved.order(:email)).to eq([u3, u1, u5])
       end
     end
     describe "Approved Administrators Scope" do
@@ -64,7 +64,7 @@ describe User do
         u3 = create(:super_user, :status => 'U')
         u4 = create(:super_user, :status => 'R')
         u5 = create(:super_user, :status => 'D')
-        User.approved_superusers.should eq([u1])
+        expect(User.approved_superusers).to eq([u1])
       end
     end
   end
@@ -74,7 +74,7 @@ describe User do
       user = create(:user, :status => 'U')
       capturesystem = create(:capturesystem, :name => 'capture_system_1', :base_url => 'http://capture.system.one.org')
       user.approve_access_request('','',capturesystem)
-      user.status.should eq("A")
+      expect(user.status).to eq("A")
     end
   end
 
@@ -83,7 +83,7 @@ describe User do
       user = create(:user, :status => 'U')
       capturesystem = create(:capturesystem, :name => 'capture_system_1', :base_url => 'http://capture.system.one.org')
       user.reject_access_request('NPESU',capturesystem)
-      user.status.should eq("R")
+      expect(user.status).to eq("R")
     end
   end
 
@@ -91,33 +91,33 @@ describe User do
     context "Active" do
       it "should be active" do
         user = create(:user, :status => 'A')
-        user.approved?.should be true
+        expect(user.approved?).to be true
       end
       it "should not be pending approval" do
         user = create(:user, :status => 'A')
-        user.pending_approval?.should be false
+        expect(user.pending_approval?).to be false
       end
     end
 
     context "Unapproved" do
       it "should not be active" do
         user = create(:user, :status => 'U')
-        user.approved?.should be false
+        expect(user.approved?).to be false
       end
       it "should be pending approval" do
         user = create(:user, :status => 'U')
-        user.pending_approval?.should be true
+        expect(user.pending_approval?).to be true
       end
     end
 
     context "Rejected" do
       it "should not be active" do
         user = create(:user, :status => 'R')
-        user.approved?.should be false
+        expect(user.approved?).to be false
       end
       it "should not be pending approval" do
         user = create(:user, :status => 'R')
-        user.pending_approval?.should be false
+        expect(user.pending_approval?).to be false
       end
     end
   end
@@ -126,51 +126,51 @@ describe User do
     it "should fail if current password is incorrect" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "asdf", :password => "Pass.456", :password_confirmation => "Pass.456"})
-      result.should be false
-      user.errors[:current_password].should eq ["is invalid"]
+      expect(result).to be false
+      expect(user.errors[:current_password]).to eq ["is invalid"]
     end
     it "should fail if current password is blank" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "", :password => "Pass.456", :password_confirmation => "Pass.456"})
-      result.should be false
-      user.errors[:current_password].should eq ["can't be blank"]
+      expect(result).to be false
+      expect(user.errors[:current_password]).to eq ["can't be blank"]
     end
     it "should fail if new password and confirmation blank" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "", :password_confirmation => ""})
-      result.should be false
-      user.errors[:password].should eq ["can't be blank", "must be between 6 and 20 characters long and contain at least one uppercase letter, one lowercase letter, one digit and one symbol"]
+      expect(result).to be false
+      expect(user.errors[:password]).to eq ["can't be blank", "must be between 6 and 20 characters long and contain at least one uppercase letter, one lowercase letter, one digit and one symbol"]
     end
 
     it "should fail if confirmation blank" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => ""})
-      result.should be false
-      user.errors[:password_confirmation].should eq ["doesn't match Password"]
+      expect(result).to be false
+      expect(user.errors[:password_confirmation]).to eq ["doesn't match Password"]
     end
 
     it "should fail if confirmation doesn't match new password" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => "Pass.678"})
-      result.should be false
-      user.errors[:password_confirmation].should eq ["doesn't match Password"]
+      expect(result).to be false
+      expect(user.errors[:password_confirmation]).to eq ["doesn't match Password"]
     end
     it "should fail if password doesn't meet rules" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass4567", :password_confirmation => "Pass4567"})
-      result.should be false
-      user.errors[:password].should eq ["must be between 6 and 20 characters long and contain at least one uppercase letter, one lowercase letter, one digit and one symbol"]
+      expect(result).to be false
+      expect(user.errors[:password]).to eq ["must be between 6 and 20 characters long and contain at least one uppercase letter, one lowercase letter, one digit and one symbol"]
     end
     it "should succeed if current password correct and new password ok" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => "Pass.456"})
-      result.should be true
+      expect(result).to be true
     end
     it "should always blank out passwords" do
       user = create(:user, :password => "Pass.123")
       result = user.update_password({:current_password => "Pass.123", :password => "Pass.456", :password_confirmation => "Pass.456"})
-      user.password.should be_blank
-      user.password_confirmation.should be_blank
+      expect(user.password).to be_blank
+      expect(user.password_confirmation).to be_blank
     end
   end
 
@@ -179,19 +179,19 @@ describe User do
       user_1 = create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
       user_2 = create(:super_user, :status => 'A', :email => 'user2@intersect.org.au')
       user_3 = create(:super_user, :status => 'A', :email => 'user3@intersect.org.au')
-      user_1.check_number_of_superusers(1, 1).should eq(true)
+      expect(user_1.check_number_of_superusers(1, 1)).to eq(true)
     end
 
     it "should return false if there is only 1 superuser" do
       user_1 = create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
-      user_1.check_number_of_superusers(1, 1).should eq(false)
+      expect(user_1.check_number_of_superusers(1, 1)).to eq(false)
     end
 
     it "should return true if the logged in user does not match the user record being modified" do
       research_role = create(:role, :name => 'Data Provider')
       user_1 = create(:super_user, :status => 'A', :email => 'user1@intersect.org.au')
       user_2 = create(:user, :role => research_role, :status => 'A', :email => 'user2@intersect.org.au', :clinics => [create(:clinic)])
-      user_1.check_number_of_superusers(1, 2).should eq(true)
+      expect(user_1.check_number_of_superusers(1, 2)).to eq(true)
     end
   end
 
@@ -216,9 +216,9 @@ describe User do
         u.clinics.clear
       end
 
-      users[0].should be_valid
-      users[1].should be_valid
-      users[2].should_not be_valid
+      expect(users[0]).to be_valid
+      expect(users[1]).to be_valid
+      expect(users[2]).to_not be_valid
 
     end
 
@@ -227,12 +227,12 @@ describe User do
       clinic = create(:clinic)
 
       user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :clinics  => [clinic])
-      user1.clinics.count.should eq(1)
-      user1.clinics.should include(clinic)
+      expect(user1.clinics.count).to eq(1)
+      expect(user1.clinics).to include(clinic)
 
       user1.role = super_role
-      user1.should be_valid
-      user1.clinics.count.should eq(0)
+      expect(user1).to be_valid
+      expect(user1.clinics.count).to eq(0)
       expect(user1.allocated_unit_code).to eq(nil)
 
     end
@@ -241,11 +241,11 @@ describe User do
       clinic = create(:clinic)
       user1 = create(:user, :status => 'A', :email => 'user1@intersect.org.au', :clinics => [clinic])
 
-      user1.should be_valid
+      expect(user1).to be_valid
       user1.save
       user1a = User.find_by_email('user1@intersect.org.au')
-      user1a.clinics.count.should eq(1)
-      user1a.clinics.should include(clinic)
+      expect(user1a.clinics.count).to eq(1)
+      expect(user1a.clinics).to include(clinic)
       expect(user1.allocated_unit_code).to eq(clinic.unit_code)
 
     end
@@ -313,7 +313,7 @@ describe User do
       admin = create(:user, :role => admin_role, :status => "A", :email => "f@intersect.org.au", :clinics => [create(:clinic)])
 
       supers = User.get_superuser_emails
-      supers.should eq(["a@intersect.org.au", "c@intersect.org.au"])
+      expect(supers).to eq(["a@intersect.org.au", "c@intersect.org.au"])
     end
   end
   

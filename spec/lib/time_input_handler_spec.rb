@@ -44,26 +44,26 @@ describe TimeInputHandler do
   describe "Accepting hash input" do
     it "should be valid when both fields supplied" do
       dih = TimeInputHandler.new(ActiveSupport::HashWithIndifferentAccess.new ({hour: "14", min: "59"}))
-      dih.should be_valid
-      dih.to_time.should eq(Time.utc(2000, 1, 1, 14, 59))
+      expect(dih).to be_valid
+      expect(dih.to_time).to eq(Time.utc(2000, 1, 1, 14, 59))
     end
 
     it "should be invalid if a field is missing - hour missing" do
       dih = TimeInputHandler.new(ActiveSupport::HashWithIndifferentAccess.new ({hour: "", min: "59"}))
-      dih.should_not be_valid
+      expect(dih).to_not be_valid
       raw = dih.to_raw
-      raw.should be_a(Hash)
-      raw[:hour].should == ""
-      raw[:min].should == "59"
+      expect(raw).to be_a(Hash)
+      expect(raw[:hour]).to eq ""
+      expect(raw[:min]).to eq "59"
     end
 
     it "should be invalid if a field is missing - minute missing" do
       dih = TimeInputHandler.new(ActiveSupport::HashWithIndifferentAccess.new ({hour: "14", min: ""}))
-      dih.should_not be_valid
+      expect(dih).to_not be_valid
       raw = dih.to_raw
-      raw.should be_a(Hash)
-      raw[:hour].should == "14"
-      raw[:min].should == ""
+      expect(raw).to be_a(Hash)
+      expect(raw[:hour]).to eq "14"
+      expect(raw[:min]).to eq ""
     end
   end
 
@@ -71,41 +71,41 @@ describe TimeInputHandler do
     it "should accept it as is since it must be valid" do
       time = Time.now
       dih = TimeInputHandler.new(time)
-      dih.should be_valid
-      dih.to_time.should be(time)
+      expect(dih).to be_valid
+      expect(dih.to_time).to be(time)
     end
   end
 
   describe "Refuses to handle other types of input" do
     it "should throw an error on other types" do
-      lambda { TimeInputHandler.new(123) }.should raise_error("TimeInputHandler can only handle String, Hash and Time input")
+      expect(lambda { TimeInputHandler.new(123) }).to raise_error("TimeInputHandler can only handle String, Hash and Time input")
     end
   end
 
   describe "Refuses to answer to_raw if valid" do
     it "should throw an error" do
       dih = TimeInputHandler.new("11:45")
-      lambda { dih.to_raw }.should raise_error("Time is valid, cannot call to_raw, you should check valid? first")
+      expect(lambda { dih.to_raw }).to raise_error("Time is valid, cannot call to_raw, you should check valid? first")
     end
   end
 
   describe "Refuses to answer to_time if invalid" do
     it "should throw an error" do
       dih = TimeInputHandler.new("asdf")
-      lambda { dih.to_time }.should raise_error("Time is not valid, cannot call to_time, you should check valid? first")
+      expect(lambda { dih.to_time }).to raise_error("Time is not valid, cannot call to_time, you should check valid? first")
     end
   end
 
   def should_accept(string, h, m)
     dih = TimeInputHandler.new(string)
-    dih.should be_valid, "Expected time string #{string} to be valid"
-    dih.to_time.should eq(Time.utc(2000, 1, 1, h, m))
+    expect(dih).to be_valid, "Expected time string #{string} to be valid"
+    expect(dih.to_time).to eq(Time.utc(2000, 1, 1, h, m))
   end
 
   def should_reject(string)
     dih = TimeInputHandler.new(string)
-    dih.should_not be_valid, "Expected time string #{string} to not be valid"
-    dih.to_raw.should eq(string)
+    expect(dih).to_not be_valid, "Expected time string #{string} to not be valid"
+    expect(dih.to_raw).to eq(string)
   end
 end
 

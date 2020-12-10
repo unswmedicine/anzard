@@ -48,50 +48,50 @@ describe Answer do
     describe "Should call the string length validator if question type is text" do
       it "should record the warning if validation fails" do
         expect(StringLengthValidator).to receive(:validate).twice.with(text_question, "blah").and_return([false, "My string warning"])
-        text_answer.has_warning?.should eq true
-        text_answer.warnings.should eq ["My string warning"]
-        text_answer.fatal_warnings.should eq []
+        expect(text_answer.has_warning?).to eq true
+        expect(text_answer.warnings).to eq ["My string warning"]
+        expect(text_answer.fatal_warnings).to eq []
       end
     end
 
     describe "Should call the number validator if question type is integer" do
       it "should record the warning if validation fails" do
-        NumberRangeValidator.should_receive(:validate).twice.with(integer_question, 34).and_return([false, "My integer warning"])
-        integer_answer.has_warning?.should eq true
-        integer_answer.warnings.should eq ["My integer warning"]
-        integer_answer.fatal_warnings.should eq []
+        expect(NumberRangeValidator).to receive(:validate).twice.with(integer_question, 34).and_return([false, "My integer warning"])
+        expect(integer_answer.has_warning?).to eq true
+        expect(integer_answer.warnings).to eq ["My integer warning"]
+        expect(integer_answer.fatal_warnings).to eq []
       end
     end
 
     describe "Should call the number validator if question type is decimal" do
       it "should record the warning if validation fails" do
-        NumberRangeValidator.should_receive(:validate).twice.with(decimal_question, 1.13).and_return([false, "My decimal warning"])
-        decimal_answer.has_warning?.should eq true
-        decimal_answer.warnings.should eq ["My decimal warning"]
-        decimal_answer.fatal_warnings.should eq []
+        expect(NumberRangeValidator).to receive(:validate).twice.with(decimal_question, 1.13).and_return([false, "My decimal warning"])
+        expect(decimal_answer.has_warning?).to eq true
+        expect(decimal_answer.warnings).to eq ["My decimal warning"]
+        expect(decimal_answer.fatal_warnings).to eq []
       end
     end
 
     describe "Cross-question validation" do
       it "should record the warning if validation fails" do
-        CrossQuestionValidation.should_receive(:check).twice.and_return(['error1', 'error2'])
+        expect(CrossQuestionValidation).to receive(:check).twice.and_return(['error1', 'error2'])
         answer = create(:answer)
 
-        answer.should have_warning
-        answer.warnings.should eq ["error1", "error2"]
-        answer.fatal_warnings.should eq []
+        expect(answer).to have_warning
+        expect(answer.warnings).to eq ["error1", "error2"]
+        expect(answer.fatal_warnings).to eq []
       end
     end
 
     describe "Validating that choice answers are one of the allowed values" do
       it "should pass when value is allowed" do
         answer = create(:answer, question: choice_question, answer_value: "99")
-        answer.should_not have_warning
+        expect(answer).to_not have_warning
       end
       it "should fail when value is not allowed" do
         answer = create(:answer, question: choice_question, answer_value: "98")
-        answer.fatal_warnings.should eq(['Answer must be one of ["0", "1", "99"]'])
-        answer.should have_warning
+        expect(answer.fatal_warnings).to eq(['Answer must be one of ["0", "1", "99"]'])
+        expect(answer).to have_warning
       end
     end
   end
@@ -108,20 +108,20 @@ describe Answer do
         q_time = create(:answer, question: time_question, answer_value: Time.now)
 
         #some select cases. the key thing is that they don't explode (but the logic should also never break)
-        (q_choice.answer_with_offset(-1) < q_i.answer_with_offset(0)).should be true
-        (q_choice.answer_with_offset(-1) > q_i.answer_with_offset(0)).should be false
-        (q_choice.answer_with_offset(-1) < q_dec.answer_with_offset(0)).should be true
-        (q_choice.answer_with_offset(-1) > q_dec.answer_with_offset(0)).should be false
+        expect((q_choice.answer_with_offset(-1) < q_i.answer_with_offset(0))).to be true
+        expect((q_choice.answer_with_offset(-1) > q_i.answer_with_offset(0))).to be false
+        expect((q_choice.answer_with_offset(-1) < q_dec.answer_with_offset(0))).to be true
+        expect((q_choice.answer_with_offset(-1) > q_dec.answer_with_offset(0))).to be false
 
         #offsets ignored for strings
-        (q_s.answer_with_offset(45345) == q_s2.answer_with_offset(-2342323)).should be true
-        (q_s.answer_with_offset(45345) != q_s2.answer_with_offset(-2342323)).should be false
+        expect((q_s.answer_with_offset(45345) == q_s2.answer_with_offset(-2342323))).to be true
+        expect((q_s.answer_with_offset(45345) != q_s2.answer_with_offset(-2342323))).to be false
 
-        (q_date.answer_with_offset(1) > q_date.answer_with_offset(0)).should be true
-        (q_date.answer_with_offset(1) < q_date.answer_with_offset(0)).should be false
+        expect((q_date.answer_with_offset(1) > q_date.answer_with_offset(0))).to be true
+        expect((q_date.answer_with_offset(1) < q_date.answer_with_offset(0))).to be false
 
-        (q_time.answer_with_offset(1) > q_time.answer_with_offset(0)).should be true
-        (q_time.answer_with_offset(1) < q_time.answer_with_offset(0)).should be false
+        expect((q_time.answer_with_offset(1) > q_time.answer_with_offset(0))).to be true
+        expect((q_time.answer_with_offset(1) < q_time.answer_with_offset(0))).to be false
       end
 
     end
@@ -137,36 +137,36 @@ describe Answer do
     describe "Decimal" do
       it "saves a decimal as a decimal" do
         a = create(:answer, question: decimal_question, answer_value: '1.23')
-        a.decimal_answer.should eq 1.23
+        expect(a.decimal_answer).to eq 1.23
       end
       it "saves an integer as a decimal" do
         a = create(:answer, question: decimal_question, answer_value: '123')
-        a.decimal_answer.should eq 123
+        expect(a.decimal_answer).to eq 123
       end
       it "saves invalid input as 'raw input' and has a warning" do
         a = create(:answer, question: decimal_question, answer_value: '1.23f')
-        a.decimal_answer.should be nil
-        a.raw_answer.should eq '1.23f'
-        a.has_warning?.should be true
+        expect(a.decimal_answer).to be nil
+        expect(a.raw_answer).to eq '1.23f'
+        expect(a.has_warning?).to be true
 
       end
       # The answer record should be culled if it becomes empty, but if it gets left behind it should be blank.
       it "nils out on empty string" do
         a = create(:answer, question: decimal_question, decimal_answer: 1.23)
-        a.decimal_answer.should eq 1.23
+        expect(a.decimal_answer).to eq 1.23
 
         a.answer_value = ''
-        a.decimal_answer.should be nil
-        a.raw_answer.should be nil
+        expect(a.decimal_answer).to be nil
+        expect(a.raw_answer).to be nil
       end
       it "does not nil out on invalid input, and has a warning" do
         a = create(:answer, question: decimal_question, decimal_answer: 1.23)
-        a.decimal_answer.should eq 1.23
+        expect(a.decimal_answer).to eq 1.23
 
         a.answer_value = 'garbage'
-        a.decimal_answer.should be nil
-        a.raw_answer.should eq 'garbage'
-        a.has_warning?.should be true
+        expect(a.decimal_answer).to be nil
+        expect(a.raw_answer).to eq 'garbage'
+        expect(a.has_warning?).to be true
 
       end
     end
@@ -174,31 +174,31 @@ describe Answer do
 
       it "saves an integer as an integer" do
         a = create(:answer, question: integer_question, answer_value: '1234')
-        a.integer_answer.should eq 1234
+        expect(a.integer_answer).to eq 1234
       end
       it "saves invalid input as 'raw input' and has a warning" do
         a = create(:answer, question: integer_question, answer_value: '1234d')
-        a.raw_answer.should eq '1234d'
-        a.has_warning?.should be true
+        expect(a.raw_answer).to eq '1234d'
+        expect(a.has_warning?).to be true
 
       end
       it "nils out on empty string" do
         a = create(:answer, question: integer_question, integer_answer: 123)
-        a.integer_answer.should eq 123
+        expect(a.integer_answer).to eq 123
 
         a.answer_value = ''
-        a.integer_answer.should be nil
-        a.raw_answer.should be nil
+        expect(a.integer_answer).to be nil
+        expect(a.raw_answer).to be nil
       end
       # The answer record should be culled if it becomes empty, but if it gets left behind it should be blank.
       it "does not nil out on invalid input and shows a warning" do
         a = create(:answer, question: integer_question, integer_answer: 123)
-        a.integer_answer.should eq 123
+        expect(a.integer_answer).to eq 123
 
         a.answer_value = 'garbage'
-        a.integer_answer.should be nil
-        a.raw_answer.should eq 'garbage'
-        a.has_warning?.should be true
+        expect(a.integer_answer).to be nil
+        expect(a.raw_answer).to eq 'garbage'
+        expect(a.has_warning?).to be true
 
       end
     end
@@ -207,22 +207,22 @@ describe Answer do
       it "should set the date answer if the input is valid" do
         date = Date.today
         mock_ih = double('mock input handler')
-        DateInputHandler.should_receive(:new).and_return(mock_ih)
-        mock_ih.should_receive(:valid?).and_return(true)
-        mock_ih.should_receive(:to_date).and_return(date)
+        expect(DateInputHandler).to receive(:new).and_return(mock_ih)
+        expect(mock_ih).to receive(:valid?).and_return(true)
+        expect(mock_ih).to receive(:to_date).and_return(date)
         a = create(:answer, question: date_question, answer_value: "abc")
-        a.date_answer.should be(date)
-        a.raw_answer.should be_nil
+        expect(a.date_answer).to be(date)
+        expect(a.raw_answer).to be_nil
       end
 
       it "should set the raw answer if the input is invalid" do
         mock_ih = double('mock input handler')
-        DateInputHandler.should_receive(:new).and_return(mock_ih)
-        mock_ih.should_receive(:valid?).and_return(false)
-        mock_ih.should_receive(:to_raw).and_return("blah")
+        expect(DateInputHandler).to receive(:new).and_return(mock_ih)
+        expect(mock_ih).to receive(:valid?).and_return(false)
+        expect(mock_ih).to receive(:to_raw).and_return("blah")
         a = create(:answer, question: date_question, answer_value: "abc")
-        a.date_answer.should be_nil
-        a.raw_answer.should eq("blah")
+        expect(a.date_answer).to be_nil
+        expect(a.raw_answer).to eq("blah")
       end
     end
 
@@ -230,22 +230,22 @@ describe Answer do
       it "should set the time answer if the input is valid" do
         time = Time.now.round.utc
         mock_ih = double('mock input handler')
-        TimeInputHandler.should_receive(:new).and_return(mock_ih)
-        mock_ih.should_receive(:valid?).and_return(true)
-        mock_ih.should_receive(:to_time).and_return(time)
+        expect(TimeInputHandler).to receive(:new).and_return(mock_ih)
+        expect(mock_ih).to receive(:valid?).and_return(true)
+        expect(mock_ih).to receive(:to_time).and_return(time)
         a = build(:answer, question: time_question, answer_value: "abc")
-        a.time_answer.should eq(time)
-        a.raw_answer.should be_nil
+        expect(a.time_answer).to eq(time)
+        expect(a.raw_answer).to be_nil
       end
 
       it "should set the raw answer if the input is invalid" do
         mock_ih = double('mock input handler')
-        TimeInputHandler.should_receive(:new).and_return(mock_ih)
-        mock_ih.should_receive(:valid?).and_return(false)
-        mock_ih.should_receive(:to_raw).and_return("blah")
+        expect(TimeInputHandler).to receive(:new).and_return(mock_ih)
+        expect(mock_ih).to receive(:valid?).and_return(false)
+        expect(mock_ih).to receive(:to_raw).and_return("blah")
         a = create(:answer, question: time_question, answer_value: "abc")
-        a.time_answer.should be_nil
-        a.raw_answer.should eq("blah")
+        expect(a.time_answer).to be_nil
+        expect(a.raw_answer).to eq("blah")
       end
     end
   end
@@ -254,35 +254,35 @@ describe Answer do
     it "Valid text" do
       a = create(:answer, question: text_question, answer_value: "abc")
       a.save!; a.answer_value = nil; a.reload
-      a.answer_value.should eq("abc")
+      expect(a.answer_value).to eq("abc")
     end
     it "Valid date" do
       date = Time.now.to_date
       date_hash = PartialDateTimeHash.new({day: date.day, month: date.month, year: date.year})
       a = create(:answer, question: date_question, answer_value: date_hash)
       a.save!; a.answer_value = nil; a.reload
-      PartialDateTimeHash.new(a.answer_value).should eq(date_hash)
+      expect(PartialDateTimeHash.new(a.answer_value)).to eq(date_hash)
     end
     it "Valid time" do
       time_hash = PartialDateTimeHash.new(Time.now)
       a = create(:answer, question: time_question, answer_value: time_hash)
       a.save!; a.answer_value = nil; a.reload
-      PartialDateTimeHash.new(a.answer_value).should eq(time_hash)
+      expect(PartialDateTimeHash.new(a.answer_value)).to eq(time_hash)
     end
     it "Valid decimal" do
       a = create(:answer, question: decimal_question, answer_value: "3.45")
       a.save!; a.answer_value = nil; a.reload
-      a.answer_value.should eq(3.45)
+      expect(a.answer_value).to eq(3.45)
     end
     it "Valid integer" do
       a = create(:answer, question: integer_question, answer_value: "423")
       a.save!; a.answer_value = nil; a.reload
-      a.answer_value.should eq(423)
+      expect(a.answer_value).to eq(423)
     end
     it "Valid choice" do
       a = create(:answer, question: choice_question, answer_value: "1")
       a.save!; a.answer_value = nil; a.reload
-      a.answer_value.should eq("1")
+      expect(a.answer_value).to eq("1")
     end
 
   end
@@ -292,9 +292,9 @@ describe Answer do
     it "invalid date from a string" do
       a = create(:answer, question: date_question, answer_value: "blah")
       a.reload
-      a.answer_value.should eq("blah")
-      a.has_warning?.should be true
-      a.fatal_warnings.should eq(["Answer is invalid (must be a valid date)"])
+      expect(a.answer_value).to eq("blah")
+      expect(a.has_warning?).to be true
+      expect(a.fatal_warnings).to eq(["Answer is invalid (must be a valid date)"])
     end
 
     it "invalid date from a hash" do
@@ -302,9 +302,9 @@ describe Answer do
       date_hash = PartialDateTimeHash.new date_a_s_hash
       a = create(:answer, question: date_question, answer_value: date_a_s_hash)
       a.reload
-      a.answer_value.should eq(date_hash)
-      a.has_warning?.should be true
-      a.fatal_warnings.should eq(["Answer is invalid (Provided date does not exist)"])
+      expect(a.answer_value).to eq(date_hash)
+      expect(a.has_warning?).to be true
+      expect(a.fatal_warnings).to eq(["Answer is invalid (Provided date does not exist)"])
     end
 
     it "partial date from a hash" do
@@ -312,17 +312,17 @@ describe Answer do
       date_hash = PartialDateTimeHash.new date_a_s_hash
       a = create(:answer, question: date_question, answer_value: date_a_s_hash)
       a.reload
-      a.answer_value.should eq(date_hash)
-      a.has_warning?.should be true
-      a.fatal_warnings.should eq(["Answer is incomplete (one or more fields left blank)"])
+      expect(a.answer_value).to eq(date_hash)
+      expect(a.has_warning?).to be true
+      expect(a.fatal_warnings).to eq(["Answer is incomplete (one or more fields left blank)"])
     end
 
     it "invalid time from a string" do
       a = create(:answer, question: time_question, answer_value: "ab:11")
       a.reload
-      a.answer_value.should eq("ab:11")
-      a.has_warning?.should be true
-      a.fatal_warnings.should eq(["Answer is invalid (must be a valid time)"])
+      expect(a.answer_value).to eq("ab:11")
+      expect(a.has_warning?).to be true
+      expect(a.fatal_warnings).to eq(["Answer is invalid (must be a valid time)"])
     end
 
     it "invalid time from a hash" do
@@ -330,9 +330,9 @@ describe Answer do
       time_hash = PartialDateTimeHash.new time_a_s_hash
       a = create(:answer, question: time_question, answer_value: time_a_s_hash)
       a.reload
-      a.answer_value.should eq(time_hash)
-      a.has_warning?.should be true
-      a.fatal_warnings.should eq(["Answer is incomplete (a field was left blank)"])
+      expect(a.answer_value).to eq(time_hash)
+      expect(a.has_warning?).to be true
+      expect(a.fatal_warnings).to eq(["Answer is incomplete (a field was left blank)"])
     end
 
     it "partial time" do
@@ -340,24 +340,24 @@ describe Answer do
       time_hash = PartialDateTimeHash.new time_a_s_hash
       a = create(:answer, question: time_question, answer_value: time_a_s_hash)
       a.reload
-      a.answer_value.should eq(time_hash)
-      a.fatal_warnings.should eq(["Answer is incomplete (a field was left blank)"])
+      expect(a.answer_value).to eq(time_hash)
+      expect(a.fatal_warnings).to eq(["Answer is incomplete (a field was left blank)"])
     end
 
     it "invalid integer" do
       input = "4.5"
       a = create(:answer, question: integer_question, answer_value: input)
       a.save!; b = Answer.find(a.id); a = b
-      a.answer_value.should eq(input)
-      a.has_warning?.should be true
+      expect(a.answer_value).to eq(input)
+      expect(a.has_warning?).to be true
     end
 
     it "invalid decimal" do
       input = "abc"
       a = create(:answer, question: decimal_question, answer_value: input)
       a.save!; b = Answer.find(a.id); a = b
-      a.answer_value.should eq(input)
-      a.has_warning?.should be true
+      expect(a.answer_value).to eq(input)
+      expect(a.has_warning?).to be true
     end
 
   end
@@ -365,57 +365,57 @@ describe Answer do
   describe "Formatting an answer for display" do
 
     it "should handle each of the data types correctly" do
-      create(:answer, question: text_question, answer_value: "blah").format_for_display.should eq("blah")
-      create(:answer, question: integer_question, answer_value: "14").format_for_display.should eq("14")
-      create(:answer, question: decimal_question, answer_value: "14").format_for_display.should eq("14.0")
-      create(:answer, question: decimal_question, answer_value: "22.5").format_for_display.should eq("22.5")
-      create(:answer, question: decimal_question, answer_value: "22.59").format_for_display.should eq("22.59")
-      create(:answer, question: date_question, answer_value: PartialDateTimeHash.new({day: 31, month: 12, year: 2011})).format_for_display.should eq("31/12/2011")
-      create(:answer, question: time_question, answer_value: PartialDateTimeHash.new({hour: 18, min: 6})).format_for_display.should eq("18:06")
+      expect(create(:answer, question: text_question, answer_value: "blah").format_for_display).to eq("blah")
+      expect(create(:answer, question: integer_question, answer_value: "14").format_for_display).to eq("14")
+      expect(create(:answer, question: decimal_question, answer_value: "14").format_for_display).to eq("14.0")
+      expect(create(:answer, question: decimal_question, answer_value: "22.5").format_for_display).to eq("22.5")
+      expect(create(:answer, question: decimal_question, answer_value: "22.59").format_for_display).to eq("22.59")
+      expect(create(:answer, question: date_question, answer_value: PartialDateTimeHash.new({day: 31, month: 12, year: 2011})).format_for_display).to eq("31/12/2011")
+      expect(create(:answer, question: time_question, answer_value: PartialDateTimeHash.new({hour: 18, min: 6})).format_for_display).to eq("18:06")
 
-      create(:answer, question: choice_question, answer_value: "99").format_for_display.should eq("(99) Apple")
+      expect(create(:answer, question: choice_question, answer_value: "99").format_for_display).to eq("(99) Apple")
     end
 
     it "should handle answers that are not filled out yet" do
-      create(:answer, question: text_question, answer_value: nil).format_for_display.should eq("Not answered")
-      create(:answer, question: integer_question, answer_value: nil).format_for_display.should eq("Not answered")
-      create(:answer, question: decimal_question, answer_value: nil).format_for_display.should eq("Not answered")
-      create(:answer, question: date_question, answer_value: nil).format_for_display.should eq("Not answered")
-      create(:answer, question: time_question, answer_value: nil).format_for_display.should eq("Not answered")
-      create(:answer, question: choice_question, answer_value: nil).format_for_display.should eq("Not answered")
+      expect(create(:answer, question: text_question, answer_value: nil).format_for_display).to eq("Not answered")
+      expect(create(:answer, question: integer_question, answer_value: nil).format_for_display).to eq("Not answered")
+      expect(create(:answer, question: decimal_question, answer_value: nil).format_for_display).to eq("Not answered")
+      expect(create(:answer, question: date_question, answer_value: nil).format_for_display).to eq("Not answered")
+      expect(create(:answer, question: time_question, answer_value: nil).format_for_display).to eq("Not answered")
+      expect(create(:answer, question: choice_question, answer_value: nil).format_for_display).to eq("Not answered")
     end
 
     it "should return blank for answers that are invalid" do
-      create(:answer, question: integer_question, raw_answer: "asdf").format_for_display.should eq("")
+      expect(create(:answer, question: integer_question, raw_answer: "asdf").format_for_display).to eq("")
 
-      create(:answer, question: decimal_question, raw_answer: "asdf").format_for_display.should eq("")
+      expect(create(:answer, question: decimal_question, raw_answer: "asdf").format_for_display).to eq("")
 
       date_as_hash = ActiveSupport::HashWithIndifferentAccess.new ({day: 1, year: 2000})
-      create(:answer, question: date_question, raw_answer: PartialDateTimeHash.new(date_as_hash)).format_for_display.should eq("")
+      expect(create(:answer, question: date_question, raw_answer: PartialDateTimeHash.new(date_as_hash)).format_for_display).to eq("")
 
       time_as_hash = ActiveSupport::HashWithIndifferentAccess.new ({hour: 1})
-      create(:answer, question: time_question, raw_answer: PartialDateTimeHash.new(time_as_hash)).format_for_display.should eq("")
+      expect(create(:answer, question: time_question, raw_answer: PartialDateTimeHash.new(time_as_hash)).format_for_display).to eq("")
     end
   end
 
   describe "Formatting an answer for batch file detail report" do
 
     it "should handle each of the data types correctly" do
-      create(:answer, question: text_question, answer_value: "blah").format_for_csv.should eq("blah")
-      create(:answer, question: integer_question, answer_value: "14").format_for_csv.should eq("14")
-      create(:answer, question: decimal_question, answer_value: "14").format_for_csv.should eq("14.0")
-      create(:answer, question: decimal_question, answer_value: "22.5").format_for_csv.should eq("22.5")
-      create(:answer, question: decimal_question, answer_value: "22.59").format_for_csv.should eq("22.59")
-      create(:answer, question: date_question, answer_value: "31/12/2011").format_for_csv.should eq("2011-12-31")
-      create(:answer, question: time_question, answer_value: "18:06").format_for_csv.should eq("18:06")
-      create(:answer, question: choice_question, answer_value: "99").format_for_csv.should eq("99")
+      expect(create(:answer, question: text_question, answer_value: "blah").format_for_csv).to eq("blah")
+      expect(create(:answer, question: integer_question, answer_value: "14").format_for_csv).to eq("14")
+      expect(create(:answer, question: decimal_question, answer_value: "14").format_for_csv).to eq("14.0")
+      expect(create(:answer, question: decimal_question, answer_value: "22.5").format_for_csv).to eq("22.5")
+      expect(create(:answer, question: decimal_question, answer_value: "22.59").format_for_csv).to eq("22.59")
+      expect(create(:answer, question: date_question, answer_value: "31/12/2011").format_for_csv).to eq("2011-12-31")
+      expect(create(:answer, question: time_question, answer_value: "18:06").format_for_csv).to eq("18:06")
+      expect(create(:answer, question: choice_question, answer_value: "99").format_for_csv).to eq("99")
     end
 
     it "should return the raw answer for answers that are invalid" do
-      create(:answer, question: integer_question, raw_answer: "asdf").format_for_csv.should eq("asdf")
-      create(:answer, question: decimal_question, raw_answer: "asdf").format_for_csv.should eq("asdf")
-      create(:answer, question: date_question, raw_answer: "12/ff/3333").format_for_csv.should eq("12/ff/3333")
-      create(:answer, question: time_question, raw_answer: "18:ab").format_for_csv.should eq("18:ab")
+      expect(create(:answer, question: integer_question, raw_answer: "asdf").format_for_csv).to eq("asdf")
+      expect(create(:answer, question: decimal_question, raw_answer: "asdf").format_for_csv).to eq("asdf")
+      expect(create(:answer, question: date_question, raw_answer: "12/ff/3333").format_for_csv).to eq("12/ff/3333")
+      expect(create(:answer, question: time_question, raw_answer: "18:ab").format_for_csv).to eq("18:ab")
     end
   end
 
