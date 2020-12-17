@@ -37,7 +37,7 @@ end
 
 gem "therubyracer"
 group :development, :test do
-  gem "create_deployment_record", git: 'https://github.com/IntersectAustralia/create_deployment_record.git'
+  #gem "create_deployment_record", git: 'https://github.com/IntersectAustralia/create_deployment_record.git'
   gem "rspec-rails"
   gem "factory_girl_rails"
   gem "shoulda-matchers", '2.8'
@@ -98,4 +98,4 @@ gem 'jekyll', :require => false
 gem 'highline' # This has (up until now) been implicitly included by capistrano
 gem 'passenger', '~> 5.1.2', :require => false
 
-gem 'rails_request_stats', group: :development
+#gem 'rails_request_stats', group: :development

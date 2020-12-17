@@ -1,5 +1,5 @@
 # Follows Ruby and Docker compose reference at https://docs.docker.com/compose/rails/
-FROM ruby:2.4
+FROM ruby:2.6.6
 
 # Install apt based dependencies required to run Rails as well as RubyGems.
 RUN apt-get update && apt-get install -y build-essential nodejs

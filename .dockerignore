@@ -1,6 +1,6 @@
 .git
 .dockerignore
 log/*
-docker_dir/db
+docker_dir/db_*
 Dockerfile
 docker-compose.yml
