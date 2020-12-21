@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :role do |f|
     f.sequence(:name) { |n| "role-#{n}" }
   end

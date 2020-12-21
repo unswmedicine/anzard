@@ -16,11 +16,11 @@
 
 # Read about factories at http://github.com/thoughtbot/factory_girl
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :answer do
     association :response
     association :question
-    answer_value "100"
+    answer_value { "100" }
     initialize_with {
       answer = response.answers.build(question_id: question&.id)
       answer.answer_value = answer_value unless answer_value.nil?

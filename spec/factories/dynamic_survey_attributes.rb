@@ -16,10 +16,10 @@
 
 # Read about factories at http://github.com/thoughtbot/factory_girl
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :survey_configurations do
     association :survey
-    start_year_of_treatment "2003"
-    end_year_of_treatment "2003"
+    start_year_of_treatment { "2003" }
+    end_year_of_treatment { "2003" }
   end
 end

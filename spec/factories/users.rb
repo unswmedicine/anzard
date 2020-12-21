@@ -14,18 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :basic_user, class: :user do
-    first_name "Fred"
-    last_name "Bloggs"
-    password "Pas$w0rd"
+    first_name { "Fred" }
+    last_name { "Bloggs" }
+    password { "Pas$w0rd" }
     sequence(:email) { |n| "#{n}@intersect.org.au" }
 
-    allocated_unit_code nil
+    allocated_unit_code { nil }
 
     factory :user do
       transient do
-        clinics_count 0
+        clinics_count { 0 }
       end
 
       after(:create) do |user, evaluator|

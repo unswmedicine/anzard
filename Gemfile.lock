@@ -1,39 +1,39 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    actioncable (5.0.7.2)
-      actionpack (= 5.0.7.2)
-      nio4r (>= 1.2, < 3.0)
+    actioncable (5.1.7)
+      actionpack (= 5.1.7)
+      nio4r (~> 2.0)
       websocket-driver (~> 0.6.1)
-    actionmailer (5.0.7.2)
-      actionpack (= 5.0.7.2)
-      actionview (= 5.0.7.2)
-      activejob (= 5.0.7.2)
+    actionmailer (5.1.7)
+      actionpack (= 5.1.7)
+      actionview (= 5.1.7)
+      activejob (= 5.1.7)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.0.7.2)
-      actionview (= 5.0.7.2)
-      activesupport (= 5.0.7.2)
+    actionpack (5.1.7)
+      actionview (= 5.1.7)
+      activesupport (= 5.1.7)
       rack (~> 2.0)
-      rack-test (~> 0.6.3)
+      rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.0.7.2)
-      activesupport (= 5.0.7.2)
+    actionview (5.1.7)
+      activesupport (= 5.1.7)
       builder (~> 3.1)
-      erubis (~> 2.7.0)
+      erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    activejob (5.0.7.2)
-      activesupport (= 5.0.7.2)
+    activejob (5.1.7)
+      activesupport (= 5.1.7)
       globalid (>= 0.3.6)
-    activemodel (5.0.7.2)
-      activesupport (= 5.0.7.2)
-    activerecord (5.0.7.2)
-      activemodel (= 5.0.7.2)
-      activesupport (= 5.0.7.2)
-      arel (~> 7.0)
-    activesupport (5.0.7.2)
+    activemodel (5.1.7)
+      activesupport (= 5.1.7)
+    activerecord (5.1.7)
+      activemodel (= 5.1.7)
+      activesupport (= 5.1.7)
+      arel (~> 8.0)
+    activesupport (5.1.7)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -41,7 +41,7 @@ GEM
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     ansi (1.5.0)
-    arel (7.1.4)
+    arel (8.0.0)
     autoprefixer-rails (10.1.0.0)
       execjs
     bcrypt (3.1.16)
@@ -62,8 +62,6 @@ GEM
       pager (~> 1.0)
     chronic (0.10.2)
     climate_control (0.2.0)
-    cocaine (0.5.8)
-      climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.3)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
@@ -131,7 +129,7 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.4.4)
-    docile (1.3.2)
+    docile (1.3.3)
     em-websocket (0.5.2)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
@@ -139,15 +137,16 @@ GEM
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
       mail (~> 2.7)
+    erubi (1.10.0)
     erubis (2.7.0)
     eventmachine (1.2.7)
     execjs (2.7.0)
-    factory_girl (4.9.0)
-      activesupport (>= 3.0.0)
-    factory_girl_rails (4.9.0)
-      factory_girl (~> 4.9.0)
-      railties (>= 3.0.0)
-    ffi (1.13.1)
+    factory_bot (6.1.0)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.1.0)
+      factory_bot (~> 6.1.0)
+      railties (>= 5.0.0)
+    ffi (1.14.1)
     forwardable-extended (2.6.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -155,12 +154,12 @@ GEM
     haml (5.2.1)
       temple (>= 0.8.0)
       tilt
-    haml-rails (1.0.0)
-      actionpack (>= 4.0.1)
-      activesupport (>= 4.0.1)
+    haml-rails (2.0.1)
+      actionpack (>= 5.1)
+      activesupport (>= 5.1)
       haml (>= 4.0.6, < 6.0)
       html2haml (>= 1.0.1)
-      railties (>= 4.0.1)
+      railties (>= 5.1)
     highline (2.0.3)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
@@ -201,7 +200,7 @@ GEM
       kramdown (~> 2.0)
     launchy (2.5.0)
       addressable (~> 2.7)
-    libv8 (3.16.14.19-x86_64-linux)
+    libv8 (3.16.14.19)
     liquid (4.0.3)
     listen (3.3.3)
       rb-fsevent (~> 0.10, >= 0.10.3)
@@ -227,19 +226,19 @@ GEM
       minitest (>= 5.0)
       ruby-progressbar
     multi_test (0.1.2)
-    mysql2 (0.4.10)
+    mysql2 (0.5.3)
     nio4r (2.5.4)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     orm_adapter (0.5.0)
     pager (1.0.1)
-    paperclip (5.2.1)
+    paperclip (6.1.0)
       activemodel (>= 4.2.0)
       activesupport (>= 4.2.0)
-      cocaine (~> 0.5.5)
       mime-types
       mimemagic (~> 0.3.0)
-    passenger (5.1.12)
+      terrapin (~> 0.6.0)
+    passenger (6.0.7)
       rack
       rake (>= 0.8.1)
     pathutil (0.16.2)
@@ -262,19 +261,19 @@ GEM
       pry (>= 0.10.4)
     public_suffix (4.0.6)
     rack (2.2.3)
-    rack-test (0.6.3)
-      rack (>= 1.0)
-    rails (5.0.7.2)
-      actioncable (= 5.0.7.2)
-      actionmailer (= 5.0.7.2)
-      actionpack (= 5.0.7.2)
-      actionview (= 5.0.7.2)
-      activejob (= 5.0.7.2)
-      activemodel (= 5.0.7.2)
-      activerecord (= 5.0.7.2)
-      activesupport (= 5.0.7.2)
+    rack-test (1.1.0)
+      rack (>= 1.0, < 3)
+    rails (5.1.7)
+      actioncable (= 5.1.7)
+      actionmailer (= 5.1.7)
+      actionpack (= 5.1.7)
+      actionview (= 5.1.7)
+      activejob (= 5.1.7)
+      activemodel (= 5.1.7)
+      activerecord (= 5.1.7)
+      activesupport (= 5.1.7)
       bundler (>= 1.3.0)
-      railties (= 5.0.7.2)
+      railties (= 5.1.7)
       sprockets-rails (>= 2.0.0)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
@@ -283,13 +282,13 @@ GEM
       loofah (~> 2.3)
     rails3-generators (1.0.0)
       railties (>= 3.0.0)
-    railties (5.0.7.2)
-      actionpack (= 5.0.7.2)
-      activesupport (= 5.0.7.2)
+    railties (5.1.7)
+      actionpack (= 5.1.7)
+      activesupport (= 5.1.7)
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (13.0.1)
+    rake (13.0.3)
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -357,6 +356,8 @@ GEM
     temple (0.8.2)
     terminal-table (2.0.0)
       unicode-display_width (~> 1.1, >= 1.1.1)
+    terrapin (0.6.0)
+      climate_control (>= 0.0.3, < 1.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -368,7 +369,7 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.10)
     ttfunk (1.6.2.1)
-    turn (0.8.3)
+    turn (0.9.6)
       ansi
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
@@ -391,10 +392,10 @@ GEM
       rails (>= 3.1.0)
 
 PLATFORMS
-  x86_64-linux
+  ruby
 
 DEPENDENCIES
-  bootstrap-sass (~> 3.4.1)
+  bootstrap-sass
   cancancan
   capybara
   cheat
@@ -409,7 +410,7 @@ DEPENDENCIES
   delayed_job_active_record
   devise (~> 4.7.1)
   email_spec
-  factory_girl_rails
+  factory_bot_rails
   google-analytics-rails
   haml
   haml-rails
@@ -420,13 +421,13 @@ DEPENDENCIES
   launchy
   minitest
   minitest-reporters
-  mysql2 (~> 0.4.4)
-  paperclip (~> 5.2.0)
-  passenger (~> 5.1.2)
+  mysql2
+  paperclip
+  passenger
   prawn
   prawn-table
   pry-rails
-  rails (= 5.0.7.2)
+  rails (= 5.1.7)
   rails3-generators
   rspec-rails
   ruby-debug-ide
@@ -435,11 +436,11 @@ DEPENDENCIES
   shoulda-matchers (= 2.8)
   simplecov
   simplecov-rcov
-  spork (~> 0.9.0.rc)
+  spork
   tabs_on_rails
   therubyracer
   thin
-  turn (~> 0.8.3)
+  turn
   uglifier (>= 1.0.3)
   whenever
   will_paginate (> 3.0)
@@ -447,4 +448,4 @@ DEPENDENCIES
   xray-rails
 
 BUNDLED WITH
-   2.2.1
+   2.1.4
