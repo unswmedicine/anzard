@@ -54,8 +54,7 @@ Anzard::Application.configure do
   # config.active_record.schema_format = :sql
 
   # Raise for deprecation 
-  #config.active_support.deprecation = :raise
-  config.active_support.deprecation = :notify
+  config.active_support.deprecation = :raise
 
   config.eager_load = false
 end

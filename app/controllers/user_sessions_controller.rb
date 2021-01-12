@@ -86,7 +86,7 @@ private
 
   def get_warden_user_user_key_from_cookie(cookie_str)
       hashed_session, session_signature=cookie_str.split('--')
-      if OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, Rails.application.config.secret_token, hashed_session) == session_signature 
+      if OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, Rails.application.config.secret_key_base, hashed_session) == session_signature 
         unfolded_session=Marshal.load(Base64.strict_decode64(hashed_session))
         #"users.id"
         [unfolded_session["warden.user.user.key"][0][0].to_i, unfolded_session["warden.user.user.key"][1]]

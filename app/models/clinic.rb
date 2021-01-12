@@ -106,7 +106,7 @@ class Clinic < ApplicationRecord
 
   # Returns a list of all distinct Units, ordered by unit code
   def self.distinct_unit_list(capturesystem)
-    units = order(:unit_code).where(capturesystem_id:capturesystem.id).pluck('DISTINCT unit_code, unit_name')
+    units = order(:unit_code).where(capturesystem_id:capturesystem.id).pluck(Arel.sql('DISTINCT unit_code, unit_name'))
     units.map{ |code, name| {unit_code: code, unit_name: name}}
   end
 

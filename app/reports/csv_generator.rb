@@ -118,7 +118,7 @@ class CsvGenerator
     #answer_hash = answer_array.reduce({}) { |hash, answer| hash[answer.question.code] = answer; hash }
 
     answer_hash = Question.joins(:answers).where(answers:{response_id:response.id}).pluck(
-      :'questions.code', :'questions.question_type', "CASE WHEN questions.question_type='Choice' THEN answers.choice_answer WHEN questions.question_type='Date' THEN answers.date_answer WHEN questions.question_type='Decimal' THEN answers.decimal_answer WHEN questions.question_type='Integer' THEN answers.integer_answer WHEN questions.question_type='Text' THEN answers.text_answer WHEN questions.question_type='Time' THEN answers.time_answer ELSE '' END"
+      :'questions.code', :'questions.question_type', Arel.sql("CASE WHEN questions.question_type='Choice' THEN answers.choice_answer WHEN questions.question_type='Date' THEN answers.date_answer WHEN questions.question_type='Decimal' THEN answers.decimal_answer WHEN questions.question_type='Integer' THEN answers.integer_answer WHEN questions.question_type='Text' THEN answers.text_answer WHEN questions.question_type='Time' THEN answers.time_answer ELSE '' END")
     ).map{|a| [ a.slice(0), a.slice(1,2) ]}.to_h
     question_codes.collect do |code|
       CsvGenerator.format_for_csv(answer_hash[code])

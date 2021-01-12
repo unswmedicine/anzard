@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '5.1.7'
+gem 'rails', '5.2.4.4'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
@@ -79,7 +79,8 @@ gem "iconv"
 gem "haml"
 gem "haml-rails"
 gem "tabs_on_rails"
-gem 'devise', '~> 4.7.1'
+#gem 'devise', '~> 4.7.1'
+gem 'devise'
 gem "email_spec", :group => :test
 gem "cancancan"
 gem "simplecov", :require => false, :group => :test

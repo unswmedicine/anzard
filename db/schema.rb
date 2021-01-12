@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200702131003) do
+ActiveRecord::Schema.define(version: 2020_07_02_131003) do
 
-  create_table "answers", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "answers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "response_id"
     t.integer "question_id"
     t.text "text_answer"
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["response_id"], name: "index_answers_on_response_id"
   end
 
-  create_table "batch_files", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "batch_files", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "survey_id"
     t.integer "user_id"
     t.datetime "created_at"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["survey_id"], name: "index_batch_files_on_survey_id"
   end
 
-  create_table "capturesystem_surveys", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "capturesystem_surveys", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "capturesystem_id"
     t.integer "survey_id"
     t.datetime "created_at", null: false
@@ -56,7 +56,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["survey_id"], name: "index_capturesystem_surveys_on_survey_id"
   end
 
-  create_table "capturesystem_users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "capturesystem_users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "capturesystem_id"
     t.integer "user_id"
     t.datetime "created_at", null: false
@@ -68,14 +68,14 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["user_id"], name: "index_capturesystem_users_on_user_id"
   end
 
-  create_table "capturesystems", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "capturesystems", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "base_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "clinic_allocations", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "clinic_allocations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "clinic_id"
     t.integer "user_id"
     t.datetime "created_at", null: false
@@ -84,7 +84,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["user_id"], name: "index_clinic_allocations_on_user_id"
   end
 
-  create_table "clinics", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "clinics", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "state"
     t.string "unit_name"
     t.datetime "created_at"
@@ -97,7 +97,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["capturesystem_id", "unit_code", "site_code"], name: "index_clinics_on_capturesystem_id_and_unit_code_and_site_code", unique: true
   end
 
-  create_table "configuration_items", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "configuration_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "configuration_value"
     t.datetime "created_at"
@@ -105,7 +105,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["name"], name: "index_configuration_items_on_name", unique: true
   end
 
-  create_table "cross_question_validations", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "cross_question_validations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "question_id"
     t.integer "related_question_id"
     t.string "rule"
@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.text "comments"
   end
 
-  create_table "delayed_jobs", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "delayed_jobs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "priority", default: 0
     t.integer "attempts", default: 0
     t.text "handler"
@@ -137,7 +137,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "question_options", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "question_options", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "question_id"
     t.string "option_value"
     t.string "label"
@@ -148,7 +148,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["question_id"], name: "index_question_options_on_question_id"
   end
 
-  create_table "questions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "questions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "section_id"
     t.string "question"
     t.string "question_type"
@@ -168,7 +168,7 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.integer "order_within_group"
   end
 
-  create_table "responses", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "responses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "survey_id"
     t.integer "user_id"
     t.string "cycle_id"
@@ -182,19 +182,19 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["survey_id", "year_of_registration", "cycle_id"], name: "index_response_for_upload_records", unique: true
   end
 
-  create_table "roles", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "roles", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "sections", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "sections", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "survey_id"
     t.integer "section_order"
     t.string "name"
   end
 
-  create_table "survey_configurations", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "survey_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "survey_id"
     t.integer "start_year_of_treatment"
     t.integer "end_year_of_treatment"
@@ -204,13 +204,13 @@ ActiveRecord::Schema.define(version: 20200702131003) do
     t.index ["survey_id"], name: "index_survey_configurations_on_survey_id"
   end
 
-  create_table "surveys", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "surveys", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "name"
   end
 
-  create_table "users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", limit: 128, default: "", null: false
     t.string "reset_password_token"
