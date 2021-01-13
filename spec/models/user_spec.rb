@@ -312,8 +312,17 @@ describe User do
       super_5 = create(:super_user, :status => "R", :email => "e@intersect.org.au")
       admin = create(:user, :role => admin_role, :status => "A", :email => "f@intersect.org.au", :clinics => [create(:clinic)])
 
+      #get_superuser_emails is deprecated
       supers = User.get_superuser_emails
       expect(supers).to eq(["a@intersect.org.au", "c@intersect.org.au"])
+
+      capturesystem = create(:capturesystem, :name => 'capture_system_1', :base_url => 'http://capture.system.one.org')
+      capturesystem_user = create(:capturesystem_user, capturesystem: capturesystem, user:super_1, access_status: CapturesystemUser::STATUS_UNAPPROVED)
+      capturesystem_user = create(:capturesystem_user, capturesystem: capturesystem, user:super_2, access_status: CapturesystemUser::STATUS_ACTIVE)
+      capturesystem_user = create(:capturesystem_user, capturesystem: capturesystem, user:super_3, access_status: CapturesystemUser::STATUS_ACTIVE)
+      capturesystem_user = create(:capturesystem_user, capturesystem: capturesystem, user:super_4, access_status: CapturesystemUser::STATUS_ACTIVE)
+      capturesystem_user = create(:capturesystem_user, capturesystem: capturesystem, user:super_5, access_status: CapturesystemUser::STATUS_ACTIVE)
+      expect(capturesystem.active_superusers_emails).to eq(["c@intersect.org.au"])
     end
   end
   

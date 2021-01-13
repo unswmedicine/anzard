@@ -48,7 +48,9 @@ describe Notifier do
   it "should send the right email" do
     address = 'user@email.org'
     user = create(:user, :status => "U", :email => address)
-    expect(User).to receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
+    #get_superuser_emails is deprecated
+    #expect(User).to receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
+    expect(capturesystem).to receive(:active_superusers_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
     email = Notifier.notify_superusers_of_access_request(user, 'NPESU', capturesystem.base_url, capturesystem).deliver
 
     # check that the email has been queued for sending

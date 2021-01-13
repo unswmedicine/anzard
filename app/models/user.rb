@@ -196,6 +196,7 @@ class User < ApplicationRecord
     current_user_id != id.to_i or User.approved_superusers.length >= 2
   end
 
+  #deprecated
   def self.get_superuser_emails
     approved_superusers.collect { |u| u.email }
   end
