@@ -20,7 +20,9 @@ Anzard::Application.configure do
 
   # Settings specified here will take precedence over those in config/application.rb
 
+  #rails6 memory_store appears to cause slow view rendering in dev atm...
   config.cache_store = :memory_store, {size: 32.megabytes}
+  #config.cache_store = :file_store, "/app/tmp/cache_file_store"
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development
@@ -39,7 +41,7 @@ Anzard::Application.configure do
   config.action_mailer.raise_delivery_errors = false
 
   # Print deprecation notices to the Rails logger
-  config.active_support.deprecation = :log
+  config.active_support.deprecation = :raise
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
