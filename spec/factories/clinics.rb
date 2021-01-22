@@ -29,7 +29,8 @@ FactoryBot.define do
       active { true }
       association :capturesystem
       after(:create) do |capturesystem|
-        StaticModelPreloader.load
+        #StaticModelPreloader is deprecated, use the builtin association mechanism
+        #StaticModelPreloader.load
       end
     end
 end

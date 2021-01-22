@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '5.2.4.4'
+gem 'rails', '6.0.3.4'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
@@ -13,7 +13,8 @@ gem 'mysql2'
 group :assets do
   gem 'sass', '~> 3.4.23'
   gem 'sass-rails',   '~> 5.0.6'
-  gem 'coffee-rails', '~> 4.2.1'
+  #gem 'coffee-rails', '~> 4.2.1'
+  gem 'coffee-rails'
   gem 'uglifier', '>= 1.0.3'
 end
 

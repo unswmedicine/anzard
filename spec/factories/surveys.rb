@@ -20,7 +20,8 @@ FactoryBot.define do
   factory :survey do
     sequence(:name) { |n| "mysurvey #{n}" }
     after(:create) do |survey|
-      StaticModelPreloader.load
+      #StaticModelPreloader is deprecated, use the builtin association mechanism
+      #StaticModelPreloader.load
     end
   end
 end

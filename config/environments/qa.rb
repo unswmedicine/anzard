@@ -79,4 +79,9 @@ Anzard::Application.configure do
 
   config.eager_load = true
   config.eager_load_paths += %W(#{config.root}/lib)
+
+  #need to reset seceret_base_key if changed cookies_serializer
+  config.action_dispatch.cookies_serializer = :json
+
+  config.hosts = nil
 end

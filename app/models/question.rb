@@ -39,7 +39,7 @@ class Question < ApplicationRecord
   validates_presence_of :question_type
   validates_presence_of :code
 
-  validates_uniqueness_of :question_order, scope: :section_id
+  validates_uniqueness_of :question_order, scope: :section_id, case_sensitive: true
 
   validates_inclusion_of :question_type, in: [TYPE_CHOICE, TYPE_DATE, TYPE_DECIMAL, TYPE_INTEGER, TYPE_TEXT, TYPE_TIME]
 

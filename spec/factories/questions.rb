@@ -24,7 +24,8 @@ FactoryBot.define do
     question_type { "Text" }
     code { "What" }
     after(:create) do |survey|
-      StaticModelPreloader.load
+      #StaticModelPreloader is deprecated, use the builtin association mechanism
+      #StaticModelPreloader.load
     end
   end
 end

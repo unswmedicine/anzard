@@ -51,4 +51,11 @@ Anzard::Application.configure do
   config.assets.debug = true
 
   config.eager_load = false
+
+  #need to reset seceret_base_key if changed cookies_serializer
+  config.action_dispatch.cookies_serializer = :json
+
+  config.hosts << "npesu.med.unsw.edu.au"
+  config.hosts << "anzard.med.unsw.edu.au"
+  config.hosts << "varta.med.unsw.edu.au"
 end

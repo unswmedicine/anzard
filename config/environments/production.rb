@@ -87,4 +87,11 @@ Anzard::Application.configure do
   GA.tracker = 'UA-108624567-1'
 
   config.eager_load = true
+
+  #need to reset seceret_base_key if changed cookies_serializer
+  config.action_dispatch.cookies_serializer = :json
+
+  config.hosts << "npesu.med.unsw.edu.au"
+  config.hosts << "anzard.med.unsw.edu.au"
+  config.hosts << "varta.med.unsw.edu.au"
 end

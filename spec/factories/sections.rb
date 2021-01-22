@@ -22,7 +22,8 @@ FactoryBot.define do
     sequence :section_order
     association :survey
     after(:create) do |survey|
-      StaticModelPreloader.load
+      #StaticModelPreloader is deprecated, use the builtin association mechanism
+      #StaticModelPreloader.load
     end
   end
 end

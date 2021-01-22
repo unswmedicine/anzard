@@ -52,7 +52,8 @@ class User < ApplicationRecord
   scope :pending_approval, -> {where(status: STATUS_UNAPPROVED).order(:email)}
   scope :approved, -> {where(status: STATUS_ACTIVE).order(:email)}
   scope :deactivated_or_approved, -> {where("status = 'D' or status = 'A' ")}
-  scope :approved_superusers, -> {joins(:role).merge(User.approved).merge(Role.superuser_roles)}
+  #scope :approved_superusers, -> {joins(:role).merge(User.approved).merge(Role.superuser_roles)}
+  scope :approved_superusers, -> {joins(:role).merge(self.approved).merge(Role.superuser_roles)}
 
   # Override Devise active for authentication method so that users must be approved before being allowed to log in
   # https://github.com/plataformatec/devise/wiki/How-To:-Require-admin-to-activate-account-before-sign_in
@@ -87,7 +88,8 @@ class User < ApplicationRecord
     current_password = params.delete(:current_password)
 
     result = if valid_password?(current_password)
-               update_attributes(params)
+               #update_attributes(params)
+               update(params)
              else
                self.errors.add(:current_password, current_password.blank? ? :blank : :invalid)
                self.attributes = params

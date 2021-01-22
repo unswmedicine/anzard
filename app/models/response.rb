@@ -41,7 +41,7 @@ class Response < ApplicationRecord
   # ToDo: refactor year_of_registration to year_of_treatment to keep code consistent with intent
   validates_presence_of :year_of_registration
   validates_inclusion_of :submitted_status, in: [STATUS_UNSUBMITTED, STATUS_SUBMITTED]
-  validates_uniqueness_of :cycle_id, scope: [:survey_id, :year_of_registration]
+  validates_uniqueness_of :cycle_id, scope: [:survey_id, :year_of_registration], case_sensitive: true
 
   before_validation :strip_whitespace
   before_validation :clear_dummy_answers

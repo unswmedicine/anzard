@@ -30,7 +30,8 @@ FactoryBot.define do
     conditional_set_operator { nil }
     conditional_set { nil }
     after(:create) do |survey|
-      StaticModelPreloader.load
+      #StaticModelPreloader is deprecated, use the builtin association mechanism
+      #StaticModelPreloader.load
     end
 
     #Comparisons

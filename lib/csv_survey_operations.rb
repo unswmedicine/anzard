@@ -89,7 +89,8 @@ module CsvSurveyOperations
       end
 
       SurveyConfiguration.create!(survey: survey)
-      StaticModelPreloader.load
+      #StaticModelPreloader is deprecated, use the builtin association mechanism
+      #StaticModelPreloader.load
       survey
     end
   end

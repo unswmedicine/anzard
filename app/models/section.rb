@@ -20,7 +20,7 @@ class Section < ApplicationRecord
 
   validates_presence_of :name
   validates_presence_of :section_order
-  validates_uniqueness_of :section_order, scope: :survey_id
+  validates_uniqueness_of :section_order, scope: :survey_id, case_sensitive: true
 
   def last?
     section_orders = survey.sections.collect(&:section_order).sort

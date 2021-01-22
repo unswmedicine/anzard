@@ -14,22 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-SURVEYS = {}
-QUESTIONS = {}
+#This file is deprecated
+#SURVEYS = {}
+#QUESTIONS = {}
 
-class StaticModelPreloader
-  def self.load
-    SURVEYS.clear
-    Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).order(:name).all.each do |survey|
-      SURVEYS[survey.id] = survey
-    end
-
-    QUESTIONS.clear
-    Question.includes(:cross_question_validations, :question_options).all.each do |question|
-      QUESTIONS[question.id] = question
-    end
-  end
-end
+#class StaticModelPreloader
+  #def self.load
+    #SURVEYS.clear
+    #Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).order(:name).all.each do |survey|
+      #SURVEYS[survey.id] = survey
+    #end
+#
+    #QUESTIONS.clear
+    #Question.includes(:cross_question_validations, :question_options).all.each do |question|
+      #QUESTIONS[question.id] = question
+    #end
+  #end
+#end
 
 #StaticModelPreloader.load unless ENV['SKIP_PRELOAD_MODELS'] == 'skip'
 #TODO Remove above anti-pattern by splitting 'Question' table
