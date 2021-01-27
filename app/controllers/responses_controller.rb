@@ -194,6 +194,9 @@ class ResponsesController < ApplicationController
           headers["Content-Type"] = "text/csv"
           headers["Content-Disposition"] = "attachment; filename=\"#{generator_csv_filename}\""
           headers["X-Accel-Buffering"] = "no"
+
+          headers["Last-Modified"] = "0" #rack(at 2.2.3) issue 1619 , bypass etag checking for now to let it flow
+
           self.response_body = generator.csv_enumerator
           response.status = 200
           logger.debug("Started responding: #{generator_csv_filename}")

@@ -56,7 +56,8 @@ Anzard::Application.configure do
   # config.logger = SyslogLogger.new
 
   # Use a different cache store in production
-  config.cache_store = :memory_store, {size: 32.megabytes}
+  # use default file_store for now as memory_store in rails 6.0.x 6.1.x as slowed drastically(bug)
+  #config.cache_store = :memory_store, {size: 32.megabytes}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"

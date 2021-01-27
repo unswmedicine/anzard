@@ -20,9 +20,9 @@ Anzard::Application.configure do
 
   # Settings specified here will take precedence over those in config/application.rb
 
-  #rails6 memory_store appears to cause slow view rendering in dev atm...
-  config.cache_store = :memory_store, {size: 32.megabytes}
-  #config.cache_store = :file_store, "/app/tmp/cache_file_store"
+  # use default file_store for now as memory_store in rails 6.0.x 6.1.x as slowed drastically(bug)
+  # cache files live in app_root/tmp/cache folder, delete this folder after survey updates
+  #config.cache_store = :memory_store, {size: 32.megabytes}
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development
