@@ -22,7 +22,7 @@ Anzard::Application.configure do
 
   # use default file_store for now as memory_store in rails 6.0.x 6.1.x as slowed drastically(bug)
   # cache files live in app_root/tmp/cache folder, delete this folder after survey updates
-  #config.cache_store = :memory_store, {size: 32.megabytes}
+  config.cache_store = :memory_store, {size: 64.megabytes}
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development
