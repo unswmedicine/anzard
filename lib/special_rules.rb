@@ -417,10 +417,10 @@ class SpecialRules
 
       if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
         break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        (n_eggdon_fresh <= 0 || n_embdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <=0 || n_clfz_v <=0)
+        break true unless (n_eggdon_fresh <= 0 || n_embdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <=0 || n_clfz_v <=0)
       else
         break true unless (cycle_type == 2 && n_eggrec_fresh == 0 &&  n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        (n_eggdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <= 0 || n_clfz_v <=0)
+        break true unless (n_eggdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <= 0 || n_clfz_v <=0)
       end
     }
 
@@ -460,11 +460,11 @@ class SpecialRules
       end
 
       if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
-        break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_embdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
-        n_eggrec_fresh > 0 || n_embrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0
+        break true unless (cycle_type == 2 && n_eggdon_fresh == 0 && n_embdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0)
+        break true unless (n_eggrec_fresh > 0 || n_embrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0)
       else
-        break true unless cycle_type == 2 && n_eggdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0
-        n_eggrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0
+        break true unless (cycle_type == 2 && n_eggdon_fresh == 0 && n_egfz_s == 0 && n_egfz_v == 0 && n_blfz_s == 0 && n_blfz_v == 0 && n_clfz_s == 0 && n_clfz_v == 0)
+        break true unless (n_eggrec_fresh > 0 || n_s_egth > 0 || n_v_egth > 0 || n_s_clth > 0 || n_s_blth > 0 || n_v_blth > 0 || n_v_clth > 0)
       end
     }
 
@@ -567,13 +567,13 @@ class SpecialRules
 
       sp_site = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SITE')
       sp_source = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SOURCE').to_i
-      sp_qual = answer.response.comparable_answer_or_nil_for_question_with_code('SP_QUAL')
+      sp_qual = answer.response.comparable_answer_or_nil_for_question_with_code('SP_QUAL').to_i
       n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF').to_i
       n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI').to_i
 
 
       break true unless (sp_site == 'e' && sp_source==1) &&  (n_ivf > 0 || n_icsi > 0)
-      !sp_qual.nil?
+      break true unless !sp_qual.nil?
     }
 
 
