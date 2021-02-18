@@ -78,21 +78,35 @@ const_implies_one_of_const  | If this answer meants (constant expression), then 
 ![Expected Columns](developer/expected_columns.png)
  
 ### Specialised Rules
-Rule                       | Question Code | Description                                                                                                                                                             
----------------------------|---------------|------------
-special_dob                |               | DOB must be in the same year as the year of registration
-special_rule_comp1         | N_V_EGTH      | (n_v_egth + n_s_egth + n_eggs + n_recvd) must be >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
-special_rule_comp2         | N_FERT        | n_fert must be <= (n_ivf + n_icsi)
-special_rule_comp3         | N_S_CLTH      | (n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v)
-special_rule_mtage         | N_EMBDISP     | If n_embdisp == 0 then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 55 years)
-special_rule_mtagedisp     | N_EMBDISP     | If n_embdisp > 0  then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 70 years)
-special_rule_pr_clin       | PR_CLIN       | If pr_clin equals 'y' or 'u' then n_bl_et > 0 or n_cl_et > 0 or iui_date must be present
-special_rule_gest_iui_date | N_DELIV       | If gestational age (pr_end_dt - iui_date) is greater than 20 weeks then n_deliv must be present
-special_rule_gest_et_date  | N_DELIV       | If gestational age (pr_end_dt - et_date) is greater than 20 weeks then n_deliv must be present
-special_rule_thaw_don      | THAW_DON      | If (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete then thaw_don must be complete
-special_rule_surr          | DON_AGE       | If surr equals 'y' and (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 then don_age must be present
-special_rule_et_date       | ET_DATE       | If et_date is a date then at least one of n_cl_et or n_bl_et must be > 0
-special_rule_stim_1st      | STIM_1ST      | If stim_1st equals 'y' then opu_date must be complete or can_date must be complete
+Rule                         | Question Code  | Description                                                                                                                                                             
+-----------------------------|----------------|-------------
+special_dob                  |                | DOB must be in the same year as the year of registration
+special_rule_comp1           | N_V_EGTH       | (n_v_egth + n_s_egth + n_eggs + n_recvd) must be >= (n_donate + n_ivf + n_icsi + n_egfz_s + n_egfz_v)
+special_rule_comp2           | N_FERT         | n_fert must be <= (n_ivf + n_icsi)
+special_rule_comp3           | N_S_CLTH       | (n_embrec_fresh + n_s_clth + n_v_clth + n_s_blth + n_v_blth + n_fert) >= (n_bl_et + n_cl_et + n_clfz_s + n_clfz_v + n_blfz_s + n_blfz_v + n_embdon_fresh)
+special_rule_mtage           | N_EMBDISP      | If n_embdisp == 0 then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 55 years)
+special_rule_mtagedisp       | N_EMBDISP      | If n_embdisp > 0  then (cyc_date >= fdob + 18 years) and (cyc_date <= fdob + 70 years)
+special_rule_pr_clin         | PR_CLIN        | If pr_clin equals 'y' then n_bl_et > 0 OR n_cl_et > 0 OR iui_date must be present
+special_rule_gest_iui_date   | N_DELIV        | If gestational age (pr_end_dt - iui_date) is greater than 20 weeks then n_deliv must be present
+special_rule_gest_et_date    | N_DELIV        | If gestational age (pr_end_dt - et_date) is greater than 20 weeks then n_deliv must be present
+special_rule_thaw_don        | THAW_DON       | If (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 and don_age is complete then thaw_don must be complete
+special_rule_surr            | DON_AGE        | If surr equals 'y' and (n_s_clth + n_v_clth + n_s_blth + n_v_blth) > 0 then don_age must be present
+special_rule_et_date         | ET_DATE        | If et_date is a date then at least one of n_cl_et or n_bl_et must be > 0
+special_rule_stim_1st        | STIM_1ST       | If stim_1st equals 'y' and iui_date=nil then opu_date must be complete or can_date must be complete
+special_rule_pgt_2           | N_PGT_ET       | n_pgt_assay  + n_pgt_th >=n_pgt_et
+special_rule_pgt_3           | N_PGT_TH       | (n_s_clth + n_v_clth + n_s_blth + n_v_blth) >= (n_pgt_th + ni_pgt_th)
+special_rule_surr_3          | CYCLE_TYPE     | If surr='y' & cycle_type!= 7, then et_date = NULL & (n_bl_et+n_cl_et)=0
+special_rule_cycletype_2_don | CYCLE_TYPE     | If cycle_type = 2 & n_eggrec_fresh & n_embrec_fresh & n_s_egth & n_v_egth & n_s_clth & n_s_blth & n_v_clth & n_v_blth=0, then (at least one of n_eggdon_fresh or n_embdon_fresh or n_egfz_s or n_egfz_v or n_blfz_s or n_blfz_v or n_clfz_s or n_clfz_v >0) 
+special_rule_cycletype_2_rec | CYCLE_TYPE     | If cycle_type = 2 & n_eggdon_fresh & n_embdon_fresh & n_efgz_s &  n_egfz_v & n_blfz_s & n_blfz_v & n_clfz_s & n_clfz_v=0 then  (at least one of n_eggrec_fresh or n_embrec_fresh or n_s_egth or n_v_egth or n_s_clth or n_s_blth or n_v_blth or n_v_clth >0)
+special_rule_ttc_1           | DATE_TTC       | If parent_sex=1 & art_reason=n then date_ttc!= ""
+special_rule_thaw_1          | N_V_EGTH       | (n_v_egth + n_s_egth + n_eggs + n_eggrec_fresh) >= (n_eggdon_fresh + n_ivf + n_icsi + n_gift+ n_egfz_s + n_egfz_v)
+special_rule_ttc_2           | DATE_TTC       | If parent_sex=1 &  art_reason=y then date_ttc= ""
+special_rule_ivm             | IVM            | If cycle_type = 1, 2, 3 or 6 & (opu_date!="" or can_date!="") then ivm must be complete.
+special_rule_art_reason      | ART_REASON     | If art_reason=y then ci_tube, ci_oth, ci_endo, ci_male and ci_unex=n
+special_rule_ci_1            | MALE_DIAG      | If ci_male = y & parent_sex=1 & cycle_type=1, 3, 4, 5, 6 or 7, then male_diag must be complete
+special_rule_sperm           | SP_QUAL        | If sp_site=e & sp_source=1 & (n_ivf>0 OR n_icsi>0) then sp_qual!=nil
+special_rule_fdob_pat        | FDOB_PAT       | If cycle_type=8 & parent_sex=1,2 or 3 then fdob_pat must be complete.
+special_rule_pgt_9           | NI_PGT_ET      | ni_pgt_assay + ni_pgt_th >=ni_pgt_et
 
 ### Operators
 Operator | Description
