@@ -41,7 +41,7 @@ class Response < ApplicationRecord
   # ToDo: refactor year_of_registration to year_of_treatment to keep code consistent with intent
   validates_presence_of :year_of_registration
   validates_inclusion_of :submitted_status, in: [STATUS_UNSUBMITTED, STATUS_SUBMITTED]
-  validates_uniqueness_of :cycle_id, scope: [:survey_id, :year_of_registration]
+  validates_uniqueness_of :cycle_id, scope: [:survey_id, :year_of_registration], case_sensitive: true
 
   before_validation :strip_whitespace
   before_validation :clear_dummy_answers
@@ -59,8 +59,8 @@ class Response < ApplicationRecord
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of surveys that are loaded once in an initializer
   def survey
-    #SURVEYS[survey_id]
     return Survey.find(self.survey_id) if Rails.env.test?
+    return SURVEYS[self.survey_id] #workaround the rails 6 cache Marshal.dump slowdown
     Rails.cache.fetch("#{self.survey_id}_SURVEY", compress:false) do
       logger.debug("Fetching [#{self.survey_id}_SURVEY]")
       Survey.includes(sections: [questions: [:cross_question_validations, :question_options]]).find(self.survey_id)

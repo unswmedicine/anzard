@@ -25,7 +25,7 @@ end
 
 def counts_should_eq_0(*models)
   counts = models.map { |m| m.count }
-  counts.should eq ([0] * models.length)
+  expect(counts).to eq ([0] * models.length)
 end
 
 describe CsvSurveyOperations do
@@ -41,41 +41,41 @@ describe CsvSurveyOperations do
 
     it "works on good input" do
       s = create_survey('some_name', good_question_file, good_options_file, good_cqv_file)
-      s.sections.count.should eq 3
-      s.sections.first.questions.count.should eq 6
-      s.sections.second.questions.count.should eq 5
-      s.sections.third.questions.count.should eq 3
+      expect(s.sections.count).to eq 3
+      expect(s.sections.first.questions.count).to eq 6
+      expect(s.sections.second.questions.count).to eq 5
+      expect(s.sections.third.questions.count).to eq 3
 
-      Section.find_by_name!('0').section_order.should eq 0
-      Section.find_by_name!('1').section_order.should eq 1
+      expect(Section.find_by_name!('0').section_order).to eq 0
+      expect(Section.find_by_name!('1').section_order).to eq 1
     end
 
     it "should be transactional with a bad cqv file" do
-      lambda {
+      expect(lambda {
         create_survey('some name', good_question_file, good_options_file, bad_cqv_file)
-      }.should raise_error(ActiveRecord::RecordNotFound)
+      }).to raise_error(ActiveRecord::RecordNotFound)
       counts_should_eq_0 Survey, Question, CrossQuestionValidation, Answer, Response, QuestionOption
 
     end
 
     it "should be transactional with a bad options file" do
-      lambda {
+      expect(lambda {
         create_survey('some name', good_question_file, bad_options_file, good_cqv_file)
-      }.should raise_error(ActiveRecord::RecordInvalid)
+      }).to raise_error(ActiveRecord::RecordInvalid)
       counts_should_eq_0 Survey, Question, CrossQuestionValidation, Answer, Response, QuestionOption
 
     end
     it "should be transactional with a bad question file" do
-      lambda {
+      expect(lambda {
         create_survey('some name', bad_question_file, good_options_file, good_cqv_file)
-      }.should raise_error(ActiveRecord::RecordInvalid)
+      }).to raise_error(ActiveRecord::RecordInvalid)
       counts_should_eq_0 Survey, Question, CrossQuestionValidation, Answer, Response, QuestionOption
     end
 
     it 'should reject if there are multiple questions with the same code' do
-      lambda {
+      expect(lambda {
         create_survey('some name', duplicate_name_question_file, good_options_file, good_cqv_file)
-      }.should raise_error(InputError)
+      }).to raise_error(InputError)
 
       counts_should_eq_0 Survey, Question, CrossQuestionValidation, Answer, Response, QuestionOption
     end
@@ -118,13 +118,13 @@ describe CsvSurveyOperations do
 
     end
     it 'should accept if it can map question lists to questions' do
-      run_make_cqv_test(@survey, @multi_related_hash).should be true
+      expect(run_make_cqv_test(@survey, @multi_related_hash)).to be true
     end
 
     it 'should reject if it can\'t map question lists to questions' do
       new_hash = @multi_related_hash
       new_hash['related_question_list'] = "q2, q3, q4"
-      run_make_cqv_test(@survey, new_hash).should be false
+      expect(run_make_cqv_test(@survey, new_hash)).to be false
     end
 
 
@@ -182,13 +182,13 @@ describe CsvSurveyOperations do
     end
 
     it "should create CQVs for all rules passed in, assuming they're all valid" do
-      run_make_cqvs_test(@survey, @hashes).should eq 3
+      expect(run_make_cqvs_test(@survey, @hashes)).to eq 3
     end
 
     it 'should stop creating CQVs if one fails' do
       new_hashes = @hashes.dup
       new_hashes[1]['related_question_list'] = "q2, q3, q4"
-      run_make_cqvs_test(@survey, new_hashes).should eq 1
+      expect(run_make_cqvs_test(@survey, new_hashes)).to eq 1
     end
 
 

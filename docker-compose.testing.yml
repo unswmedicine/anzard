@@ -1,0 +1,14 @@
+version: '3.6'
+services:
+  web:
+    command: "start_app.sh passenger"
+    environment:
+      - RAILS_ENV
+    volumes:
+      - "./docker_dir/database_testing.yml:/app/config/database.yml"
+    depends_on:
+      - db
+
+  db:
+    volumes:
+      - "./docker_dir/db_${RAILS_ENV}:/var/lib/mysql"

@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#This file is still used before the rails cache store memory_store get improved on marshaling speed
 SURVEYS = {}
 QUESTIONS = {}
 
@@ -32,4 +33,7 @@ class StaticModelPreloader
 end
 
 #StaticModelPreloader.load unless ENV['SKIP_PRELOAD_MODELS'] == 'skip'
+Rails.configuration.to_prepare do
+  StaticModelPreloader.load unless ENV['SKIP_PRELOAD_MODELS'] == 'skip'
+end
 #TODO Remove above anti-pattern by splitting 'Question' table

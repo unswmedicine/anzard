@@ -84,15 +84,32 @@ class UserSessionsController < Devise::SessionsController
 
 private
 
+  def decrypt_session(cookie_string, mode = 'json')
+    serializer = case mode
+    when 'json' then JSON
+    when 'marshal' then ActiveSupport::MessageEncryptor::NullSerializer
+    end
+  
+    cookie = CGI::unescape(cookie_string.strip)
+    salt = Rails.configuration.action_dispatch.encrypted_cookie_salt
+    signed_salt = Rails.configuration.action_dispatch.encrypted_signed_cookie_salt
+    key_generator = ActiveSupport::KeyGenerator.new(Rails.application.secret_key_base, iterations: 1000)
+    secret = key_generator.generate_key(salt)[0, 32]
+    sign_secret = key_generator.generate_key(signed_salt)
+    encryptor = ActiveSupport::MessageEncryptor.new(secret, sign_secret, serializer: serializer)
+    result = encryptor.decrypt_and_verify(cookie)
+  
+    (mode == 'marshal') ? Marshal.load(result) : result
+  end
   def get_warden_user_user_key_from_cookie(cookie_str)
-      hashed_session, session_signature=cookie_str.split('--')
-      if OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, Rails.application.config.secret_token, hashed_session) == session_signature 
-        unfolded_session=Marshal.load(Base64.strict_decode64(hashed_session))
-        #"users.id"
-        [unfolded_session["warden.user.user.key"][0][0].to_i, unfolded_session["warden.user.user.key"][1]]
-      else
-        [-1, 'not_authenticatable']
-      end
+    begin
+      unfolded_session=decrypt_session(cookie_str)
+      #"users.id"
+      [unfolded_session["warden.user.user.key"][0][0].to_i, unfolded_session["warden.user.user.key"][1]]
+    rescue => exception
+      logger.error("Recieved [#{exception}] when decrypt_session")
+      [-1, 'not_authenticatable']
+    end
   end
 
 end

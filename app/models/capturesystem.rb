@@ -26,4 +26,8 @@ class Capturesystem < ApplicationRecord
     uri.host + ':' + uri.port
   end
 
+  def active_superusers_emails
+    self.users.approved_superusers.where(capturesystem_users: {access_status: CapturesystemUser::STATUS_ACTIVE}).pluck(:email).uniq
+  end
+
 end

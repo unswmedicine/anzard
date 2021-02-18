@@ -43,8 +43,8 @@ class Answer < ApplicationRecord
   # Performance Optimisation: we don't load through the association, instead we do a global lookup by ID
   # to a cached set of questions that are loaded once in an initializer
   def question
-    #QUESTIONS[self.question_id]
     return Question.find(self.question_id) if Rails.env.test?
+    return QUESTIONS[self.question_id] #workaround the rails 6 cache Marshal.dump slowdown
     Rails.cache.fetch("#{self.question_id}_QUESTION", compress:false) do
       logger.debug("Fetching [#{self.question_id}_QUESTION]")
       Question.includes(:cross_question_validations, :question_options).find(self.question_id)

@@ -27,7 +27,7 @@ describe Role do
         r1 = Role.create(:name => "bcd")
         r2 = Role.create(:name => "aaa")
         r3 = Role.create(:name => "abc")
-        Role.by_name.should eq([r2, r3, r1])
+        expect(Role.by_name).to eq([r2, r3, r1])
       end
     end
   end
@@ -38,13 +38,13 @@ describe Role do
     it "should reject duplicate names" do
       Role.create!(name: "abc")
       with_duplicate_name = Role.new(name: "abc")
-      with_duplicate_name.should_not be_valid
+      expect(with_duplicate_name).to_not be_valid
     end
 
     it "should reject duplicate names identical except for case" do
       Role.create!(name: "ABC")
       with_duplicate_name = Role.new(name: "abc")
-      with_duplicate_name.should_not be_valid
+      expect(with_duplicate_name).to_not be_valid
     end
   end
 

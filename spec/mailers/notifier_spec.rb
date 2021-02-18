@@ -27,9 +27,9 @@ describe Notifier do
       email = Notifier.notify_user_of_approved_request(user, 'NPESU', 'localhost', capturesystem).deliver
   
       # check that the email has been queued for sending
-      ActionMailer::Base.deliveries.empty?.should eq(false) 
-      email.to.should eq([address])
-      email.subject.should eq("NPESU | ANZARD - Your access request has been approved")
+      expect(ActionMailer::Base.deliveries.empty?).to eq(false) 
+      expect(email.to).to eq([address])
+      expect(email.subject).to eq("NPESU | ANZARD - Your access request has been approved")
     end
 
     it "should send mail to user if access request denied" do
@@ -38,9 +38,9 @@ describe Notifier do
       email = Notifier.notify_user_of_rejected_request(user, 'NPESU', capturesystem).deliver
   
       # check that the email has been queued for sending
-      ActionMailer::Base.deliveries.empty?.should eq(false) 
-      email.to.should eq([address])
-      email.subject.should eq("NPESU | ANZARD - Your access request has been rejected")
+      expect(ActionMailer::Base.deliveries.empty?).to eq(false) 
+      expect(email.to).to eq([address])
+      expect(email.subject).to eq("NPESU | ANZARD - Your access request has been rejected")
     end
   end
 
@@ -48,13 +48,15 @@ describe Notifier do
   it "should send the right email" do
     address = 'user@email.org'
     user = create(:user, :status => "U", :email => address)
-    User.should_receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
+    #get_superuser_emails is deprecated
+    #expect(User).to receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
+    expect(capturesystem).to receive(:active_superusers_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
     email = Notifier.notify_superusers_of_access_request(user, 'NPESU', capturesystem.base_url, capturesystem).deliver
 
     # check that the email has been queued for sending
-    ActionMailer::Base.deliveries.empty?.should eq(false)
-    email.subject.should eq("NPESU | ANZARD - There has been a new access request")
-    email.to.should eq(["super1@intersect.org.au", "super2@intersect.org.au"])
+    expect(ActionMailer::Base.deliveries.empty?).to eq(false)
+    expect(email.subject).to eq("NPESU | ANZARD - There has been a new access request")
+    expect(email.to).to eq(["super1@intersect.org.au", "super2@intersect.org.au"])
   end
  
 end

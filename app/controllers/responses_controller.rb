@@ -90,7 +90,11 @@ class ResponsesController < ApplicationController
 
   def update
     answers = params[:answers]
-    answers ||= {}
+    if answers.present? 
+      answers = answers.to_unsafe_h
+    else
+      answers = {}
+    end
     submitted_answers = answers.map { |id, val| [id.to_i, val] }
     submitted_questions = submitted_answers.map { |q_a| q_a.first }
      #WARNING: this is a performance enhancing hack to get around the fact that reverse associations are not loaded as one would expect - don't change it
@@ -190,6 +194,9 @@ class ResponsesController < ApplicationController
           headers["Content-Type"] = "text/csv"
           headers["Content-Disposition"] = "attachment; filename=\"#{generator_csv_filename}\""
           headers["X-Accel-Buffering"] = "no"
+
+          headers["Last-Modified"] = "0" #rack(at 2.2.3) issue 1619 , bypass etag checking for now to let it flow
+
           self.response_body = generator.csv_enumerator
           response.status = 200
           logger.debug("Started responding: #{generator_csv_filename}")

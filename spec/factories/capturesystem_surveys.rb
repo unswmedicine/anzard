@@ -1,6 +1,6 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :capturesystem_survey do
-    capturesystem nil
-    survey nil
+    capturesystem { nil }
+    survey { nil }
   end
 end

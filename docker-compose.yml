@@ -2,8 +2,13 @@ version: '3.6'
 services:
   web:
     build: .
+    environment:
+      - BUNDLE_PATH=/bundle_path
+      - GEM_PATH=/bundle_path
+      - GEM_HOME=/bundle_path
     volumes:
       - .:/app
+      - ./docker_dir/bundle_path:/bundle_path
       - ./docker_dir/sample_password.yml:/app/tmp/env_config/sample_password.yml
     ports:
       - "3000:3000"
@@ -12,7 +17,6 @@ services:
 
   db:
     image: "mysql:5.7"
-    restart: always
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -20,7 +24,7 @@ services:
       MYSQL_USER: anzard
       MYSQL_PASSWORD: anzard
     volumes:
-      - "./docker_dir/db:/var/lib/mysql"
+      - "./docker_dir/db_development:/var/lib/mysql"
       - "./docker_dir/prepare_anzard_mysql_user.sql:/docker-entrypoint-initdb.d/prepare_anzard_mysql_user.sql"
     ports:
       - "3306:3306"

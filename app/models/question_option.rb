@@ -21,7 +21,7 @@ class QuestionOption < ApplicationRecord
   validates_presence_of :option_value
   validates_presence_of :label
   validates_presence_of :option_order
-  validates_uniqueness_of :option_order, scope: :question_id
+  validates_uniqueness_of :option_order, scope: :question_id, case_sensitive: true
 
   before_save :downcase_option_value
 

@@ -36,28 +36,28 @@ describe Response do
       [Response::STATUS_SUBMITTED, Response::STATUS_UNSUBMITTED].each do |value|
         should allow_value(value).for(:submitted_status)
       end
-      build(:response, submitted_status: nil).should_not be_valid
-      build(:response, submitted_status: "Blah").should_not be_valid
+      expect(build(:response, submitted_status: nil)).to_not be_valid
+      expect(build(:response, submitted_status: "Blah")).to_not be_valid
     end
 
     it "should validate that cycle id is unique within survey and year of registration" do
       first = create(:response, cycle_id: "abcd", year_of_registration: "2000")
       second = build(:response, survey: first.survey, cycle_id: first.cycle_id, year_of_registration: first.year_of_registration)
-      second.should_not be_valid
-      second.errors.full_messages.should eq(["Cycle ID abcd has already been used within the year of treatment."])
+      expect(second).to_not be_valid
+      expect(second.errors.full_messages).to eq(["Cycle ID abcd has already been used within the year of treatment."])
       diff_survey = build(:response, survey: create(:survey), cycle_id: first.cycle_id, year_of_registration: first.year_of_registration)
-      diff_survey.should be_valid
+      expect(diff_survey).to be_valid
       diff_year = build(:response, survey: first.survey, cycle_id: first.cycle_id, year_of_registration: (first.year_of_registration.to_i + 1).to_s)
-      diff_year.should be_valid
+      expect(diff_year).to be_valid
     end
 
     it "should strip leading/trailing spaces from cycle ids before validating" do
       first = create(:response, cycle_id: " abcd ")
-      first.cycle_id.should eq("abcd")
+      expect(first.cycle_id).to eq("abcd")
 
       second = build(:response, survey: first.survey, cycle_id: " abcd")
-      second.should_not be_valid
-      second.errors.full_messages.should eq(["Cycle ID abcd has already been used within the year of treatment."])
+      expect(second).to_not be_valid
+      expect(second.errors.full_messages).to eq(["Cycle ID abcd has already been used within the year of treatment."])
     end
   end
 
@@ -69,7 +69,7 @@ describe Response do
       r2 = create(:response, survey: survey_b)
       r3 = create(:response, survey: survey_a)
       matches = Response.for_survey(survey_a).collect(&:id).sort
-      matches.should eq([r1.id, r3.id])
+      expect(matches).to eq([r1.id, r3.id])
     end
 
     it "unsubmitted scope should return responses that are unsubmitted" do
@@ -77,7 +77,7 @@ describe Response do
       r2 = create(:response, submitted_status: Response::STATUS_SUBMITTED)
       r3 = create(:response, submitted_status: Response::STATUS_UNSUBMITTED)
       matches = Response.unsubmitted.collect(&:id).sort
-      matches.should eq([r1.id, r3.id])
+      expect(matches).to eq([r1.id, r3.id])
     end
   end
 
@@ -102,27 +102,27 @@ describe Response do
     end
 
     it "should return all submitted responses for survey when clinic and year of reg not provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "").collect(&:id).should eq([@r1, @r2, @r3, @r4, @r5, @r6, @r8])
+      expect(Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "").collect(&:id)).to eq([@r1, @r2, @r3, @r4, @r5, @r6, @r8])
     end
 
     it "should filter by unit when provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, "", "").collect(&:id).should eq([@r1, @r2, @r3, @r8])
+      expect(Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, "", "").collect(&:id)).to eq([@r1, @r2, @r3, @r8])
     end
 
     it "should filter by unit and site when provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, @clinic_a.site_code, "").collect(&:id).should eq([@r1, @r2, @r3])
+      expect(Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, @clinic_a.site_code, "").collect(&:id)).to eq([@r1, @r2, @r3])
     end
 
     it "should filter by year of reg when provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "2001").collect(&:id).should eq([@r1, @r2, @r4, @r8])
+      expect(Response.for_survey_clinic_and_year_of_registration(@survey_a, "", "", "2001").collect(&:id)).to eq([@r1, @r2, @r4, @r8])
     end
 
     it "should filter by clinic unit and year of reg when both provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, "", "2001").collect(&:id).should eq([@r1, @r2, @r8])
+      expect(Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, "", "2001").collect(&:id)).to eq([@r1, @r2, @r8])
     end
 
     it "should filter by clinic unit and site and year of reg when all provided" do
-      Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, @clinic_a.site_code, "2001").collect(&:id).should eq([@r1, @r2])
+      expect(Response.for_survey_clinic_and_year_of_registration(@survey_a, @clinic_a.unit_code, @clinic_a.site_code, "2001").collect(&:id)).to eq([@r1, @r2])
     end
   end
 
@@ -134,36 +134,36 @@ describe Response do
       create(:response, year_of_registration: 2007, survey: survey)
       create(:response, year_of_registration: 2009, survey: survey)
       create(:response, year_of_registration: 2011, survey: survey)
-      Response.existing_years_of_registration(capturesystem).should eq([2007, 2009, 2011])
+      expect(Response.existing_years_of_registration(capturesystem)).to eq([2007, 2009, 2011])
     end
   end
 
   describe "submit" do
     let(:response) { create(:response) }
     it "should set the status of the response when complete" do
-      response.stub(:validation_status) { Response::COMPLETE }
-      response.submitted_status.should eq Response::STATUS_UNSUBMITTED
+      allow(response).to receive(:validation_status) { Response::COMPLETE }
+      expect(response.submitted_status).to eq Response::STATUS_UNSUBMITTED
 
       response.submit!
 
-      response.submitted_status.should eq Response::STATUS_SUBMITTED
+      expect(response.submitted_status).to eq Response::STATUS_SUBMITTED
       response.reload
 
-      response.submitted_status.should eq Response::STATUS_SUBMITTED
+      expect(response.submitted_status).to eq Response::STATUS_SUBMITTED
     end
     it "should set the status of the response when complete with warnings" do
-      response.stub(:validation_status) { Response::COMPLETE_WITH_WARNINGS }
-      response.submitted_status.should eq Response::STATUS_UNSUBMITTED
+      allow(response).to receive(:validation_status) { Response::COMPLETE_WITH_WARNINGS }
+      expect(response.submitted_status).to eq Response::STATUS_UNSUBMITTED
 
       response.submit!
 
-      response.submitted_status.should eq Response::STATUS_SUBMITTED
+      expect(response.submitted_status).to eq Response::STATUS_SUBMITTED
       response.reload
 
-      response.submitted_status.should eq Response::STATUS_SUBMITTED
+      expect(response.submitted_status).to eq Response::STATUS_SUBMITTED
     end
     it "can't submit a response incomplete" do
-      response.stub(:validation_status) { Response::INCOMPLETE }
+      allow(response).to receive(:validation_status) { Response::INCOMPLETE }
 
       expect { response.submit! }.to raise_error("Can't submit with status Incomplete")
     end
@@ -172,16 +172,16 @@ describe Response do
   describe "submit_warning" do
     let(:response) { create(:response) }
     it "dies on complete" do
-      response.stub(:validation_status) { Response::COMPLETE }
-      response.submit_warning.should be_nil
+      allow(response).to receive(:validation_status) { Response::COMPLETE }
+      expect(response.submit_warning).to be_nil
     end
     it "shows a warning for incomplete" do
-      response.stub(:validation_status) { Response::INCOMPLETE }
-      response.submit_warning.should eq "This data entry form is incomplete and can't be submitted."
+      allow(response).to receive(:validation_status) { Response::INCOMPLETE }
+      expect(response.submit_warning).to eq "This data entry form is incomplete and can't be submitted."
     end
     it "shows a warning for complete with warnings" do
-      response.stub(:validation_status) { Response::COMPLETE_WITH_WARNINGS }
-      response.submit_warning.should eq "This data entry form has warnings. Double check them. If you believe them to be correct, contact an administrator."
+      allow(response).to receive(:validation_status) { Response::COMPLETE_WITH_WARNINGS }
+      expect(response.submit_warning).to eq "This data entry form has warnings. Double check them. If you believe them to be correct, contact an administrator."
     end
   end
 
@@ -204,21 +204,21 @@ describe Response do
     end
     describe "of a response" do
       it "incomplete when nothing done yet" do
-        @response.validation_status.should eq "Incomplete"
+        expect(@response.validation_status).to eq "Incomplete"
       end
       it "incomplete section 1" do
         create(:answer, response: @response, question: @q1, integer_answer: 3)
         @response.save!
         @response.reload
 
-        @response.validation_status.should eq "Incomplete"
+        expect(@response.validation_status).to eq "Incomplete"
       end
       it "incomplete section 2" do
         create(:answer, response: @response, question: @q7, integer_answer: 16)
         @response.save!
         @response.reload
 
-        @response.validation_status.should eq "Incomplete"
+        expect(@response.validation_status).to eq "Incomplete"
       end
       it "Complete with warnings" do
         create(:answer, question: @q1, response: @response, integer_answer: 9)
@@ -227,7 +227,7 @@ describe Response do
         create(:answer, question: @q5, response: @response)
         @response.reload
         @response.save!
-        @response.validation_status.should eq "Complete with warnings"
+        expect(@response.validation_status).to eq "Complete with warnings"
       end
       it "Complete with no warnings" do
         create(:answer, question: @q1, response: @response, integer_answer: 11)
@@ -237,7 +237,7 @@ describe Response do
         @response.reload
         @response.save!
 
-        @response.validation_status.should eq "Complete"
+        expect(@response.validation_status).to eq "Complete"
       end
       it "should recognise section 2 as incomplete and mark the response as incomplete even if section 1 is complete" do
         create(:answer, question: @q1, response: @response, integer_answer: 11)
@@ -245,26 +245,26 @@ describe Response do
         @response.reload
         @response.save!
 
-        @response.validation_status.should eq "Incomplete"
+        expect(@response.validation_status).to eq "Incomplete"
       end
     end
     describe "of a section" do
 
       it "should be incomplete if no answers have been saved yet" do
-        @response.section_started?(@section1).should be false
-        @response.status_of_section(@section1).should eq("Incomplete")
-        @response.section_started?(@section2).should be false
-        @response.status_of_section(@section2).should eq("Incomplete")
+        expect(@response.section_started?(@section1)).to be false
+        expect(@response.status_of_section(@section1)).to eq("Incomplete")
+        expect(@response.section_started?(@section2)).to be false
+        expect(@response.status_of_section(@section2)).to eq("Incomplete")
       end
 
       it "should be incomplete if at least one question is answered but not all mandatory questions are answered" do
         create(:answer, question: @q1, response: @response)
         @response.reload
 
-        @response.section_started?(@section1).should be true
-        @response.status_of_section(@section1).should eq("Incomplete")
-        @response.section_started?(@section2).should be false
-        @response.status_of_section(@section2).should eq("Incomplete")
+        expect(@response.section_started?(@section1)).to be true
+        expect(@response.status_of_section(@section1)).to eq("Incomplete")
+        expect(@response.section_started?(@section2)).to be false
+        expect(@response.status_of_section(@section2)).to eq("Incomplete")
       end
 
       it "should be complete once all mandatory questions are answered" do
@@ -272,8 +272,8 @@ describe Response do
         create(:answer, question: @q2, response: @response)
         @response.reload
 
-        @response.section_started?(@section1).should be true
-        @response.status_of_section(@section1).should eq("Complete")
+        expect(@response.section_started?(@section1)).to be true
+        expect(@response.status_of_section(@section1)).to eq("Complete")
       end
 
       it "should be complete with warnings when all mandatory questions are answered but a warning is present" do
@@ -282,8 +282,8 @@ describe Response do
         create(:answer, question: @q7, response: @response, answer_value: 16)
         @response.reload
 
-        @response.section_started?(@section2).should be true
-        @response.status_of_section(@section2).should eq 'Complete with warnings'
+        expect(@response.section_started?(@section2)).to be true
+        expect(@response.status_of_section(@section2)).to eq 'Complete with warnings'
 
       end
 
@@ -291,8 +291,8 @@ describe Response do
         create(:answer, question: @q1, response: @response, answer_value: "5")
         @response.reload
 
-        @response.section_started?(@section1).should be true
-        @response.status_of_section(@section1).should eq("Incomplete")
+        expect(@response.section_started?(@section1)).to be true
+        expect(@response.status_of_section(@section1)).to eq("Incomplete")
       end
 
       it "should be incomplete if all mandatory questions are answered and garbage is stored" do
@@ -301,16 +301,16 @@ describe Response do
         create(:answer, question: @q7, answer_value: 'abvcasdfsadf', response: @response)
         @response.reload
 
-        @response.section_started?(@section2).should be true
-        @response.status_of_section(@section2).should eq 'Incomplete'
+        expect(@response.section_started?(@section2)).to be true
+        expect(@response.status_of_section(@section2)).to eq 'Incomplete'
       end
 
       it "should be incomplete if all mandatory questions are answered and a cross-question validation fails" do
         create(:answer, question: @q7, answer_value: 'abvcasdfsadf', response: @response)
         @response.reload
 
-        @response.section_started?(@section2).should be true
-        @response.status_of_section(@section2).should eq 'Incomplete'
+        expect(@response.section_started?(@section2)).to be true
+        expect(@response.status_of_section(@section2)).to eq 'Incomplete'
       end
 
       it "shows complete with warnings if a CQV fails and a range check fails" do
@@ -323,8 +323,8 @@ describe Response do
         create(:answer, question: @q9, answer_value: -1, response: @response)
         @response.reload
 
-        @response.section_started?(@section3).should be true
-        @response.status_of_section(@section3).should eq 'Complete with warnings'
+        expect(@response.section_started?(@section3)).to be true
+        expect(@response.status_of_section(@section3)).to eq 'Complete with warnings'
       end
 
       it "takes unanswered questions into account" do
@@ -346,8 +346,8 @@ describe Response do
         # no answer for particular question
         response.reload
 
-        response.section_started?(section).should be true
-        response.status_of_section(section).should eq 'Complete with warnings'
+        expect(response.section_started?(section)).to be true
+        expect(response.status_of_section(section)).to eq 'Complete with warnings'
       end
     end
   end
@@ -362,13 +362,13 @@ describe Response do
 
     it "both warnings and fatal warnings are true if mandatory questions are missing" do
       response = create(:response, survey: @survey)
-      response.fatal_warnings?.should be true
-      response.warnings?.should be true
+      expect(response.fatal_warnings?).to be true
+      expect(response.warnings?).to be true
       response.build_answers_from_hash({"B" => "B answer"})
       response.save!
       response.reload
-      response.fatal_warnings?.should be true
-      response.warnings?.should be true
+      expect(response.fatal_warnings?).to be true
+      expect(response.warnings?).to be true
     end
 
     it "both warnings and fatal warnings are false if mandatory questions are all answered" do
@@ -376,29 +376,29 @@ describe Response do
       response.build_answers_from_hash({"A" => "10"})
       response.save!
       response.reload
-      response.fatal_warnings?.should be false
-      response.warnings?.should be false
+      expect(response.fatal_warnings?).to be false
+      expect(response.warnings?).to be false
     end
 
     it "has fatal warnings and has warnings are both true if at least one answer has a fatal warning" do
       response = create(:response, survey: @survey)
       response.build_answers_from_hash({"A" => "A answer", "B" => "B answer"}) #A answer is invalid
-      response.fatal_warnings?.should be true
-      response.warnings?.should be true
+      expect(response.fatal_warnings?).to be true
+      expect(response.warnings?).to be true
     end
 
     it "has fatal warnings is false but has warnings is true if at least one answer has a warning but none have fatal warnings" do
       response = create(:response, survey: @survey)
       response.build_answers_from_hash({"A" => "2", "B" => "B answer"}) #A is out of range
-      response.fatal_warnings?.should be false
-      response.warnings?.should be true
+      expect(response.fatal_warnings?).to be false
+      expect(response.warnings?).to be true
     end
 
     it "has fatal warnings and has warnings are both false if no answers have warnings or fatal warnings" do
       response = create(:response, survey: @survey)
       response.build_answers_from_hash({"A" => "7", "B" => "B answer"}) #A is out of range
-      response.fatal_warnings?.should be false
-      response.warnings?.should be false
+      expect(response.fatal_warnings?).to be false
+      expect(response.warnings?).to be false
     end
   end
 end

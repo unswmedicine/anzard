@@ -19,18 +19,18 @@
     - if can?(:download, Response)
       %div{class: "nav_link"}
         =link_to prepare_download_responses_path do
-          %img{src: "/images/icon_download.png", class: "nav_icon center"}
+          =image_tag("icon_download.png", class: "nav_icon center")
           Download Data
     %div{class: "nav_link"}
       =link_to responses_path  do
-        %img{src: "/images/icon_data_entry.png", class: "nav_icon center"}
+        =image_tag("icon_data_entry.png", class: "nav_icon center")
         Data Entry Forms
     %div{class: "nav_link"}
       =link_to batch_files_path do
-        %img{src: "/images/icon_upload.png", class: "nav_icon center"}
+        =image_tag("icon_upload.png", class: "nav_icon center")
         Batch Uploads
     - if can?(:submission_summary, Response)
       %div{class: "nav_link"}
         =link_to submission_summary_responses_path do
-          %img{src: "/images/icon_information.png", class: "nav_icon center"}
+          =image_tag("icon_information.png", class: "nav_icon center")
           Submission Summary

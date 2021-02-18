@@ -1,18 +1,20 @@
 source 'http://rubygems.org'
 
-gem 'rails', '5.0.7.2'
+gem 'rails', '6.0.3.4'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
 #gem 'pg'
-gem 'mysql2', '~> 0.4.4'
+#gem 'mysql2', '~> 0.4.4'
+gem 'mysql2'
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
   gem 'sass', '~> 3.4.23'
   gem 'sass-rails',   '~> 5.0.6'
-  gem 'coffee-rails', '~> 4.2.1'
+  #gem 'coffee-rails', '~> 4.2.1'
+  gem 'coffee-rails'
   gem 'uglifier', '>= 1.0.3'
 end
 
@@ -32,14 +34,15 @@ gem 'jquery-rails'
 
 group :test do
   # Pretty printed test output
-  gem 'turn', '~> 0.8.3', :require => false
+  #gem 'turn', '~> 0.8.3', :require => false
+  gem 'turn', :require => false
 end
 
 gem "therubyracer"
 group :development, :test do
-  gem "create_deployment_record", git: 'https://github.com/IntersectAustralia/create_deployment_record.git'
+  #gem "create_deployment_record", git: 'https://github.com/IntersectAustralia/create_deployment_record.git'
   gem "rspec-rails"
-  gem "factory_girl_rails"
+  gem "factory_bot_rails"
   gem "shoulda-matchers", '2.8'
   gem 'xray-rails'
   gem 'pry-rails'
@@ -48,7 +51,8 @@ group :development, :test do
   gem "cucumber"
   gem "capybara"
   gem "database_cleaner"
-  gem "spork", '~> 0.9.0.rc'
+  #gem "spork", '~> 0.9.0.rc'
+  gem "spork"
   gem "launchy"    # So you can do Then show me the page
   gem "minitest"  # currently breaks without this
   gem "minitest-reporters"
@@ -76,13 +80,16 @@ gem "iconv"
 gem "haml"
 gem "haml-rails"
 gem "tabs_on_rails"
-gem 'devise', '~> 4.7.1'
+#gem 'devise', '~> 4.7.1'
+gem 'devise'
 gem "email_spec", :group => :test
 gem "cancancan"
 gem "simplecov", :require => false, :group => :test
 gem "simplecov-rcov", :require => false, :group => :test
-gem "bootstrap-sass", '~> 3.4.1'
-gem "paperclip", "~> 5.2.0"
+#gem "bootstrap-sass", '~> 3.4.1'
+gem "bootstrap-sass"
+#gem "paperclip", "~> 5.2.0"
+gem "paperclip"
 gem 'delayed_job', '~> 4.1.2'
 gem 'delayed_job_active_record'
 gem 'daemons'
@@ -96,6 +103,7 @@ gem 'whenever', require: false
 gem 'jekyll', :require => false
 
 gem 'highline' # This has (up until now) been implicitly included by capistrano
-gem 'passenger', '~> 5.1.2', :require => false
+#gem 'passenger', '~> 5.1.2', :require => false
+gem 'passenger', :require => false
 
-gem 'rails_request_stats', group: :development
+#gem 'rails_request_stats', group: :development

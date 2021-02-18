@@ -21,8 +21,8 @@ describe BatchSummaryReportGenerator do
   it "should create a pdf in the specified path" do
     batch_file = create(:batch_file)
     organiser = double
-    organiser.should_receive(:summary_problems_as_table).and_return([["row1", "row1"], ["row2", "row2"]])
+    expect(organiser).to receive(:summary_problems_as_table).and_return([["row1", "row1"], ["row2", "row2"]])
     BatchSummaryReportGenerator.generate_report(batch_file, organiser, Rails.root.join("tmp/summary.pdf"))
-    File.exist?("tmp/summary.pdf").should be true
+    expect(File.exist?("tmp/summary.pdf")).to be true
   end
 end

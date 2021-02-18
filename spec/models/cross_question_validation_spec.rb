@@ -26,36 +26,36 @@ describe CrossQuestionValidation do
     it { should validate_presence_of :rule }
     it { should validate_presence_of :error_message }
     context "should check that comparison CQVs have safe operators" do
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '').should_not be_valid }
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>').should be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '')).to_not be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>')).to be_valid }
       specify do
         cqv = build(:cross_question_validation, rule: 'comparison', operator: 'dodgy_operator')
-        cqv.should_not be_valid
-        cqv.errors.messages[:base].should include("dodgy_operator not included in #{%w(== <= >= < > !=)}")
+        expect(cqv).to_not be_valid
+        expect(cqv.errors.messages[:base]).to include("dodgy_operator not included in #{%w(== <= >= < > !=)}")
       end
     end
     context "should check that comparison CQVs have numerical offset constants" do
       # Blank offset
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: nil).should be_valid }
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '').should be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>', constant: nil)).to be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '')).to be_valid }
       # Numerical offset
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 0).should be_valid }
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '0').should be_valid }
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '-1.5').should be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 0)).to be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '0')).to be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>', constant: '-1.5')).to be_valid }
       # Invalid offset (any non-numerical text)
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'y').should_not be_valid }
-      specify { build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'one').should_not be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'y')).to_not be_valid }
+      specify { expect(build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'one')).to_not be_valid }
       specify do
         cqv = build(:cross_question_validation, rule: 'comparison', operator: '>', constant: 'some text')
-        cqv.should_not be_valid
-        cqv.errors.messages[:base].should include("invalid cqv offset \"some text\" - constant offset must be an integer or decimal")
+        expect(cqv).to_not be_valid
+        expect(cqv.errors.messages[:base]).to include("invalid cqv offset \"some text\" - constant offset must be an integer or decimal")
       end
     end
     it "should validate that the rule is one of the allowed rules" do
       CrossQuestionValidation.valid_rules.each do |value|
         should allow_value(value).for(:rule)
       end
-      build(:cross_question_validation, rule: 'Blahblah').should_not be_valid
+      expect(build(:cross_question_validation, rule: 'Blahblah')).to_not be_valid
     end
     it "should validate only one of related question, or related question list populated" do
       # 0 0 F
@@ -63,10 +63,10 @@ describe CrossQuestionValidation do
       # 1 0 T
       # 1 1 F
 
-      build(:cross_question_validation, related_question_id: nil, related_question_ids: nil).should_not be_valid
-      build(:cross_question_validation, related_question_id: nil, related_question_ids: [1]).should be_valid
-      build(:cross_question_validation, related_question_id: 1, related_question_ids: nil).should be_valid
-      build(:cross_question_validation, related_question_id: 1, related_question_ids: [1]).should_not be_valid
+      expect(build(:cross_question_validation, related_question_id: nil, related_question_ids: nil)).to_not be_valid
+      expect(build(:cross_question_validation, related_question_id: nil, related_question_ids: [1])).to be_valid
+      expect(build(:cross_question_validation, related_question_id: 1, related_question_ids: nil)).to be_valid
+      expect(build(:cross_question_validation, related_question_id: 1, related_question_ids: [1])).to_not be_valid
 
     end
     it "should validate that a CQV is only applied to question codes that they apply to" do
@@ -74,8 +74,8 @@ describe CrossQuestionValidation do
       SpecialRules::RULE_CODES_REQUIRING_PARTICULAR_QUESTION_CODES.each do |rule_code, required_question_code|
         good_q = create(:question, code: required_question_code)
 
-        build(:cross_question_validation, rule: rule_code, question: bad_q).should_not be_valid
-        build(:cross_question_validation, rule: rule_code, question: good_q).should be_valid
+        expect(build(:cross_question_validation, rule: rule_code, question: bad_q)).to_not be_valid
+        expect(build(:cross_question_validation, rule: rule_code, question: good_q)).to be_valid
       end
     end
   end
@@ -110,23 +110,23 @@ describe CrossQuestionValidation do
 
       it "should accept 'safe' operators" do
         CrossQuestionValidation::SAFE_OPERATORS.each do |op|
-          CrossQuestionValidation.is_operator_safe?(op).should eq true
+          expect(CrossQuestionValidation.is_operator_safe?(op)).to eq true
         end
       end
       it "should reject 'unsafe' operators" do
         UNSAFE_OPERATORS.each do |op|
-          CrossQuestionValidation.is_operator_safe?(op).should eq false
+          expect(CrossQuestionValidation.is_operator_safe?(op)).to eq false
         end
       end
 
       it "should accept 'safe' operators for textual validations" do
         CrossQuestionValidation::SAFE_TEXT_OPERATORS.each do |op|
-          CrossQuestionValidation.is_operator_safe?(op, true).should eq true
+          expect(CrossQuestionValidation.is_operator_safe?(op, true)).to eq true
         end
       end
       it "should reject 'unsafe' operators for textual validations" do
         UNSAFE_TEXT_OPERATORS.each do |op|
-          CrossQuestionValidation.is_operator_safe?(op, true).should eq false
+          expect(CrossQuestionValidation.is_operator_safe?(op, true)).to eq false
         end
       end
     end
@@ -134,81 +134,81 @@ describe CrossQuestionValidation do
     describe 'valid set operators' do
       it "should accept valid operators" do
         CrossQuestionValidation::ALLOWED_SET_OPERATORS.each do |op|
-          CrossQuestionValidation.is_set_operator_valid?(op).should eq true
+          expect(CrossQuestionValidation.is_set_operator_valid?(op)).to eq true
         end
       end
       it "should reject invalid operators" do
-        CrossQuestionValidation.is_set_operator_valid?("invalid_operator").should eq false
-        CrossQuestionValidation.is_set_operator_valid?("something_else").should eq false
+        expect(CrossQuestionValidation.is_set_operator_valid?("invalid_operator")).to eq false
+        expect(CrossQuestionValidation.is_set_operator_valid?("something_else")).to eq false
       end
 
       it "should accept valid operators for sets with textual items" do
         CrossQuestionValidation::ALLOWED_SET_TEXT_OPERATORS.each do |op|
-          CrossQuestionValidation.is_set_operator_valid?(op, true).should eq true
+          expect(CrossQuestionValidation.is_set_operator_valid?(op, true)).to eq true
         end
       end
       it "should reject invalid operators for sets with textual items" do
-        CrossQuestionValidation.is_set_operator_valid?("range", true).should eq false
-        CrossQuestionValidation.is_set_operator_valid?("invalid_operator", true).should eq false
-        CrossQuestionValidation.is_set_operator_valid?("something_else", true).should eq false
+        expect(CrossQuestionValidation.is_set_operator_valid?("range", true)).to eq false
+        expect(CrossQuestionValidation.is_set_operator_valid?("invalid_operator", true)).to eq false
+        expect(CrossQuestionValidation.is_set_operator_valid?("something_else", true)).to eq false
       end
     end
 
     describe 'set_meets_conditions' do
       it "should pass true statements" do
-        CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "included", 5).should eq true
-        CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "excluded", 4).should eq true
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 4).should eq true
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 1).should eq true
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 5).should eq true
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 4.9).should eq true
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 1.1).should eq true
-        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "included", 'unknown').should eq true
-        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "excluded", 'all').should eq true
+        expect(CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "included", 5)).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "excluded", 4)).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 4)).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 1)).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 5)).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 4.9)).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 1.1)).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "included", 'unknown')).to eq true
+        expect(CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "excluded", 'all')).to eq true
       end
 
       it "should reject false statements" do
-        CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "included", 4).should eq false
-        CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "excluded", 5).should eq false
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 0).should eq false
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 6).should eq false
-        CrossQuestionValidation.set_meets_condition?([1, 5], "range", 5.1).should eq false
-        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "included", 'all').should eq false
-        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "excluded", 'unknown').should eq false
+        expect(CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "included", 4)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?([1, 3, 5, 7], "excluded", 5)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 0)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 6)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?([1, 5], "range", 5.1)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "included", 'all')).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "excluded", 'unknown')).to eq false
       end
 
       it "should reject statements with invalid operators" do
-        CrossQuestionValidation.set_meets_condition?([1, 3, 5], "swirly", 0).should eq false
-        CrossQuestionValidation.set_meets_condition?([1, 3, 5], "includified", 0).should eq false
-        CrossQuestionValidation.set_meets_condition?(['a', 'b', 'c'], "range", 0).should eq false
-        CrossQuestionValidation.set_meets_condition?(['a', 'b', 'c'], "range", 'b').should eq false
-        CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "range", 'no').should eq false
+        expect(CrossQuestionValidation.set_meets_condition?([1, 3, 5], "swirly", 0)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?([1, 3, 5], "includified", 0)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?(['a', 'b', 'c'], "range", 0)).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?(['a', 'b', 'c'], "range", 'b')).to eq false
+        expect(CrossQuestionValidation.set_meets_condition?(['yes', 'no', 'unknown'], "range", 'no')).to eq false
       end
     end
 
     describe 'const_meets_conditions' do
       it "should pass true statements" do
-        CrossQuestionValidation.const_meets_condition?(0, "==", 0).should eq true
-        CrossQuestionValidation.const_meets_condition?(5, "!=", 3).should eq true
-        CrossQuestionValidation.const_meets_condition?(5, ">=", 3).should eq true
-        CrossQuestionValidation.const_meets_condition?('yes', "==", 'yes').should eq true
-        CrossQuestionValidation.const_meets_condition?('yes', "!=", 'no').should eq true
+        expect(CrossQuestionValidation.const_meets_condition?(0, "==", 0)).to eq true
+        expect(CrossQuestionValidation.const_meets_condition?(5, "!=", 3)).to eq true
+        expect(CrossQuestionValidation.const_meets_condition?(5, ">=", 3)).to eq true
+        expect(CrossQuestionValidation.const_meets_condition?('yes', "==", 'yes')).to eq true
+        expect(CrossQuestionValidation.const_meets_condition?('yes', "!=", 'no')).to eq true
       end
 
       it "should reject false statements" do
-        CrossQuestionValidation.const_meets_condition?(0, "<", 0).should eq false
-        CrossQuestionValidation.const_meets_condition?(5, "==", 3).should eq false
-        CrossQuestionValidation.const_meets_condition?(5, "<=", 3).should eq false
-        CrossQuestionValidation.const_meets_condition?('yes', "==", 'no').should eq false
-        CrossQuestionValidation.const_meets_condition?('yes', "!=", 'yes').should eq false
+        expect(CrossQuestionValidation.const_meets_condition?(0, "<", 0)).to eq false
+        expect(CrossQuestionValidation.const_meets_condition?(5, "==", 3)).to eq false
+        expect(CrossQuestionValidation.const_meets_condition?(5, "<=", 3)).to eq false
+        expect(CrossQuestionValidation.const_meets_condition?('yes', "==", 'no')).to eq false
+        expect(CrossQuestionValidation.const_meets_condition?('yes', "!=", 'yes')).to eq false
       end
 
       it "should reject statements with unsafe operators" do
         UNSAFE_OPERATORS.each do |operator|
-          CrossQuestionValidation.const_meets_condition?(0, operator, 0).should eq false
+          expect(CrossQuestionValidation.const_meets_condition?(0, operator, 0)).to eq false
         end
         UNSAFE_TEXT_OPERATORS.each do |operator|
-          CrossQuestionValidation.const_meets_condition?('yes', operator, 'no').should eq false
+          expect(CrossQuestionValidation.const_meets_condition?('yes', operator, 'no')).to eq false
         end
       end
     end
@@ -223,7 +223,7 @@ describe CrossQuestionValidation do
 
     def do_cqv_check (first, val)
       error_messages = CrossQuestionValidation.check first
-      error_messages.should eq val
+      expect(error_messages).to eq val
     end
 
     def standard_cqv_test(val_first, val_second, error)
@@ -609,7 +609,7 @@ describe CrossQuestionValidation do
         @q2 = create :question, section: @section, question_type: 'Date'
         @response = create :response, survey: @survey
         @response.reload
-        @response.answers.count.should eq 0
+        expect(@response.answers.count).to eq 0
       end
       describe "date_lte" do
         before :each do

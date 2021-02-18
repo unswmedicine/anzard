@@ -39,10 +39,11 @@ class Notifier < ActionMailer::Base
 
   # notifications for super users
   def notify_superusers_of_access_request(applicant, system_name, system_base_url, capturesystem)
-    superusers_emails = capturesystem.users.get_superuser_emails.flatten.uniq
+    #superusers_emails = capturesystem.users.get_superuser_emails.flatten.uniq
+    active_superusers_emails = capturesystem.active_superusers_emails
     @user = applicant
     @host_url = system_base_url
-    mail( to: superusers_emails,
+    mail( to: active_superusers_emails,
           from: APP_CONFIG['account_request_admin_notification_sender'],
           reply_to: @user.email,
           subject: "#{system_name} | #{capturesystem.name} - There has been a new access request")

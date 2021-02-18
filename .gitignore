@@ -23,10 +23,14 @@ rerun.txt
 
 # Ignore generated user manual
 /public/user_manual
+#Ignore generated assets
+/public/assets
 
 # Mac finder artifacts
 .DS_Store
 
+# Dev temp
 *.swo
 *.swp
-docker_dir/db
+docker_dir/
+manual/.jekyll-cache

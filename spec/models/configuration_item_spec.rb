@@ -28,7 +28,7 @@ describe ConfigurationItem do
       create(:configuration_item, name: "#{capturesystem.name}_#{ConfigurationItem::YEAR_OF_REGISTRATION_START}", configuration_value: "2005")
       create(:configuration_item, name: "#{capturesystem.name}_#{ConfigurationItem::YEAR_OF_REGISTRATION_END}", configuration_value: "2012")
       
-      ConfigurationItem.year_of_registration_range(capturesystem).should eq((2005..2012).to_a)
+      expect(ConfigurationItem.year_of_registration_range(capturesystem)).to eq((2005..2012).to_a)
     end
   end
 end

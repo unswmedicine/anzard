@@ -57,7 +57,8 @@ Anzard::Application.configure do
 
   # Use a different cache store in production
   # config.cache_store = :mem_cache_store
-  config.cache_store = :memory_store, {size: 32.megabytes}
+  # use default file_store for now as memory_store in rails 6.0.x 6.1.x as slowed drastically(bug)
+  config.cache_store = :memory_store, {size: 64.megabytes}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -80,4 +81,8 @@ Anzard::Application.configure do
   config.eager_load = true
   config.eager_load_paths += %W(#{config.root}/lib)
 
+  #need to reset seceret_base_key if changed cookies_serializer
+  config.action_dispatch.cookies_serializer = :json
+
+  config.hosts = nil
 end

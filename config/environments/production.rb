@@ -63,7 +63,9 @@ Anzard::Application.configure do
   # config.logger = SyslogLogger.new
 
   # Use a different cache store in production
-  config.cache_store = :memory_store, {size: 32.megabytes}
+  # use default file_store for now as memory_store in rails 6.0.x 6.1.x as slowed drastically(bug)
+  # cache files live in app_root/tmp/cache folder, delete this folder after survey updates
+  config.cache_store = :memory_store, {size: 64.megabytes}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -87,4 +89,11 @@ Anzard::Application.configure do
   GA.tracker = 'UA-108624567-1'
 
   config.eager_load = true
+
+  #need to reset seceret_base_key if changed cookies_serializer
+  config.action_dispatch.cookies_serializer = :json
+
+  config.hosts << "npesu.med.unsw.edu.au"
+  config.hosts << "anzard.med.unsw.edu.au"
+  config.hosts << "varta.med.unsw.edu.au"
 end

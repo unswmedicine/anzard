@@ -21,7 +21,7 @@ class ClinicAllocation < ApplicationRecord
 
   validates_presence_of :user
   validates_presence_of :clinic, :clinic_id
-  validates_uniqueness_of :user_id, scope: :clinic_id, message: 'has already been added to specified Clinic' # Each allocation should be unique
+  validates_uniqueness_of :user_id, scope: :clinic_id, case_sensitive: true, message: 'has already been added to specified Clinic' # Each allocation should be unique
 
   validate :user_can_only_be_allocated_to_one_clinic_unit
 

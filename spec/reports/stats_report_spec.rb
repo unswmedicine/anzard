@@ -26,11 +26,11 @@ describe StatsReport do
   describe "Empty" do
     it "should return true if the survey has no responses" do
       create(:response, survey: survey_b, year_of_registration: 2001)
-      StatsReport.new(survey_a).should be_empty
+      expect(StatsReport.new(survey_a)).to be_empty
     end
     it "should return true if the survey has no responses" do
       create(:response, survey: survey_a, year_of_registration: 2001)
-      StatsReport.new(survey_a).should_not be_empty
+      expect(StatsReport.new(survey_a)).to_not be_empty
     end
   end
 
@@ -42,8 +42,8 @@ describe StatsReport do
       create(:response, survey: survey_b, year_of_registration: 2002)
       create(:response, survey: survey_b, year_of_registration: 2001)
 
-      StatsReport.new(survey_a).years.should eq([2001, 2005, 2007])
-      StatsReport.new(survey_b).years.should eq([2001, 2002])
+      expect(StatsReport.new(survey_a).years).to eq([2001, 2005, 2007])
+      expect(StatsReport.new(survey_b).years).to eq([2001, 2002])
     end
   end
 
@@ -72,20 +72,20 @@ describe StatsReport do
       create(:response, survey: survey_b, year_of_registration: 2001, clinic: clinic_a, submitted_status: Response::STATUS_SUBMITTED)
 
       report = StatsReport.new(survey_a)
-      report.response_count(2001, Response::STATUS_SUBMITTED, clinic_a.id).should eq(3)
-      report.response_count(2001, Response::STATUS_SUBMITTED, clinic_b.id).should eq(2)
-      report.response_count(2001, Response::STATUS_UNSUBMITTED, clinic_a.id).should eq(1)
-      report.response_count(2001, Response::STATUS_UNSUBMITTED, clinic_b.id).should eq(3)
+      expect(report.response_count(2001, Response::STATUS_SUBMITTED, clinic_a.id)).to eq(3)
+      expect(report.response_count(2001, Response::STATUS_SUBMITTED, clinic_b.id)).to eq(2)
+      expect(report.response_count(2001, Response::STATUS_UNSUBMITTED, clinic_a.id)).to eq(1)
+      expect(report.response_count(2001, Response::STATUS_UNSUBMITTED, clinic_b.id)).to eq(3)
 
-      report.response_count(2005, Response::STATUS_SUBMITTED, clinic_a.id).should eq(1)
-      report.response_count(2005, Response::STATUS_SUBMITTED, clinic_b.id).should eq(3)
-      report.response_count(2005, Response::STATUS_UNSUBMITTED, clinic_a.id).should eq('none')
-      report.response_count(2005, Response::STATUS_UNSUBMITTED, clinic_b.id).should eq('none')
+      expect(report.response_count(2005, Response::STATUS_SUBMITTED, clinic_a.id)).to eq(1)
+      expect(report.response_count(2005, Response::STATUS_SUBMITTED, clinic_b.id)).to eq(3)
+      expect(report.response_count(2005, Response::STATUS_UNSUBMITTED, clinic_a.id)).to eq('none')
+      expect(report.response_count(2005, Response::STATUS_UNSUBMITTED, clinic_b.id)).to eq('none')
 
-      report.response_count(2007, Response::STATUS_SUBMITTED, clinic_a.id).should eq('none')
-      report.response_count(2007, Response::STATUS_SUBMITTED, clinic_b.id).should eq('none')
-      report.response_count(2007, Response::STATUS_UNSUBMITTED, clinic_a.id).should eq(2)
-      report.response_count(2007, Response::STATUS_UNSUBMITTED, clinic_b.id).should eq('none')
+      expect(report.response_count(2007, Response::STATUS_SUBMITTED, clinic_a.id)).to eq('none')
+      expect(report.response_count(2007, Response::STATUS_SUBMITTED, clinic_b.id)).to eq('none')
+      expect(report.response_count(2007, Response::STATUS_UNSUBMITTED, clinic_a.id)).to eq(2)
+      expect(report.response_count(2007, Response::STATUS_UNSUBMITTED, clinic_b.id)).to eq('none')
     end
   end
 
