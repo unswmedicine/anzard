@@ -559,7 +559,6 @@ class SpecialRules
       !male_diag.nil?
     }
 
-
     CrossQuestionValidation.register_checker 'special_rule_sperm', lambda { |answer, ununused_related_answer, checker_params|
       # special_rule_sperm: if sp_site=e & sp_source=1 & (n_ivf>0|n_icsi>0) then sp_qual!=
 
@@ -567,13 +566,13 @@ class SpecialRules
 
       sp_site = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SITE')
       sp_source = answer.response.comparable_answer_or_nil_for_question_with_code('SP_SOURCE').to_i
-      sp_qual = answer.response.comparable_answer_or_nil_for_question_with_code('SP_QUAL').to_i
+      sp_qual = answer.response.comparable_answer_or_nil_for_question_with_code('SP_QUAL')
       n_ivf = answer.response.comparable_answer_or_nil_for_question_with_code('N_IVF').to_i
       n_icsi = answer.response.comparable_answer_or_nil_for_question_with_code('N_ICSI').to_i
 
 
       break true unless (sp_site == 'e' && sp_source==1) &&  (n_ivf > 0 || n_icsi > 0)
-      break true unless !sp_qual.nil?
+      !sp_qual.nil?
     }
 
 
