@@ -417,10 +417,10 @@ class SpecialRules
 
       if check_N_EMBREC_FRESH_exists == true && check_N_EMBDON_FRESH_exists == true
         break true unless (cycle_type == 2 && n_eggrec_fresh == 0 && n_embrec_fresh == 0 && n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        (n_eggdon_fresh <= 0 || n_embdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <=0 || n_clfz_v <=0)
+        (n_eggdon_fresh > 0 || n_embdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s >0 || n_clfz_v >0)
       else
         break true unless (cycle_type == 2 && n_eggrec_fresh == 0 &&  n_s_egth == 0 && n_v_egth == 0 &&  n_s_clth ==0 && n_s_blth == 0 && n_v_clth ==0 &&  n_v_blth ==0)
-        (n_eggdon_fresh <= 0 || n_egfz_s <= 0 || n_egfz_v <= 0 || n_blfz_s <= 0 || n_blfz_v <= 0 || n_clfz_s <= 0 || n_clfz_v <=0)
+        (n_eggdon_fresh > 0 || n_egfz_s > 0 || n_egfz_v > 0 || n_blfz_s > 0 || n_blfz_v > 0 || n_clfz_s > 0 || n_clfz_v >0)
       end
     }
 
