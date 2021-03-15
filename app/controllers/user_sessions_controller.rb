@@ -70,7 +70,7 @@ class UserSessionsController < Devise::SessionsController
         when nil, '', CapturesystemUser::STATUS_UNAPPROVED
           return redirect_to(root_path, alert:"Your request to access #{@requested_capturesystem.name} is pending")
         when CapturesystemUser::STATUS_DEACTIVATED
-          return redirect_to(root_path, alert:"Your access to #{@requested_capturesystem.name} has been dactivated")
+          return redirect_to(root_path, alert:"Your access to #{@requested_capturesystem.name} has been deactivated")
         when CapturesystemUser::STATUS_REJECTED
           return redirect_to(root_path, alert:"Your request to access #{@requested_capturesystem.name} has been rejected")
         else
