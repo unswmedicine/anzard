@@ -32,6 +32,7 @@ class BatchFile < ApplicationRecord
   COLUMN_ANZARD_UNIT_CODE = 'ANZARD_UNIT'
   COLUMN_ART_UNIT_SITE_CODE = 'ART_UNIT'
   COLUMN_ART_UNIT_SITE_CODE_DOWNCASE = 'art_unit'
+  COLUMN_ANZARD_UNIT_CODE_DOWNCASE = 'anzard_unit'
 
   MESSAGE_WARNINGS = 'The file you uploaded has one or more warnings. Please review the reports for details.'
   MESSAGE_NO_CYCLE_ID = "The file you uploaded did not contain a #{COLUMN_CYCLE_ID} column."
@@ -342,6 +343,7 @@ class BatchFile < ApplicationRecord
           end
         end
 
+       #a
        #unless (
        #  self.clinic.unit_code == row[COLUMN_UNIT_CODE_DOWNCASE].to_i && self.clinic.site_code == row[COLUMN_SITE_CODE_DOWNCASE].to_i ||
        #  self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && self.clinic.site_code == row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i
@@ -352,11 +354,23 @@ class BatchFile < ApplicationRecord
        #end
        #The above clinic mataching is according to the upload page selection.
        #Changed above to below as requested to allow records with multiple clinics given the clinic is assigned to the user who uploaded the batch csv file.
+       #b
+       #unless (
+       #  self.clinic.unit_code == row[COLUMN_UNIT_CODE_DOWNCASE].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_SITE_CODE_DOWNCASE].to_i) ||
+       #  self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i)
+       #)
+       #c
         unless (
           self.clinic.unit_code == row[COLUMN_UNIT_CODE_DOWNCASE].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_SITE_CODE_DOWNCASE].to_i) ||
-          self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i)
+          self.clinic.unit_code == row[capturesystem_unit_column_name].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i) ||
+          #the below case is requested by Jade to specifically allow the usage of ANZARD_UNIT header in a uploaded file for VARTA portal to identify a unit code 
+          self.clinic.capturesystem.name == 'VARTA' && self.clinic.unit_code == row[COLUMN_ANZARD_UNIT_CODE_DOWNCASE].to_i && user_allocated_clinic_site_codes.include?(row[COLUMN_ART_UNIT_SITE_CODE_DOWNCASE].to_i)
         )
-          message_unknown_unit_site = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
+          if self.clinic.capturesystem.name == 'VARTA'
+            message_unknown_unit_site = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE}/ANZARD_UNIT or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
+          else
+            message_unknown_unit_site = "The file you uploaded contains a #{COLUMN_UNIT_CODE}/#{self.clinic.capturesystem.name}_#{COLUMN_UNIT_CODE} or #{COLUMN_SITE_CODE}/#{COLUMN_ART_UNIT_SITE_CODE} that is unknown to our database."
+          end
           set_outcome(STATUS_FAILED, message_unknown_unit_site + MESSAGE_CSV_STOP_LINE + @csv_row_count.to_s)
           return false
         end
